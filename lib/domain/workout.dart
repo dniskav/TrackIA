@@ -50,10 +50,13 @@ class WorkoutSet {
     required this.id,
     required this.weight,
     required this.reps,
+    this.recordedAt,
   });
   final String id;
   final int weight;
   final int reps;
+  // Capture time is not necessarily the time the exercise was performed.
+  final DateTime? recordedAt;
 }
 
 class Exercise {
@@ -61,10 +64,16 @@ class Exercise {
     required this.id,
     required this.name,
     required List<WorkoutSet> sets,
+    this.targetSets,
+    this.repsMin,
+    this.repsMax,
+    this.restSeconds = 90,
   }) : sets = List.unmodifiable(sets);
   final String id;
   final String name;
   final List<WorkoutSet> sets;
+  final int? targetSets, repsMin, repsMax;
+  final int restSeconds;
 }
 
 class Workout {
@@ -74,14 +83,102 @@ class Workout {
     required this.startedAt,
     required this.finishedAt,
     required List<Exercise> exercises,
-  }) : exercises = List.unmodifiable(exercises);
+    this.finishedRecordedAt,
+    this.finishTimeSource,
+    List<String> finishTimeIssues = const [],
+  }) : exercises = List.unmodifiable(exercises),
+       finishTimeIssues = List.unmodifiable(finishTimeIssues);
   final String id;
   final String name;
   final DateTime startedAt;
   final DateTime? finishedAt;
+  final DateTime? finishedRecordedAt;
+  final FinishTimeSource? finishTimeSource;
+  final List<String> finishTimeIssues;
   final List<Exercise> exercises;
   bool get isActive => finishedAt == null;
   int get setCount => exercises.fold(0, (n, e) => n + e.sets.length);
   int get repCount =>
       exercises.fold(0, (n, e) => n + e.sets.fold(0, (s, r) => s + r.reps));
+}
+
+enum FinishTimeSource { system, user }
+
+class FinishTimeIssue {
+  const FinishTimeIssue(this.code, this.message);
+  final String code, message;
+}
+
+/// Inconsistent times are user-overridable observations, not an instruction
+/// to silently repair or delete records. Unknown capture times remain unknown.
+List<FinishTimeIssue> reviewFinishTime(
+  Workout workout,
+  Iterable<Workout> all,
+  DateTime end,
+  DateTime now, {
+  Iterable<DateTime> activityEnds = const [],
+}) {
+  String stamp(DateTime t) {
+    final local = t.toLocal();
+    String two(int n) => n.toString().padLeft(2, '0');
+    return '${two(local.day)}/${two(local.month)}/${local.year} ${two(local.hour)}:${two(local.minute)}:${two(local.second)}';
+  }
+
+  final issues = <FinishTimeIssue>[];
+  if (end.isBefore(workout.startedAt)) {
+    issues.add(
+      FinishTimeIssue(
+        'before_start',
+        'La hora elegida es anterior al inicio (${stamp(workout.startedAt)}).',
+      ),
+    );
+  }
+  final times =
+      workout.exercises
+          .expand((e) => e.sets)
+          .map((s) => s.recordedAt)
+          .whereType<DateTime>()
+          .toList()
+        ..sort();
+  if (times.isNotEmpty && end.isBefore(times.last)) {
+    issues.add(
+      FinishTimeIssue(
+        'before_last_record',
+        'Hay una serie registrada a las ${stamp(times.last)}, después de la hora de finalización elegida. La hora de registro puede diferir de la de ejecución.',
+      ),
+    );
+  }
+  if (end.isAfter(now)) {
+    issues.add(
+      const FinishTimeIssue('in_future', 'La hora elegida está en el futuro.'),
+    );
+  }
+  if (activityEnds.any((t) => end.isBefore(t))) {
+    issues.add(
+      const FinishTimeIssue(
+        'before_last_activity',
+        'La hora elegida es anterior al fin registrado de una actividad.',
+      ),
+    );
+  }
+  if (!end.isBefore(workout.startedAt)) {
+    for (final other in all) {
+      final otherEnd = other.finishedAt;
+      if (other.id == workout.id ||
+          otherEnd == null ||
+          otherEnd.isBefore(other.startedAt)) {
+        continue;
+      }
+      if (workout.startedAt.isBefore(otherEnd) &&
+          other.startedAt.isBefore(end)) {
+        issues.add(
+          FinishTimeIssue(
+            'overlap:${other.id}',
+            'El horario se solapa con «${other.name}» (${stamp(other.startedAt)} – ${stamp(otherEnd)}).',
+          ),
+        );
+      }
+    }
+  }
+  return issues;
 }

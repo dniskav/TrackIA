@@ -44,6 +44,10 @@ android {
         }
     }
     buildTypes {
+        debug {
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+        }
         release {
             signingConfig = signingConfigs.findByName("personal")
         }
@@ -59,4 +63,11 @@ gradle.taskGraph.whenReady {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    testImplementation("junit:junit:4.12")
+    testImplementation("org.json:json:20180813")
+    // Keep Android 6 support; 22.x raises the library's minimum to API 24.
+    implementation("com.google.android.gms:play-services-auth:21.5.0")
 }

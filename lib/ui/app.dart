@@ -1,64 +1,166 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
 import '../application/workout_controller.dart';
 import '../domain/workout.dart';
-
-const lime = Color(0xFFD4F876);
-const ink = Color(0xFF111716);
-const panel = Color(0xFF1E2724);
-const muted = Color(0xFFAEBBB4);
-
-final gymTheme = ThemeData(
-  useMaterial3: true,
-  brightness: Brightness.dark,
-  scaffoldBackgroundColor: ink,
-  colorScheme: ColorScheme.fromSeed(
-    seedColor: lime,
-    brightness: Brightness.dark,
-  ).copyWith(primary: lime, onPrimary: ink, surface: panel),
-  appBarTheme: const AppBarTheme(
-    backgroundColor: ink,
-    surfaceTintColor: Colors.transparent,
-  ),
-  inputDecorationTheme: InputDecorationTheme(
-    filled: true,
-    fillColor: ink,
-    border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-  ),
-  filledButtonTheme: FilledButtonThemeData(
-    style: FilledButton.styleFrom(
-      minimumSize: const Size(0, 54),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-    ),
-  ),
-  outlinedButtonTheme: OutlinedButtonThemeData(
-    style: OutlinedButton.styleFrom(
-      minimumSize: const Size(0, 50),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-    ),
-  ),
-);
+import 'theme.dart';
+import '../data/theme_settings.dart';
+import '../data/welcome_settings_store.dart';
+import 'welcome.dart';
+import 'routines.dart';
+import 'rest_timer_panel.dart';
+import 'data_transfer.dart';
+import 'assistant_chat.dart';
+import 'session_control.dart';
+export 'theme.dart' show gymTheme;
 
 class GymApp extends StatelessWidget {
   const GymApp({super.key, required this.controller});
   final WorkoutController controller;
   @override
-  Widget build(BuildContext context) => MaterialApp(
-    title: 'GymIA',
-    debugShowCheckedModeBanner: false,
-    theme: gymTheme,
-    locale: const Locale('es'),
-    supportedLocales: const [Locale('es')],
-    localizationsDelegates: GlobalMaterialLocalizations.delegates,
-    home: GymHome(controller: controller),
+  Widget build(BuildContext context) => ListenableBuilder(
+    listenable: ThemeSettings.instance,
+    builder:
+        (context, _) => MaterialApp(
+          title: 'TrackIA',
+          debugShowCheckedModeBanner: false,
+          theme: gymLightTheme,
+          darkTheme: gymTheme,
+          themeMode: ThemeSettings.instance.mode,
+          locale: const Locale('es'),
+          supportedLocales: const [Locale('es')],
+          localizationsDelegates: GlobalMaterialLocalizations.delegates,
+          home: GymRoot(controller: controller),
+        ),
+  );
+}
+
+class GymRoot extends StatefulWidget {
+  const GymRoot({super.key, required this.controller});
+  final WorkoutController controller;
+  @override
+  State<GymRoot> createState() => _GymRootState();
+}
+
+class _GymRootState extends State<GymRoot> {
+  static const _importChannel = MethodChannel('com.gymia.app/import');
+  bool takingImport = false;
+  bool showingWelcome = false;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_maybeWelcome);
+    _importChannel.setMethodCallHandler((call) async {
+      if (call.method == 'importReady') await _takeIncomingImport();
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _takeIncomingImport();
+      _maybeWelcome();
+    });
+  }
+
+  void _maybeWelcome() {
+    if (!mounted ||
+        showingWelcome ||
+        takingImport ||
+        !WelcomeSettings.instance.loaded ||
+        widget.controller.focus != null ||
+        !WelcomeSettings.instance.autoShow ||
+        WelcomeSettings.instance.offeredThisLaunch) {
+      return;
+    }
+    WelcomeSettings.instance.offeredThisLaunch = true;
+    showingWelcome = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (!mounted) return;
+      await Navigator.of(
+        context,
+      ).push(MaterialPageRoute<void>(builder: (_) => const WelcomeScreen()));
+      showingWelcome = false;
+    });
+  }
+
+  Future<void> _takeIncomingImport() async {
+    if (takingImport || !mounted) return;
+    takingImport = true;
+    try {
+      while (mounted) {
+        final file = await _importChannel.invokeMapMethod<String, dynamic>(
+          'takePendingImport',
+        );
+        if (file == null) break;
+        final bytes = file['bytes'];
+        if (bytes is! Uint8List) {
+          throw const ValidationException(
+            'No se pudo leer la copia compartida.',
+          );
+        }
+        if (!mounted) break;
+        await openImportDocument(
+          context,
+          widget.controller,
+          bytes,
+          name: file['name'] as String? ?? 'Hoja cargada',
+        );
+      }
+    } on MissingPluginException {
+      // The shared-file channel is provided by Android only.
+    } on PlatformException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.message ?? 'No se pudo abrir la copia compartida.'),
+          ),
+        );
+      }
+    } on ValidationException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.message)));
+      }
+    } finally {
+      takingImport = false;
+      _maybeWelcome();
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_maybeWelcome);
+    _importChannel.setMethodCallHandler(null);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AssistantChatScreen(
+    controller: widget.controller,
+    focusMode: true,
+    onTraining:
+        () => Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder:
+                (_) => GymHome(
+                  controller: widget.controller,
+                  onAssistant: () => Navigator.of(context).pop(),
+                ),
+          ),
+        ),
+    onData:
+        () => Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) => DataTransferScreen(controller: widget.controller),
+          ),
+        ),
   );
 }
 
 class GymHome extends StatefulWidget {
-  const GymHome({super.key, required this.controller});
+  const GymHome({super.key, required this.controller, this.onAssistant});
   final WorkoutController controller;
+  final VoidCallback? onAssistant;
   @override
   State<GymHome> createState() => _GymHomeState();
 }
@@ -67,6 +169,25 @@ class _GymHomeState extends State<GymHome> {
   int tab = 0;
   String? selectedId;
   WorkoutController get c => widget.controller;
+  int _recordsFor(Workout w) =>
+      w.setCount +
+      c.activities
+          .where((a) => a.workoutId == w.id)
+          .fold(
+            0,
+            (count, a) =>
+                count + a.intervals.where((i) => i.endedAt != null).length,
+          );
+  int _activitiesFor(Workout w) =>
+      w.exercises.length +
+      c.activities
+          .where(
+            (a) =>
+                a.workoutId == w.id &&
+                a.exerciseId == null &&
+                a.intervals.isNotEmpty,
+          )
+          .length;
 
   Future<void> _start() async {
     final name = await showDialog<String>(
@@ -106,8 +227,14 @@ class _GymHomeState extends State<GymHome> {
     final result = await showDialog<SetInput>(
       context: context,
       builder:
-          (_) =>
-              SetDialog(existing: existing, previous: exercise.sets.lastOrNull),
+          (_) => SetDialog(
+            existing: existing,
+            previous:
+                exercise.sets.lastOrNull ??
+                (c.active == null
+                    ? null
+                    : c.previousFor(exercise, c.active!)?.sets.firstOrNull),
+          ),
     );
     if (result == null) return;
     await c.run(
@@ -140,21 +267,7 @@ class _GymHomeState extends State<GymHome> {
       false;
 
   Future<void> _finish(Workout workout) async {
-    if (!await _confirm(
-      '¿Finalizar entrenamiento?',
-      '${workout.setCount} series registradas. Podrás consultar esta sesión en tu historial.',
-      'Finalizar',
-    )) {
-      return;
-    }
-    final ok = await c.run(() => c.repository.finish(workout.id));
-    if (ok && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Entrenamiento guardado en tu historial.'),
-        ),
-      );
-    }
+    await finishSession(context, c, workout);
   }
 
   @override
@@ -180,9 +293,9 @@ class _GymHomeState extends State<GymHome> {
             title: Row(
               children: [
                 if (selected == null) ...[
-                  const Icon(
+                  Icon(
                     Icons.fitness_center_rounded,
-                    color: lime,
+                    color: Theme.of(context).colorScheme.primary,
                     size: 23,
                   ),
                   const SizedBox(width: 10),
@@ -201,10 +314,33 @@ class _GymHomeState extends State<GymHome> {
               ],
             ),
             actions: [
+              IconButton(
+                tooltip: 'Asistente TrackIA',
+                onPressed:
+                    widget.onAssistant ??
+                    () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => AssistantChatScreen(controller: c),
+                      ),
+                    ),
+                icon: Icon(
+                  Icons.chat_bubble_outline_rounded,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+              ),
               if (selected == null)
-                const Padding(
-                  padding: EdgeInsets.only(right: 20),
-                  child: Icon(Icons.offline_bolt_outlined, color: muted),
+                IconButton(
+                  tooltip: 'Tus datos',
+                  onPressed:
+                      () => Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) => DataTransferScreen(controller: c),
+                        ),
+                      ),
+                  icon: Icon(
+                    Icons.folder_open_rounded,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
             ],
           ),
@@ -220,7 +356,7 @@ class _GymHomeState extends State<GymHome> {
                       vertical: 8,
                     ),
                     child: Material(
-                      color: const Color(0xFF482727),
+                      color: Theme.of(context).colorScheme.errorContainer,
                       borderRadius: BorderRadius.circular(12),
                       child: Padding(
                         padding: const EdgeInsets.all(12),
@@ -235,6 +371,12 @@ class _GymHomeState extends State<GymHome> {
                         ),
                       ),
                     ),
+                  ),
+                if (selected?.isActive == true)
+                  RestTimerPanel(
+                    key: ValueKey(selected!.id),
+                    controller: c,
+                    workout: selected,
                   ),
                 Expanded(
                   child:
@@ -255,6 +397,28 @@ class _GymHomeState extends State<GymHome> {
                                     ? _detail(selected)
                                     : tab == 0
                                     ? _today()
+                                    : tab == 1
+                                    ? RoutineLibrary(
+                                      controller: c,
+                                      onStart: (routine) async {
+                                        if (c.active != null) {
+                                          setState(
+                                            () => selectedId = c.active!.id,
+                                          );
+                                          return;
+                                        }
+                                        final ok = await c.run(() async {
+                                          await c.repository.startRoutine(
+                                            routine.id,
+                                          );
+                                        });
+                                        if (ok && mounted) {
+                                          setState(
+                                            () => selectedId = c.active?.id,
+                                          );
+                                        }
+                                      },
+                                    )
                                     : _history(),
                           ),
                 ),
@@ -272,6 +436,10 @@ class _GymHomeState extends State<GymHome> {
                       NavigationDestination(
                         icon: Icon(Icons.grid_view_rounded),
                         label: 'Hoy',
+                      ),
+                      NavigationDestination(
+                        icon: Icon(Icons.view_list_rounded),
+                        label: 'Rutinas',
                       ),
                       NavigationDestination(
                         icon: Icon(Icons.history_rounded),
@@ -295,8 +463,8 @@ class _GymHomeState extends State<GymHome> {
             "EEEE, d 'de' MMMM",
             'es',
           ).format(DateTime.now()).toUpperCase(),
-          style: const TextStyle(
-            color: muted,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
             fontSize: 11,
             fontWeight: FontWeight.w700,
             letterSpacing: 1.3,
@@ -313,9 +481,13 @@ class _GymHomeState extends State<GymHome> {
           ),
         ),
         const SizedBox(height: 14),
-        const Text(
+        Text(
           'Una serie a la vez. Lleva el registro de lo que haces hoy.',
-          style: TextStyle(color: muted, fontSize: 16, height: 1.5),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            fontSize: 16,
+            height: 1.5,
+          ),
         ),
         const SizedBox(height: 28),
         Container(
@@ -356,7 +528,7 @@ class _GymHomeState extends State<GymHome> {
               Text(
                 active == null
                     ? 'Añade tus ejercicios y registra cada serie.'
-                    : '${active.exercises.length} ejercicios · ${active.setCount} series guardadas',
+                    : '${_activitiesFor(active)} actividades · ${_recordsFor(active)} registros',
                 style: const TextStyle(color: Color(0xFF39452B), height: 1.4),
               ),
               const SizedBox(height: 24),
@@ -398,8 +570,9 @@ class _GymHomeState extends State<GymHome> {
             const SizedBox(width: 12),
             Expanded(
               child: StatTile(
-                value: '${c.history.fold<int>(0, (n, w) => n + w.setCount)}',
-                label: 'series registradas',
+                value:
+                    '${c.history.fold<int>(0, (n, w) => n + _recordsFor(w))}',
+                label: 'registros',
               ),
             ),
           ],
@@ -417,15 +590,22 @@ class _GymHomeState extends State<GymHome> {
         else
           _workoutTile(c.history.first),
         const SizedBox(height: 22),
-        const Row(
+        Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.check_circle_outline_rounded, size: 15, color: muted),
+            Icon(
+              Icons.check_circle_outline_rounded,
+              size: 15,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
             SizedBox(width: 8),
             Flexible(
               child: Text(
                 'Guardado en este dispositivo · Sin conexión',
-                style: TextStyle(color: muted, fontSize: 12),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontSize: 12,
+                ),
               ),
             ),
           ],
@@ -446,9 +626,12 @@ class _GymHomeState extends State<GymHome> {
         ),
       ),
       const SizedBox(height: 8),
-      const Text(
+      Text(
         'Cada sesión cuenta.',
-        style: TextStyle(color: muted, fontSize: 16),
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+          fontSize: 16,
+        ),
       ),
       const SizedBox(height: 24),
       if (c.history.isEmpty)
@@ -466,7 +649,7 @@ class _GymHomeState extends State<GymHome> {
   );
 
   Widget _workoutTile(Workout w) => Material(
-    color: panel,
+    color: Theme.of(context).colorScheme.surface,
     borderRadius: BorderRadius.circular(20),
     child: InkWell(
       borderRadius: BorderRadius.circular(20),
@@ -475,7 +658,10 @@ class _GymHomeState extends State<GymHome> {
         padding: const EdgeInsets.all(20),
         child: Row(
           children: [
-            const Icon(Icons.check_circle_outline_rounded, color: lime),
+            Icon(
+              Icons.check_circle_outline_rounded,
+              color: Theme.of(context).colorScheme.primary,
+            ),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -491,17 +677,26 @@ class _GymHomeState extends State<GymHome> {
                   const SizedBox(height: 6),
                   Text(
                     DateFormat('d MMM yyyy · HH:mm', 'es').format(w.startedAt),
-                    style: const TextStyle(color: muted, fontSize: 12),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 12,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${w.exercises.length} ejercicios · ${w.setCount} series',
-                    style: const TextStyle(color: muted, fontSize: 12),
+                    '${_activitiesFor(w)} actividades · ${_recordsFor(w)} registros',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 12,
+                    ),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right_rounded, color: muted),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
           ],
         ),
       ),
@@ -513,8 +708,8 @@ class _GymHomeState extends State<GymHome> {
     children: [
       Text(
         w.isActive ? 'EN CURSO' : 'COMPLETADO',
-        style: const TextStyle(
-          color: lime,
+        style: TextStyle(
+          color: Theme.of(context).colorScheme.primary,
           fontSize: 11,
           fontWeight: FontWeight.w800,
           letterSpacing: 1.8,
@@ -533,20 +728,41 @@ class _GymHomeState extends State<GymHome> {
       const SizedBox(height: 10),
       Text(
         DateFormat("d 'de' MMMM · HH:mm", 'es').format(w.startedAt),
-        style: const TextStyle(color: muted),
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
       ),
+      if (w.finishedAt != null) ...[
+        const SizedBox(height: 8),
+        Text(
+          'Finalizó: ${DateFormat('d/M/yyyy HH:mm:ss').format(w.finishedAt!.toLocal())}',
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+        ),
+        if (w.finishedRecordedAt != null)
+          Text(
+            'Cierre registrado: ${DateFormat('d/M/yyyy HH:mm:ss').format(w.finishedRecordedAt!.toLocal())}${w.finishTimeSource == FinishTimeSource.user ? ' · hora elegida por ti' : ''}',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+        if (w.finishTimeIssues.isNotEmpty)
+          Text(
+            'Horario conservado con aviso. Puedes revisarlo más adelante.',
+            style: TextStyle(color: Theme.of(context).colorScheme.primary),
+          ),
+      ],
       const SizedBox(height: 22),
       Row(
         children: [
           Expanded(
             child: StatTile(
-              value: '${w.exercises.length}',
-              label: 'ejercicios',
+              value: '${_activitiesFor(w)}',
+              label: 'actividades',
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: StatTile(value: '${w.setCount}', label: 'series guardadas'),
+            child: StatTile(value: '${_recordsFor(w)}', label: 'registros'),
           ),
         ],
       ),
@@ -561,8 +777,60 @@ class _GymHomeState extends State<GymHome> {
               'Añade un ejercicio para empezar a registrar peso y repeticiones.',
         ),
       for (var i = 0; i < w.exercises.length; i++) ...[
-        _exerciseCard(w.exercises[i], i + 1, w.isActive),
+        _exerciseCard(w.exercises[i], i + 1, w),
         const SizedBox(height: 16),
+      ],
+      for (final activity in c.activities.where(
+        (a) => a.workoutId == w.id,
+      )) ...[
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  activity.definition.name,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  activity.intervals.isEmpty
+                      ? 'Sin iniciar'
+                      : '${activity.intervals.where((i) => i.endedAt != null).length} ${activity.definition.repeated ? 'series / tramos' : 'tramos'}',
+                ),
+                if (activity.finishedAt != null)
+                  Text(
+                    'Fin: ${DateFormat('d/M/yyyy HH:mm').format(activity.finishedAt!.toLocal())}',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                if (activity.finishIssues
+                    .where((i) => i != 'not_started')
+                    .isNotEmpty)
+                  Text(
+                    'Horario conservado con aviso.',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                for (final message in activity.messages.where(
+                  (m) => m.role == 'user',
+                ))
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: SelectableText(message.text),
+                  ),
+                if (activity.draft.isNotEmpty)
+                  Text('Borrador: ${activity.draft}'),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
       ],
       if (w.isActive) ...[
         const SizedBox(height: 8),
@@ -573,17 +841,21 @@ class _GymHomeState extends State<GymHome> {
         ),
         const SizedBox(height: 24),
         FilledButton.icon(
-          onPressed: w.setCount == 0 ? null : () => _finish(w),
+          onPressed:
+              _recordsFor(w) == 0 || c.focus != null ? null : () => _finish(w),
           icon: const Icon(Icons.check_rounded),
           label: const Text('Finalizar entrenamiento'),
         ),
         const SizedBox(height: 8),
         Text(
-          w.setCount == 0
+          _recordsFor(w) == 0
               ? 'Registra al menos una serie para finalizar.'
               : 'Cada serie se guarda al pulsar Guardar.',
           textAlign: TextAlign.center,
-          style: const TextStyle(color: muted, fontSize: 12),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            fontSize: 12,
+          ),
         ),
         const SizedBox(height: 16),
         TextButton(
@@ -598,21 +870,29 @@ class _GymHomeState extends State<GymHome> {
             final ok = await c.run(() => c.repository.discard(w.id));
             if (ok && mounted) setState(() => selectedId = null);
           },
-          child: const Text('Descartar sesión', style: TextStyle(color: muted)),
+          child: Text(
+            'Descartar sesión',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
         ),
       ] else ...[
         const SizedBox(height: 8),
-        const Text(
+        Text(
           'Sesión guardada. Buen trabajo.',
           textAlign: TextAlign.center,
-          style: TextStyle(color: lime, fontWeight: FontWeight.w600),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.primary,
+            fontWeight: FontWeight.w600,
+          ),
         ),
         const SizedBox(height: 16),
         OutlinedButton(
           onPressed:
               () => setState(() {
                 selectedId = null;
-                tab = 1;
+                tab = 2;
               }),
           child: const Text('Ver historial'),
         ),
@@ -620,156 +900,245 @@ class _GymHomeState extends State<GymHome> {
     ],
   );
 
-  Widget _exerciseCard(Exercise e, int number, bool editable) => Container(
-    padding: const EdgeInsets.all(18),
-    decoration: BoxDecoration(
-      color: panel,
-      borderRadius: BorderRadius.circular(20),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              number.toString().padLeft(2, '0'),
-              style: const TextStyle(color: lime, fontWeight: FontWeight.w800),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                e.name,
-                style: const TextStyle(
-                  fontSize: 19,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-            if (editable)
-              IconButton(
-                tooltip: 'Eliminar ejercicio ${e.name}',
-                icon: const Icon(
-                  Icons.delete_outline_rounded,
-                  size: 20,
-                  color: muted,
-                ),
-                onPressed: () async {
-                  if (await _confirm(
-                    '¿Eliminar ejercicio?',
-                    'Se eliminará ${e.name} y sus ${e.sets.length} series.',
-                    'Eliminar',
-                  )) {
-                    await c.run(() => c.repository.deleteExercise(e.id));
-                  }
-                },
-              ),
-          ],
-        ),
-        if (e.sets.isEmpty)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 16),
-            child: Text(
-              'Todavía no has registrado series.',
-              style: TextStyle(color: muted, fontSize: 13),
-            ),
-          ),
-        if (e.sets.isNotEmpty) ...[
-          const SizedBox(height: 16),
-          const Row(
+  Widget _exerciseCard(Exercise e, int number, Workout workout) {
+    final editable = workout.isActive;
+    final previous = editable ? c.previousFor(e, workout) : null;
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              SizedBox(
-                width: 42,
-                child: Text(
-                  'SERIE',
-                  style: TextStyle(color: muted, fontSize: 10),
+              Text(
+                number.toString().padLeft(2, '0'),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.w800,
                 ),
               ),
-              Expanded(
-                child: Text('KG', style: TextStyle(color: muted, fontSize: 10)),
-              ),
+              const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'REPS',
-                  style: TextStyle(color: muted, fontSize: 10),
+                  e.name,
+                  style: const TextStyle(
+                    fontSize: 19,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
               ),
-              SizedBox(width: 48),
+              if (editable)
+                IconButton(
+                  tooltip: 'Eliminar ejercicio ${e.name}',
+                  icon: Icon(
+                    Icons.delete_outline_rounded,
+                    size: 20,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                  onPressed: () async {
+                    if (await _confirm(
+                      '¿Eliminar ejercicio?',
+                      'Se eliminará ${e.name} y sus ${e.sets.length} series.',
+                      'Eliminar',
+                    )) {
+                      await c.run(() => c.repository.deleteExercise(e.id));
+                    }
+                  },
+                ),
             ],
           ),
-          for (var i = 0; i < e.sets.length; i++)
+          if (e.targetSets != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: Text(
+                'Objetivo: ${e.targetSets} series de ${e.repsMin}–${e.repsMax} reps · ${e.sets.length}/${e.targetSets} registradas',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          if (editable)
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      previous == null
+                          ? 'Sin sesión anterior registrada'
+                          : 'Última vez · ${DateFormat("d MMM", "es").format(previous.date)}',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontSize: 12,
+                      ),
+                    ),
+                    if (previous != null) ...[
+                      const SizedBox(height: 6),
+                      Text(
+                        previous.sets
+                            .map(
+                              (s) => '${formatWeight(s.weight)} kg × ${s.reps}',
+                            )
+                            .join('  /  '),
+                        style: const TextStyle(fontSize: 13, height: 1.5),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
+          if (e.sets.isEmpty)
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 16),
+              child: Text(
+                'Todavía no has registrado series.',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+          if (e.sets.isNotEmpty) ...[
+            const SizedBox(height: 16),
             Row(
               children: [
                 SizedBox(
                   width: 42,
-                  child: Text('${i + 1}', style: const TextStyle(color: muted)),
-                ),
-                Expanded(
                   child: Text(
-                    formatWeight(e.sets[i].weight),
-                    style: const TextStyle(
-                      fontSize: 19,
-                      fontWeight: FontWeight.w600,
+                    'SERIE',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 10,
                     ),
                   ),
                 ),
                 Expanded(
                   child: Text(
-                    '${e.sets[i].reps}',
-                    style: const TextStyle(
-                      fontSize: 19,
-                      fontWeight: FontWeight.w600,
+                    'KG',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 10,
                     ),
                   ),
                 ),
-                if (editable)
-                  PopupMenuButton<String>(
-                    tooltip: 'Opciones de la serie ${i + 1}',
-                    onSelected: (action) async {
-                      if (action == 'edit') {
-                        await _set(e, e.sets[i]);
-                      } else if (await _confirm(
-                        '¿Eliminar serie?',
-                        '${formatWeight(e.sets[i].weight)} kg × ${e.sets[i].reps} repeticiones.',
-                        'Eliminar',
-                      )) {
-                        await c.run(() => c.repository.deleteSet(e.sets[i].id));
-                      }
-                    },
-                    itemBuilder:
-                        (_) => const [
-                          PopupMenuItem(
-                            value: 'edit',
-                            child: Text('Editar serie'),
-                          ),
-                          PopupMenuItem(
-                            value: 'delete',
-                            child: Text('Eliminar serie'),
-                          ),
-                        ],
-                  )
-                else
-                  const SizedBox(
-                    width: 48,
-                    height: 48,
-                    child: Icon(Icons.check_rounded, color: lime, size: 18),
+                Expanded(
+                  child: Text(
+                    'REPS',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 10,
+                    ),
                   ),
+                ),
+                SizedBox(width: 48),
               ],
             ),
-        ],
-        if (editable) ...[
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: () => _set(e),
-              icon: const Icon(Icons.add_rounded, size: 18),
-              label: const Text('Añadir serie'),
+            for (var i = 0; i < e.sets.length; i++)
+              Row(
+                children: [
+                  SizedBox(
+                    width: 42,
+                    child: Text(
+                      '${i + 1}',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      formatWeight(e.sets[i].weight),
+                      style: const TextStyle(
+                        fontSize: 19,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(
+                      '${e.sets[i].reps}',
+                      style: const TextStyle(
+                        fontSize: 19,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  if (editable)
+                    PopupMenuButton<String>(
+                      tooltip: 'Opciones de la serie ${i + 1}',
+                      onSelected: (action) async {
+                        if (action == 'edit') {
+                          await _set(e, e.sets[i]);
+                        } else if (await _confirm(
+                          '¿Eliminar serie?',
+                          '${formatWeight(e.sets[i].weight)} kg × ${e.sets[i].reps} repeticiones.',
+                          'Eliminar',
+                        )) {
+                          await c.run(
+                            () => c.repository.deleteSet(e.sets[i].id),
+                          );
+                        }
+                      },
+                      itemBuilder:
+                          (_) => const [
+                            PopupMenuItem(
+                              value: 'edit',
+                              child: Text('Editar serie'),
+                            ),
+                            PopupMenuItem(
+                              value: 'delete',
+                              child: Text('Eliminar serie'),
+                            ),
+                          ],
+                    )
+                  else
+                    SizedBox(
+                      width: 48,
+                      height: 48,
+                      child: Icon(
+                        Icons.check_rounded,
+                        color: Theme.of(context).colorScheme.primary,
+                        size: 18,
+                      ),
+                    ),
+                ],
+              ),
+          ],
+          if (editable) ...[
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => _set(e),
+                icon: const Icon(Icons.add_rounded, size: 18),
+                label: const Text('Añadir serie'),
+              ),
             ),
-          ),
+            TextButton.icon(
+              onPressed:
+                  () => c.run(
+                    () => c.repository.startRest(workout.id, e.restSeconds),
+                  ),
+              icon: const Icon(Icons.timer_outlined, size: 18),
+              label: Text('Descansar ${e.restSeconds}s'),
+            ),
+          ],
         ],
-      ],
-    ),
-  );
+      ),
+    );
+  }
 }
 
 class SectionLabel extends StatelessWidget {
@@ -778,9 +1147,9 @@ class SectionLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Text(
     text,
-    style: const TextStyle(
+    style: TextStyle(
       fontSize: 11,
-      color: muted,
+      color: Theme.of(context).colorScheme.onSurfaceVariant,
       letterSpacing: 1.4,
       fontWeight: FontWeight.w700,
     ),
@@ -795,7 +1164,7 @@ class StatTile extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     padding: const EdgeInsets.all(18),
     decoration: BoxDecoration(
-      color: panel,
+      color: Theme.of(context).colorScheme.surface,
       borderRadius: BorderRadius.circular(18),
     ),
     child: Column(
@@ -806,7 +1175,13 @@ class StatTile extends StatelessWidget {
           style: const TextStyle(fontSize: 29, fontWeight: FontWeight.w800),
         ),
         const SizedBox(height: 4),
-        Text(label, style: const TextStyle(color: muted, fontSize: 12)),
+        Text(
+          label,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            fontSize: 12,
+          ),
+        ),
       ],
     ),
   );
@@ -827,13 +1202,17 @@ class EmptyPanel extends StatelessWidget {
     width: double.infinity,
     padding: const EdgeInsets.all(24),
     decoration: BoxDecoration(
-      border: Border.all(color: const Color(0xFF334039)),
+      border: Border.all(color: Theme.of(context).colorScheme.outlineVariant),
       borderRadius: BorderRadius.circular(20),
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, color: muted, size: 30),
+        Icon(
+          icon,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+          size: 30,
+        ),
         const SizedBox(height: 18),
         Text(
           title,
@@ -842,7 +1221,11 @@ class EmptyPanel extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           subtitle,
-          style: const TextStyle(color: muted, height: 1.5, fontSize: 14),
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            height: 1.5,
+            fontSize: 14,
+          ),
         ),
       ],
     ),
@@ -1022,9 +1405,12 @@ class _SetDialogState extends State<SetDialog> {
               },
             ),
             const SizedBox(height: 14),
-            const Text(
+            Text(
               'Usa 0 kg si entrenas sin carga externa.',
-              style: TextStyle(color: muted, fontSize: 12),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                fontSize: 12,
+              ),
             ),
           ],
         ),
