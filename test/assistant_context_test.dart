@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gymia/application/ai_availability.dart';
+import 'package:gymia/application/progress_service.dart';
 import 'package:gymia/application/workout_controller.dart';
 import 'package:gymia/data/ai_client.dart';
 import 'package:gymia/data/ai_model_catalog.dart';
@@ -12,7 +13,9 @@ import 'package:gymia/data/ai_settings_store.dart';
 import 'package:gymia/data/companion_store.dart';
 import 'package:gymia/data/sqlite_workout_repository.dart';
 import 'package:gymia/domain/ai_config.dart';
+import 'package:gymia/domain/activity.dart';
 import 'package:gymia/domain/companion.dart';
+import 'package:gymia/domain/progress.dart';
 import 'package:gymia/ui/assistant_chat.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -254,6 +257,115 @@ void main() {
         contains('Cambiaste el descanso a 120 s'),
       );
       expect(messages.first['content'], contains('Cambios recientes'));
+    });
+  });
+
+  group('progress (FR-032)', () {
+    const instruction =
+        'No afirmes que el usuario desbloqueó un logro o cumplió una meta: la app lo calcula y te lo indica en el contexto.';
+
+    Future<String> systemWithProgress(WidgetTester tester) async {
+      final payloads = <Map<String, dynamic>>[];
+      await tester.pumpWidget(
+        MaterialApp(
+          home: AssistantChatScreen(
+            controller: controller,
+            progressService: ProgressService(
+              progress: controller.progress!,
+              clock: () => DateTime(2026, 10, 29, 9),
+            ),
+            client: AiClient(
+              transport: (_, __, body) async {
+                payloads.add(body);
+                return {
+                  'choices': [
+                    {
+                      'message': {'content': 'Hola'},
+                    },
+                  ],
+                };
+              },
+            ),
+            availability: AiAvailability(
+              catalog: AiModelCatalog(
+                transport: (_, __) async => {
+                  'data': [
+                    {'id': 'test-model'},
+                  ],
+                },
+              ),
+            ),
+          ),
+        ),
+      );
+      for (var i = 0; i < 6; i++) {
+        await tester.runAsync(
+          () => Future<void>.delayed(const Duration(milliseconds: 40)),
+        );
+        await tester.pump(const Duration(milliseconds: 50));
+      }
+      await tester.enterText(
+        find.byKey(const Key('assistant-input')),
+        'Mensaje',
+      );
+      await tester.tap(find.byTooltip('Enviar'));
+      await tester.pump();
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 80)),
+      );
+      await tester.pumpAndSettle();
+      expect(payloads, hasLength(1));
+      return payloads.single['messages'][0]['content'] as String;
+    }
+
+    testWidgets('game mode adds the calculated state as data', (tester) async {
+      await tester.runAsync(() async {
+        final progress = controller.progress!;
+        await progress.saveSettings(
+          (await progress.settings('gymbro')).copyWith(mode: 'game'),
+        );
+        await progress.saveGoal(
+          'gymbro',
+          GoalRule(metric: Metric.sessions('day'), period: 'day', target: 2),
+        );
+        await repo.observations.record(
+          companionId: 'gymbro',
+          definition: ActivityDefinition(
+            name: 'Algo',
+            repeated: false,
+            restSeconds: 0,
+          ),
+          original: 'Hoy',
+        );
+      });
+      final prompt = await systemWithProgress(tester);
+      expect(prompt, contains(instruction));
+      expect(prompt, contains('Estado de progreso calculado por la app'));
+      expect(prompt, contains('"mode":"game"'));
+      // One session does not reach a goal of two, so the day is not done yet.
+      expect(prompt, contains('"currentStreak":0'));
+      expect(prompt, contains('"value":1.0,"target":2.0'));
+      expect(prompt, contains('"met":false'));
+      expect(prompt, contains('"unlockedToday":[]'));
+    });
+
+    testWidgets('outside game mode only the fixed instruction is added', (
+      tester,
+    ) async {
+      final prompt = await systemWithProgress(tester);
+      expect(prompt, contains(instruction));
+      expect(prompt, isNot(contains('Estado de progreso')));
+    });
+
+    testWidgets('every golden context carries the fixed instruction', (
+      tester,
+    ) async {
+      for (final name in ['gymbro', 'gymbro_focus', 'custom_focus']) {
+        expect(
+          File('test/fixtures/assistant_context_$name.txt').readAsStringSync(),
+          contains(instruction),
+        );
+      }
     });
   });
 }

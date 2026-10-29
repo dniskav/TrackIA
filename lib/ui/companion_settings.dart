@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../application/reminder_scheduler.dart';
 import '../data/progress_repository.dart';
 import '../domain/companion.dart';
+import '../domain/progress.dart';
 import '../domain/reminder.dart';
 import '../domain/workout.dart';
 
@@ -57,6 +58,14 @@ class _CompanionSettingsScreenState extends State<CompanionSettingsScreen> {
   String minimumMetric = 'sessions';
   final minimumValue = TextEditingController(text: '1');
 
+  // Goal (game mode)
+  List<Map<String, dynamic>> goalFields = [];
+  bool useGoal = false;
+  String goalMetric = 'sessions';
+  String goalPeriod = 'day';
+  final goalTarget = TextEditingController(text: '1');
+  final goalMinimum = TextEditingController();
+
   DateTime now() => (widget.clock ?? DateTime.now)();
 
   @override
@@ -68,6 +77,8 @@ class _CompanionSettingsScreenState extends State<CompanionSettingsScreen> {
   @override
   void dispose() {
     minimumValue.dispose();
+    goalTarget.dispose();
+    goalMinimum.dispose();
     super.dispose();
   }
 
@@ -75,10 +86,26 @@ class _CompanionSettingsScreenState extends State<CompanionSettingsScreen> {
     try {
       final loaded = await widget.progress.settings(widget.companion.id);
       final reminder = await widget.progress.reminderFor(widget.companion.id);
+      final goal = await widget.progress.activeGoal(widget.companion.id);
+      final fields = await widget.progress.typedFields(widget.companion.id);
       if (!mounted) return;
       setState(() {
         settings = loaded;
         stored = reminder;
+        goalFields = fields;
+        if (goal != null) {
+          useGoal = true;
+          goalPeriod = goal.period;
+          final metric = goal.metric;
+          goalMetric = metric.source == 'field'
+              ? 'field:${metric.field}'
+              : metric.source;
+          final divisor = metric.source == 'time' ? 60 : 1;
+          goalTarget.text = _plain(goal.target / divisor);
+          goalMinimum.text = goal.minimum == null
+              ? ''
+              : _plain(goal.minimum! / divisor);
+        }
         if (reminder != null) {
           remind = reminder.enabled;
           days = reminder.days;
@@ -104,6 +131,50 @@ class _CompanionSettingsScreenState extends State<CompanionSettingsScreen> {
         });
       }
     }
+  }
+
+  static String _plain(double v) =>
+      v == v.roundToDouble() ? '${v.toInt()}' : '$v';
+
+  /// The goal the user described, or null when there is none. Time is typed in
+  /// minutes and stored in seconds.
+  GoalRule? buildGoal() {
+    if (!settings.game || !settings.goalsEnabled || !useGoal) return null;
+    final target = double.tryParse(goalTarget.text.trim().replaceAll(',', '.'));
+    if (target == null || target <= 0) {
+      throw const ValidationException(
+        'El objetivo debe ser un número mayor que 0.',
+      );
+    }
+    final minText = goalMinimum.text.trim();
+    final minimum = minText.isEmpty
+        ? null
+        : double.tryParse(minText.replaceAll(',', '.'));
+    if (minText.isNotEmpty && (minimum == null || minimum <= 0)) {
+      throw const ValidationException(
+        'El mínimo debe ser un número mayor que 0.',
+      );
+    }
+    final factor = goalMetric == 'time' ? 60 : 1;
+    final Metric metric;
+    if (goalMetric.startsWith('field:')) {
+      final key = goalMetric.substring(6);
+      final field = goalFields.firstWhere((f) => f['key'] == key);
+      metric = Metric(
+        source: 'field',
+        field: key,
+        aggregate: field['aggregate'] as String,
+        per: goalPeriod,
+      );
+    } else {
+      metric = Metric(source: goalMetric, per: goalPeriod);
+    }
+    return GoalRule(
+      metric: metric,
+      period: goalPeriod,
+      target: target * factor,
+      minimum: minimum == null ? null : minimum * factor,
+    );
   }
 
   static String clock(int minutes) =>
@@ -138,7 +209,16 @@ class _CompanionSettingsScreenState extends State<CompanionSettingsScreen> {
     try {
       final id = widget.companion.id;
       final minimumValueToSave = minimum;
+      final goal = buildGoal();
       await widget.progress.saveSettings(settings);
+      // Leaving game mode keeps the goal for when the user comes back.
+      if (settings.game) {
+        if (settings.goalsEnabled && useGoal) {
+          await widget.progress.saveGoal(id, goal!);
+        } else {
+          await widget.progress.clearGoal(id);
+        }
+      }
       if (remind) {
         await widget.progress.saveReminder(
           companionId: id,
@@ -278,6 +358,63 @@ class _CompanionSettingsScreenState extends State<CompanionSettingsScreen> {
     },
   );
 
+  List<Widget> goalEditor() => [
+    switchTile('goal-enabled', 'Poner una meta', useGoal, (v) => useGoal = v),
+    if (useGoal) ...[
+      Row(
+        children: [
+          Expanded(
+            child: DropdownButtonFormField<String>(
+              key: const Key('goal-metric'),
+              initialValue: goalMetric,
+              decoration: const InputDecoration(labelText: 'Qué medir'),
+              items: [
+                const DropdownMenuItem(
+                  value: 'time',
+                  child: Text('Tiempo (minutos)'),
+                ),
+                const DropdownMenuItem(
+                  value: 'sessions',
+                  child: Text('Sesiones'),
+                ),
+                for (final f in goalFields)
+                  DropdownMenuItem(
+                    value: 'field:${f['key']}',
+                    child: Text('${f['label']}'),
+                  ),
+              ],
+              onChanged: (v) => setState(() => goalMetric = v!),
+            ),
+          ),
+          const SizedBox(width: 12),
+          DropdownButton<String>(
+            key: const Key('goal-period'),
+            value: goalPeriod,
+            items: const [
+              DropdownMenuItem(value: 'day', child: Text('al día')),
+              DropdownMenuItem(value: 'week', child: Text('a la semana')),
+            ],
+            onChanged: (v) => setState(() => goalPeriod = v!),
+          ),
+        ],
+      ),
+      TextField(
+        key: const Key('goal-target'),
+        controller: goalTarget,
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        decoration: const InputDecoration(labelText: 'Objetivo'),
+      ),
+      TextField(
+        key: const Key('goal-minimum'),
+        controller: goalMinimum,
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        decoration: const InputDecoration(
+          labelText: 'Mínimo para mantener la racha (opcional)',
+        ),
+      ),
+    ],
+  ];
+
   @override
   Widget build(BuildContext context) {
     final paused = stored?.paused ?? false;
@@ -327,6 +464,7 @@ class _CompanionSettingsScreenState extends State<CompanionSettingsScreen> {
                     settings.cheersEnabled,
                     (v) => settings = settings.copyWith(cheersEnabled: v),
                   ),
+                  if (settings.goalsEnabled) ...goalEditor(),
                   ListTile(
                     title: const Text('Días libres por semana'),
                     subtitle: const Text('No rompen la racha.'),

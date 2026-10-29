@@ -3,10 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gymia/application/ai_availability.dart';
+import 'package:gymia/application/progress_service.dart';
 import 'package:gymia/data/ai_model_catalog.dart';
 import 'package:gymia/data/progress_repository.dart';
 import 'package:gymia/data/sqlite_workout_repository.dart';
+import 'package:gymia/domain/activity.dart';
 import 'package:gymia/domain/companion.dart';
+import 'package:gymia/domain/progress.dart';
 import 'package:gymia/ui/companions.dart';
 import 'package:gymia/ui/theme.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -46,6 +49,8 @@ void main() {
     }
   }
 
+  Companion? progressFor;
+
   Future<void> show(WidgetTester tester, {bool withSettings = true}) async {
     tester.view.physicalSize = const Size(800, 2400);
     tester.view.devicePixelRatio = 1;
@@ -62,6 +67,11 @@ void main() {
           onOpen: (_) {},
           onCompanionSettings: withSettings ? (c) => settingsFor = c : null,
           onRemindersChanged: () => changes++,
+          progressService: ProgressService(
+            progress: progress,
+            clock: () => DateTime(2026, 10, 29, 9),
+          ),
+          onProgress: (c) => progressFor = c,
         ),
       ),
     );
@@ -155,5 +165,66 @@ void main() {
     expect(await tester.runAsync(() => progress.reminderFor('gymbro')), isNull);
     expect(changes, 1);
     await tester.pumpWidget(const SizedBox());
+  });
+
+  group('game mode card', () {
+    Future<void> playedToday(WidgetTester tester, String companionId) =>
+        tester.runAsync(() async {
+          await progress.saveSettings(
+            (await progress.settings(companionId)).copyWith(mode: 'game'),
+          );
+          await progress.saveGoal(
+            companionId,
+            GoalRule(
+              metric: Metric.sessions('week'),
+              period: 'week',
+              target: 4,
+            ),
+          );
+          await repo.observations.record(
+            companionId: companionId,
+            definition: ActivityDefinition(
+              name: 'Algo',
+              repeated: false,
+              restSeconds: 0,
+              companionId: companionId,
+            ),
+            original: 'Hoy',
+          );
+        });
+
+    testWidgets('shows the goal ring and the streak only in game mode', (
+      tester,
+    ) async {
+      await playedToday(tester, 'gymbro');
+      await show(tester);
+      expect(find.byKey(const Key('game-gymbro')), findsOneWidget);
+      expect(find.byKey(const Key('ring-gymbro')), findsOneWidget);
+      expect(find.text('Racha: 1 día'), findsOneWidget);
+      // Companions in reminder mode show nothing of it.
+      expect(find.byKey(const Key('game-enfoque')), findsNothing);
+      expect(find.byKey(const Key('ring-enfoque')), findsNothing);
+      await tester.pumpWidget(const SizedBox());
+    });
+
+    testWidgets('the trophy opens that companion\'s progress', (tester) async {
+      await playedToday(tester, 'gymbro');
+      await show(tester);
+      await tester.tap(find.byTooltip('Progreso de GymBro'));
+      await tester.pump();
+      expect(progressFor?.id, 'gymbro');
+      await tester.pumpWidget(const SizedBox());
+    });
+
+    testWidgets('without a goal there is a streak line but no ring', (
+      tester,
+    ) async {
+      await playedToday(tester, 'gymbro');
+      await tester.runAsync(() => progress.clearGoal('gymbro'));
+      await show(tester);
+      expect(find.byKey(const Key('game-gymbro')), findsOneWidget);
+      expect(find.byKey(const Key('ring-gymbro')), findsNothing);
+      await tester.pumpWidget(const SizedBox());
+    });
   });
 }

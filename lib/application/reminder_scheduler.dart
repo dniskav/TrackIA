@@ -19,6 +19,7 @@ class ReminderScheduler {
     Future<Object?> Function(String method, Map<String, Object?> args)? invoke,
     DateTime Function()? clock,
     bool? supported,
+    this.doneDays,
   }) : _invoke = invoke ?? _channelInvoke,
        _clock = clock ?? DateTime.now,
        supported = supported ?? Platform.isAndroid;
@@ -33,6 +34,10 @@ class ReminderScheduler {
   ) => channel.invokeMethod<Object?>(method, args);
 
   final ProgressRepository progress;
+
+  /// Days that count as done for a companion. By default a day with any session
+  /// does; the app passes the progress engine's rule instead (goals, minimum).
+  final Future<Set<String>> Function(String companionId)? doneDays;
   final Future<List<Companion>> Function() companions;
   final Future<Object?> Function(String method, Map<String, Object?> args)
   _invoke;
@@ -131,7 +136,9 @@ class ReminderScheduler {
     for (var reminder in await progress.activeReminders()) {
       final name = names[reminder.companionId];
       if (name == null) continue;
-      final done = await progress.sessionDays(reminder.companionId);
+      final done = await (doneDays ?? progress.sessionDays)(
+        reminder.companionId,
+      );
       reminder = await _applyPause(reminder, done, today, now);
       entries.add(_entry(reminder, name, done, today).toJson());
     }

@@ -4,7 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gymia/application/reminder_scheduler.dart';
 import 'package:gymia/data/progress_repository.dart';
 import 'package:gymia/data/sqlite_workout_repository.dart';
+import 'package:gymia/domain/activity.dart';
 import 'package:gymia/domain/companion.dart';
+import 'package:gymia/domain/progress.dart';
 import 'package:gymia/ui/companion_settings.dart';
 import 'package:gymia/ui/theme.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -53,7 +55,7 @@ void main() {
   bool? popped;
 
   Future<void> settle(WidgetTester tester) async {
-    for (var i = 0; i < 6; i++) {
+    for (var i = 0; i < 12; i++) {
       await tester.runAsync(
         () => Future<void>.delayed(const Duration(milliseconds: 30)),
       );
@@ -280,5 +282,172 @@ void main() {
     );
     expect(syncCalls, 1);
     await tester.pumpWidget(const SizedBox());
+  });
+
+  group('goal (game mode)', () {
+    Future<void> withPagesField(WidgetTester tester) => tester.runAsync(
+      () => repo.templates.save(
+        companionId: 'lectura',
+        definition: ActivityDefinition(
+          name: 'Leer',
+          repeated: false,
+          restSeconds: 0,
+          companionId: 'lectura',
+          fields: const [
+            {
+              'key': 'paginas',
+              'label': 'Páginas',
+              'unit': '',
+              'type': 'number',
+              'aggregate': 'sum',
+            },
+            {'key': 'notas', 'label': 'Notas', 'unit': ''},
+          ],
+        ),
+      ),
+    );
+
+    Future<void> pick(WidgetTester tester, String key, String text) async {
+      await tapKey(tester, key);
+      await tester.tap(find.text(text).last);
+      await tester.pump(const Duration(milliseconds: 200));
+    }
+
+    testWidgets('the goal editor only appears in game mode with goals on', (
+      tester,
+    ) async {
+      await open(tester);
+      expect(find.byKey(const Key('goal-enabled')), findsNothing);
+      await tapKey(tester, 'mode-game');
+      expect(find.byKey(const Key('goal-enabled')), findsOneWidget);
+      await tapKey(tester, 'game-goals');
+      expect(find.byKey(const Key('goal-enabled')), findsNothing);
+      await tester.pumpWidget(const SizedBox());
+    });
+
+    testWidgets('a daily goal on a typed field is saved with its minimum', (
+      tester,
+    ) async {
+      await withPagesField(tester);
+      await open(tester);
+      await tapKey(tester, 'mode-game');
+      await tapKey(tester, 'goal-enabled');
+      await pick(tester, 'goal-metric', 'Páginas');
+      await tester.enterText(find.byKey(const Key('goal-target')), '20');
+      await tester.enterText(find.byKey(const Key('goal-minimum')), '5');
+      await save(tester);
+
+      final goal = (await tester.runAsync(
+        () => progress.activeGoal('lectura'),
+      ))!;
+      expect(goal.metric.toJson(), {
+        'source': 'field',
+        'field': 'paginas',
+        'aggregate': 'sum',
+        'per': 'day',
+      });
+      expect([goal.period, goal.target, goal.minimum], ['day', 20, 5]);
+      await tester.pumpWidget(const SizedBox());
+    });
+
+    testWidgets('legacy fields cannot be measured; time is typed in minutes', (
+      tester,
+    ) async {
+      await withPagesField(tester);
+      await open(tester);
+      await tapKey(tester, 'mode-game');
+      await tapKey(tester, 'goal-enabled');
+      await tapKey(tester, 'goal-metric');
+      expect(find.text('Notas'), findsNothing);
+      await tester.tap(find.text('Tiempo (minutos)').last);
+      await tester.pump(const Duration(milliseconds: 200));
+      await pick(tester, 'goal-period', 'a la semana');
+      await tester.enterText(find.byKey(const Key('goal-target')), '90');
+      await save(tester);
+
+      final goal = (await tester.runAsync(
+        () => progress.activeGoal('lectura'),
+      ))!;
+      expect(goal.metric.source, 'time');
+      expect(goal.period, 'week');
+      expect(goal.target, 5400); // 90 minutes in seconds
+      await tester.pumpWidget(const SizedBox());
+    });
+
+    testWidgets('a saved goal is shown again and can be switched off', (
+      tester,
+    ) async {
+      await tester.runAsync(() async {
+        await progress.saveSettings(
+          (await progress.settings('lectura')).copyWith(mode: 'game'),
+        );
+        await progress.saveGoal(
+          'lectura',
+          GoalRule(metric: Metric.sessions('week'), period: 'week', target: 3),
+        );
+      });
+      await open(tester);
+      expect(
+        tester
+            .widget<TextField>(find.byKey(const Key('goal-target')))
+            .controller!
+            .text,
+        '3',
+      );
+      await tapKey(tester, 'goal-enabled');
+      await save(tester);
+      expect(
+        await tester.runAsync(() => progress.activeGoal('lectura')),
+        isNull,
+      );
+      await tester.pumpWidget(const SizedBox());
+    });
+
+    testWidgets('a bad target or minimum shows an error and saves nothing', (
+      tester,
+    ) async {
+      await open(tester);
+      await tapKey(tester, 'mode-game');
+      await tapKey(tester, 'goal-enabled');
+      await tester.enterText(find.byKey(const Key('goal-target')), '0');
+      await save(tester);
+      expect(
+        find.text('El objetivo debe ser un número mayor que 0.'),
+        findsOneWidget,
+      );
+      await tester.enterText(find.byKey(const Key('goal-target')), '10');
+      await tester.enterText(find.byKey(const Key('goal-minimum')), '20');
+      await save(tester);
+      expect(
+        find.textContaining('el mínimo debe ser mayor que 0'),
+        findsOneWidget,
+      );
+      expect(
+        await tester.runAsync(() => progress.activeGoal('lectura')),
+        isNull,
+      );
+      expect(popped, isNull);
+      await tester.pumpWidget(const SizedBox());
+    });
+
+    testWidgets('leaving game mode keeps the goal for later', (tester) async {
+      await tester.runAsync(() async {
+        await progress.saveSettings(
+          (await progress.settings('lectura')).copyWith(mode: 'game'),
+        );
+        await progress.saveGoal(
+          'lectura',
+          GoalRule(metric: Metric.sessions('day'), period: 'day', target: 1),
+        );
+      });
+      await open(tester);
+      await tapKey(tester, 'mode-reminder');
+      await save(tester);
+      expect(
+        await tester.runAsync(() => progress.activeGoal('lectura')),
+        isNotNull,
+      );
+      await tester.pumpWidget(const SizedBox());
+    });
   });
 }

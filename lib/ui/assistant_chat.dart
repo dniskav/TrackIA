@@ -1,3 +1,5 @@
+import '../application/progress_service.dart';
+import 'activity_summary.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
@@ -74,6 +76,8 @@ class AssistantChatScreen extends StatefulWidget {
     this.companion,
     this.onSwitchCompanion,
     this.onCompanionSettings,
+    this.progressService,
+    this.onProgress,
   });
   final WorkoutController controller;
   final AiClient? client;
@@ -90,6 +94,13 @@ class AssistantChatScreen extends StatefulWidget {
   /// Opens «Modo y avisos» of this chat's companion; without it the menu has
   /// no such entry.
   final VoidCallback? onCompanionSettings;
+
+  /// Evaluates goals and achievements after an activity; without it the chat
+  /// shows no summary and adds no progress to the context.
+  final ProgressService? progressService;
+
+  /// Opens «Progreso» of this chat's companion.
+  final VoidCallback? onProgress;
   @override
   State<AssistantChatScreen> createState() => _AssistantChatScreenState();
 }
@@ -415,6 +426,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     if (revision != activityTranscriptRevision) {
       activityTranscriptRevision = revision;
       scheduleScrollToLatest();
+      unawaited(refreshProgress());
     }
     final a = companionFocus;
     if (a?.id == focusId) return;
@@ -1118,6 +1130,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
       input.addListener(draftChanged);
     }
     load();
+    unawaited(refreshProgress());
   }
 
   Future<void> load() async {
@@ -1701,6 +1714,13 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
           'Rutinas e historial',
           enabled: aiReady,
         ),
+      if (widget.onProgress != null)
+        menuItem(
+          'menu-progress',
+          'progress',
+          Icons.emoji_events_outlined,
+          'Progreso',
+        ),
       if (widget.onCompanionSettings != null)
         menuItem(
           'menu-companion-settings',
@@ -1759,6 +1779,8 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
         widget.onTraining?.call();
       case 'companion-settings':
         widget.onCompanionSettings?.call();
+      case 'progress':
+        widget.onProgress?.call();
       case 'sheet-sync':
         unawaited(openSheetSync());
       case 'archive':
@@ -1798,6 +1820,75 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     await persist();
   }
 
+  /// Streak, today's goal and today's achievements for the AI context; null
+  /// outside game mode.
+  Map<String, dynamic>? progressContext;
+
+  Future<void> refreshProgress() async {
+    final service = widget.progressService;
+    if (service == null) return;
+    try {
+      final state = await service.state(companionId);
+      if (!mounted) return;
+      final today = service.today;
+      progressContext = state.settings.game
+          ? {
+              'mode': 'game',
+              'currentStreak': state.streak.current,
+              'bestStreak': state.streak.best,
+              'todayGoal': state.goal == null
+                  ? null
+                  : {
+                      'value': state.goalProgress?.value,
+                      'target': state.goal!.target,
+                      'met': state.goalProgress?.met,
+                      'minimumMet': state.goalProgress?.minimumMet,
+                    },
+              'unlockedToday': [
+                for (final a in state.achievements)
+                  if (a.unlock != null &&
+                      ProgressService.dayOf(a.unlock!.unlockedAt) == today)
+                    a.title,
+              ],
+            }
+          : null;
+    } catch (_) {
+      // The context simply goes without progress this time.
+    }
+  }
+
+  /// «Sesión terminada» in game mode, with the records and achievements the
+  /// activity brought (FR-035).
+  Future<void> activityFinished(FocusActivity activity) async {
+    final service = widget.progressService;
+    if (service == null) return;
+    try {
+      final delta = await service.afterChange(
+        companionId,
+        companionName: widget.companion?.name ?? 'GymBro',
+        fields: activity.definition.fields,
+        activityId: activity.id,
+      );
+      unawaited(refreshProgress());
+      final settings = await service.progress.settings(companionId);
+      if (!settings.game || !mounted) return;
+      var seconds = 0;
+      for (final i in activity.intervals) {
+        if (i.endedAt != null) {
+          seconds += i.endedAt!.difference(i.startedAt).inSeconds;
+        }
+      }
+      await showActivitySummary(
+        context,
+        name: activity.definition.name,
+        duration: Duration(seconds: seconds),
+        delta: delta,
+      );
+    } catch (_) {
+      // A summary that cannot be calculated never blocks finishing.
+    }
+  }
+
   List<String> get recentEvents => [
     for (final m
         in messages
@@ -1834,6 +1925,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
       sheetQuestionWorkoutId: sheetQuestionWorkoutId,
       sheetConnectionForAi: sheetConnectionForAi,
       recentEvents: recentEvents,
+      progress: progressContext,
       pendingSheetsForAi: pendingSheetsForAi,
     ),
   );
@@ -2227,6 +2319,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
                           onEnableNotices: enableNotices,
                           onInstantRecorded: instantRecorded,
                           onActivityEdited: activityEdited,
+                          onActivityFinished: activityFinished,
                         )
                       : SessionControl(
                           controller: widget.controller,
@@ -2584,6 +2677,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
                 onEnableNotices: enableNotices,
                 onInstantRecorded: instantRecorded,
                 onActivityEdited: activityEdited,
+                onActivityFinished: activityFinished,
                 compact: MediaQuery.viewInsetsOf(context).bottom > 0,
               ),
             if (notifications.error != null)

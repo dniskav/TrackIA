@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 import '../application/ai_availability.dart';
 import '../data/ai_settings_store.dart';
 import '../data/companion_store.dart';
+import '../application/progress_service.dart';
 import '../data/progress_repository.dart';
 import '../domain/companion.dart';
 import 'ai_settings.dart';
 import 'companion_style.dart';
+import 'goal_ring.dart';
 
 class CompanionDashboard extends StatefulWidget {
   const CompanionDashboard({
@@ -18,6 +20,8 @@ class CompanionDashboard extends StatefulWidget {
     this.progress,
     this.onCompanionSettings,
     this.onRemindersChanged,
+    this.progressService,
+    this.onProgress,
   });
   final String profileId;
   final void Function(Companion) onOpen;
@@ -38,6 +42,12 @@ class CompanionDashboard extends StatefulWidget {
   /// the phone gets a fresh snapshot.
   final VoidCallback? onRemindersChanged;
 
+  /// Reads the streak and goal of companions in game mode for their card.
+  final ProgressService? progressService;
+
+  /// Opens «Progreso» of a companion.
+  final void Function(Companion)? onProgress;
+
   @override
   State<CompanionDashboard> createState() => _CompanionDashboardState();
 }
@@ -50,6 +60,7 @@ class _CompanionDashboardState extends State<CompanionDashboard>
       AiAvailability(store: AiSettingsStore(profileId: widget.profileId));
   List<Companion> companions = [];
   Set<String> pausedIds = {};
+  Map<String, ProgressState> gameStates = {};
   bool loading = true;
   String? error;
 
@@ -175,6 +186,60 @@ class _CompanionDashboardState extends State<CompanionDashboard>
       }
     }
     if (mounted) setState(() => pausedIds = paused);
+    await loadGameStates(loaded);
+  }
+
+  /// Streak and goal ring for the companions in game mode.
+  Future<void> loadGameStates(List<Companion> loaded) async {
+    final service = widget.progressService;
+    if (service == null) return;
+    final states = <String, ProgressState>{};
+    for (final c in loaded) {
+      try {
+        final state = await service.state(c.id);
+        if (state.settings.game) states[c.id] = state;
+      } catch (_) {
+        // A companion whose progress cannot be calculated shows no ring.
+      }
+    }
+    if (mounted) setState(() => gameStates = states);
+  }
+
+  /// Ring of the goal and the streak line of a companion in game mode.
+  Widget gameLine(Companion companion, ProgressState state) {
+    final goal = state.goalProgress;
+    final days = state.streak.current;
+    return Padding(
+      key: Key('game-${companion.id}'),
+      padding: const EdgeInsets.only(top: 6),
+      child: Row(
+        children: [
+          if (goal != null) ...[
+            GoalRing(
+              key: Key('ring-${companion.id}'),
+              fraction: goal.fraction,
+              size: 28,
+            ),
+            const SizedBox(width: 8),
+          ],
+          const Icon(Icons.local_fire_department, size: 18),
+          const SizedBox(width: 4),
+          Flexible(
+            child: Text(
+              days == 1 ? 'Racha: 1 día' : 'Racha: $days días',
+              key: Key('streak-${companion.id}'),
+            ),
+          ),
+          if (widget.onProgress != null)
+            IconButton(
+              key: Key('progress-${companion.id}'),
+              tooltip: 'Progreso de ${companion.name}',
+              icon: const Icon(Icons.emoji_events_outlined),
+              onPressed: () => widget.onProgress!(companion),
+            ),
+        ],
+      ),
+    );
   }
 
   Future<void> resume(Companion companion) async {
@@ -303,6 +368,8 @@ class _CompanionDashboardState extends State<CompanionDashboard>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(companion.description),
+                          if (gameStates[companion.id] case final state?)
+                            gameLine(companion, state),
                           if (pausedIds.contains(companion.id))
                             Row(
                               key: Key('paused-${companion.id}'),

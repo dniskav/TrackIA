@@ -15,6 +15,8 @@ import 'data_transfer.dart';
 import 'assistant_chat.dart';
 import 'companions.dart';
 import 'companion_settings.dart';
+import 'progress_screen.dart';
+import '../application/progress_service.dart';
 import '../application/reminder_scheduler.dart';
 import '../data/companion_store.dart';
 import 'settings.dart';
@@ -56,12 +58,28 @@ class _GymRootState extends State<GymRoot> {
   String? activeCompanionId;
 
   /// Keeps the phone's reminders in step with what the user records.
+  late final ProgressService? progressService =
+      widget.controller.progress == null
+      ? null
+      : ProgressService(progress: widget.controller.progress!);
+
+  void openProgress(Companion companion) {
+    final service = progressService;
+    if (service == null) return;
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ProgressScreen(service: service, companion: companion),
+      ),
+    );
+  }
+
   late final ReminderScheduler? reminders = widget.controller.progress == null
       ? null
       : ReminderScheduler(
           progress: widget.controller.progress!,
           companions: () =>
               CompanionStore(profileId: widget.controller.profileId).load(),
+          doneDays: progressService!.doneDays,
         );
 
   /// A tapped reminder opens that companion's chat; one of another profile
@@ -246,6 +264,8 @@ class _GymRootState extends State<GymRoot> {
     profileId: widget.controller.profileId,
     progress: widget.controller.progress,
     onCompanionSettings: openCompanionSettings,
+    progressService: progressService,
+    onProgress: openProgress,
     onRemindersChanged: () => unawaited(reminders?.sync()),
     onOpen: openCompanion,
     onSettings: () => Navigator.of(context).push(

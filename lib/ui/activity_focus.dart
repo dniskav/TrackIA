@@ -25,6 +25,7 @@ class ActivityFocusControls extends StatefulWidget {
     this.onEnableNotices,
     this.onInstantRecorded,
     this.onActivityEdited,
+    this.onActivityFinished,
   });
   final WorkoutController controller;
   final Future<void> Function() flushInput;
@@ -43,6 +44,9 @@ class ActivityFocusControls extends StatefulWidget {
 
   /// Told about a manual edit so the chat can note it for the assistant.
   final void Function(String)? onActivityEdited;
+
+  /// Told when the activity was finished, so the chat can show its summary.
+  final void Function(FocusActivity)? onActivityFinished;
   @override
   State<ActivityFocusControls> createState() => _ActivityFocusControlsState();
 }
@@ -297,13 +301,14 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
             false;
         if (!accept) return;
       }
-      await c.run(
+      final done = await c.run(
         () => c.activityRepository!.finishActivity(
           a.id,
           end,
           acceptConflicts: accept,
         ),
       );
+      if (done) widget.onActivityFinished?.call(a);
     } finally {
       if (mounted) setState(() => acting = false);
     }
