@@ -34,13 +34,31 @@ más `manual_activity_android_test.dart`, `reminders_android_test.dart` y `progr
 
 ### R1 · Aviso de descanso con No molestar (US1)
 
-1. `$ADB shell cmd notification set_dnd priority`
-2. En la app: Ajustes → Avisos → ver «No molestar está activo»; activar avisos y «Tratar como alarma».
-3. Preparar una actividad por tramos con 10 s de descanso, Iniciar, Parar y esperar 10 s.
-4. `$ADB shell dumpsys notification --noredact | grep -B2 -A8 "trackia_timer_alarm_v1"` → hay una
-   notificación reciente del paquete `com.gymia.app.dev` en ese canal.
-5. Desactivar «Tratar como alarma», repetir → el aviso aparece en `gymia_rest`.
-6. `$ADB shell cmd notification set_dnd off`
+Con la prueba de integración `integration_test/alarm_style_android_test.dart` (verificada el
+2026-10-29 en `emulator-5554`, API 35). `flutter test` desinstala la app al terminar, así que hay
+que reinstalarla y volver a conceder los permisos antes de cada ejecución:
+
+```sh
+ADB=.tools/android-sdk/platform-tools/adb; PKG=com.gymia.app.dev
+$ADB install -r build/app/outputs/flutter-apk/app-debug.apk     # tras ./scripts/flutter-local.sh build apk --debug
+$ADB shell pm grant $PKG android.permission.POST_NOTIFICATIONS
+$ADB shell appops set $PKG SCHEDULE_EXACT_ALARM allow
+$ADB shell cmd notification set_dnd priority
+# en otra terminal, mientras corre la prueba (cada 2 s durante ~90 s):
+$ADB shell dumpsys notification --noredact | grep -E "Notification\(channel=|NotificationChannel\{mId='(trackia_timer_alarm_v1|gymia_rest)'"
+./scripts/flutter-local.sh test integration_test/alarm_style_android_test.dart -d emulator-5554 --no-dds
+$ADB shell cmd notification set_dnd off
+```
+
+Resultado esperado: una notificación `channel=trackia_timer_alarm_v1 … category=alarm` con la alarma
+activada y otra `channel=gymia_rest` con ella desactivada; el canal de alarma con
+`usage=USAGE_ALARM` y `mSound=…alarm_alert`. Sin `--no-dds` el runner falla con «Failed to start
+Dart Development Service»; con `--no-dds` el caso pasa y el runner añade un error de carga ajeno
+al caso (`streamListen … VmServiceProxyGoldenFileComparator`). Si la ejecución termina antes de
+empezar el caso, repetir desde la reinstalación.
+
+Recorrido manual equivalente: Ajustes → Avisos → «Probar con No molestar activo», activar
+No molestar dentro de los 5 segundos y comprobar que el aviso suena (solo en un teléfono real).
 
 ### R2 · Configurar la IA desde el tablero (US2)
 

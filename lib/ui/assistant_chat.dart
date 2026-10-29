@@ -24,6 +24,7 @@ import '../domain/sheet_context.dart';
 import '../domain/workout.dart';
 import '../domain/ai_config.dart';
 import 'ai_settings.dart';
+import 'notification_settings.dart';
 import 'google_sheets_import.dart';
 import 'data_transfer.dart';
 import 'session_control.dart';
@@ -1882,6 +1883,26 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
                                   notifications.busy
                                       ? null
                                       : notifications.testNotification,
+                            ),
+                          if (notifications.supported)
+                            ListTile(
+                              key: const Key('open-notification-settings'),
+                              leading: const Icon(Icons.dark_mode_outlined),
+                              title: const Text('Avisos y No molestar'),
+                              subtitle: const Text(
+                                'Alarma, prueba y estado de No molestar.',
+                              ),
+                              onTap: () {
+                                Navigator.pop(context);
+                                Navigator.of(context).push(
+                                  MaterialPageRoute<void>(
+                                    builder:
+                                        (_) => NotificationSettingsScreen(
+                                          notifications: notifications,
+                                        ),
+                                  ),
+                                );
+                              },
                             ),
                           if (notifications.testStatus != null)
                             Padding(

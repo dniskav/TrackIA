@@ -14,7 +14,11 @@ class RestNotificationController extends ChangeNotifier {
       enabled = false,
       granted = false,
       exact = false,
-      busy = false;
+      busy = false,
+      alarmStyle = true,
+      dnd = false,
+      alarmChannelBlocked = false;
+  int dndFilter = 1;
   String? error;
   String? testStatus;
   bool _disposed = false;
@@ -37,6 +41,11 @@ class RestNotificationController extends ChangeNotifier {
               ? 'Los avisos siguen activados en TrackIA, pero Android bloquea su permiso o canal de notificaciones.'
               : null;
       exact = status?['exact'] == true;
+      // An older bridge without these keys keeps the safe defaults.
+      alarmStyle = status?['alarmStyle'] != false;
+      dnd = status?['dnd'] == true;
+      dndFilter = (status?['dndFilter'] as num?)?.toInt() ?? 1;
+      alarmChannelBlocked = status?['alarmChannelBlocked'] == true;
       _scheduled = null;
       sync();
       notifyListeners();
@@ -80,6 +89,63 @@ class RestNotificationController extends ChangeNotifier {
   }
 
   Future<void> allowExact() => channel.invokeMethod<void>('exactSettings');
+
+  Future<void> setAlarmStyle(bool value) async {
+    if (!supported) return;
+    try {
+      await channel.invokeMethod<bool>('setAlarmStyle', {'enabled': value});
+      if (_disposed) return;
+      alarmStyle = value;
+      error = null;
+    } on MissingPluginException {
+      /* Android bridge; no fake iOS support. */
+    } catch (_) {
+      error = 'No se pudo cambiar el aviso como alarma. Vuelve a intentarlo.';
+    }
+    if (!_disposed) notifyListeners();
+  }
+
+  /// Schedules a test end-of-rest notice five seconds ahead so Do Not Disturb
+  /// can be switched on in between.
+  Future<bool> testAlarm() async {
+    if (!supported) return false;
+    try {
+      final scheduled = await channel.invokeMethod<bool>('testAlarm') == true;
+      if (_disposed) return scheduled;
+      testStatus =
+          scheduled
+              ? 'Aviso programado dentro de 5 segundos. Si quieres probar No molestar, actívalo ahora.'
+              : 'Activa los avisos y concede el permiso de notificaciones en Android antes de probar.';
+      notifyListeners();
+      return scheduled;
+    } on MissingPluginException {
+      return false;
+    } catch (_) {
+      if (!_disposed) {
+        error = 'No se pudo programar el aviso de prueba.';
+        notifyListeners();
+      }
+      return false;
+    }
+  }
+
+  Future<void> openChannelSettings(String channelName) async {
+    try {
+      await channel.invokeMethod<void>('openChannelSettings', {
+        'channel': channelName,
+      });
+    } catch (_) {
+      /* Settings screens differ by device; nothing to recover. */
+    }
+  }
+
+  Future<void> openDndSettings() async {
+    try {
+      await channel.invokeMethod<void>('openDndSettings');
+    } catch (_) {
+      /* Settings screens differ by device; nothing to recover. */
+    }
+  }
 
   Future<void> testNotification() async {
     if (busy || !supported) return;

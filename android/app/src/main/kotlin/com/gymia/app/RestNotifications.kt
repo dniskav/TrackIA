@@ -16,12 +16,15 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.Typeface
+import android.media.AudioAttributes
+import android.media.RingtoneManager
 import android.os.Build
 import android.os.SystemClock
 import java.util.UUID
 
 object RestNotifications {
     private const val channelId = "gymia_rest"
+    const val alarmChannelId = "trackia_timer_alarm_v1"
     private const val requestId = 8401
     private const val testRequestId = 8403
     private const val startRequestId = 8404
@@ -34,10 +37,11 @@ object RestNotifications {
     private const val stopRequestId = 8411
     private const val activityAlarmRequestId = 8412
     private const val activityCloseRequestId = 8413
+    private const val testAlarmRequestId = 8414
     const val startAction = "com.gymia.app.START_REST_ACTIVITY"
     const val stopAction = "com.gymia.app.STOP_RUNNING_ACTIVITY"
     const val closeAction = "com.gymia.app.CLOSE_REST_NOTICE"
-    private val brandTeal = Color.rgb(0, 109, 126)
+    private val brandTeal = Color.rgb(2, 125, 146)
     private val brandOrange = Color.rgb(255, 106, 26)
     private fun brandIcon(): Bitmap {
         val bitmap = Bitmap.createBitmap(192, 192, Bitmap.Config.ARGB_8888)
@@ -73,6 +77,71 @@ object RestNotifications {
         return runtimePermissionGranted(context) &&
             (Build.VERSION.SDK_INT < 24 || manager.areNotificationsEnabled()) &&
             (Build.VERSION.SDK_INT < 26 || manager.getNotificationChannel(channelId)?.importance != NotificationManager.IMPORTANCE_NONE)
+    }
+    fun alarmStyle(context: Context): Boolean = preferences(context).getBoolean("alarmStyle", true)
+    /** Alarm-usage channel: Android lets alarms through Do Not Disturb priority mode. */
+    fun ensureAlarmChannel(manager: NotificationManager) {
+        if (Build.VERSION.SDK_INT < 26) return
+        val sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+            ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+        manager.createNotificationChannel(NotificationChannel(alarmChannelId, "Fin de descanso y tramo", NotificationManager.IMPORTANCE_HIGH).apply {
+            description = "Suena como una alarma cuando termina un descanso o un tramo con duración."
+            enableVibration(true)
+            vibrationPattern = longArrayOf(0, 400, 200, 400)
+            setSound(sound, AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_ALARM)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                .build())
+        })
+    }
+    /** Builder for the end-of-rest and end-of-segment notices; null when the user blocked the channel. */
+    private fun timerBuilder(context: Context, manager: NotificationManager): Notification.Builder? {
+        val alarm = alarmStyle(context)
+        val builder: Notification.Builder
+        if (Build.VERSION.SDK_INT >= 26) {
+            if (alarm) ensureAlarmChannel(manager)
+            val id = if (alarm) alarmChannelId else channelId
+            if (manager.getNotificationChannel(id)?.importance == NotificationManager.IMPORTANCE_NONE) return null
+            builder = Notification.Builder(context, id)
+        } else builder = Notification.Builder(context)
+        if (alarm) builder.setCategory(Notification.CATEGORY_ALARM)
+        return builder
+    }
+    /** True while any Do Not Disturb mode restricts interruptions. */
+    fun dnd(context: Context): Boolean {
+        if (Build.VERSION.SDK_INT < 23) return false
+        val filter = context.getSystemService(NotificationManager::class.java).currentInterruptionFilter
+        return filter != NotificationManager.INTERRUPTION_FILTER_ALL && filter != NotificationManager.INTERRUPTION_FILTER_UNKNOWN
+    }
+    fun dndFilter(context: Context): Int =
+        if (Build.VERSION.SDK_INT < 23) 1 else context.getSystemService(NotificationManager::class.java).currentInterruptionFilter
+    fun alarmChannelBlocked(context: Context): Boolean {
+        if (Build.VERSION.SDK_INT < 26) return false
+        val manager = context.getSystemService(NotificationManager::class.java)
+        return manager.getNotificationChannel(alarmChannelId)?.importance == NotificationManager.IMPORTANCE_NONE
+    }
+    fun scheduleTestAlarm(context: Context): Boolean {
+        if (!preferences(context).getBoolean("enabled", false) || !permitted(context)) return false
+        val alarm = context.getSystemService(AlarmManager::class.java)
+        val intent = PendingIntent.getBroadcast(context, testAlarmRequestId,
+            Intent(context, RestAlarmReceiver::class.java).putExtra("kind", "test"),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        alarm.setAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 5000, intent)
+        return true
+    }
+    fun notifyTimerTest(context: Context): Boolean {
+        if (!preferences(context).getBoolean("enabled", false) || !permitted(context)) return false
+        val manager = context.getSystemService(NotificationManager::class.java)
+        val builder = timerBuilder(context, manager) ?: return false
+        val open = PendingIntent.getActivity(context, testAlarmRequestId, Intent(context, MainActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        manager.notify(testAlarmRequestId, builder.setSmallIcon(R.drawable.ic_trackia)
+            .setLargeIcon(brandIcon()).setColor(brandTeal)
+            .setContentTitle("Prueba del aviso de descanso")
+            .setContentText(if (alarmStyle(context)) "Suena como una alarma." else "Aviso normal.")
+            .setContentIntent(open).setAutoCancel(true).setTimeoutAfter(15000)
+            .setVisibility(Notification.VISIBILITY_PRIVATE)
+            .setDefaults(Notification.DEFAULT_ALL).build())
+        return true
     }
     fun exact(context: Context): Boolean = Build.VERSION.SDK_INT < 31 ||
         context.getSystemService(AlarmManager::class.java).canScheduleExactAlarms()
@@ -115,8 +184,8 @@ object RestNotifications {
                 enableVibration(true)
                 description = "Avisa al preparar una actividad y cuando termina el descanso."
             })
-            if (manager.getNotificationChannel(channelId)?.importance == NotificationManager.IMPORTANCE_NONE) return false
         }
+        val builder = timerBuilder(context, manager) ?: return false
         val open = PendingIntent.getActivity(context, requestId, Intent(context, MainActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val nonce = UUID.randomUUID().toString()
         preferences(context).edit().putString("actionNonce", nonce).apply()
@@ -130,7 +199,6 @@ object RestNotifications {
             Intent(context, RestActionReceiver::class.java).setAction(closeAction)
                 .putExtra("nonce", nonce).putExtra("kind", "rest"),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        val builder = if (Build.VERSION.SDK_INT >= 26) Notification.Builder(context, channelId) else Notification.Builder(context)
         manager.notify(requestId, builder.setSmallIcon(R.drawable.ic_trackia)
             .setLargeIcon(brandIcon()).setColor(brandTeal)
             .setContentTitle("Descanso terminado")
@@ -245,7 +313,7 @@ object RestNotifications {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val open = PendingIntent.getActivity(context, runningRequestId,
             Intent(context, MainActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-        val builder = if (Build.VERSION.SDK_INT >= 26) Notification.Builder(context, channelId) else Notification.Builder(context)
+        val builder = timerBuilder(context, manager) ?: return false
         manager.notify(runningRequestId, builder.setSmallIcon(R.drawable.ic_trackia)
             .setLargeIcon(brandIcon()).setColor(brandTeal)
             .setContentTitle("Tramo terminado").setContentText("$name · tiempo cumplido")
@@ -364,6 +432,10 @@ object RestNotifications {
 class RestAlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val preferences = RestNotifications.preferences(context)
+        if (intent.getStringExtra("kind") == "test") {
+            RestNotifications.notifyTimerTest(context)
+            return
+        }
         val id = intent.getStringExtra("id") ?: return
         val end = intent.getLongExtra("end", 0)
         if (intent.getStringExtra("kind") == "activity") {

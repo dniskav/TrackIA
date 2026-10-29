@@ -132,7 +132,7 @@ class MainActivity : FlutterActivity() {
             .setMethodCallHandler { call, result ->
                 try {
                     when (call.method) {
-                        "status" -> result.success(mapOf("enabled" to RestNotifications.preferences(this).getBoolean("enabled", false), "granted" to RestNotifications.permitted(this), "exact" to RestNotifications.exact(this), "lastDeliveredId" to RestNotifications.preferences(this).getString("lastDeliveredId", null), "lastDeliveredEnd" to RestNotifications.preferences(this).getLong("lastDeliveredEnd", 0), "scheduledRestEnd" to RestNotifications.preferences(this).getLong("end", 0), "scheduledActivityEnd" to RestNotifications.preferences(this).getLong("activityEnd", 0)))
+                        "status" -> result.success(mapOf("enabled" to RestNotifications.preferences(this).getBoolean("enabled", false), "granted" to RestNotifications.permitted(this), "exact" to RestNotifications.exact(this), "lastDeliveredId" to RestNotifications.preferences(this).getString("lastDeliveredId", null), "lastDeliveredEnd" to RestNotifications.preferences(this).getLong("lastDeliveredEnd", 0), "scheduledRestEnd" to RestNotifications.preferences(this).getLong("end", 0), "scheduledActivityEnd" to RestNotifications.preferences(this).getLong("activityEnd", 0), "alarmStyle" to RestNotifications.alarmStyle(this), "dnd" to RestNotifications.dnd(this), "dndFilter" to RestNotifications.dndFilter(this), "alarmChannelBlocked" to RestNotifications.alarmChannelBlocked(this)))
                         "enable" -> {
                             val enabled = call.argument<Boolean>("enabled") == true
                             if (enabled && !RestNotifications.runtimePermissionGranted(this)) {
@@ -160,6 +160,33 @@ class MainActivity : FlutterActivity() {
                             call.argument<Number>("end")?.toLong() ?: 0L))
                         "cancel" -> { RestNotifications.cancel(this); result.success(null) }
                         "test" -> result.success(RestNotifications.notifyTest(this))
+                        "setAlarmStyle" -> {
+                            RestNotifications.preferences(this).edit().putBoolean("alarmStyle", call.argument<Boolean>("enabled") != false).apply()
+                            result.success(true)
+                        }
+                        "testAlarm" -> result.success(RestNotifications.scheduleTestAlarm(this))
+                        "openChannelSettings" -> {
+                            val manager = getSystemService(android.app.NotificationManager::class.java)
+                            val channel = when (call.argument<String>("channel")) {
+                                "alarm" -> { RestNotifications.ensureAlarmChannel(manager); RestNotifications.alarmChannelId }
+                                "reminders" -> "trackia_reminders_v1"
+                                else -> "gymia_rest"
+                            }
+                            val exists = Build.VERSION.SDK_INT >= 26 && manager.getNotificationChannel(channel) != null
+                            try {
+                                startActivity(Intent(if (exists) android.provider.Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS else android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                                    .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, packageName)
+                                    .also { if (exists) it.putExtra(android.provider.Settings.EXTRA_CHANNEL_ID, channel) })
+                            } catch (_: Exception) {
+                                startActivity(Intent(android.provider.Settings.ACTION_SETTINGS))
+                            }
+                            result.success(null)
+                        }
+                        "openDndSettings" -> {
+                            try { startActivity(Intent("android.settings.ZEN_MODE_SETTINGS")) }
+                            catch (_: Exception) { startActivity(Intent(android.provider.Settings.ACTION_SETTINGS)) }
+                            result.success(null)
+                        }
                         "pendingAction" -> result.success(RestNotifications.pendingAction(this))
                         "completeAction" -> result.success(RestNotifications.completeAction(this,
                             call.argument<String>("id")!!, call.argument<Number>("end")!!.toLong(),
