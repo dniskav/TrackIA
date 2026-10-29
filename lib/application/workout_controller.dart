@@ -5,6 +5,7 @@ import '../domain/routine.dart';
 import '../domain/rest_timer.dart';
 import '../data/activity_template_repository.dart';
 import '../data/observation_repository.dart';
+import '../data/progress_repository.dart';
 import '../data/sqlite_workout_repository.dart';
 import '../domain/activity.dart';
 
@@ -21,21 +22,26 @@ class WorkoutController extends ChangeNotifier {
   List<Routine> routines = [];
   RestTimerState? restTimer;
   List<FocusActivity> activities = [];
-  ActivityRepository? get activityRepository =>
-      repository is ActivityRepository
-          ? repository as ActivityRepository
-          : null;
+  ActivityRepository? get activityRepository => repository is ActivityRepository
+      ? repository as ActivityRepository
+      : null;
+
   /// The user's saved activities; null with a repository that has none.
   ActivityTemplateRepository? get templates =>
       repository is SqliteWorkoutRepository
-          ? (repository as SqliteWorkoutRepository).templates
-          : null;
+      ? (repository as SqliteWorkoutRepository).templates
+      : null;
 
   /// Point records (no running clock); null with a repository that has none.
   ObservationRepository? get observations =>
       repository is SqliteWorkoutRepository
-          ? (repository as SqliteWorkoutRepository).observations
-          : null;
+      ? (repository as SqliteWorkoutRepository).observations
+      : null;
+
+  /// Companion settings and reminders; null with a repository that has none.
+  ProgressRepository? get progress => repository is SqliteWorkoutRepository
+      ? (repository as SqliteWorkoutRepository).progress
+      : null;
   FocusActivity? get focus => activities.where((a) => a.active).firstOrNull;
   bool busy = false;
   bool loaded = false;
@@ -82,11 +88,10 @@ class WorkoutController extends ChangeNotifier {
             .toList()
           ..sort((a, b) => b.finishedAt!.compareTo(a.finishedAt!));
     for (final w in candidates) {
-      final sets =
-          w.exercises
-              .where((e) => exerciseKey(e.name) == exerciseKey(exercise.name))
-              .expand((e) => e.sets)
-              .toList();
+      final sets = w.exercises
+          .where((e) => exerciseKey(e.name) == exerciseKey(exercise.name))
+          .expand((e) => e.sets)
+          .toList();
       if (sets.isNotEmpty) {
         return PreviousPerformance(date: w.startedAt, sets: sets);
       }

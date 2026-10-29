@@ -65,46 +65,46 @@ void main() {
       MaterialApp(
         theme: gymTheme,
         home: Builder(
-          builder:
-              (context) => Scaffold(
-                body: Center(
-                  child: TextButton(
-                    onPressed:
-                        () => Navigator.of(context).push(
-                          MaterialPageRoute<void>(
-                            builder:
-                                (_) => AssistantChatScreen(
-                                  controller: controller,
-                                  client: AiClient(
-                                    transport: (_, __, ___) async => {},
-                                  ),
-                                  companion: companion,
-                                  focusMode: focusMode,
-                                  onTraining: () => trainingOpened++,
-                                  onData: () async {},
-                                  onSwitchCompanion: (c) => switched = c,
-                                  availability: AiAvailability(
-                                    catalog: AiModelCatalog(
-                                      transport:
-                                          (_, __) async => {
-                                            'data': [
-                                              {'id': 'test-model'},
-                                            ],
-                                          },
-                                    ),
-                                  ),
-                                ),
-                          ),
+          builder: (context) => Scaffold(
+            body: Center(
+              child: TextButton(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => AssistantChatScreen(
+                      controller: controller,
+                      client: AiClient(transport: (_, __, ___) async => {}),
+                      companion: companion,
+                      focusMode: focusMode,
+                      onTraining: () => trainingOpened++,
+                      onData: () async {},
+                      onSwitchCompanion: (c) => switched = c,
+                      availability: AiAvailability(
+                        catalog: AiModelCatalog(
+                          transport: (_, __) async => {
+                            'data': [
+                              {'id': 'test-model'},
+                            ],
+                          },
                         ),
-                    child: const Text('abrir'),
+                      ),
+                    ),
                   ),
                 ),
+                child: const Text('abrir'),
               ),
+            ),
+          ),
         ),
       ),
     );
     await tester.tap(find.text('abrir'));
     // Not pumpAndSettle: the panel loads saved activities asynchronously.
+    // The template load of T042 uses a real sqflite transaction whose watchdog
+    // timer stays pending if the chat is disposed mid-query, so finish the IO
+    // first.
+    await tester.runAsync(() async {
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+    });
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 600));
   }
@@ -145,7 +145,10 @@ void main() {
     await tester.tap(find.byKey(const Key('companion-switcher')));
     await tester.pumpAndSettle();
     for (final name in ['GymBro', 'Enfoque', 'Calma', 'Diario']) {
-      expect(find.byKey(Key('switch-to-${name.toLowerCase()}')), findsOneWidget);
+      expect(
+        find.byKey(Key('switch-to-${name.toLowerCase()}')),
+        findsOneWidget,
+      );
     }
     await tester.tap(find.byKey(const Key('switch-to-calma')));
     await tester.pumpAndSettle();
@@ -191,7 +194,9 @@ void main() {
     expect(find.byKey(const Key('menu-recover')), findsNothing);
   });
 
-  testWidgets('Rutinas e historial calls the training callback', (tester) async {
+  testWidgets('Rutinas e historial calls the training callback', (
+    tester,
+  ) async {
     await openChat(tester, companion: Companion.suggestions.first);
     await openMenu(tester);
     await tester.tap(find.byKey(const Key('menu-training')));

@@ -61,24 +61,35 @@ mixin _SqliteActivities implements ActivityRepository {
       });
 
   @override
-  Future<void> renameActivity(String activityId, String name) =>
-      _db.transaction((tx) async {
-        final row = await _activeActivity(tx, activityId);
-        final definition = Map<String, dynamic>.from(
-          jsonDecode(row['definition'] as String) as Map,
-        );
-        // The key is derived from the name until the first rename pins it, so
-        // goals and achievements keep following the same activity.
-        definition['activityKey'] =
-            ActivityDefinition.fromJson(definition).activityKey;
-        definition['name'] = validName(name);
-        await tx.update(
-          'activities',
-          {'definition': jsonEncode(definition)},
-          where: 'id = ?',
-          whereArgs: [activityId],
-        );
-      });
+  Future<void> renameActivity(
+    String activityId,
+    String name, {
+    String source = 'user',
+  }) => _db.transaction((tx) async {
+    final row = await _activeActivity(tx, activityId);
+    final definition = Map<String, dynamic>.from(
+      jsonDecode(row['definition'] as String) as Map,
+    );
+    // The key is derived from the name until the first rename pins it, so
+    // goals and achievements keep following the same activity.
+    definition['activityKey'] = ActivityDefinition.fromJson(
+      definition,
+    ).activityKey;
+    definition['name'] = validName(name);
+    if (source == 'user') {
+      final userSet = ((definition['userSet'] as List?) ?? const [])
+          .cast<String>()
+          .toSet();
+      userSet.add('name');
+      definition['userSet'] = userSet.toList();
+    }
+    await tx.update(
+      'activities',
+      {'definition': jsonEncode(definition)},
+      where: 'id = ?',
+      whereArgs: [activityId],
+    );
+  });
 
   @override
   Future<void> replaceActivityPreparation(
@@ -242,8 +253,9 @@ mixin _SqliteActivities implements ActivityRepository {
     );
     final additions = <Map<String, Object>>[];
     for (final field in fields) {
-      final previous =
-          old.fields.where((f) => f['key'] == field['key']).firstOrNull;
+      final previous = old.fields
+          .where((f) => f['key'] == field['key'])
+          .firstOrNull;
       if (previous != null) {
         if (previous['unit'] != field['unit'] ||
             previous['label'] != field['label']) {
@@ -329,43 +341,40 @@ mixin _SqliteActivities implements ActivityRepository {
             createdAt: _date(a['created_at'])!,
             finishedAt: _date(a['finished_at']),
             finishedRecordedAt: _date(a['finished_recorded_at']),
-            finishIssues:
-                a['finish_time_issues'] == null
-                    ? []
-                    : (jsonDecode(a['finish_time_issues'] as String) as List)
-                        .cast<String>(),
+            finishIssues: a['finish_time_issues'] == null
+                ? []
+                : (jsonDecode(a['finish_time_issues'] as String) as List)
+                      .cast<String>(),
             draft: a['draft'] as String,
             restEndsAt: _date(a['rest_ends_at']),
-            intervals:
-                intervals
-                    .where((i) => i['activity_id'] == a['id'])
-                    .map(
-                      (i) => ActivityInterval(
-                        i['id'] as String,
-                        _date(i['started_at'])!,
-                        _date(i['ended_at']),
-                        restSeconds: i['rest_seconds'] as int?,
-                      ),
-                    )
-                    .toList(),
-            messages:
-                messages
-                    .where((m) => m['activity_id'] == a['id'])
-                    .map(
-                      (m) => ActivityMessage(
-                        id: m['id'] as String,
-                        text: m['text'] as String,
-                        role: m['role'] as String,
-                        recordedAt: _date(m['recorded_at'])!,
-                        intervalId: m['interval_id'] as String?,
-                        mediaName: m['attachment_name'] as String?,
-                        mediaMime: m['attachment_mime'] as String?,
-                        metrics:
-                            jsonDecode(m['metrics'] as String)
-                                as Map<String, dynamic>,
-                      ),
-                    )
-                    .toList(),
+            intervals: intervals
+                .where((i) => i['activity_id'] == a['id'])
+                .map(
+                  (i) => ActivityInterval(
+                    i['id'] as String,
+                    _date(i['started_at'])!,
+                    _date(i['ended_at']),
+                    restSeconds: i['rest_seconds'] as int?,
+                  ),
+                )
+                .toList(),
+            messages: messages
+                .where((m) => m['activity_id'] == a['id'])
+                .map(
+                  (m) => ActivityMessage(
+                    id: m['id'] as String,
+                    text: m['text'] as String,
+                    role: m['role'] as String,
+                    recordedAt: _date(m['recorded_at'])!,
+                    intervalId: m['interval_id'] as String?,
+                    mediaName: m['attachment_name'] as String?,
+                    mediaMime: m['attachment_mime'] as String?,
+                    metrics:
+                        jsonDecode(m['metrics'] as String)
+                            as Map<String, dynamic>,
+                  ),
+                )
+                .toList(),
           ),
         )
         .toList();
@@ -488,10 +497,9 @@ mixin _SqliteActivities implements ActivityRepository {
     await tx.update(
       'activities',
       {
-        'rest_ends_at':
-            definition.restSeconds == 0
-                ? null
-                : now + definition.restSeconds * 1000,
+        'rest_ends_at': definition.restSeconds == 0
+            ? null
+            : now + definition.restSeconds * 1000,
       },
       where: 'id = ?',
       whereArgs: [activityId],
@@ -573,9 +581,10 @@ mixin _SqliteActivities implements ActivityRepository {
       'metrics': jsonEncode(
         role == 'user'
             ? {
-              ...compactStrengthMetrics(text, definition),
-              if (metrics != null) ...validateFieldValues(definition, metrics),
-            }
+                ...compactStrengthMetrics(text, definition),
+                if (metrics != null)
+                  ...validateFieldValues(definition, metrics),
+              }
             : {},
       ),
     });
@@ -640,55 +649,60 @@ mixin _SqliteActivities implements ActivityRepository {
   });
 
   @override
-  Future<void> setActivityRest(String activityId, int seconds) =>
-      _db.transaction((tx) async {
-        final rows = await tx.query(
-          'activities',
-          where: 'id = ?',
-          whereArgs: [activityId],
-        );
-        if (rows.isEmpty ||
-            (rows.single['finished_at'] != null &&
-                rows.single['rest_ends_at'] == null)) {
-          throw const ValidationException('Este descanso ya no está activo.');
-        }
-        final a = rows.single;
-        final old = ActivityDefinition.fromJson(
-          jsonDecode(a['definition'] as String) as Map<String, dynamic>,
-        );
-        final definition = ActivityDefinition.fromJson({
-          ...old.toJson(),
-          'restSeconds': seconds,
-        });
-        final intervals = await tx.query(
-          'activity_intervals',
-          where: 'activity_id = ?',
-          whereArgs: [activityId],
-          orderBy: 'started_at DESC, rowid DESC',
-          limit: 1,
-        );
-        final lastEnd = intervals.firstOrNull?['ended_at'] as int?;
-        if (a['rest_ends_at'] != null && lastEnd != null) {
-          await tx.update(
-            'activity_intervals',
-            {'rest_seconds': seconds},
-            where: 'id = ?',
-            whereArgs: [intervals.single['id']],
-          );
-        }
-        await tx.update(
-          'activities',
-          {
-            'definition': jsonEncode(definition.toJson()),
-            'rest_ends_at':
-                a['rest_ends_at'] != null && lastEnd != null && seconds > 0
-                    ? lastEnd + seconds * 1000
-                    : null,
-          },
-          where: 'id = ?',
-          whereArgs: [activityId],
-        );
-      });
+  Future<void> setActivityRest(
+    String activityId,
+    int seconds, {
+    String source = 'user',
+  }) => _db.transaction((tx) async {
+    final rows = await tx.query(
+      'activities',
+      where: 'id = ?',
+      whereArgs: [activityId],
+    );
+    if (rows.isEmpty ||
+        (rows.single['finished_at'] != null &&
+            rows.single['rest_ends_at'] == null)) {
+      throw const ValidationException('Este descanso ya no está activo.');
+    }
+    final a = rows.single;
+    final old = ActivityDefinition.fromJson(
+      jsonDecode(a['definition'] as String) as Map<String, dynamic>,
+    );
+    final definition = ActivityDefinition.fromJson({
+      ...old.toJson(),
+      'restSeconds': seconds,
+      if (source == 'user' && !old.userSet.contains('restSeconds'))
+        'userSet': [...old.userSet, 'restSeconds'],
+    });
+    final intervals = await tx.query(
+      'activity_intervals',
+      where: 'activity_id = ?',
+      whereArgs: [activityId],
+      orderBy: 'started_at DESC, rowid DESC',
+      limit: 1,
+    );
+    final lastEnd = intervals.firstOrNull?['ended_at'] as int?;
+    if (a['rest_ends_at'] != null && lastEnd != null) {
+      await tx.update(
+        'activity_intervals',
+        {'rest_seconds': seconds},
+        where: 'id = ?',
+        whereArgs: [intervals.single['id']],
+      );
+    }
+    await tx.update(
+      'activities',
+      {
+        'definition': jsonEncode(definition.toJson()),
+        'rest_ends_at':
+            a['rest_ends_at'] != null && lastEnd != null && seconds > 0
+            ? lastEnd + seconds * 1000
+            : null,
+      },
+      where: 'id = ?',
+      whereArgs: [activityId],
+    );
+  });
 
   @override
   Future<void> setActivityTiming(
@@ -696,16 +710,27 @@ mixin _SqliteActivities implements ActivityRepository {
     required int? activitySeconds,
     required int restSeconds,
     required int? targetCycles,
+    String source = 'user',
   }) => _db.transaction((tx) async {
     final row = await _activeActivity(tx, activityId);
     final old = ActivityDefinition.fromJson(
       jsonDecode(row['definition'] as String) as Map<String, dynamic>,
     );
+    // Solo se fija lo que el usuario cambió de verdad: reenviar el valor
+    // anterior no debe bloquear a la IA en esa propiedad.
+    final userSet = source == 'user'
+        ? old.userSet.toSet().union({
+            if (restSeconds != old.restSeconds) 'restSeconds',
+            if (activitySeconds != old.activitySeconds) 'activitySeconds',
+            if (targetCycles != old.targetCycles) 'targetCycles',
+          })
+        : old.userSet.toSet();
     final definition = ActivityDefinition.fromJson({
       ...old.toJson(),
       'activitySeconds': activitySeconds,
       'restSeconds': restSeconds,
       'targetCycles': targetCycles,
+      'userSet': userSet.toList(),
     });
     final intervals = await tx.query(
       'activity_intervals',
@@ -721,8 +746,8 @@ mixin _SqliteActivities implements ActivityRepository {
         'definition': jsonEncode(definition.toJson()),
         'rest_ends_at':
             row['rest_ends_at'] != null && lastEnd != null && restSeconds > 0
-                ? lastEnd + restSeconds * 1000
-                : null,
+            ? lastEnd + restSeconds * 1000
+            : null,
       },
       where: 'id = ?',
       whereArgs: [activityId],
@@ -736,4 +761,27 @@ mixin _SqliteActivities implements ActivityRepository {
       );
     }
   });
+
+  @override
+  Future<void> clearUserSetLock(String activityId, String lock) {
+    if (!ActivityDefinition.isLockable(lock)) {
+      throw const ValidationException('Los datos fijados no son válidos.');
+    }
+    return _db.transaction((tx) async {
+      final row = await _activeActivity(tx, activityId);
+      final old = ActivityDefinition.fromJson(
+        jsonDecode(row['definition'] as String) as Map<String, dynamic>,
+      );
+      final definition = ActivityDefinition.fromJson({
+        ...old.toJson(),
+        'userSet': old.userSet.where((l) => l != lock).toList(),
+      });
+      await tx.update(
+        'activities',
+        {'definition': jsonEncode(definition.toJson())},
+        where: 'id = ?',
+        whereArgs: [activityId],
+      );
+    });
+  }
 }

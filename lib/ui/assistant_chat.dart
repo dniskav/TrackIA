@@ -18,6 +18,7 @@ import '../application/rest_notifications.dart';
 import '../data/ai_client.dart';
 import '../data/ai_settings_store.dart';
 import '../data/sheet_context_store.dart';
+import 'proposal_card.dart';
 import '../domain/sheet_context.dart';
 import '../domain/workout.dart';
 import '../domain/ai_config.dart';
@@ -39,6 +40,28 @@ import '../data/companion_store.dart';
 import '../domain/companion.dart';
 import 'companion_style.dart';
 
+/// Mensaje de confirmación tras guardar tiempos propuestos por la IA. Lo no
+/// propuesto se toma de la definición actual de la actividad.
+@visibleForTesting
+String savedTimingsMessage(
+  ActivityDefinition definition,
+  Map<String, int> proposal,
+) {
+  String clock(int seconds) =>
+      '${seconds ~/ 60}:${(seconds % 60).toString().padLeft(2, '0')}';
+  final activitySeconds =
+      proposal['activitySeconds'] ?? definition.activitySeconds;
+  final restSeconds = proposal['restSeconds'] ?? definition.restSeconds;
+  final targetCycles = proposal['targetCycles'] ?? definition.targetCycles;
+  final duration = activitySeconds == null
+      ? 'sin límite'
+      : clock(activitySeconds);
+  final cycles = targetCycles == null ? '' : ', $targetCycles ciclos';
+  return 'Tiempos guardados en la actividad: $duration por tramo, '
+      '${clock(restSeconds)} de descanso$cycles. '
+      'Los avisos se enviarán si Android los permite.';
+}
+
 class AssistantChatScreen extends StatefulWidget {
   const AssistantChatScreen({
     super.key,
@@ -50,6 +73,7 @@ class AssistantChatScreen extends StatefulWidget {
     this.availability,
     this.companion,
     this.onSwitchCompanion,
+    this.onCompanionSettings,
   });
   final WorkoutController controller;
   final AiClient? client;
@@ -62,6 +86,10 @@ class AssistantChatScreen extends StatefulWidget {
   /// Called when the user picks another companion from the title. The host
   /// decides how to navigate; without it the picker only closes.
   final void Function(Companion)? onSwitchCompanion;
+
+  /// Opens «Modo y avisos» of this chat's companion; without it the menu has
+  /// no such entry.
+  final VoidCallback? onCompanionSettings;
   @override
   State<AssistantChatScreen> createState() => _AssistantChatScreenState();
 }
@@ -111,6 +139,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
   AiAttachment? attachment;
   SheetContext? sheetContext;
   ActivityDefinition? proposal;
+  List<LockedProposal>? lockedProposals;
   String? focusId;
   String preparationDraft = '';
   Timer? draftTimer;
@@ -139,16 +168,15 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
       final fresh = await sheets.refresh();
       final config = await sheets.service.connection();
       final jobs = await sheets.jobs();
-      sheetConnectionForAi =
-          config == null
-              ? null
-              : {
-                'name': config['name'],
-                'title': config['title'],
-                'automatic': config['automatic'],
-                'allowOverwrite': config['allowOverwrite'],
-                'layout': config['layout'],
-              };
+      sheetConnectionForAi = config == null
+          ? null
+          : {
+              'name': config['name'],
+              'title': config['title'],
+              'automatic': config['automatic'],
+              'allowOverwrite': config['allowOverwrite'],
+              'layout': config['layout'],
+            };
       pendingSheetsForAi = [
         for (final j in jobs)
           if (j['status'] != 'sent' &&
@@ -170,22 +198,20 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     } catch (e) {
       if (mounted) {
         setState(
-          () =>
-              sheetReadWarning =
-                  'No se pudo leer Google ahora. La copia es de ${sheetContext?.loadedAt.toIso8601String() ?? "fecha desconocida"}; no presentes sus datos como actuales. ${sheetError(e)}',
+          () => sheetReadWarning =
+              'No se pudo leer Google ahora. La copia es de ${sheetContext?.loadedAt.toIso8601String() ?? "fecha desconocida"}; no presentes sus datos como actuales. ${sheetError(e)}',
         );
       }
     }
   }
 
-  String sheetError(Object error) =>
-      error is PlatformException
-          ? error.message ?? error.code
-          : error is ValidationException
-          ? error.message
-          : error is SheetClarification
-          ? error.question
-          : 'Comprueba la conexión con Google.';
+  String sheetError(Object error) => error is PlatformException
+      ? error.message ?? error.code
+      : error is ValidationException
+      ? error.message
+      : error is SheetClarification
+      ? error.question
+      : 'Comprueba la conexión con Google.';
   Future<void> saveSheetReply(String text) async {
     if (!mounted) return;
     messages.add(
@@ -198,7 +224,10 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     }
   }
 
-  String sheetConversation() => transcript.reversed
+  String sheetConversation() => transcript
+      .where((m) => m.role != 'event')
+      .toList()
+      .reversed
       .take(10)
       .toList()
       .reversed
@@ -228,8 +257,9 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
   }
 
   Future<void> editSheetFromChat(String answer) async {
-    final latestUser =
-        messages.reversed.where((m) => m.role == 'user').firstOrNull;
+    final latestUser = messages.reversed
+        .where((m) => m.role == 'user')
+        .firstOrNull;
     if (latestUser == null) return;
     try {
       final receipt = await sheets.directEdit(
@@ -267,20 +297,19 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
       final config = await sheets.service.connection();
       if (config == null || config['automatic'] != true) return;
       final jobs = await sheets.jobs();
-      final job =
-          jobs
-              .where(
-                (j) =>
-                    j['status'] == 'pending' &&
-                    j['id'] == config['id'] &&
-                    j['sheetId'] == config['sheetId'] &&
-                    j['subject'] == config['subject'] &&
-                    (j['retryAfter'] == null ||
-                        !DateTime.parse(
-                          j['retryAfter'] as String,
-                        ).isAfter(DateTime.now())),
-              )
-              .firstOrNull;
+      final job = jobs
+          .where(
+            (j) =>
+                j['status'] == 'pending' &&
+                j['id'] == config['id'] &&
+                j['sheetId'] == config['sheetId'] &&
+                j['subject'] == config['subject'] &&
+                (j['retryAfter'] == null ||
+                    !DateTime.parse(
+                      j['retryAfter'] as String,
+                    ).isAfter(DateTime.now())),
+          )
+          .firstOrNull;
       if (job == null) return;
       await synchronizeSheet(job['workoutId'] as String);
     } catch (e) {
@@ -304,16 +333,15 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
   }
 
   bool get canRecord => widget.focusMode && companionFocus != null;
-  FocusActivity? get recoverablePreparation =>
-      companionActivities
-          .where(
-            (a) =>
-                !a.active &&
-                a.intervals.isEmpty &&
-                a.finishIssues.contains('not_started') &&
-                a.workoutId == widget.controller.active?.id,
-          )
-          .firstOrNull;
+  FocusActivity? get recoverablePreparation => companionActivities
+      .where(
+        (a) =>
+            !a.active &&
+            a.intervals.isEmpty &&
+            a.finishIssues.contains('not_started') &&
+            a.workoutId == widget.controller.active?.id,
+      )
+      .firstOrNull;
   List<AiMessage> get transcript {
     if (!widget.focusMode) return messages;
     return [
@@ -398,6 +426,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     input.text = a?.draft ?? preparationDraft;
     input.addListener(draftChanged);
     if (a != null) proposal = null;
+    if (lockedProposals != null) lockedProposals = null;
   }
 
   void draftChanged() {
@@ -477,9 +506,8 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
       draftTail.catchError((_) {
         if (mounted) {
           setState(
-            () =>
-                error =
-                    'No se pudo guardar el borrador. Conserva el texto y vuelve a intentarlo.',
+            () => error =
+                'No se pudo guardar el borrador. Conserva el texto y vuelve a intentarlo.',
           );
         }
       }),
@@ -497,10 +525,9 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     final a = companionFocus;
     if (a == null) return Future.value();
     final media = attachment;
-    final text =
-        input.text.trim().isEmpty && media != null
-            ? 'Interpreta el adjunto de esta actividad.'
-            : input.text;
+    final text = input.text.trim().isEmpty && media != null
+        ? 'Interpreta el adjunto de esta actividad.'
+        : input.text;
     if (text.trim().isEmpty) return Future.value();
     final revision = inputRevision, token = '${a.id}:$inputRevision';
     final interval = a.intervals.lastOrNull?.id;
@@ -513,14 +540,13 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
             a.id,
             media == null ? text : '$text\n[Adjunto: ${media.name}]',
             intervalId: interval,
-            media:
-                media == null
-                    ? null
-                    : ActivityMedia(
-                      name: media.name,
-                      mime: media.mime,
-                      bytes: media.bytes,
-                    ),
+            media: media == null
+                ? null
+                : ActivityMedia(
+                    name: media.name,
+                    mime: media.mime,
+                    bytes: media.bytes,
+                  ),
           );
       capturedInputs.add(token);
       if (capturedInputs.length > 100) {
@@ -544,9 +570,8 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     if (widget.controller.focus != null) {
       if (mounted) {
         setState(
-          () =>
-              error =
-                  'Termina la actividad abierta en el otro acompañante antes de preparar esta.',
+          () => error =
+              'Termina la actividad abierta en el otro acompañante antes de preparar esta.',
         );
       }
       return;
@@ -589,12 +614,11 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     setState(() => listening = false);
     final selected = await Navigator.of(context).push<SheetContext>(
       MaterialPageRoute(
-        builder:
-            (_) => GoogleSheetsImportScreen(
-              controller: widget.controller,
-              forAssistant: true,
-              loadOnly: !aiReady,
-            ),
+        builder: (_) => GoogleSheetsImportScreen(
+          controller: widget.controller,
+          forAssistant: true,
+          loadOnly: !aiReady,
+        ),
       ),
     );
     if (selected != null && mounted) await useSheet(selected);
@@ -616,9 +640,8 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     } catch (_) {
       if (mounted) {
         setState(
-          () =>
-              error =
-                  'No se pudo guardar la hoja en el móvil. La copia anterior se conserva.',
+          () => error =
+              'No se pudo guardar la hoja en el móvil. La copia anterior se conserva.',
         );
       }
     } finally {
@@ -645,9 +668,8 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     } catch (_) {
       if (mounted) {
         setState(
-          () =>
-              error =
-                  'La respuesta llegó, pero la hoja sigue pendiente de interpretación en el móvil.',
+          () => error =
+              'La respuesta llegó, pero la hoja sigue pendiente de interpretación en el móvil.',
         );
       }
     }
@@ -688,10 +710,9 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     } on PlatformException catch (e) {
       if (mounted) {
         setState(
-          () =>
-              error =
-                  e.message ??
-                  'No se pudo actualizar la hoja. La copia anterior se conserva.',
+          () => error =
+              e.message ??
+              'No se pudo actualizar la hoja. La copia anterior se conserva.',
         );
       }
     } on ValidationException catch (e) {
@@ -699,9 +720,8 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     } catch (_) {
       if (mounted) {
         setState(
-          () =>
-              error =
-                  'No se pudo actualizar la hoja. La copia anterior se conserva.',
+          () => error =
+              'No se pudo actualizar la hoja. La copia anterior se conserva.',
         );
       }
     } finally {
@@ -720,28 +740,27 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     }
     final choice = await showDialog<String>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: Text(sheet.name),
-            content: Text(
-              '${sheet.title} · ${sheet.rows.length} filas\nÚltima lectura: ${DateFormat('d/M/yyyy HH:mm').format(sheet.loadedAt.toLocal())}.\n\n${sheet.interpretationPending ? 'Pendiente de interpretación por la IA. No se han importado entrenamientos.' : 'El asistente ha analizado esta copia; no se han importado entrenamientos.'}',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, 'remove'),
-                child: const Text('Quitar del contexto'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, 'change'),
-                child: const Text('Cambiar hoja'),
-              ),
-              if (sheet.source == 'google')
-                FilledButton(
-                  onPressed: () => Navigator.pop(context, 'refresh'),
-                  child: const Text('Actualizar hoja'),
-                ),
-            ],
+      builder: (context) => AlertDialog(
+        title: Text(sheet.name),
+        content: Text(
+          '${sheet.title} · ${sheet.rows.length} filas\nÚltima lectura: ${DateFormat('d/M/yyyy HH:mm').format(sheet.loadedAt.toLocal())}.\n\n${sheet.interpretationPending ? 'Pendiente de interpretación por la IA. No se han importado entrenamientos.' : 'El asistente ha analizado esta copia; no se han importado entrenamientos.'}',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'remove'),
+            child: const Text('Quitar del contexto'),
           ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'change'),
+            child: const Text('Cambiar hoja'),
+          ),
+          if (sheet.source == 'google')
+            FilledButton(
+              onPressed: () => Navigator.pop(context, 'refresh'),
+              child: const Text('Actualizar hoja'),
+            ),
+        ],
+      ),
     );
     if (!mounted) return;
     if (choice == 'refresh') await refreshSheet();
@@ -826,10 +845,9 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
       }
       final locales = await speech.locales();
       if (!mounted) return;
-      final spanish =
-          locales
-              .where((l) => l.localeId.toLowerCase().startsWith('es'))
-              .toList();
+      final spanish = locales
+          .where((l) => l.localeId.toLowerCase().startsWith('es'))
+          .toList();
       final prefix = input.text.trim();
       final speechFocus = focusId;
       setState(() => listening = true);
@@ -877,51 +895,48 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     final kind = await showModalBottomSheet<String>(
       isScrollControlled: true,
       context: context,
-      builder:
-          (context) => SafeArea(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.camera_alt_outlined),
-                  title: const Text('Cámara'),
-                  onTap: () => Navigator.pop(context, 'camera'),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.image_outlined),
-                  title: const Text('Fotos'),
-                  onTap: () => Navigator.pop(context, 'image'),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.description_outlined),
-                  title: const Text('Documento PDF'),
-                  subtitle: const Text(
-                    'Necesita un modelo que admita documentos',
-                  ),
-                  onTap: () => Navigator.pop(context, 'pdf'),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.audio_file_outlined),
-                  title: const Text('Archivo de audio'),
-                  subtitle: const Text(
-                    'Requiere un modelo de Gemini que admita audio',
-                  ),
-                  onTap: () => Navigator.pop(context, 'audio'),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.table_chart_outlined),
-                  title: const Text('Hoja Excel o CSV'),
-                  onTap: () => Navigator.pop(context, 'spreadsheet'),
-                ),
-                if (defaultTargetPlatform == TargetPlatform.android)
-                  ListTile(
-                    leading: const Icon(Icons.cloud_outlined),
-                    title: const Text('Google Sheets / Drive'),
-                    onTap: () => Navigator.pop(context, 'sheet'),
-                  ),
-              ],
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt_outlined),
+              title: const Text('Cámara'),
+              onTap: () => Navigator.pop(context, 'camera'),
             ),
-          ),
+            ListTile(
+              leading: const Icon(Icons.image_outlined),
+              title: const Text('Fotos'),
+              onTap: () => Navigator.pop(context, 'image'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.description_outlined),
+              title: const Text('Documento PDF'),
+              subtitle: const Text('Necesita un modelo que admita documentos'),
+              onTap: () => Navigator.pop(context, 'pdf'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.audio_file_outlined),
+              title: const Text('Archivo de audio'),
+              subtitle: const Text(
+                'Requiere un modelo de Gemini que admita audio',
+              ),
+              onTap: () => Navigator.pop(context, 'audio'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.table_chart_outlined),
+              title: const Text('Hoja Excel o CSV'),
+              onTap: () => Navigator.pop(context, 'spreadsheet'),
+            ),
+            if (defaultTargetPlatform == TargetPlatform.android)
+              ListTile(
+                leading: const Icon(Icons.cloud_outlined),
+                title: const Text('Google Sheets / Drive'),
+                onTap: () => Navigator.pop(context, 'sheet'),
+              ),
+          ],
+        ),
+      ),
     );
     if (kind == null || !mounted) return;
     if (kind == 'sheet') {
@@ -938,9 +953,8 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     }
     if (!aiReady && !canRecord) {
       setState(
-        () =>
-            error =
-                'Conecta la IA para enviar imágenes, documentos o audio. Puedes cargar una hoja sin IA.',
+        () => error =
+            'Conecta la IA para enviar imágenes, documentos o audio. Puedes cargar una hoja sin IA.',
       );
       return;
     }
@@ -991,8 +1005,9 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
       }
       final picked = await FilePicker.platform.pickFiles(
         type: FileType.custom,
-        allowedExtensions:
-            kind == 'pdf' ? ['pdf'] : ['mp3', 'wav', 'm4a', 'ogg', 'flac'],
+        allowedExtensions: kind == 'pdf'
+            ? ['pdf']
+            : ['mp3', 'wav', 'm4a', 'ogg', 'flac'],
         withData: true,
       );
       if (picked == null || !mounted) return;
@@ -1016,8 +1031,9 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
         'ogg' => 'audio/ogg',
         'flac' => 'audio/flac',
         'pdf' => 'application/pdf',
-        _ =>
-          throw const ValidationException('Formato de adjunto no compatible.'),
+        _ => throw const ValidationException(
+          'Formato de adjunto no compatible.',
+        ),
       };
       if (mime == 'application/pdf' &&
           (bytes.length < 5 ||
@@ -1063,12 +1079,11 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
       final bytes = await photo.readAsBytes();
       if (mounted && attachment == null && bytes.isNotEmpty) {
         setState(
-          () =>
-              attachment = AiAttachment(
-                name: photo.name,
-                mime: mime,
-                bytes: bytes,
-              ),
+          () => attachment = AiAttachment(
+            name: photo.name,
+            mime: mime,
+            bytes: bytes,
+          ),
         );
       }
     } catch (_) {
@@ -1185,10 +1200,9 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     'carryForward': carryForward,
     'deferredArchive': deferredArchive,
     'sheetQuestionWorkoutId': sheetQuestionWorkoutId,
-    'composerDraft':
-        includeDraft
-            ? AiMessage('user', input.text, attachment: attachment).forStorage()
-            : null,
+    'composerDraft': includeDraft
+        ? AiMessage('user', input.text, attachment: attachment).forStorage()
+        : null,
   };
 
   Future<String> replyWithArchives(
@@ -1229,9 +1243,8 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     final directive = chatDirective(answer, 'archive');
     if (directive == null && answer.contains('```gymia-archive') && mounted) {
       setState(
-        () =>
-            error =
-                'El modelo pidió archivar con datos incompletos. El chat sigue abierto.',
+        () => error =
+            'El modelo pidió archivar con datos incompletos. El chat sigue abierto.',
       );
     }
     if (directive != null && mounted && pending == null) {
@@ -1239,12 +1252,11 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
         await archiveChat(directive: directive);
       } else {
         setState(
-          () =>
-              deferredArchive = {
-                'directive': directive,
-                'sessionId': sessionId,
-                'messageCount': transcript.length,
-              },
+          () => deferredArchive = {
+            'directive': directive,
+            'sessionId': sessionId,
+            'messageCount': transcript.length,
+          },
         );
         await persist();
       }
@@ -1361,9 +1373,8 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     } catch (_) {
       if (mounted) {
         setState(
-          () =>
-              error =
-                  'No se pudo archivar. La conversación y los entrenamientos se conservan.',
+          () => error =
+              'No se pudo archivar. La conversación y los entrenamientos se conservan.',
         );
       }
     } finally {
@@ -1378,15 +1389,14 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     final result = await Navigator.push<String>(
       context,
       MaterialPageRoute(
-        builder:
-            (_) => SheetSyncScreen(
-              controller: widget.controller,
-              companionId: companionId,
-              client: widget.client,
-              workoutId: directive?['workoutId'] as String?,
-              create: directive?['create'] as bool? ?? false,
-              name: directive?['name'] as String?,
-            ),
+        builder: (_) => SheetSyncScreen(
+          controller: widget.controller,
+          companionId: companionId,
+          client: widget.client,
+          workoutId: directive?['workoutId'] as String?,
+          create: directive?['create'] as bool? ?? false,
+          name: directive?['name'] as String?,
+        ),
       ),
     );
     if (result != null && mounted) {
@@ -1413,24 +1423,66 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
         );
         return;
       }
-      final activitySeconds =
-          timing['activitySeconds'] ?? activity.definition.activitySeconds;
-      final restSeconds =
-          timing['restSeconds'] ?? activity.definition.restSeconds;
-      final targetCycles =
-          timing['targetCycles'] ?? activity.definition.targetCycles;
-      final applied = await widget.controller.run(
+      // FR-023: lo fijado a mano no se aplica solo; va a una tarjeta
+      // Aplicar/Ignorar. Lo libre se aplica con origen assistant.
+      Future<bool> applyTiming(
+        Map<String, int?> values,
+      ) => widget.controller.run(
         () => widget.controller.activityRepository!.setActivityTiming(
           activity.id,
-          activitySeconds: activitySeconds,
-          restSeconds: restSeconds,
-          targetCycles: targetCycles,
+          activitySeconds:
+              values['activitySeconds'] ?? activity.definition.activitySeconds,
+          restSeconds: values['restSeconds'] ?? activity.definition.restSeconds,
+          targetCycles:
+              values['targetCycles'] ?? activity.definition.targetCycles,
+          source: 'assistant',
         ),
       );
+      final locked = timing.keys
+          .where(activity.definition.userSet.contains)
+          .toSet();
+      if (locked.isEmpty) {
+        final applied = await applyTiming(timing.cast<String, int?>());
+        await saveSheetReply(
+          applied
+              ? savedTimingsMessage(activity.definition, timing)
+              : 'No se pudieron guardar los tiempos. Revisa la actividad y vuelve a intentarlo.',
+        );
+        return;
+      }
+      final freeApply = <String, int>{
+        for (final e in timing.entries)
+          if (!locked.contains(e.key)) e.key: e.value,
+      };
+      final appliedFree = freeApply.isEmpty
+          ? true
+          : await applyTiming(freeApply.cast<String, int?>());
+      if (mounted) {
+        setState(
+          () => lockedProposals = [
+            for (final name in locked)
+              LockedProposal(name, switch (name) {
+                'restSeconds' => activity.definition.restSeconds,
+                'activitySeconds' => activity.definition.activitySeconds ?? 0,
+                _ => activity.definition.targetCycles ?? 0,
+              }, timing[name]!),
+          ],
+        );
+      }
+      final covered = [
+        for (final name in locked)
+          switch (name) {
+            'restSeconds' => 'descanso',
+            'activitySeconds' => 'duración',
+            _ => 'ciclos',
+          },
+      ];
       await saveSheetReply(
-        applied
-            ? 'Tiempos guardados en la actividad: ${activitySeconds == null ? 'sin límite' : '${activitySeconds ~/ 60}:${(activitySeconds % 60).toString().padLeft(2, '0')}'} por tramo, ${restSeconds ~/ 60}:${(restSeconds % 60).toString().padLeft(2, '0')} de descanso${targetCycles == null ? '' : ', $targetCycles ciclos'}. Los avisos se enviarán si Android los permite.'
-            : 'No se pudieron guardar los tiempos. Revisa la actividad y vuelve a intentarlo.',
+        '${freeApply.isEmpty
+            ? ''
+            : appliedFree
+            ? 'Los tiempos libres se guardaron. '
+            : 'No se pudieron guardar los tiempos libres. '}Lo fijado por ti (${covered.join(', ')}) no se cambió: decide en la tarjeta de abajo.',
       );
       return;
     }
@@ -1467,9 +1519,8 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     } else if (answer.contains('```gymia-sync')) {
       if (mounted) {
         setState(
-          () =>
-              error =
-                  'La propuesta de envío no es válida. Usa Enviar a Google Sheets en el menú.',
+          () => error =
+              'La propuesta de envío no es válida. Usa Enviar a Google Sheets en el menú.',
         );
       }
     } else {
@@ -1481,8 +1532,8 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     final id = await Navigator.push<String>(
       context,
       MaterialPageRoute(
-        builder:
-            (_) => ArchivedChatsScreen(store: archiveStore, entries: archives),
+        builder: (_) =>
+            ArchivedChatsScreen(store: archiveStore, entries: archives),
       ),
     );
     if (id == null || !mounted) return;
@@ -1500,6 +1551,38 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     } catch (_) {
       if (mounted) setState(() => error = 'No se pudo consultar el archivo.');
     }
+  }
+
+  /// Aplica lo propuesto en la tarjeta FR-023; sigue siendo un cambio de
+  /// origen assistant («Aplicar» lo confirma).
+  Future<void> applyLockedProposal() async {
+    final card = lockedProposals;
+    final activity = companionFocus;
+    if (card == null || activity == null) return;
+    final values = {for (final p in card) p.property: p.proposedValue};
+    setState(() => lockedProposals = null);
+    final applied = await widget.controller.run(
+      () => widget.controller.activityRepository!.setActivityTiming(
+        activity.id,
+        activitySeconds:
+            values['activitySeconds'] ?? activity.definition.activitySeconds,
+        restSeconds: values['restSeconds'] ?? activity.definition.restSeconds,
+        targetCycles:
+            values['targetCycles'] ?? activity.definition.targetCycles,
+        source: 'assistant',
+      ),
+    );
+    final descanso = values['restSeconds'] ?? activity.definition.restSeconds;
+    await saveSheetReply(
+      applied
+          ? 'Aplicado: ${descanso ~/ 60}:${(descanso % 60).toString().padLeft(2, '0')} de descanso.'
+          : 'No se pudo aplicar la propuesta. Revisa la actividad.',
+    );
+  }
+
+  void ignoreLockedProposal() {
+    setState(() => lockedProposals = null);
+    saveSheetReply('Propuesta ignorada; lo fijado por ti sigue igual.');
   }
 
   bool get canArchive =>
@@ -1528,7 +1611,9 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
           children: [
             CompanionAvatar(companion: current, radius: 14),
             const SizedBox(width: 8),
-            Flexible(child: Text(current.name, overflow: TextOverflow.ellipsis)),
+            Flexible(
+              child: Text(current.name, overflow: TextOverflow.ellipsis),
+            ),
             const Icon(Icons.expand_more),
           ],
         ),
@@ -1542,29 +1627,30 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     try {
       all = await CompanionStore(profileId: profileId).load();
     } catch (_) {
-      if (mounted) setState(() => error = 'No se pudieron cargar los acompañantes.');
+      if (mounted) {
+        setState(() => error = 'No se pudieron cargar los acompañantes.');
+      }
       return;
     }
     if (!mounted) return;
     final chosen = await showModalBottomSheet<Companion>(
       context: context,
-      builder:
-          (sheetContext) => SafeArea(
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                for (final c in all)
-                  ListTile(
-                    key: Key('switch-to-${c.id}'),
-                    leading: CompanionAvatar(companion: c),
-                    title: Text(c.name),
-                    subtitle: c.description.isEmpty ? null : Text(c.description),
-                    trailing: c.id == current.id ? const Icon(Icons.check) : null,
-                    onTap: () => Navigator.pop(sheetContext, c),
-                  ),
-              ],
-            ),
-          ),
+      builder: (sheetContext) => SafeArea(
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            for (final c in all)
+              ListTile(
+                key: Key('switch-to-${c.id}'),
+                leading: CompanionAvatar(companion: c),
+                title: Text(c.name),
+                subtitle: c.description.isEmpty ? null : Text(c.description),
+                trailing: c.id == current.id ? const Icon(Icons.check) : null,
+                onTap: () => Navigator.pop(sheetContext, c),
+              ),
+          ],
+        ),
+      ),
     );
     if (chosen != null && chosen.id != current.id) {
       widget.onSwitchCompanion?.call(chosen);
@@ -1606,65 +1692,73 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     key: const Key('chat-menu'),
     tooltip: 'Más opciones',
     onSelected: onMenu,
-    itemBuilder:
-        (_) => [
-          if (widget.onTraining != null)
-            menuItem(
-              'menu-training',
-              'training',
-              Icons.history,
-              'Rutinas e historial',
-              enabled: aiReady,
-            ),
-          menuItem(
-            'menu-sheet-sync',
-            'sheet-sync',
-            Icons.cloud_upload_outlined,
-            'Enviar a Google Sheets',
-            enabled: !busy && !voiceStarting,
-          ),
-          menuItem(
-            'archive-chat',
-            'archive',
-            Icons.archive_outlined,
-            'Archivar chat',
-            enabled: canArchive,
-          ),
-          menuItem(
-            'menu-archives',
-            'archives',
-            Icons.inventory_2_outlined,
-            'Chats archivados',
-            enabled: !busy,
-          ),
-          menuItem(
-            'menu-sheet',
-            'sheet',
-            Icons.table_chart_outlined,
-            'Hoja cargada',
-          ),
-          if (canCloseDay)
-            menuItem(
-              'menu-close-day',
-              'close-day',
-              Icons.flag_outlined,
-              'Finalizar día',
-            ),
-          if (!canRecord && recoverablePreparation != null)
-            menuItem(
-              'menu-recover',
-              'recover',
-              Icons.restore,
-              'Recuperar preparación',
-              detail: recoverablePreparation!.definition.name,
-            ),
-        ],
+    itemBuilder: (_) => [
+      if (widget.onTraining != null)
+        menuItem(
+          'menu-training',
+          'training',
+          Icons.history,
+          'Rutinas e historial',
+          enabled: aiReady,
+        ),
+      if (widget.onCompanionSettings != null)
+        menuItem(
+          'menu-companion-settings',
+          'companion-settings',
+          Icons.tune,
+          'Modo y avisos',
+        ),
+      menuItem(
+        'menu-sheet-sync',
+        'sheet-sync',
+        Icons.cloud_upload_outlined,
+        'Enviar a Google Sheets',
+        enabled: !busy && !voiceStarting,
+      ),
+      menuItem(
+        'archive-chat',
+        'archive',
+        Icons.archive_outlined,
+        'Archivar chat',
+        enabled: canArchive,
+      ),
+      menuItem(
+        'menu-archives',
+        'archives',
+        Icons.inventory_2_outlined,
+        'Chats archivados',
+        enabled: !busy,
+      ),
+      menuItem(
+        'menu-sheet',
+        'sheet',
+        Icons.table_chart_outlined,
+        'Hoja cargada',
+      ),
+      if (canCloseDay)
+        menuItem(
+          'menu-close-day',
+          'close-day',
+          Icons.flag_outlined,
+          'Finalizar día',
+        ),
+      if (!canRecord && recoverablePreparation != null)
+        menuItem(
+          'menu-recover',
+          'recover',
+          Icons.restore,
+          'Recuperar preparación',
+          detail: recoverablePreparation!.definition.name,
+        ),
+    ],
   );
 
   void onMenu(String value) {
     switch (value) {
       case 'training':
         widget.onTraining?.call();
+      case 'companion-settings':
+        widget.onCompanionSettings?.call();
       case 'sheet-sync':
         unawaited(openSheetSync());
       case 'archive':
@@ -1696,6 +1790,26 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     await persist();
   }
 
+  /// A manual edit is kept in the chat as a neutral `event` line (FR-024); it
+  /// is never sent to the provider as a message, only summarised in the context.
+  Future<void> activityEdited(String text) async {
+    messages.add(AiMessage('event', text, recordedAt: widget.controller.now()));
+    if (mounted) setState(() {});
+    await persist();
+  }
+
+  List<String> get recentEvents => [
+    for (final m
+        in messages
+            .where((m) => m.role == 'event')
+            .toList()
+            .reversed
+            .take(5)
+            .toList()
+            .reversed)
+      m.text,
+  ];
+
   bool get noticesOff =>
       notifications.supported &&
       !(notifications.enabled && notifications.granted);
@@ -1719,6 +1833,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
       sheetReadWarning: sheetReadWarning,
       sheetQuestionWorkoutId: sheetQuestionWorkoutId,
       sheetConnectionForAi: sheetConnectionForAi,
+      recentEvents: recentEvents,
       pendingSheetsForAi: pendingSheetsForAi,
     ),
   );
@@ -1732,10 +1847,9 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
         listening) {
       return;
     }
-    final text =
-        input.text.trim().isEmpty
-            ? 'Interpreta el adjunto de esta actividad.'
-            : input.text;
+    final text = input.text.trim().isEmpty
+        ? 'Interpreta el adjunto de esta actividad.'
+        : input.text;
     if (text.length > 8000) {
       setState(() => error = 'El registro supera 8000 caracteres.');
       return;
@@ -1754,15 +1868,13 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
       await widget.controller.refresh();
       final local = compactStrengthMetrics(text, a.definition);
       if (media == null && local.isNotEmpty) {
-        final stored =
-            widget.controller.activities
-                .where((item) => item.id == a.id)
-                .firstOrNull;
-        final ended =
-            stored?.intervals
-                .where((item) => item.id == interval)
-                .firstOrNull
-                ?.endedAt;
+        final stored = widget.controller.activities
+            .where((item) => item.id == a.id)
+            .firstOrNull;
+        final ended = stored?.intervals
+            .where((item) => item.id == interval)
+            .firstOrNull
+            ?.endedAt;
         await widget.controller.activityRepository!.recordActivityMessage(
           a.id,
           '${formatWeight(((local['weight_kg'] as num) * 100).round())} kg × ${local['reps']}${local['failure'] == true ? ' · fallo' : ''}${ended == null ? ' · anotado' : ' · fin ${DateFormat('HH:mm:ss').format(ended.toLocal())}'}',
@@ -1783,18 +1895,19 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
           'Registro guardado en el móvil. Configura el proveedor para consultar al asistente.',
         );
       }
-      final activityHistory =
-          a.messages
-              .where((m) => !archivedActivityMessageIds.contains(m.id))
-              .toList()
-              .reversed
-              .take(12)
-              .toList()
-              .reversed
-              .map((m) => AiMessage(m.role, m.text))
-              .toList();
+      final activityHistory = a.messages
+          .where((m) => !archivedActivityMessageIds.contains(m.id))
+          .toList()
+          .reversed
+          .take(12)
+          .toList()
+          .reversed
+          .map((m) => AiMessage(m.role, m.text))
+          .toList();
       final history = [
-        ...messages.skip(messages.length > 12 ? messages.length - 12 : 0),
+        ...messages
+            .where((m) => m.role != 'event')
+            .skip(messages.length > 12 ? messages.length - 12 : 0),
         ...activityHistory,
       ];
       if (history.firstOrNull?.role == 'assistant') history.removeAt(0);
@@ -1809,10 +1922,9 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
         onText: receiveText,
       );
       await aiStore.markVerified(config);
-      final block =
-          RegExp(
-            r'```gymia-result\s*\n([\s\S]*?)```',
-          ).allMatches(answer).toList();
+      final block = RegExp(
+        r'```gymia-result\s*\n([\s\S]*?)```',
+      ).allMatches(answer).toList();
       if (block.length == 1) {
         try {
           final result =
@@ -1823,10 +1935,9 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
                 .interpretActivityMessage(
                   messageId,
                   result['metrics'] as Map<String, dynamic>,
-                  fields:
-                      (result['fields'] as List? ?? [])
-                          .map((f) => Map<String, Object>.from(f as Map))
-                          .toList(),
+                  fields: (result['fields'] as List? ?? [])
+                      .map((f) => Map<String, Object>.from(f as Map))
+                      .toList(),
                 );
           }
         } on ValidationException {
@@ -1873,10 +1984,9 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     if (!aiReady) return;
     final media = includeAttachment ? attachment : null;
     final typed = retry ?? input.text.trim();
-    final text =
-        typed.isEmpty && media != null
-            ? 'Ayúdame a interpretar este adjunto en el contexto del entrenamiento.'
-            : typed;
+    final text = typed.isEmpty && media != null
+        ? 'Ayúdame a interpretar este adjunto en el contexto del entrenamiento.'
+        : typed;
     if (busy || listening || text.isEmpty) return;
     if (text.length > 8000) {
       setState(() => error = 'El mensaje supera 8000 caracteres.');
@@ -1911,14 +2021,14 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
           last?.text == outgoing.text &&
           last?.attachment?.mime == media?.mime &&
           listEquals(last?.attachment?.bytes, media?.bytes);
-      final previous =
-          reuse
-              ? messages.take(messages.length - 1).toList()
-              : messages.toList();
-      final history =
-          previous
-              .skip(previous.length > 20 ? previous.length - 20 : 0)
-              .toList();
+      final previous = reuse
+          ? messages.take(messages.length - 1).toList()
+          : messages.toList();
+      final history = previous
+          .where((m) => m.role != 'event')
+          .toList()
+          .skip(previous.length > 20 ? previous.length - 20 : 0)
+          .toList();
       if (!reuse) messages.add(outgoing);
       try {
         await persist();
@@ -2018,468 +2128,469 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
   @override
   Widget build(BuildContext context) => ListenableBuilder(
     listenable: widget.controller,
-    builder:
-        (context, _) => Scaffold(
-          appBar: AppBar(
-            title:
-                widget.focusMode
-                    ? companionTitle(context)
-                    : Text(widget.companion?.name ?? 'TrackIA'),
-            actions:
-                widget.focusMode
-                    ? [chatMenu()]
-                    : [
-                      IconButton(
-                        tooltip: 'Enviar a Google Sheets',
-                        onPressed: busy ? null : () => openSheetSync(),
-                        icon: const Icon(Icons.cloud_upload_outlined),
+    builder: (context, _) => Scaffold(
+      appBar: AppBar(
+        title: widget.focusMode
+            ? companionTitle(context)
+            : Text(widget.companion?.name ?? 'TrackIA'),
+        actions: widget.focusMode
+            ? [chatMenu()]
+            : [
+                IconButton(
+                  tooltip: 'Enviar a Google Sheets',
+                  onPressed: busy ? null : () => openSheetSync(),
+                  icon: const Icon(Icons.cloud_upload_outlined),
+                ),
+                IconButton(
+                  key: const Key('archive-chat'),
+                  tooltip: 'Archivar chat',
+                  onPressed: canArchive ? () => archiveChat() : null,
+                  icon: const Icon(Icons.archive_outlined),
+                ),
+                IconButton(
+                  tooltip: 'Chats archivados',
+                  onPressed: busy ? null : openArchives,
+                  icon: const Icon(Icons.inventory_2_outlined),
+                ),
+                if (widget.onData != null)
+                  IconButton(
+                    tooltip: 'Tus datos',
+                    onPressed: () async {
+                      await widget.onData!();
+                      if (mounted) await reloadSheet();
+                    },
+                    icon: const Icon(Icons.folder_open_outlined),
+                  ),
+                IconButton(
+                  tooltip: 'Proveedor de IA',
+                  onPressed: busy ? null : settings,
+                  icon: const Icon(Icons.settings_outlined),
+                ),
+              ],
+      ),
+      body: SafeArea(
+        child: Column(
+          children: [
+            if (!aiReady &&
+                canRecord &&
+                MediaQuery.viewInsetsOf(context).bottom == 0)
+              const Padding(
+                padding: EdgeInsets.only(top: 4),
+                child: Text(
+                  'IA no disponible · puedes parar y guardar notas localmente',
+                ),
+              ),
+            if (!aiReady && !canRecord)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 12, 24, 8),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(availability.message),
+                    if (availability.status == AiAvailabilityStatus.checking)
+                      const LinearProgressIndicator()
+                    else
+                      Wrap(
+                        spacing: 8,
+                        children: [
+                          FilledButton(
+                            onPressed: settings,
+                            child: const Text('Configurar IA'),
+                          ),
+                          if (availability.status !=
+                              AiAvailabilityStatus.unconfigured)
+                            TextButton(
+                              onPressed: () => availability.check(verify: true),
+                              child: const Text(
+                                'Verificar conexión · usa tu API',
+                              ),
+                            ),
+                        ],
                       ),
-                      IconButton(
-                        key: const Key('archive-chat'),
-                        tooltip: 'Archivar chat',
-                        onPressed: canArchive ? () => archiveChat() : null,
-                        icon: const Icon(Icons.archive_outlined),
-                      ),
-                      IconButton(
-                        tooltip: 'Chats archivados',
-                        onPressed: busy ? null : openArchives,
-                        icon: const Icon(Icons.inventory_2_outlined),
-                      ),
-                      if (widget.onData != null)
-                        IconButton(
-                          tooltip: 'Tus datos',
-                          onPressed: () async {
-                            await widget.onData!();
-                            if (mounted) await reloadSheet();
+                  ],
+                ),
+              ),
+            if (!widget.focusMode)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: widget.focusMode
+                      ? ActivityFocusControls(
+                          controller: widget.controller,
+                          companionId: companionId,
+                          flushInput: flushFocusInput,
+                          compact: MediaQuery.viewInsetsOf(context).bottom > 0,
+                          aiReady: aiReady,
+                          hideStart: chatInUse,
+                          noticesOff: noticesOff,
+                          onEnableNotices: enableNotices,
+                          onInstantRecorded: instantRecorded,
+                          onActivityEdited: activityEdited,
+                        )
+                      : SessionControl(
+                          controller: widget.controller,
+                          enabled: aiReady && !busy && !voiceStarting,
+                          beforeAction: () async {
+                            if (speech.isListening) await speech.stop();
+                            if (mounted) {
+                              setState(() => listening = false);
+                            }
                           },
-                          icon: const Icon(Icons.folder_open_outlined),
+                          sheetLabel: sheetContext == null
+                              ? null
+                              : '${sheetContext!.name} / ${sheetContext!.title}',
                         ),
-                      IconButton(
-                        tooltip: 'Proveedor de IA',
-                        onPressed: busy ? null : settings,
-                        icon: const Icon(Icons.settings_outlined),
-                      ),
-                    ],
-          ),
-          body: SafeArea(
-            child: Column(
-              children: [
-                if (!aiReady &&
-                    canRecord &&
-                    MediaQuery.viewInsetsOf(context).bottom == 0)
-                  const Padding(
-                    padding: EdgeInsets.only(top: 4),
-                    child: Text(
-                      'IA no disponible · puedes parar y guardar notas localmente',
+                ),
+              ),
+            if (!widget.focusMode &&
+                widget.onTraining != null &&
+                (!widget.focusMode || widget.controller.focus == null) &&
+                (!widget.focusMode ||
+                    MediaQuery.viewInsetsOf(context).bottom == 0))
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                child: ListenableBuilder(
+                  listenable: widget.controller,
+                  builder: (context, _) => OutlinedButton.icon(
+                    key: const Key('open-training'),
+                    onPressed: !aiReady
+                        ? null
+                        : () async {
+                            if (speech.isListening) {
+                              await speech.stop();
+                            }
+                            if (mounted) {
+                              setState(() => listening = false);
+                              widget.onTraining!();
+                            }
+                          },
+                    icon: const Icon(Icons.fitness_center),
+                    label: Text(
+                      widget.controller.active == null
+                          ? 'Entrenamiento'
+                          : 'Entrenamiento · ${widget.controller.active!.name}',
                     ),
                   ),
-                if (!aiReady && !canRecord)
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 12, 24, 8),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
+                ),
+              ),
+            if (!widget.focusMode &&
+                (!widget.focusMode || widget.controller.focus == null) &&
+                (!widget.focusMode ||
+                    MediaQuery.viewInsetsOf(context).bottom == 0) &&
+                (defaultTargetPlatform == TargetPlatform.android ||
+                    sheetContext != null))
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: TextButton.icon(
+                  key: const Key('assistant-sheet'),
+                  onPressed: busy || voiceStarting ? null : manageSheet,
+                  icon: const Icon(Icons.table_chart_outlined),
+                  label: Text(
+                    sheetContext == null
+                        ? 'Cargar Google Sheets'
+                        : 'Hoja · ${sheetContext!.title}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+            Expanded(
+              child: NotificationListener<ScrollMetricsNotification>(
+                onNotification: (notification) {
+                  if (notification.depth == 0 && followingLatest) {
+                    scheduleScrollToLatest();
+                  }
+                  return false;
+                },
+                child: NotificationListener<ScrollNotification>(
+                  onNotification: (notification) {
+                    if (notification.depth != 0) return false;
+                    if (notification is ScrollStartNotification &&
+                        notification.dragDetails != null) {
+                      userDragging = true;
+                      if (followingLatest) {
+                        setState(() => followingLatest = false);
+                      }
+                    } else if (notification is ScrollEndNotification &&
+                        userDragging) {
+                      userDragging = false;
+                      final next = notification.metrics.extentAfter <= 24;
+                      if (next != followingLatest) {
+                        setState(() => followingLatest = next);
+                      }
+                      if (next) unawaited(resumeDeferredArchive());
+                    }
+                    return false;
+                  },
+                  child: NotificationListener<UserScrollNotification>(
+                    onNotification: (notification) {
+                      if (notification.depth == 0 && !userDragging) {
+                        final next =
+                            notification.direction == ScrollDirection.idle &&
+                            notification.metrics.extentAfter <= 24;
+                        if (next != followingLatest) {
+                          setState(() => followingLatest = next);
+                        }
+                      }
+                      return false;
+                    },
+                    child: ListView(
+                      key: const Key('assistant-transcript'),
+                      controller: scroll,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
                       children: [
-                        Text(availability.message),
-                        if (availability.status ==
-                            AiAvailabilityStatus.checking)
-                          const LinearProgressIndicator()
-                        else
-                          Wrap(
-                            spacing: 8,
-                            children: [
-                              FilledButton(
-                                onPressed: settings,
-                                child: const Text('Configurar IA'),
+                        if (sheetContext?.interpretationPending == true &&
+                            !canRecord)
+                          Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              children: [
+                                Text(
+                                  '«${sheetContext!.name}» cargada · pendiente de interpretación. Los datos originales se conservan.',
+                                ),
+                                if (aiReady)
+                                  TextButton(
+                                    onPressed: busy ? null : analyzeSheet,
+                                    child: const Text(
+                                      'Interpretar hoja con IA',
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        if (transcript.isEmpty && companionFocus == null)
+                          Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Text(
+                              aiReady
+                                  ? '¿Qué te gustaría hacer hoy? Cuéntame y lo organizamos juntos.'
+                                  : 'Carga tus datos con + cuando quieras. La IA podrá interpretar su formato cuando esté conectada.',
+                            ),
+                          ),
+                        for (final message in transcript)
+                          if (message.role == 'event')
+                            Padding(
+                              key: const Key('event-line'),
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: Center(
+                                child: Text(
+                                  message.text,
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                ),
                               ),
-                              if (availability.status !=
-                                  AiAvailabilityStatus.unconfigured)
-                                TextButton(
-                                  onPressed:
-                                      () => availability.check(verify: true),
-                                  child: const Text(
-                                    'Verificar conexión · usa tu API',
+                            )
+                          else
+                            Align(
+                              alignment: message.role == 'user'
+                                  ? Alignment.centerRight
+                                  : Alignment.centerLeft,
+                              child: Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(14),
+                                  child: ChatMessageBody(
+                                    text: message.text,
+                                    assistant: message.role == 'assistant',
                                   ),
                                 ),
-                            ],
+                              ),
+                            ),
+                        if (proposal != null &&
+                            aiReady &&
+                            companionFocus == null)
+                          Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    proposal!.name,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${proposal!.repeated ? 'Series / tramos' : 'Actividad continua'} · ${proposal!.restSeconds}s de descanso',
+                                  ),
+                                  if (proposal!.fields.isNotEmpty)
+                                    Text(
+                                      proposal!.fields
+                                          .map((f) => f['label'])
+                                          .join(' · '),
+                                    ),
+                                  FilledButton(
+                                    key: const Key('accept-activity-proposal'),
+                                    onPressed: widget.controller.busy
+                                        ? null
+                                        : acceptProposal,
+                                    child: const Text('Preparar'),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        if (lockedProposals != null &&
+                            lockedProposals!.isNotEmpty)
+                          ProposalCard(
+                            proposals: lockedProposals!,
+                            onApply: applyLockedProposal,
+                            onIgnore: ignoreLockedProposal,
+                          ),
+                        if (busy && partialReply.isNotEmpty)
+                          Card(
+                            child: Padding(
+                              padding: const EdgeInsets.all(14),
+                              child: ChatMessageBody(
+                                text: partialReply,
+                                assistant: true,
+                              ),
+                            ),
+                          ),
+                        if (busy) ...[
+                          const LinearProgressIndicator(),
+                          if (partialReply.isEmpty)
+                            const Padding(
+                              padding: EdgeInsets.all(8),
+                              child: Text('Esperando al modelo…'),
+                            ),
+                        ],
+                        if (error != null)
+                          Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Text(error!),
                           ),
                       ],
                     ),
                   ),
-                if (!widget.focusMode)
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child:
-                          widget.focusMode
-                              ? ActivityFocusControls(
-                                controller: widget.controller,
-                                companionId: companionId,
-                                flushInput: flushFocusInput,
-                                compact:
-                                    MediaQuery.viewInsetsOf(context).bottom > 0,
-                                aiReady: aiReady,
-                                hideStart: chatInUse,
-                                noticesOff: noticesOff,
-                                onEnableNotices: enableNotices,
-                                onInstantRecorded: instantRecorded,
-                              )
-                              : SessionControl(
-                                controller: widget.controller,
-                                enabled: aiReady && !busy && !voiceStarting,
-                                beforeAction: () async {
-                                  if (speech.isListening) await speech.stop();
-                                  if (mounted) {
-                                    setState(() => listening = false);
-                                  }
-                                },
-                                sheetLabel:
-                                    sheetContext == null
-                                        ? null
-                                        : '${sheetContext!.name} / ${sheetContext!.title}',
-                              ),
-                    ),
-                  ),
-                if (!widget.focusMode &&
-                    widget.onTraining != null &&
-                    (!widget.focusMode || widget.controller.focus == null) &&
-                    (!widget.focusMode ||
-                        MediaQuery.viewInsetsOf(context).bottom == 0))
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                    child: ListenableBuilder(
-                      listenable: widget.controller,
-                      builder:
-                          (context, _) => OutlinedButton.icon(
-                            key: const Key('open-training'),
-                            onPressed:
-                                !aiReady
-                                    ? null
-                                    : () async {
-                                      if (speech.isListening) {
-                                        await speech.stop();
-                                      }
-                                      if (mounted) {
-                                        setState(() => listening = false);
-                                        widget.onTraining!();
-                                      }
-                                    },
-                            icon: const Icon(Icons.fitness_center),
-                            label: Text(
-                              widget.controller.active == null
-                                  ? 'Entrenamiento'
-                                  : 'Entrenamiento · ${widget.controller.active!.name}',
-                            ),
-                          ),
-                    ),
-                  ),
-                if (!widget.focusMode &&
-                    (!widget.focusMode || widget.controller.focus == null) &&
-                    (!widget.focusMode ||
-                        MediaQuery.viewInsetsOf(context).bottom == 0) &&
-                    (defaultTargetPlatform == TargetPlatform.android ||
-                        sheetContext != null))
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: TextButton.icon(
-                      key: const Key('assistant-sheet'),
-                      onPressed: busy || voiceStarting ? null : manageSheet,
-                      icon: const Icon(Icons.table_chart_outlined),
-                      label: Text(
-                        sheetContext == null
-                            ? 'Cargar Google Sheets'
-                            : 'Hoja · ${sheetContext!.title}',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ),
-                Expanded(
-                  child: NotificationListener<ScrollMetricsNotification>(
-                    onNotification: (notification) {
-                      if (notification.depth == 0 && followingLatest) {
-                        scheduleScrollToLatest();
-                      }
-                      return false;
-                    },
-                    child: NotificationListener<ScrollNotification>(
-                      onNotification: (notification) {
-                        if (notification.depth != 0) return false;
-                        if (notification is ScrollStartNotification &&
-                            notification.dragDetails != null) {
-                          userDragging = true;
-                          if (followingLatest) {
-                            setState(() => followingLatest = false);
-                          }
-                        } else if (notification is ScrollEndNotification &&
-                            userDragging) {
-                          userDragging = false;
-                          final next = notification.metrics.extentAfter <= 24;
-                          if (next != followingLatest) {
-                            setState(() => followingLatest = next);
-                          }
-                          if (next) unawaited(resumeDeferredArchive());
-                        }
-                        return false;
-                      },
-                      child: NotificationListener<UserScrollNotification>(
-                        onNotification: (notification) {
-                          if (notification.depth == 0 && !userDragging) {
-                            final next =
-                                notification.direction ==
-                                    ScrollDirection.idle &&
-                                notification.metrics.extentAfter <= 24;
-                            if (next != followingLatest) {
-                              setState(() => followingLatest = next);
-                            }
-                          }
-                          return false;
-                        },
-                        child: ListView(
-                          key: const Key('assistant-transcript'),
-                          controller: scroll,
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          children: [
-                            if (sheetContext?.interpretationPending == true &&
-                                !canRecord)
-                              Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Column(
-                                  children: [
-                                    Text(
-                                      '«${sheetContext!.name}» cargada · pendiente de interpretación. Los datos originales se conservan.',
-                                    ),
-                                    if (aiReady)
-                                      TextButton(
-                                        onPressed: busy ? null : analyzeSheet,
-                                        child: const Text(
-                                          'Interpretar hoja con IA',
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            if (transcript.isEmpty && companionFocus == null)
-                              Padding(
-                                padding: EdgeInsets.all(16),
-                                child: Text(
-                                  aiReady
-                                      ? '¿Qué te gustaría hacer hoy? Cuéntame y lo organizamos juntos.'
-                                      : 'Carga tus datos con + cuando quieras. La IA podrá interpretar su formato cuando esté conectada.',
-                                ),
-                              ),
-                            for (final message in transcript)
-                              Align(
-                                alignment:
-                                    message.role == 'user'
-                                        ? Alignment.centerRight
-                                        : Alignment.centerLeft,
-                                child: Card(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(14),
-                                    child: ChatMessageBody(
-                                      text: message.text,
-                                      assistant: message.role == 'assistant',
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            if (proposal != null &&
-                                aiReady &&
-                                companionFocus == null)
-                              Card(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(12),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        proposal!.name,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      Text(
-                                        '${proposal!.repeated ? 'Series / tramos' : 'Actividad continua'} · ${proposal!.restSeconds}s de descanso',
-                                      ),
-                                      if (proposal!.fields.isNotEmpty)
-                                        Text(
-                                          proposal!.fields
-                                              .map((f) => f['label'])
-                                              .join(' · '),
-                                        ),
-                                      FilledButton(
-                                        key: const Key(
-                                          'accept-activity-proposal',
-                                        ),
-                                        onPressed:
-                                            widget.controller.busy
-                                                ? null
-                                                : acceptProposal,
-                                        child: const Text('Preparar'),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            if (busy && partialReply.isNotEmpty)
-                              Card(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(14),
-                                  child: ChatMessageBody(
-                                    text: partialReply,
-                                    assistant: true,
-                                  ),
-                                ),
-                              ),
-                            if (busy) ...[
-                              const LinearProgressIndicator(),
-                              if (partialReply.isEmpty)
-                                const Padding(
-                                  padding: EdgeInsets.all(8),
-                                  child: Text('Esperando al modelo…'),
-                                ),
-                            ],
-                            if (error != null)
-                              Padding(
-                                padding: const EdgeInsets.all(12),
-                                child: Text(error!),
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
                 ),
-                if (deferredArchive != null && !followingLatest)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                    child: Text(
-                      'El asistente archivará este chat cuando vuelvas al final.',
-                    ),
-                  ),
-                if (!followingLatest)
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Padding(
-                      padding: const EdgeInsets.only(right: 16),
-                      child: IconButton.filledTonal(
-                        key: const Key('chat-latest'),
-                        tooltip: 'Ir al último mensaje',
-                        onPressed: returnToLatest,
-                        icon: const Icon(Icons.arrow_downward),
-                      ),
-                    ),
-                  ),
-                if (listening &&
-                    (!widget.focusMode ||
-                        MediaQuery.viewInsetsOf(context).bottom == 0))
-                  const Padding(
-                    padding: EdgeInsets.only(top: 8),
-                    child: Text('Escuchando… Revisa el texto y pulsa Enviar.'),
-                  ),
-                if (attachment != null)
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                    child: InputChip(
-                      label: Text(
-                        attachment!.name,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      avatar: Icon(
-                        attachment!.isImage
-                            ? Icons.image_outlined
-                            : Icons.audio_file_outlined,
-                      ),
-                      onDeleted:
-                          busy ? null : () => setState(() => attachment = null),
-                    ),
-                  ),
-                Padding(
-                  key: const Key('assistant-composer'),
-                  padding: const EdgeInsets.all(12),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        key: const Key('assistant-attach'),
-                        tooltip: 'Adjuntar',
-                        onPressed: busy || listening ? null : pickAttachment,
-                        icon: const Icon(Icons.add_circle_outline),
-                      ),
-                      Expanded(
-                        child: TextField(
-                          key: const Key('assistant-input'),
-                          controller: input,
-                          focusNode: composerFocus,
-                          onTapOutside: (_) => composerFocus.unfocus(),
-                          enabled:
-                              (!busy ||
-                                  (widget.focusMode &&
-                                      companionFocus != null)) &&
-                              (aiReady || canRecord),
-                          readOnly: listening || voiceStarting,
-                          minLines: 1,
-                          maxLines:
-                              widget.focusMode
-                                  ? (MediaQuery.viewInsetsOf(context).bottom > 0
-                                      ? 1
-                                      : 2)
-                                  : 4,
-                          decoration: InputDecoration(
-                            hintText:
-                                aiReady || canRecord
-                                    ? 'Escribe o dicta tu mensaje…'
-                                    : 'Conecta tu IA para empezar',
-                            suffixIcon: IconButton(
-                              key: const Key('assistant-talk'),
-                              tooltip:
-                                  listening
-                                      ? 'Terminar dictado'
-                                      : 'Dictar mensaje',
-                              onPressed:
-                                  (!aiReady && !canRecord) ||
-                                          voiceStarting ||
-                                          (busy && !canRecord)
-                                      ? null
-                                      : talk,
-                              icon: Icon(
-                                listening
-                                    ? Icons.stop_circle_outlined
-                                    : Icons.mic_none,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      IconButton(
-                        tooltip: 'Enviar',
-                        onPressed:
-                            busy || listening || (!aiReady && !canRecord)
-                                ? null
-                                : () => send(),
-                        icon: const Icon(Icons.send),
-                      ),
-                    ],
-                  ),
-                ),
-                if (widget.focusMode)
-                  ActivityFocusControls(
-                    controller: widget.controller,
-                    companionId: companionId,
-                    flushInput: flushFocusInput,
-                    aiReady: aiReady,
-                    hideStart: chatInUse,
-                    noticesOff: noticesOff,
-                    onEnableNotices: enableNotices,
-                    onInstantRecorded: instantRecorded,
-                    compact: MediaQuery.viewInsetsOf(context).bottom > 0,
-                  ),
-                if (notifications.error != null)
-                  Text(notifications.error!, maxLines: 2),
-              ],
+              ),
             ),
-          ),
+            if (deferredArchive != null && !followingLatest)
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                child: Text(
+                  'El asistente archivará este chat cuando vuelvas al final.',
+                ),
+              ),
+            if (!followingLatest)
+              Align(
+                alignment: Alignment.centerRight,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: IconButton.filledTonal(
+                    key: const Key('chat-latest'),
+                    tooltip: 'Ir al último mensaje',
+                    onPressed: returnToLatest,
+                    icon: const Icon(Icons.arrow_downward),
+                  ),
+                ),
+              ),
+            if (listening &&
+                (!widget.focusMode ||
+                    MediaQuery.viewInsetsOf(context).bottom == 0))
+              const Padding(
+                padding: EdgeInsets.only(top: 8),
+                child: Text('Escuchando… Revisa el texto y pulsa Enviar.'),
+              ),
+            if (attachment != null)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                child: InputChip(
+                  label: Text(
+                    attachment!.name,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  avatar: Icon(
+                    attachment!.isImage
+                        ? Icons.image_outlined
+                        : Icons.audio_file_outlined,
+                  ),
+                  onDeleted: busy
+                      ? null
+                      : () => setState(() => attachment = null),
+                ),
+              ),
+            Padding(
+              key: const Key('assistant-composer'),
+              padding: const EdgeInsets.all(12),
+              child: Row(
+                children: [
+                  IconButton(
+                    key: const Key('assistant-attach'),
+                    tooltip: 'Adjuntar',
+                    onPressed: busy || listening ? null : pickAttachment,
+                    icon: const Icon(Icons.add_circle_outline),
+                  ),
+                  Expanded(
+                    child: TextField(
+                      key: const Key('assistant-input'),
+                      controller: input,
+                      focusNode: composerFocus,
+                      onTapOutside: (_) => composerFocus.unfocus(),
+                      enabled:
+                          (!busy ||
+                              (widget.focusMode && companionFocus != null)) &&
+                          (aiReady || canRecord),
+                      readOnly: listening || voiceStarting,
+                      minLines: 1,
+                      maxLines: widget.focusMode
+                          ? (MediaQuery.viewInsetsOf(context).bottom > 0
+                                ? 1
+                                : 2)
+                          : 4,
+                      decoration: InputDecoration(
+                        hintText: aiReady || canRecord
+                            ? 'Escribe o dicta tu mensaje…'
+                            : 'Conecta tu IA para empezar',
+                        suffixIcon: IconButton(
+                          key: const Key('assistant-talk'),
+                          tooltip: listening
+                              ? 'Terminar dictado'
+                              : 'Dictar mensaje',
+                          onPressed:
+                              (!aiReady && !canRecord) ||
+                                  voiceStarting ||
+                                  (busy && !canRecord)
+                              ? null
+                              : talk,
+                          icon: Icon(
+                            listening
+                                ? Icons.stop_circle_outlined
+                                : Icons.mic_none,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: 'Enviar',
+                    onPressed: busy || listening || (!aiReady && !canRecord)
+                        ? null
+                        : () => send(),
+                    icon: const Icon(Icons.send),
+                  ),
+                ],
+              ),
+            ),
+            if (widget.focusMode)
+              ActivityFocusControls(
+                controller: widget.controller,
+                companionId: companionId,
+                flushInput: flushFocusInput,
+                aiReady: aiReady,
+                hideStart: chatInUse,
+                noticesOff: noticesOff,
+                onEnableNotices: enableNotices,
+                onInstantRecorded: instantRecorded,
+                onActivityEdited: activityEdited,
+                compact: MediaQuery.viewInsetsOf(context).bottom > 0,
+              ),
+            if (notifications.error != null)
+              Text(notifications.error!, maxLines: 2),
+          ],
         ),
+      ),
+    ),
   );
 }

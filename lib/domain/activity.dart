@@ -23,7 +23,9 @@ class ActivityDefinition {
   }) : name = validName(name),
        companionId = validTrackiaId(companionId),
        fields = List.unmodifiable(
-         fields.map((f) => Map<String, Object>.unmodifiable(_normalizeField(f))),
+         fields.map(
+           (f) => Map<String, Object>.unmodifiable(_normalizeField(f)),
+         ),
        ),
        userSet = List.unmodifiable(userSet),
        _activityKey = activityKey {
@@ -61,13 +63,19 @@ class ActivityDefinition {
         )) {
       throw const ValidationException('Los datos fijados no son válidos.');
     }
-    if (activityKey != null && (activityKey.isEmpty || activityKey.length > 80)) {
+    if (activityKey != null &&
+        (activityKey.isEmpty || activityKey.length > 80)) {
       throw const ValidationException('La clave de la actividad no es válida.');
     }
   }
 
   /// Properties and fields the user has set by hand. The assistant may only
   /// propose changes to them; it never applies them on its own.
+  /// True for a lock identifier that may appear in `userSet`.
+  static bool isLockable(String lock) =>
+      _lockNames.contains(lock) ||
+      (lock.startsWith('field:') && lock.length > 6);
+
   static const _lockNames = {
     'name',
     'restSeconds',
@@ -237,10 +245,9 @@ class ActivityDefinition {
         targetSets: value['targetSets'] as int?,
         targetCycles: value['targetCycles'] as int?,
         completedCycles: value['completedCycles'] as int? ?? 0,
-        fields:
-            (value['fields'] as List)
-                .map((f) => Map<String, Object>.from(f as Map))
-                .toList(),
+        fields: (value['fields'] as List)
+            .map((f) => Map<String, Object>.from(f as Map))
+            .toList(),
         instructions: value['instructions'] as String? ?? '',
         origin: value['origin'] as String? ?? 'user',
         companionId: value['companionId'] as String? ?? 'gymbro',
@@ -256,10 +263,9 @@ class ActivityDefinition {
       ActivityDefinition.fromJson({...toJson(), 'companionId': id});
 
   static ActivityDefinition? proposal(String response) {
-    final matches =
-        RegExp(
-          r'```gymia-activity\s*\n([\s\S]*?)```',
-        ).allMatches(response).toList();
+    final matches = RegExp(
+      r'```gymia-activity\s*\n([\s\S]*?)```',
+    ).allMatches(response).toList();
     if (matches.length != 1) return null;
     try {
       final json = jsonDecode(matches.single.group(1)!) as Map<String, dynamic>;
@@ -285,10 +291,9 @@ class ActivityDefinition {
 }
 
 Map<String, int>? activityTimingProposal(String response) {
-  final matches =
-      RegExp(
-        r'```gymia-timing\s*\n([\s\S]*?)```',
-      ).allMatches(response).toList();
+  final matches = RegExp(
+    r'```gymia-timing\s*\n([\s\S]*?)```',
+  ).allMatches(response).toList();
   if (matches.length != 1) return null;
   try {
     final value = jsonDecode(matches.single.group(1)!) as Map<String, dynamic>;
@@ -402,8 +407,9 @@ class ActivityMessage {
     'intervalId': intervalId,
     'recordedAt': recordedAt.toIso8601String(),
     'metrics': metrics,
-    'attachment':
-        mediaName == null ? null : {'name': mediaName, 'mime': mediaMime},
+    'attachment': mediaName == null
+        ? null
+        : {'name': mediaName, 'mime': mediaMime},
   };
 }
 
@@ -447,23 +453,23 @@ class FocusActivity {
           ...intervals[index].toJson(),
           'durationSeconds':
               intervals[index].endedAt != null &&
-                      !intervals[index].endedAt!.isBefore(
-                        intervals[index].startedAt,
-                      )
-                  ? intervals[index].endedAt!
-                      .difference(intervals[index].startedAt)
-                      .inSeconds
-                  : null,
+                  !intervals[index].endedAt!.isBefore(
+                    intervals[index].startedAt,
+                  )
+              ? intervals[index].endedAt!
+                    .difference(intervals[index].startedAt)
+                    .inSeconds
+              : null,
           'actualRestSeconds':
               index + 1 < intervals.length &&
-                      intervals[index].endedAt != null &&
-                      !intervals[index + 1].startedAt.isBefore(
-                        intervals[index].endedAt!,
-                      )
-                  ? intervals[index + 1].startedAt
-                      .difference(intervals[index].endedAt!)
-                      .inSeconds
-                  : null,
+                  intervals[index].endedAt != null &&
+                  !intervals[index + 1].startedAt.isBefore(
+                    intervals[index].endedAt!,
+                  )
+              ? intervals[index + 1].startedAt
+                    .difference(intervals[index].endedAt!)
+                    .inSeconds
+              : null,
         },
     ],
     'messages': messages.map((m) => m.toJson()).toList(),
@@ -488,9 +494,10 @@ Map<String, Object> validateFieldValues(
     final value = entry.value;
     if (field == null || value == null) throw mismatch;
     final ok = switch (field['type']) {
-      null => value is num && value.isFinite ||
-          value is bool ||
-          value is String && value.length <= 500,
+      null =>
+        value is num && value.isFinite ||
+            value is bool ||
+            value is String && value.length <= 500,
       'number' => value is num && value.isFinite,
       'scale' =>
         value is int &&
@@ -559,16 +566,25 @@ abstract interface class ActivityRepository {
     DateTime end, {
     bool acceptConflicts = false,
   });
-  Future<void> setActivityRest(String activityId, int seconds);
+  Future<void> setActivityRest(
+    String activityId,
+    int seconds, {
+    String source = 'user',
+  });
   Future<void> setActivityTiming(
     String activityId, {
     required int? activitySeconds,
     required int restSeconds,
     required int? targetCycles,
+    String source = 'user',
   });
   Future<ActivityMedia?> loadActivityMedia(String messageId);
   Future<void> cancelActivityPreparation(String activityId);
-  Future<void> renameActivity(String activityId, String name);
+  Future<void> renameActivity(
+    String activityId,
+    String name, {
+    String source = 'user',
+  });
   Future<void> changeCompletedCycles(String activityId, int delta);
   Future<void> replaceActivityPreparation(
     String activityId,
@@ -581,4 +597,8 @@ abstract interface class ActivityRepository {
     Map<String, dynamic> metrics, {
     List<Map<String, Object>> fields = const [],
   });
+
+  /// Frees one property the user had fixed by hand (FR-023); the lock UI calls
+  /// this when the padlock is tapped.
+  Future<void> clearUserSetLock(String activityId, String lock);
 }

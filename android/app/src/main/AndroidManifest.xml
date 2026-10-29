@@ -4,12 +4,22 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <application
         android:label="TrackIA"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher" android:allowBackup="false">
         <receiver android:name=".RestAlarmReceiver" android:exported="false"/>
         <receiver android:name=".RestActionReceiver" android:exported="false"/>
+        <receiver android:name=".ReminderReceiver" android:exported="false"/>
+        <!-- Reprograma los recordatorios tras reiniciar o cambiar hora/zona; ignora otras acciones. -->
+        <receiver android:name=".BootReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.TIME_SET"/>
+                <action android:name="android.intent.action.TIMEZONE_CHANGED"/>
+            </intent-filter>
+        </receiver>
         <activity
             android:name=".MainActivity"
             android:exported="true"

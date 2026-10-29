@@ -16,12 +16,16 @@ class Companion {
        prompt = prompt.trim(),
        icon = _validChoice(icon ?? _defaultIcon(id), iconIds, 'icono'),
        color = _validChoice(color ?? _defaultColor(id), colorIds, 'color') {
-    if (this.prompt.isEmpty || this.prompt.length > 8000) {
+    if (this.prompt.length > 8000) {
       throw const FormatException(
-        'Las instrucciones deben tener entre 1 y 8000 caracteres.',
+        'Las instrucciones no pueden superar los 8000 caracteres.',
       );
     }
   }
+
+  /// Instructions used when the companion has none (data-model §2, FR-016).
+  static const neutralPrompt =
+      'Acompaña al usuario con un tono cercano y claro. Ayúdale a registrar lo que hace sin inventar datos.';
 
   /// IDs from specs/004-trackia-experience/contracts/visual-tokens.md.
   static const iconIds = {
@@ -42,7 +46,14 @@ class Companion {
     'heart',
     'school',
   };
-  static const colorIds = {'teal', 'orange', 'green', 'amber', 'crimson', 'violet'};
+  static const colorIds = {
+    'teal',
+    'orange',
+    'green',
+    'amber',
+    'crimson',
+    'violet',
+  };
 
   static const _suggestedIcons = {
     'gymbro': 'barbell',

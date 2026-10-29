@@ -94,11 +94,10 @@ void main() {
       await storage.write(key: gymChat, value: jsonEncode({'messages': []}));
       await storage.write(key: calmChat, value: jsonEncode({'messages': []}));
       await storage.write(
-        key:
-            SheetSyncService(
-              profileId: 'local',
-              companionId: 'calma',
-            ).connectionKey,
+        key: SheetSyncService(
+          profileId: 'local',
+          companionId: 'calma',
+        ).connectionKey,
         value: jsonEncode({'id': 'sheet-calma'}),
       );
       await store.delete('calma');
@@ -114,13 +113,52 @@ void main() {
     },
   );
 
+  group('optional prompt (data-model §2, FR-016)', () {
+    test('an empty prompt is accepted and kept through JSON', () {
+      final c = Companion(
+        id: 'sin-ia',
+        name: 'Sin IA',
+        description: '',
+        prompt: '',
+      );
+      expect(c.prompt, '');
+      final again = Companion.fromJson(
+        jsonDecode(jsonEncode(c.toJson())) as Map<String, dynamic>,
+      );
+      expect(again.prompt, '');
+      expect(again.toJson(), c.toJson());
+    });
+
+    test('a blank prompt trims to empty and is accepted', () {
+      final c = Companion(id: 'x2', name: 'X', description: '', prompt: '   ');
+      expect(c.prompt, '');
+    });
+
+    test('a prompt over 8000 characters is still rejected', () {
+      expect(
+        () =>
+            Companion(id: 'x3', name: 'X', description: '', prompt: 'a' * 8001),
+        throwsFormatException,
+      );
+    });
+  });
+
   group('icon and color', () {
     test('the four suggestions each have their own icon and color', () {
       final byId = {for (final c in Companion.suggestions) c.id: c};
-      expect((byId['gymbro']!.icon, byId['gymbro']!.color), ('barbell', 'orange'));
-      expect((byId['enfoque']!.icon, byId['enfoque']!.color), ('hourglass', 'teal'));
+      expect(
+        (byId['gymbro']!.icon, byId['gymbro']!.color),
+        ('barbell', 'orange'),
+      );
+      expect(
+        (byId['enfoque']!.icon, byId['enfoque']!.color),
+        ('hourglass', 'teal'),
+      );
       expect((byId['calma']!.icon, byId['calma']!.color), ('leaf', 'green'));
-      expect((byId['diario']!.icon, byId['diario']!.color), ('notebook', 'amber'));
+      expect(
+        (byId['diario']!.icon, byId['diario']!.color),
+        ('notebook', 'amber'),
+      );
     });
 
     test('a custom companion defaults to sparkles and teal', () {
@@ -128,22 +166,25 @@ void main() {
       expect((own.icon, own.color), ('sparkles', 'teal'));
     });
 
-    test('JSON saved before this change loads with defaults and keeps its data', () {
-      final old = {
-        'id': 'gymbro',
-        'name': 'GymBro',
-        'description': 'Entrenamiento',
-        'prompt': 'Acompáñame.',
-      };
-      final loaded = Companion.fromJson(old);
-      expect((loaded.icon, loaded.color), ('barbell', 'orange'));
-      final again = Companion.fromJson(
-        jsonDecode(jsonEncode(loaded.toJson())) as Map<String, dynamic>,
-      );
-      expect(again.toJson(), loaded.toJson());
-      expect(again.name, 'GymBro');
-      expect(again.prompt, 'Acompáñame.');
-    });
+    test(
+      'JSON saved before this change loads with defaults and keeps its data',
+      () {
+        final old = {
+          'id': 'gymbro',
+          'name': 'GymBro',
+          'description': 'Entrenamiento',
+          'prompt': 'Acompáñame.',
+        };
+        final loaded = Companion.fromJson(old);
+        expect((loaded.icon, loaded.color), ('barbell', 'orange'));
+        final again = Companion.fromJson(
+          jsonDecode(jsonEncode(loaded.toJson())) as Map<String, dynamic>,
+        );
+        expect(again.toJson(), loaded.toJson());
+        expect(again.name, 'GymBro');
+        expect(again.prompt, 'Acompáñame.');
+      },
+    );
 
     test('an explicit choice is kept and copyWith can change it', () {
       final own = Companion(

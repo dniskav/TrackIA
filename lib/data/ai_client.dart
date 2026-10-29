@@ -139,6 +139,7 @@ class AiClient {
     void Function(String text)? onText,
   }) async {
     config.validate();
+    messages = messages.where((m) => m.role != 'event').toList();
     if (messages.isEmpty || messages.last.role != 'user') {
       throw const ValidationException('Escribe un mensaje para el asistente.');
     }

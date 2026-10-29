@@ -490,7 +490,12 @@ void main() {
       fields: const [
         {'key': 'pages', 'label': 'Páginas', 'unit': 'págs', 'type': 'number'},
         {'key': 'book', 'label': 'Libro', 'unit': '', 'type': 'text'},
-        {'key': 'finished', 'label': '¿Terminado?', 'unit': '', 'type': 'boolean'},
+        {
+          'key': 'finished',
+          'label': '¿Terminado?',
+          'unit': '',
+          'type': 'boolean',
+        },
         {'key': 'liked', 'label': 'Te gustó', 'unit': '', 'type': 'scale'},
         {
           'key': 'mood',
@@ -515,32 +520,42 @@ void main() {
       return a.messages.singleWhere((m) => m.id == messageId).metrics;
     }
 
-    test('a manual record stores its typed values next to the original', () async {
-      final id = await prepared();
-      final message = await repo.recordActivityMessage(
-        id,
-        'Páginas: +18',
-        metrics: const {
+    test(
+      'a manual record stores its typed values next to the original',
+      () async {
+        final id = await prepared();
+        final message = await repo.recordActivityMessage(
+          id,
+          'Páginas: +18',
+          metrics: const {
+            'pages': 18,
+            'book': 'El Hobbit',
+            'finished': false,
+            'liked': 4,
+            'mood': 'bien',
+          },
+        );
+        expect(await metricsOf(message), {
           'pages': 18,
           'book': 'El Hobbit',
           'finished': false,
           'liked': 4,
           'mood': 'bien',
-        },
-      );
-      expect(await metricsOf(message), {
-        'pages': 18,
-        'book': 'El Hobbit',
-        'finished': false,
-        'liked': 4,
-        'mood': 'bien',
-      });
-      expect((await repo.loadActivities()).single.messages.single.text, 'Páginas: +18');
-    });
+        });
+        expect(
+          (await repo.loadActivities()).single.messages.single.text,
+          'Páginas: +18',
+        );
+      },
+    );
 
     test('zero is a value and is kept apart from a missing one', () async {
       final id = await prepared();
-      final zero = await repo.recordActivityMessage(id, 'Sin páginas', metrics: const {'pages': 0});
+      final zero = await repo.recordActivityMessage(
+        id,
+        'Sin páginas',
+        metrics: const {'pages': 0},
+      );
       final none = await repo.recordActivityMessage(id, 'Solo una nota');
       final a = (await repo.loadActivities()).single;
       expect(a.messages.singleWhere((m) => m.id == zero).metrics, {'pages': 0});
@@ -559,7 +574,11 @@ void main() {
       };
       for (final entry in bad.entries) {
         await expectLater(
-          repo.recordActivityMessage(id, 'x', metrics: {entry.key: entry.value}),
+          repo.recordActivityMessage(
+            id,
+            'x',
+            metrics: {entry.key: entry.value},
+          ),
           throwsA(isA<ValidationException>()),
           reason: '${entry.key}=${entry.value}',
         );
@@ -576,17 +595,22 @@ void main() {
       expect((await repo.loadActivities()).single.messages, isEmpty);
     });
 
-    test('number fields accept decimals; legacy note fields keep their rules', () async {
-      final id = await prepared();
-      final a = await repo.recordActivityMessage(
-        id, 'x', metrics: const {'pages': 12.5, 'note': 'ok'},
-      );
-      expect(await metricsOf(a), {'pages': 12.5, 'note': 'ok'});
-      await expectLater(
-        repo.recordActivityMessage(id, 'x', metrics: {'note': 'x' * 501}),
-        throwsA(isA<ValidationException>()),
-      );
-    });
+    test(
+      'number fields accept decimals; legacy note fields keep their rules',
+      () async {
+        final id = await prepared();
+        final a = await repo.recordActivityMessage(
+          id,
+          'x',
+          metrics: const {'pages': 12.5, 'note': 'ok'},
+        );
+        expect(await metricsOf(a), {'pages': 12.5, 'note': 'ok'});
+        await expectLater(
+          repo.recordActivityMessage(id, 'x', metrics: {'note': 'x' * 501}),
+          throwsA(isA<ValidationException>()),
+        );
+      },
+    );
 
     test('the assistant interpretation is held to the same types', () async {
       final id = await prepared();
@@ -599,50 +623,112 @@ void main() {
       expect(await metricsOf(message), {'pages': 18, 'liked': 3});
     });
 
-    test('a manual record cannot touch a finished activity or another interval', () async {
-      final id = await prepared();
-      await expectLater(
-        repo.recordActivityMessage(id, 'x', intervalId: 'no-existe', metrics: const {'pages': 1}),
-        throwsA(isA<ValidationException>()),
-      );
-    });
+    test(
+      'a manual record cannot touch a finished activity or another interval',
+      () async {
+        final id = await prepared();
+        await expectLater(
+          repo.recordActivityMessage(
+            id,
+            'x',
+            intervalId: 'no-existe',
+            metrics: const {'pages': 1},
+          ),
+          throwsA(isA<ValidationException>()),
+        );
+      },
+    );
   });
 
   group('stable activity key', () {
     test('preparing an activity stores its key', () async {
-      final id = await repo.prepareActivity(ActivityDefinition(name: '  Leer   Mucho '));
+      final id = await repo.prepareActivity(
+        ActivityDefinition(name: '  Leer   Mucho '),
+      );
       final a = (await repo.loadActivities()).singleWhere((a) => a.id == id);
       expect(a.definition.activityKey, 'leer mucho');
-      final raw = await (await databaseFactoryFfi.openDatabase('${dir.path}/test.sqlite'))
-          .query('activities');
-      expect(jsonDecode(raw.single['definition'] as String)['activityKey'], 'leer mucho');
+      final raw = await (await databaseFactoryFfi.openDatabase(
+        '${dir.path}/test.sqlite',
+      )).query('activities');
+      expect(
+        jsonDecode(raw.single['definition'] as String)['activityKey'],
+        'leer mucho',
+      );
     });
 
-    test('renaming keeps the key so goals and achievements follow the activity', () async {
-      final id = await repo.prepareActivity(ActivityDefinition(name: 'Leer'));
-      await repo.renameActivity(id, 'Lectura nocturna');
-      final d = (await repo.loadActivities()).single.definition;
-      expect(d.name, 'Lectura nocturna');
-      expect(d.activityKey, 'leer');
-    });
+    test(
+      'renaming keeps the key so goals and achievements follow the activity',
+      () async {
+        final id = await repo.prepareActivity(ActivityDefinition(name: 'Leer'));
+        await repo.renameActivity(id, 'Lectura nocturna');
+        final d = (await repo.loadActivities()).single.definition;
+        expect(d.name, 'Lectura nocturna');
+        expect(d.activityKey, 'leer');
+      },
+    );
 
     test('renaming twice still keeps the original key', () async {
       final id = await repo.prepareActivity(ActivityDefinition(name: 'Leer'));
       await repo.renameActivity(id, 'Libros');
       await repo.renameActivity(id, 'Novelas');
-      expect((await repo.loadActivities()).single.definition.activityKey, 'leer');
+      expect(
+        (await repo.loadActivities()).single.definition.activityKey,
+        'leer',
+      );
     });
 
-    test('an activity saved before keys existed keeps the key of its old name on rename', () async {
-      final id = await repo.prepareActivity(ActivityDefinition(name: 'Movilidad'));
-      final db = await databaseFactoryFfi.openDatabase('${dir.path}/test.sqlite');
-      final legacy = jsonDecode(
-        (await db.query('activities')).single['definition'] as String,
-      ) as Map<String, dynamic>
-        ..remove('activityKey');
-      await db.update('activities', {'definition': jsonEncode(legacy)});
-      await repo.renameActivity(id, 'Movilidad de hombros');
-      expect((await repo.loadActivities()).single.definition.activityKey, 'movilidad');
-    });
+    test(
+      'an activity saved before keys existed keeps the key of its old name on rename',
+      () async {
+        final id = await repo.prepareActivity(
+          ActivityDefinition(name: 'Movilidad'),
+        );
+        final db = await databaseFactoryFfi.openDatabase(
+          '${dir.path}/test.sqlite',
+        );
+        final legacy =
+            jsonDecode(
+                    (await db.query('activities')).single['definition']
+                        as String,
+                  )
+                  as Map<String, dynamic>
+              ..remove('activityKey');
+        await db.update('activities', {'definition': jsonEncode(legacy)});
+        await repo.renameActivity(id, 'Movilidad de hombros');
+        expect(
+          (await repo.loadActivities()).single.definition.activityKey,
+          'movilidad',
+        );
+      },
+    );
   });
+
+  test(
+    'a timing change with a segment running leaves it alone and applies to the next (FR-025)',
+    () async {
+      final id = await repo.prepareActivity(
+        ActivityDefinition(name: 'Plancha', restSeconds: 60),
+      );
+      await repo.startInterval(id);
+      now = now.add(const Duration(seconds: 30));
+      await repo.setActivityTiming(
+        id,
+        activitySeconds: null,
+        restSeconds: 90,
+        targetCycles: null,
+      );
+      var a = (await repo.loadActivities()).singleWhere((x) => x.id == id);
+      // El tramo en marcha sigue igual: mismo inicio, sin cierre, sin descanso.
+      expect(a.running, isNotNull);
+      expect(a.intervals.single.startedAt, DateTime(2026, 10, 8, 10));
+      expect(a.intervals.single.endedAt, isNull);
+      expect(a.intervals.single.restSeconds, isNull);
+      expect(a.definition.restSeconds, 90);
+
+      // Al parar, el descanso que arranca ya usa el valor nuevo.
+      await repo.stopInterval(id);
+      a = (await repo.loadActivities()).singleWhere((x) => x.id == id);
+      expect(a.intervals.single.restSeconds, 90);
+    },
+  );
 }

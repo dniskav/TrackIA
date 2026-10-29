@@ -21,6 +21,17 @@ class MainActivity : FlutterActivity() {
     private lateinit var googleSheets: GoogleSheetsBridge
     private var notificationPermissionResult: MethodChannel.Result? = null
     private var restNotificationChannel: MethodChannel? = null
+    private var remindersChannel: MethodChannel? = null
+    /** Which companion's chat a tapped reminder asks for; handed to Flutter once. */
+    private var pendingReminderOpen: Map<String, String>? = null
+
+    private fun captureReminderOpen(intent: Intent?): Boolean {
+        val profile = intent?.getStringExtra(Reminders.extraProfile)
+        val companion = intent?.getStringExtra(Reminders.extraCompanion)
+        if (profile.isNullOrEmpty() || companion.isNullOrEmpty()) return false
+        pendingReminderOpen = mapOf("profileId" to profile, "companionId" to companion)
+        return true
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         RestNotifications.captureStartAction(this, intent)
@@ -204,6 +215,29 @@ class MainActivity : FlutterActivity() {
                 } catch (e: Exception) { result.error("REST_NOTIFICATION", "No se pudo configurar el aviso de descanso.", null) }
             }
         googleSheets = GoogleSheetsBridge(this)
+        captureReminderOpen(intent)
+        remindersChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "com.gymia.app/reminders")
+        remindersChannel!!
+            .setMethodCallHandler { call, result ->
+                try {
+                    when (call.method) {
+                        "pendingOpen" -> {
+                            val pending = pendingReminderOpen
+                            pendingReminderOpen = null
+                            result.success(pending)
+                        }
+                        "sync" -> result.success(Reminders.sync(this, call.argument<String>("snapshot") ?: ""))
+                        "clear" -> {
+                            Reminders.clear(this, call.argument<String>("profileId") ?: "")
+                            result.success(true)
+                        }
+                        "status" -> result.success(mapOf("permitted" to RestNotifications.permitted(this), "scheduled" to Reminders.scheduledCount(this), "postedToday" to Reminders.postedToday(this)))
+                        else -> result.notImplemented()
+                    }
+                } catch (error: Exception) {
+                    result.error("REMINDERS_FAILED", "No se pudieron programar los recordatorios.", null)
+                }
+            }
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "com.gymia.app/google-sheets")
             .setMethodCallHandler { call, result -> googleSheets.handle(call, result) }
         if (intent?.action == Intent.ACTION_SEND) pendingImport = intent
@@ -278,6 +312,7 @@ class MainActivity : FlutterActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
+        if (captureReminderOpen(intent)) remindersChannel?.invokeMethod("openAvailable", null)
         if (RestNotifications.captureStartAction(this, intent)) {
             restNotificationChannel?.invokeMethod("actionAvailable", null)
         }

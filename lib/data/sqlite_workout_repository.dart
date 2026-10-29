@@ -12,6 +12,7 @@ import '../domain/transfer_repository.dart';
 import '../domain/activity.dart';
 import '../domain/space.dart';
 import 'activity_template_repository.dart';
+import 'progress_repository.dart';
 import 'observation_repository.dart';
 part 'sqlite_activity_repository.dart';
 part 'trackia_migrations.dart';
@@ -29,6 +30,13 @@ class SqliteWorkoutRepository
 
   /// Point records (no running clock) of this profile.
   late final ObservationRepository observations = ObservationRepository(
+    _db,
+    _now,
+    profileId,
+  );
+
+  /// Companion settings and reminders of this profile.
+  late final ProgressRepository progress = ProgressRepository(
     _db,
     _now,
     profileId,
@@ -109,19 +117,18 @@ class SqliteWorkoutRepository
           (r) => Routine(
             id: r['id'] as String,
             name: r['name'] as String,
-            exercises:
-                exercises
-                    .where((e) => e['routine_id'] == r['id'])
-                    .map(
-                      (e) => RoutineExerciseDraft(
-                        name: e['name'] as String,
-                        targetSets: e['target_sets'] as int,
-                        repsMin: e['reps_min'] as int,
-                        repsMax: e['reps_max'] as int,
-                        restSeconds: e['rest_seconds'] as int,
-                      ),
-                    )
-                    .toList(),
+            exercises: exercises
+                .where((e) => e['routine_id'] == r['id'])
+                .map(
+                  (e) => RoutineExerciseDraft(
+                    name: e['name'] as String,
+                    targetSets: e['target_sets'] as int,
+                    repsMin: e['reps_min'] as int,
+                    repsMax: e['reps_max'] as int,
+                    restSeconds: e['rest_seconds'] as int,
+                  ),
+                )
+                .toList(),
           ),
         )
         .toList();
@@ -235,10 +242,9 @@ class SqliteWorkoutRepository
     workoutId: row['workout_id'] as String,
     durationSeconds: row['duration_seconds'] as int,
     remainingMs: row['remaining_ms'] as int,
-    endsAt:
-        row['ends_at'] == null
-            ? null
-            : DateTime.fromMillisecondsSinceEpoch(row['ends_at'] as int),
+    endsAt: row['ends_at'] == null
+        ? null
+        : DateTime.fromMillisecondsSinceEpoch(row['ends_at'] as int),
   );
 
   @override
@@ -256,8 +262,9 @@ class SqliteWorkoutRepository
         'workout_id': workoutId,
         'duration_seconds': seconds,
         'remaining_ms': seconds * 1000,
-        'ends_at':
-            running ? _now().millisecondsSinceEpoch + seconds * 1000 : null,
+        'ends_at': running
+            ? _now().millisecondsSinceEpoch + seconds * 1000
+            : null,
       }, conflictAlgorithm: ConflictAlgorithm.replace);
     });
   }
@@ -385,62 +392,53 @@ class SqliteWorkoutRepository
             startedAt: DateTime.fromMillisecondsSinceEpoch(
               w['started_at'] as int,
             ),
-            finishedAt:
-                w['finished_at'] == null
-                    ? null
-                    : DateTime.fromMillisecondsSinceEpoch(
-                      w['finished_at'] as int,
-                    ),
-            finishedRecordedAt:
-                w['finished_recorded_at'] == null
-                    ? null
-                    : DateTime.fromMillisecondsSinceEpoch(
-                      w['finished_recorded_at'] as int,
-                    ),
-            finishTimeSource:
-                w['finish_time_source'] == null
-                    ? null
-                    : FinishTimeSource.values.byName(
-                      w['finish_time_source'] as String,
-                    ),
-            finishTimeIssues:
-                w['finish_time_issues'] == null
-                    ? const []
-                    : List<String>.unmodifiable(
-                      (jsonDecode(w['finish_time_issues'] as String) as List)
-                          .cast<String>(),
-                    ),
-            exercises:
-                exercises
-                    .where((e) => e['workout_id'] == w['id'])
-                    .map(
-                      (e) => Exercise(
-                        id: e['id'] as String,
-                        name: e['name'] as String,
-                        targetSets: e['target_sets'] as int?,
-                        repsMin: e['reps_min'] as int?,
-                        repsMax: e['reps_max'] as int?,
-                        restSeconds: e['rest_seconds'] as int,
-                        sets:
-                            sets
-                                .where((s) => s['exercise_id'] == e['id'])
-                                .map(
-                                  (s) => WorkoutSet(
-                                    id: s['id'] as String,
-                                    weight: s['weight'] as int,
-                                    reps: s['reps'] as int,
-                                    recordedAt:
-                                        s['recorded_at'] == null
-                                            ? null
-                                            : DateTime.fromMillisecondsSinceEpoch(
-                                              s['recorded_at'] as int,
-                                            ),
+            finishedAt: w['finished_at'] == null
+                ? null
+                : DateTime.fromMillisecondsSinceEpoch(w['finished_at'] as int),
+            finishedRecordedAt: w['finished_recorded_at'] == null
+                ? null
+                : DateTime.fromMillisecondsSinceEpoch(
+                    w['finished_recorded_at'] as int,
+                  ),
+            finishTimeSource: w['finish_time_source'] == null
+                ? null
+                : FinishTimeSource.values.byName(
+                    w['finish_time_source'] as String,
+                  ),
+            finishTimeIssues: w['finish_time_issues'] == null
+                ? const []
+                : List<String>.unmodifiable(
+                    (jsonDecode(w['finish_time_issues'] as String) as List)
+                        .cast<String>(),
+                  ),
+            exercises: exercises
+                .where((e) => e['workout_id'] == w['id'])
+                .map(
+                  (e) => Exercise(
+                    id: e['id'] as String,
+                    name: e['name'] as String,
+                    targetSets: e['target_sets'] as int?,
+                    repsMin: e['reps_min'] as int?,
+                    repsMax: e['reps_max'] as int?,
+                    restSeconds: e['rest_seconds'] as int,
+                    sets: sets
+                        .where((s) => s['exercise_id'] == e['id'])
+                        .map(
+                          (s) => WorkoutSet(
+                            id: s['id'] as String,
+                            weight: s['weight'] as int,
+                            reps: s['reps'] as int,
+                            recordedAt: s['recorded_at'] == null
+                                ? null
+                                : DateTime.fromMillisecondsSinceEpoch(
+                                    s['recorded_at'] as int,
                                   ),
-                                )
-                                .toList(),
-                      ),
-                    )
-                    .toList(),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                )
+                .toList(),
           ),
         )
         .toList();
@@ -649,10 +647,9 @@ class SqliteWorkoutRepository
         'finish_time_source':
             (finishedAt == null ? FinishTimeSource.system : finishTimeSource)
                 .name,
-        'finish_time_issues':
-            issues.isEmpty
-                ? null
-                : jsonEncode(issues.map((i) => i.code).toList()),
+        'finish_time_issues': issues.isEmpty
+            ? null
+            : jsonEncode(issues.map((i) => i.code).toList()),
         'active_slot': null,
       },
       where: 'id = ?',
@@ -842,104 +839,98 @@ class SqliteWorkoutRepository
         }
         final raw = rawTables[entry.key];
         if (raw is! List) throw const FormatException();
-        result[entry.key] =
-            raw.map((item) {
-              // Version 1 backups predate timestamp provenance. Do not invent it.
-              if (root['version'] == 1 && item is Map) {
-                item = Map<String, dynamic>.from(item);
-                for (final column in [
-                  'recorded_at',
-                  'finished_recorded_at',
-                  'finish_time_source',
-                  'finish_time_issues',
-                ]) {
-                  if (entry.value.contains(column)) item[column] = null;
-                }
-              }
-              if (item is! Map ||
-                  item.keys
-                      .toSet()
-                      .difference(entry.value.toSet())
-                      .isNotEmpty ||
-                  !entry.value.every(item.containsKey)) {
+        result[entry.key] = raw.map((item) {
+          // Version 1 backups predate timestamp provenance. Do not invent it.
+          if (root['version'] == 1 && item is Map) {
+            item = Map<String, dynamic>.from(item);
+            for (final column in [
+              'recorded_at',
+              'finished_recorded_at',
+              'finish_time_source',
+              'finish_time_issues',
+            ]) {
+              if (entry.value.contains(column)) item[column] = null;
+            }
+          }
+          if (item is! Map ||
+              item.keys.toSet().difference(entry.value.toSet()).isNotEmpty ||
+              !entry.value.every(item.containsKey)) {
+            throw const FormatException();
+          }
+          final row = Map<String, Object?>.from(item);
+          for (final column in entry.value) {
+            final value = row[column];
+            if (value == null &&
+                !_backupNullable.contains(column) &&
+                !(entry.key == 'activity_intervals' &&
+                    column == 'rest_seconds')) {
+              throw const FormatException();
+            }
+            final isInt =
+                _backupIntFields.contains(column) ||
+                (entry.key == 'rest_timer' && column == 'id');
+            if (value != null && (isInt ? value is! int : value is! String)) {
+              throw const FormatException();
+            }
+            if (value is String &&
+                value.length >
+                    (column == 'attachment'
+                        ? 6 * 1024 * 1024
+                        : [
+                            'finish_time_issues',
+                            'definition',
+                            'metrics',
+                          ].contains(column)
+                        ? 50000
+                        : ['text', 'draft'].contains(column)
+                        ? 8000
+                        : 500)) {
+              throw const FormatException();
+            }
+            if (value is String &&
+                value.isEmpty &&
+                !['exercise_key', 'draft'].contains(column)) {
+              throw const FormatException();
+            }
+            if (column == 'name' && value is String) validName(value);
+            if (column == 'finish_time_source' &&
+                value != null &&
+                !['system', 'user'].contains(value)) {
+              throw const FormatException();
+            }
+            if (column == 'finish_time_issues' && value != null) {
+              final flags = jsonDecode(value as String);
+              if (flags is! List || flags.any((f) => f is! String)) {
                 throw const FormatException();
               }
-              final row = Map<String, Object?>.from(item);
-              for (final column in entry.value) {
-                final value = row[column];
-                if (value == null &&
-                    !_backupNullable.contains(column) &&
-                    !(entry.key == 'activity_intervals' &&
-                        column == 'rest_seconds')) {
-                  throw const FormatException();
-                }
-                final isInt =
-                    _backupIntFields.contains(column) ||
-                    (entry.key == 'rest_timer' && column == 'id');
-                if (value != null &&
-                    (isInt ? value is! int : value is! String)) {
-                  throw const FormatException();
-                }
-                if (value is String &&
-                    value.length >
-                        (column == 'attachment'
-                            ? 6 * 1024 * 1024
-                            : [
-                              'finish_time_issues',
-                              'definition',
-                              'metrics',
-                            ].contains(column)
-                            ? 50000
-                            : ['text', 'draft'].contains(column)
-                            ? 8000
-                            : 500)) {
-                  throw const FormatException();
-                }
-                if (value is String &&
-                    value.isEmpty &&
-                    !['exercise_key', 'draft'].contains(column)) {
-                  throw const FormatException();
-                }
-                if (column == 'name' && value is String) validName(value);
-                if (column == 'finish_time_source' &&
-                    value != null &&
-                    !['system', 'user'].contains(value)) {
-                  throw const FormatException();
-                }
-                if (column == 'finish_time_issues' && value != null) {
-                  final flags = jsonDecode(value as String);
-                  if (flags is! List || flags.any((f) => f is! String)) {
-                    throw const FormatException();
-                  }
-                }
-                if (column == 'definition') {
-                  ActivityDefinition.fromJson(
-                    jsonDecode(value as String) as Map<String, dynamic>,
-                  );
-                }
-                if (column == 'attachment' && value != null) {
-                  ActivityMedia.fromJson(
-                    jsonDecode(value as String) as Map<String, dynamic>,
-                  );
-                }
-                if (column == 'metrics' &&
-                    jsonDecode(value as String) is! Map) {
-                  throw const FormatException();
-                }
-                if (column == 'metrics') {
-                  final metrics = jsonDecode(value as String) as Map;
-                  if (metrics.values.any(
-                    (v) =>
-                        !(v is num && v.isFinite ||
-                            v is bool ||
-                            v is String && v.length <= 500),
-                  )) {
-                    throw const FormatException();
-                  }
-                }
+            }
+            if (column == 'definition') {
+              ActivityDefinition.fromJson(
+                jsonDecode(value as String) as Map<String, dynamic>,
+              );
+            }
+            if (column == 'attachment' && value != null) {
+              ActivityMedia.fromJson(
+                jsonDecode(value as String) as Map<String, dynamic>,
+              );
+            }
+            if (column == 'metrics' && jsonDecode(value as String) is! Map) {
+              throw const FormatException();
+            }
+            if (column == 'metrics') {
+              final metrics = jsonDecode(value as String) as Map;
+              if (metrics.values.any(
+                (v) =>
+                    !(v is num && v.isFinite ||
+                        v is bool ||
+                        v is String && v.length <= 500),
+              )) {
+                throw const FormatException();
               }
-              return row;
-            }).toList();
+            }
+          }
+          return row;
+        }).toList();
       }
       return result;
     } catch (_) {
@@ -1018,8 +1009,9 @@ class SqliteWorkoutRepository
           'id': workoutId,
           'name': name,
           'started_at': w.date.millisecondsSinceEpoch,
-          'finished_at':
-              w.date.add(const Duration(minutes: 1)).millisecondsSinceEpoch,
+          'finished_at': w.date
+              .add(const Duration(minutes: 1))
+              .millisecondsSinceEpoch,
           'active_slot': null,
         });
         for (var i = 0; i < w.exercises.length; i++) {

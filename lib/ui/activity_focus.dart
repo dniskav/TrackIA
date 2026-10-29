@@ -7,6 +7,7 @@ import '../domain/workout.dart';
 import '../data/activity_template_repository.dart';
 import 'activity_builder.dart';
 import 'instant_record.dart';
+import 'proposal_card.dart' show LockBadge;
 import 'session_control.dart';
 import 'theme.dart';
 import 'timer_ring.dart';
@@ -23,6 +24,7 @@ class ActivityFocusControls extends StatefulWidget {
     this.noticesOff = false,
     this.onEnableNotices,
     this.onInstantRecorded,
+    this.onActivityEdited,
   });
   final WorkoutController controller;
   final Future<void> Function() flushInput;
@@ -38,6 +40,9 @@ class ActivityFocusControls extends StatefulWidget {
 
   /// Told what was recorded so the chat can show «Registrado: …».
   final void Function(String)? onInstantRecorded;
+
+  /// Told about a manual edit so the chat can note it for the assistant.
+  final void Function(String)? onActivityEdited;
   @override
   State<ActivityFocusControls> createState() => _ActivityFocusControlsState();
 }
@@ -272,23 +277,22 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
         accept =
             await showDialog<bool>(
               context: context,
-              builder:
-                  (context) => AlertDialog(
-                    title: const Text('Revisar hora'),
-                    content: const Text(
-                      'La hora elegida no coincide con los registros. ¿Guardar esa hora y conservarlos?',
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, false),
-                        child: const Text('Volver'),
-                      ),
-                      FilledButton(
-                        onPressed: () => Navigator.pop(context, true),
-                        child: const Text('Guardar esa hora'),
-                      ),
-                    ],
+              builder: (context) => AlertDialog(
+                title: const Text('Revisar hora'),
+                content: const Text(
+                  'La hora elegida no coincide con los registros. ¿Guardar esa hora y conservarlos?',
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: const Text('Volver'),
                   ),
+                  FilledButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    child: const Text('Guardar esa hora'),
+                  ),
+                ],
+              ),
             ) ??
             false;
         if (!accept) return;
@@ -334,8 +338,8 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
     final choice = await showModalBottomSheet<ActivityChoice>(
       context: context,
       isScrollControlled: true,
-      builder:
-          (_) => ActivityChooser(controller: c, companionId: widget.companionId),
+      builder: (_) =>
+          ActivityChooser(controller: c, companionId: widget.companionId),
     );
     if (choice == null) return;
     await saveChoice(choice);
@@ -355,8 +359,8 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
     final choice = await showModalBottomSheet<ActivityChoice>(
       context: context,
       isScrollControlled: true,
-      builder:
-          (_) => ActivityChooser(controller: c, companionId: widget.companionId),
+      builder: (_) =>
+          ActivityChooser(controller: c, companionId: widget.companionId),
     );
     if (choice == null || focus?.id != a.id) return;
     await saveChoice(choice);
@@ -392,7 +396,9 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('No se pudo guardar el registro. Vuelve a intentarlo.'),
+            content: Text(
+              'No se pudo guardar el registro. Vuelve a intentarlo.',
+            ),
           ),
         );
       }
@@ -407,20 +413,19 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
     }
     final picked = await showModalBottomSheet<ActivityTemplate>(
       context: context,
-      builder:
-          (sheet) => SafeArea(
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                for (final t in instantTemplates)
-                  ListTile(
-                    leading: const Icon(Icons.touch_app_outlined),
-                    title: Text(t.definition.name),
-                    onTap: () => Navigator.pop(sheet, t),
-                  ),
-              ],
-            ),
-          ),
+      builder: (sheet) => SafeArea(
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            for (final t in instantTemplates)
+              ListTile(
+                leading: const Icon(Icons.touch_app_outlined),
+                title: Text(t.definition.name),
+                onTap: () => Navigator.pop(sheet, t),
+              ),
+          ],
+        ),
+      ),
     );
     if (picked != null) await recordInstant(picked.definition);
   }
@@ -433,8 +438,16 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
       builder: (_) => ActivityNameDialog(initial: a.definition.name),
     );
     if (name == null || focus?.id != a.id) return;
-    await c.run(() => c.activityRepository!.renameActivity(a.id, name));
+    final done = await c.run(
+      () => c.activityRepository!.renameActivity(a.id, name),
+    );
+    if (done) {
+      widget.onActivityEdited?.call('Renombraste la actividad a «$name»');
+    }
   }
+
+  Future<void> releaseLock(String activityId, String lock) =>
+      c.run(() => c.activityRepository!.clearUserSetLock(activityId, lock));
 
   Future<void> rest() async {
     final a = resting ?? focus;
@@ -444,7 +457,12 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
       builder: (_) => ActivityRestDialog(seconds: a.definition.restSeconds),
     );
     if (value != null) {
-      await c.run(() => c.activityRepository!.setActivityRest(a.id, value));
+      final done = await c.run(
+        () => c.activityRepository!.setActivityRest(a.id, value),
+      );
+      if (done) {
+        widget.onActivityEdited?.call('Cambiaste el descanso a $value s');
+      }
     }
   }
 
@@ -493,15 +511,11 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
           widget.companionId == 'gymbro';
       final finishButton = TextButton(
         key: const Key('finish-activity'),
-        onPressed:
-            closingDay
-                ? (enabled ? closeDay : null)
-                : enabled &&
-                    running == null &&
-                    a != null &&
-                    a.intervals.isNotEmpty
-                ? finish
-                : null,
+        onPressed: closingDay
+            ? (enabled ? closeDay : null)
+            : enabled && running == null && a != null && a.intervals.isNotEmpty
+            ? finish
+            : null,
         child: Text(
           closingDay ? 'Finalizar día' : 'Terminar',
           maxLines: 1,
@@ -511,12 +525,24 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
       final restButton = TextButton(
         key: const Key('activity-rest'),
         onPressed: enabled && (a != null || restOwner != null) ? rest : null,
-        child: Text(
-          restOwner == null
-              ? a == null
-                  ? '—'
-                  : '${a.definition.restSeconds}s'
-              : '${_clock(remaining)} · ${restOwner.definition.restSeconds}s',
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              restOwner == null
+                  ? a == null
+                        ? '—'
+                        : '${a.definition.restSeconds}s'
+                  : '${_clock(remaining)} · ${restOwner.definition.restSeconds}s',
+            ),
+            if ((restOwner ?? a)?.definition.userSet.contains('restSeconds') ??
+                false)
+              LockBadge(
+                key: const Key('lock-restSeconds'),
+                onRelease: () =>
+                    releaseLock((restOwner ?? a)!.id, 'restSeconds'),
+              ),
+          ],
         ),
       );
       if (a == null) {
@@ -538,26 +564,22 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
       final segments =
           definition.segmentPlural ??
           (definition.companionId == 'gymbro' ? 'series' : 'tramos');
-      final status =
-          running != null
-              ? definition.repeated
-                  ? '${segment[0].toUpperCase()}${segment.substring(1)} ${a.intervals.length}${definition.targetSets == null ? '' : ' de ${definition.targetSets}'}'
-                  : 'En marcha'
-              : a.intervals.isEmpty
-              ? 'Listo'
-              : definition.repeated
-              ? '${a.intervals.where((i) => i.endedAt != null).length}${definition.targetSets == null ? '' : '/${definition.targetSets}'} $segments · Descanso'
-              : 'Descanso';
-      final elapsed =
-          running == null
-              ? Duration.zero
-              : c.now().difference(running.startedAt);
-      final total =
-          definition.activitySeconds == null
-              ? null
-              : Duration(seconds: definition.activitySeconds!);
-      final canAct =
-          enabled && (running != null || !widget.hideStart);
+      final status = running != null
+          ? definition.repeated
+                ? '${segment[0].toUpperCase()}${segment.substring(1)} ${a.intervals.length}${definition.targetSets == null ? '' : ' de ${definition.targetSets}'}'
+                : 'En marcha'
+          : a.intervals.isEmpty
+          ? 'Listo'
+          : definition.repeated
+          ? '${a.intervals.where((i) => i.endedAt != null).length}${definition.targetSets == null ? '' : '/${definition.targetSets}'} $segments · Descanso'
+          : 'Descanso';
+      final elapsed = running == null
+          ? Duration.zero
+          : c.now().difference(running.startedAt);
+      final total = definition.activitySeconds == null
+          ? null
+          : Duration(seconds: definition.activitySeconds!);
+      final canAct = enabled && (running != null || !widget.hideStart);
       return Padding(
         padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
         child: ClipRRect(
@@ -601,6 +623,12 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
                                     ),
                                     const SizedBox(width: 8),
                                     const Icon(Icons.edit_outlined, size: 18),
+                                    if (definition.userSet.contains('name'))
+                                      LockBadge(
+                                        key: const Key('lock-name'),
+                                        onRelease: () =>
+                                            releaseLock(a.id, 'name'),
+                                      ),
                                   ],
                                 ),
                               ),
@@ -609,10 +637,9 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
                           IconButton(
                             key: const Key('change-activity'),
                             tooltip: 'Elegir otra actividad',
-                            onPressed:
-                                enabled && a.intervals.isEmpty
-                                    ? changePreparation
-                                    : null,
+                            onPressed: enabled && a.intervals.isEmpty
+                                ? changePreparation
+                                : null,
                             icon: const Icon(Icons.swap_horiz),
                           ),
                           finishButton,
@@ -637,9 +664,9 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
                                   total == null
                                       ? elapsed.inSeconds.clamp(0, 8640000)
                                       : (total - elapsed).inSeconds.clamp(
-                                        0,
-                                        total.inSeconds,
-                                      ),
+                                          0,
+                                          total.inSeconds,
+                                        ),
                                 ),
                                 key: const Key('activity-clock'),
                                 style: const TextStyle(
@@ -675,8 +702,8 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
                                 tooltip: 'Restar ciclo',
                                 onPressed:
                                     enabled && definition.completedCycles > 0
-                                        ? () => changeCycle(-1)
-                                        : null,
+                                    ? () => changeCycle(-1)
+                                    : null,
                                 icon: const Icon(Icons.remove_circle_outline),
                               ),
                               IconButton(
@@ -684,8 +711,8 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
                                 tooltip: 'Añadir ciclo completado',
                                 onPressed:
                                     enabled && definition.completedCycles < 999
-                                        ? () => changeCycle(1)
-                                        : null,
+                                    ? () => changeCycle(1)
+                                    : null,
                                 icon: const Icon(Icons.add_circle_outline),
                               ),
                             ],
@@ -710,10 +737,9 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
                                 IconButton(
                                   key: Key('counter-dec-${field['key']}'),
                                   tooltip: 'Quitar ${field['label']}',
-                                  onPressed:
-                                      (pending[field['key']] ?? 0) > 0
-                                          ? () => bump(field['key'] as String, -1)
-                                          : null,
+                                  onPressed: (pending[field['key']] ?? 0) > 0
+                                      ? () => bump(field['key'] as String, -1)
+                                      : null,
                                   icon: const Icon(Icons.remove_circle_outline),
                                 ),
                                 SizedBox(
@@ -734,10 +760,9 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
                                 IconButton(
                                   key: Key('counter-inc-${field['key']}'),
                                   tooltip: 'Añadir ${field['label']}',
-                                  onPressed:
-                                      enabled
-                                          ? () => bump(field['key'] as String, 1)
-                                          : null,
+                                  onPressed: enabled
+                                      ? () => bump(field['key'] as String, 1)
+                                      : null,
                                   icon: const Icon(Icons.add_circle_outline),
                                 ),
                               ],
@@ -750,15 +775,16 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
                             width: double.infinity,
                             child: FilledButton.icon(
                               key: const Key('activity-start-stop'),
-                              style:
-                                  running == null
-                                      ? startButtonStyle(context)
-                                      : stopButtonStyle(context),
+                              style: running == null
+                                  ? startButtonStyle(context)
+                                  : stopButtonStyle(context),
                               onPressed: canAct ? act : null,
                               icon: Icon(
                                 running == null ? Icons.play_arrow : Icons.stop,
                               ),
-                              label: Text(running == null ? 'Iniciar' : 'Parar'),
+                              label: Text(
+                                running == null ? 'Iniciar' : 'Parar',
+                              ),
                             ),
                           ),
                         ),
@@ -1056,15 +1082,21 @@ class _ActivityChooserState extends State<ActivityChooser> {
                       ListTile(
                         key: Key('template-${t.id}'),
                         leading: Icon(
-                          t.instant ? Icons.touch_app_outlined : Icons.bookmark_outline,
+                          t.instant
+                              ? Icons.touch_app_outlined
+                              : Icons.bookmark_outline,
                         ),
                         title: Text(t.definition.name),
-                        subtitle: Text(t.instant ? 'Registro puntual' : 'Tu actividad'),
-                        onTap:
-                            () => Navigator.pop(
-                              context,
-                              ActivityChoice.built(t.definition, instant: t.instant),
-                            ),
+                        subtitle: Text(
+                          t.instant ? 'Registro puntual' : 'Tu actividad',
+                        ),
+                        onTap: () => Navigator.pop(
+                          context,
+                          ActivityChoice.built(
+                            t.definition,
+                            instant: t.instant,
+                          ),
+                        ),
                       ),
                     const Divider(),
                   ],
@@ -1076,49 +1108,43 @@ class _ActivityChooserState extends State<ActivityChooser> {
                             ? 'Del entrenamiento actual'
                             : '${e.sets.length + controller.activities.where((a) => a.exerciseId == e.id).fold<int>(0, (n, a) => n + a.intervals.where((i) => i.endedAt != null).length)}/${e.targetSets} series · ${e.repsMin}–${e.repsMax} reps',
                       ),
-                      onTap:
-                          () => Navigator.pop(
-                            context,
-                            ActivityChoice(
-                              ActivityDefinition(
-                                name: e.name,
-                                restSeconds: e.restSeconds,
-                                fields: const [
-                                  {
-                                    'key': 'weight_kg',
-                                    'label': 'Peso',
-                                    'unit': 'kg',
-                                  },
-                                  {
-                                    'key': 'reps',
-                                    'label': 'Repeticiones',
-                                    'unit': '',
-                                  },
-                                  {
-                                    'key': 'failure',
-                                    'label': 'Fallo',
-                                    'unit': '',
-                                  },
-                                ],
-                              ),
-                              e.id,
-                            ),
+                      onTap: () => Navigator.pop(
+                        context,
+                        ActivityChoice(
+                          ActivityDefinition(
+                            name: e.name,
+                            restSeconds: e.restSeconds,
+                            fields: const [
+                              {
+                                'key': 'weight_kg',
+                                'label': 'Peso',
+                                'unit': 'kg',
+                              },
+                              {
+                                'key': 'reps',
+                                'label': 'Repeticiones',
+                                'unit': '',
+                              },
+                              {'key': 'failure', 'label': 'Fallo', 'unit': ''},
+                            ],
                           ),
+                          e.id,
+                        ),
+                      ),
                     ),
                   for (final d in unique.values)
                     ListTile(
                       title: Text(d.name),
                       subtitle: const Text('Volver a hacer'),
-                      onTap:
-                          () => Navigator.pop(
-                            context,
-                            ActivityChoice(
-                              ActivityDefinition.fromJson({
-                                ...d.toJson(),
-                                'completedCycles': 0,
-                              }),
-                            ),
-                          ),
+                      onTap: () => Navigator.pop(
+                        context,
+                        ActivityChoice(
+                          ActivityDefinition.fromJson({
+                            ...d.toJson(),
+                            'completedCycles': 0,
+                          }),
+                        ),
+                      ),
                     ),
                   for (final routine in controller.routines)
                     for (final e in routine.exercises)
@@ -1127,19 +1153,18 @@ class _ActivityChooserState extends State<ActivityChooser> {
                         subtitle: Text(
                           '${routine.name} · ${e.targetSets} series',
                         ),
-                        onTap:
-                            () => Navigator.pop(
-                              context,
-                              ActivityChoice(
-                                _legacyStrength(
-                                  e.name,
-                                  e.restSeconds,
-                                  targetSets: e.targetSets,
-                                  instructions:
-                                      'De la rutina ${routine.name}: ${e.targetSets} series, ${e.repsMin}–${e.repsMax} repeticiones previstas. No son resultados realizados.',
-                                ),
-                              ),
+                        onTap: () => Navigator.pop(
+                          context,
+                          ActivityChoice(
+                            _legacyStrength(
+                              e.name,
+                              e.restSeconds,
+                              targetSets: e.targetSets,
+                              instructions:
+                                  'De la rutina ${routine.name}: ${e.targetSets} series, ${e.repsMin}–${e.repsMax} repeticiones previstas. No son resultados realizados.',
                             ),
+                          ),
+                        ),
                       ),
                   ListTile(
                     leading: const Icon(Icons.add),
@@ -1148,10 +1173,9 @@ class _ActivityChooserState extends State<ActivityChooser> {
                       final built = await Navigator.of(context)
                           .push<ActivityBuilderResult>(
                             MaterialPageRoute(
-                              builder:
-                                  (_) => ActivityBuilder(
-                                    companionId: widget.companionId,
-                                  ),
+                              builder: (_) => ActivityBuilder(
+                                companionId: widget.companionId,
+                              ),
                             ),
                           );
                       if (context.mounted && built != null) {
@@ -1246,15 +1270,14 @@ class _ActivityEndDialogState extends State<ActivityEndDialog> {
               );
               if (date != null && mounted) {
                 setState(
-                  () =>
-                      end = DateTime(
-                        date.year,
-                        date.month,
-                        date.day,
-                        end.hour,
-                        end.minute,
-                        end.second,
-                      ),
+                  () => end = DateTime(
+                    date.year,
+                    date.month,
+                    date.day,
+                    end.hour,
+                    end.minute,
+                    end.second,
+                  ),
                 );
               }
             },
@@ -1273,24 +1296,22 @@ class _ActivityEndDialogState extends State<ActivityEndDialog> {
                 context: context,
                 initialTime: TimeOfDay.fromDateTime(end),
                 initialEntryMode: TimePickerEntryMode.input,
-                builder:
-                    (context, child) => MediaQuery(
-                      data: MediaQuery.of(
-                        context,
-                      ).copyWith(alwaysUse24HourFormat: true),
-                      child: child!,
-                    ),
+                builder: (context, child) => MediaQuery(
+                  data: MediaQuery.of(
+                    context,
+                  ).copyWith(alwaysUse24HourFormat: true),
+                  child: child!,
+                ),
               );
               if (time != null && mounted) {
                 setState(
-                  () =>
-                      end = DateTime(
-                        end.year,
-                        end.month,
-                        end.day,
-                        time.hour,
-                        time.minute,
-                      ),
+                  () => end = DateTime(
+                    end.year,
+                    end.month,
+                    end.day,
+                    time.hour,
+                    time.minute,
+                  ),
                 );
               }
             },

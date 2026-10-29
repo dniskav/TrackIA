@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -13,6 +14,9 @@ import 'rest_timer_panel.dart';
 import 'data_transfer.dart';
 import 'assistant_chat.dart';
 import 'companions.dart';
+import 'companion_settings.dart';
+import '../application/reminder_scheduler.dart';
+import '../data/companion_store.dart';
 import 'settings.dart';
 import '../domain/companion.dart';
 import 'session_control.dart';
@@ -24,18 +28,17 @@ class GymApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ListenableBuilder(
     listenable: ThemeSettings.instance,
-    builder:
-        (context, _) => MaterialApp(
-          title: 'TrackIA',
-          debugShowCheckedModeBanner: false,
-          theme: gymLightTheme,
-          darkTheme: gymTheme,
-          themeMode: ThemeSettings.instance.mode,
-          locale: const Locale('es'),
-          supportedLocales: const [Locale('es')],
-          localizationsDelegates: GlobalMaterialLocalizations.delegates,
-          home: GymRoot(controller: controller),
-        ),
+    builder: (context, _) => MaterialApp(
+      title: 'TrackIA',
+      debugShowCheckedModeBanner: false,
+      theme: gymLightTheme,
+      darkTheme: gymTheme,
+      themeMode: ThemeSettings.instance.mode,
+      locale: const Locale('es'),
+      supportedLocales: const [Locale('es')],
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      home: GymRoot(controller: controller),
+    ),
   );
 }
 
@@ -52,16 +55,64 @@ class _GymRootState extends State<GymRoot> {
   bool showingWelcome = false;
   String? activeCompanionId;
 
+  /// Keeps the phone's reminders in step with what the user records.
+  late final ReminderScheduler? reminders = widget.controller.progress == null
+      ? null
+      : ReminderScheduler(
+          progress: widget.controller.progress!,
+          companions: () =>
+              CompanionStore(profileId: widget.controller.profileId).load(),
+        );
+
+  /// A tapped reminder opens that companion's chat; one of another profile
+  /// leaves the app on the dashboard.
+  Future<void> _openFromReminder() async {
+    final scheduler = reminders;
+    if (scheduler == null || !mounted) return;
+    final pending = await scheduler.takePendingOpen();
+    if (pending == null || !mounted) return;
+    final companion = ReminderScheduler.resolveOpen(
+      pending,
+      currentProfileId: widget.controller.profileId,
+      companions: await CompanionStore(
+        profileId: widget.controller.profileId,
+      ).load(),
+    );
+    if (!mounted) return;
+    Navigator.of(context).popUntil((route) => route.isFirst);
+    if (companion != null) openCompanion(companion);
+  }
+
+  void openCompanionSettings(Companion companion) {
+    final progress = widget.controller.progress;
+    if (progress == null) return;
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => CompanionSettingsScreen(
+          progress: progress,
+          companion: companion,
+          scheduler: reminders,
+        ),
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
     widget.controller.addListener(_maybeWelcome);
+    reminders?.attach(widget.controller);
+    unawaited(reminders?.sync());
     _importChannel.setMethodCallHandler((call) async {
       if (call.method == 'importReady') await _takeIncomingImport();
+    });
+    ReminderScheduler.channel.setMethodCallHandler((call) async {
+      if (call.method == 'openAvailable') await _openFromReminder();
     });
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _takeIncomingImport();
       _maybeWelcome();
+      await _openFromReminder();
     });
   }
 
@@ -140,39 +191,37 @@ class _GymRootState extends State<GymRoot> {
   @override
   void dispose() {
     widget.controller.removeListener(_maybeWelcome);
+    reminders?.dispose();
     _importChannel.setMethodCallHandler(null);
+    ReminderScheduler.channel.setMethodCallHandler(null);
     super.dispose();
   }
 
   Route<void> companionRoute(Companion companion) => MaterialPageRoute<void>(
-    builder:
-        (_) => AssistantChatScreen(
-          key: ValueKey(companion.id),
-          controller: widget.controller,
-          companion: companion,
-          focusMode: true,
-          onSwitchCompanion: switchCompanion,
-          onTraining:
-              () => Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder:
-                      (_) => GymHome(
-                        controller: widget.controller,
-                        onAssistant: () => Navigator.of(context).pop(),
-                      ),
-                ),
-              ),
-          onData:
-              () => Navigator.of(context).push(
-                MaterialPageRoute<void>(
-                  builder:
-                      (_) => DataTransferScreen(
-                        controller: widget.controller,
-                        companionId: companion.id,
-                      ),
-                ),
-              ),
+    builder: (_) => AssistantChatScreen(
+      key: ValueKey(companion.id),
+      controller: widget.controller,
+      companion: companion,
+      focusMode: true,
+      onSwitchCompanion: switchCompanion,
+      onCompanionSettings: () => openCompanionSettings(companion),
+      onTraining: () => Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => GymHome(
+            controller: widget.controller,
+            onAssistant: () => Navigator.of(context).pop(),
+          ),
         ),
+      ),
+      onData: () => Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => DataTransferScreen(
+            controller: widget.controller,
+            companionId: companion.id,
+          ),
+        ),
+      ),
+    ),
   );
 
   void openCompanion(Companion companion) {
@@ -195,13 +244,15 @@ class _GymRootState extends State<GymRoot> {
   @override
   Widget build(BuildContext context) => CompanionDashboard(
     profileId: widget.controller.profileId,
+    progress: widget.controller.progress,
+    onCompanionSettings: openCompanionSettings,
+    onRemindersChanged: () => unawaited(reminders?.sync()),
     onOpen: openCompanion,
-    onSettings:
-        () => Navigator.of(context).push(
-          MaterialPageRoute<void>(
-            builder: (_) => SettingsScreen(controller: widget.controller),
-          ),
-        ),
+    onSettings: () => Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => SettingsScreen(controller: widget.controller),
+      ),
+    ),
   );
 }
 
@@ -240,13 +291,12 @@ class _GymHomeState extends State<GymHome> {
   Future<void> _start() async {
     final name = await showDialog<String>(
       context: context,
-      builder:
-          (_) => const NameDialog(
-            title: 'Nuevo entrenamiento',
-            label: 'Nombre de la sesión',
-            initial: 'Entrenamiento',
-            action: 'Empezar',
-          ),
+      builder: (_) => const NameDialog(
+        title: 'Nuevo entrenamiento',
+        label: 'Nombre de la sesión',
+        initial: 'Entrenamiento',
+        action: 'Empezar',
+      ),
     );
     if (name == null || !mounted) return;
     final ok = await c.run(() async {
@@ -258,13 +308,12 @@ class _GymHomeState extends State<GymHome> {
   Future<void> _addExercise(Workout workout) async {
     final name = await showDialog<String>(
       context: context,
-      builder:
-          (_) => const NameDialog(
-            title: 'Añadir ejercicio',
-            label: 'Nombre del ejercicio',
-            action: 'Añadir',
-            suggestions: true,
-          ),
+      builder: (_) => const NameDialog(
+        title: 'Añadir ejercicio',
+        label: 'Nombre del ejercicio',
+        action: 'Añadir',
+        suggestions: true,
+      ),
     );
     if (name != null) {
       await c.run(() => c.repository.addExercise(workout.id, name));
@@ -274,43 +323,40 @@ class _GymHomeState extends State<GymHome> {
   Future<void> _set(Exercise exercise, [WorkoutSet? existing]) async {
     final result = await showDialog<SetInput>(
       context: context,
-      builder:
-          (_) => SetDialog(
-            existing: existing,
-            previous:
-                exercise.sets.lastOrNull ??
-                (c.active == null
-                    ? null
-                    : c.previousFor(exercise, c.active!)?.sets.firstOrNull),
-          ),
+      builder: (_) => SetDialog(
+        existing: existing,
+        previous:
+            exercise.sets.lastOrNull ??
+            (c.active == null
+                ? null
+                : c.previousFor(exercise, c.active!)?.sets.firstOrNull),
+      ),
     );
     if (result == null) return;
     await c.run(
-      () =>
-          existing == null
-              ? c.repository.addSet(exercise.id, result.weight, result.reps)
-              : c.repository.editSet(existing.id, result.weight, result.reps),
+      () => existing == null
+          ? c.repository.addSet(exercise.id, result.weight, result.reps)
+          : c.repository.editSet(existing.id, result.weight, result.reps),
     );
   }
 
   Future<bool> _confirm(String title, String message, String action) async =>
       await showDialog<bool>(
         context: context,
-        builder:
-            (context) => AlertDialog(
-              title: Text(title),
-              content: Text(message),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: const Text('Cancelar'),
-                ),
-                FilledButton(
-                  onPressed: () => Navigator.pop(context, true),
-                  child: Text(action),
-                ),
-              ],
+        builder: (context) => AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancelar'),
             ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(action),
+            ),
+          ],
+        ),
       ) ??
       false;
 
@@ -330,14 +376,13 @@ class _GymHomeState extends State<GymHome> {
         },
         child: Scaffold(
           appBar: AppBar(
-            leading:
-                selected == null
-                    ? null
-                    : IconButton(
-                      tooltip: 'Volver',
-                      onPressed: () => setState(() => selectedId = null),
-                      icon: const Icon(Icons.arrow_back_rounded),
-                    ),
+            leading: selected == null
+                ? null
+                : IconButton(
+                    tooltip: 'Volver',
+                    onPressed: () => setState(() => selectedId = null),
+                    icon: const Icon(Icons.arrow_back_rounded),
+                  ),
             title: Row(
               children: [
                 if (selected == null) ...[
@@ -379,12 +424,11 @@ class _GymHomeState extends State<GymHome> {
               if (selected == null)
                 IconButton(
                   tooltip: 'Tus datos',
-                  onPressed:
-                      () => Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (_) => DataTransferScreen(controller: c),
-                        ),
-                      ),
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => DataTransferScreen(controller: c),
+                    ),
+                  ),
                   icon: Icon(
                     Icons.folder_open_rounded,
                     color: Theme.of(context).colorScheme.primary,
@@ -427,75 +471,66 @@ class _GymHomeState extends State<GymHome> {
                     workout: selected,
                   ),
                 Expanded(
-                  child:
-                      !c.loaded
-                          ? Center(
-                            child:
-                                c.busy
-                                    ? const CircularProgressIndicator()
-                                    : FilledButton(
-                                      onPressed: c.refresh,
-                                      child: const Text('Cargar bitácora'),
-                                    ),
-                          )
-                          : AbsorbPointer(
-                            absorbing: c.busy,
-                            child:
-                                selected != null
-                                    ? _detail(selected)
-                                    : tab == 0
-                                    ? _today()
-                                    : tab == 1
-                                    ? RoutineLibrary(
-                                      controller: c,
-                                      onStart: (routine) async {
-                                        if (c.active != null) {
-                                          setState(
-                                            () => selectedId = c.active!.id,
-                                          );
-                                          return;
-                                        }
-                                        final ok = await c.run(() async {
-                                          await c.repository.startRoutine(
-                                            routine.id,
-                                          );
-                                        });
-                                        if (ok && mounted) {
-                                          setState(
-                                            () => selectedId = c.active?.id,
-                                          );
-                                        }
-                                      },
-                                    )
-                                    : _history(),
-                          ),
+                  child: !c.loaded
+                      ? Center(
+                          child: c.busy
+                              ? const CircularProgressIndicator()
+                              : FilledButton(
+                                  onPressed: c.refresh,
+                                  child: const Text('Cargar bitácora'),
+                                ),
+                        )
+                      : AbsorbPointer(
+                          absorbing: c.busy,
+                          child: selected != null
+                              ? _detail(selected)
+                              : tab == 0
+                              ? _today()
+                              : tab == 1
+                              ? RoutineLibrary(
+                                  controller: c,
+                                  onStart: (routine) async {
+                                    if (c.active != null) {
+                                      setState(() => selectedId = c.active!.id);
+                                      return;
+                                    }
+                                    final ok = await c.run(() async {
+                                      await c.repository.startRoutine(
+                                        routine.id,
+                                      );
+                                    });
+                                    if (ok && mounted) {
+                                      setState(() => selectedId = c.active?.id);
+                                    }
+                                  },
+                                )
+                              : _history(),
+                        ),
                 ),
               ],
             ),
           ),
-          bottomNavigationBar:
-              selected == null
-                  ? NavigationBar(
-                    selectedIndex: tab,
-                    onDestinationSelected:
-                        (value) => setState(() => tab = value),
-                    backgroundColor: Theme.of(context).colorScheme.surface,
-                    destinations: const [
-                      NavigationDestination(
-                        icon: Icon(Icons.grid_view_rounded),
-                        label: 'Hoy',
-                      ),
-                      NavigationDestination(
-                        icon: Icon(Icons.view_list_rounded),
-                        label: 'Rutinas',
-                      ),
-                      NavigationDestination(
-                        icon: Icon(Icons.history_rounded),
-                        label: 'Historial',
-                      ),
-                    ],
-                  )
-                  : null,
+          bottomNavigationBar: selected == null
+              ? NavigationBar(
+                  selectedIndex: tab,
+                  onDestinationSelected: (value) => setState(() => tab = value),
+                  backgroundColor: Theme.of(context).colorScheme.surface,
+                  destinations: const [
+                    NavigationDestination(
+                      icon: Icon(Icons.grid_view_rounded),
+                      label: 'Hoy',
+                    ),
+                    NavigationDestination(
+                      icon: Icon(Icons.view_list_rounded),
+                      label: 'Rutinas',
+                    ),
+                    NavigationDestination(
+                      icon: Icon(Icons.history_rounded),
+                      label: 'Historial',
+                    ),
+                  ],
+                )
+              : null,
         ),
       );
     },
@@ -593,10 +628,9 @@ class _GymHomeState extends State<GymHome> {
                     backgroundColor: Theme.of(context).colorScheme.onPrimary,
                     foregroundColor: Theme.of(context).colorScheme.primary,
                   ),
-                  onPressed:
-                      active == null
-                          ? _start
-                          : () => setState(() => selectedId = active.id),
+                  onPressed: active == null
+                      ? _start
+                      : () => setState(() => selectedId = active.id),
                   icon: Icon(
                     active == null
                         ? Icons.add_rounded
@@ -895,8 +929,9 @@ class _GymHomeState extends State<GymHome> {
         ),
         const SizedBox(height: 24),
         FilledButton.icon(
-          onPressed:
-              _recordsFor(w) == 0 || c.focus != null ? null : () => _finish(w),
+          onPressed: _recordsFor(w) == 0 || c.focus != null
+              ? null
+              : () => _finish(w),
           icon: const Icon(Icons.check_rounded),
           label: const Text('Finalizar entrenamiento'),
         ),
@@ -943,11 +978,10 @@ class _GymHomeState extends State<GymHome> {
         ),
         const SizedBox(height: 16),
         OutlinedButton(
-          onPressed:
-              () => setState(() {
-                selectedId = null;
-                tab = 2;
-              }),
+          onPressed: () => setState(() {
+            selectedId = null;
+            tab = 2;
+          }),
           child: const Text('Ver historial'),
         ),
       ],
@@ -1145,17 +1179,16 @@ class _GymHomeState extends State<GymHome> {
                           );
                         }
                       },
-                      itemBuilder:
-                          (_) => const [
-                            PopupMenuItem(
-                              value: 'edit',
-                              child: Text('Editar serie'),
-                            ),
-                            PopupMenuItem(
-                              value: 'delete',
-                              child: Text('Eliminar serie'),
-                            ),
-                          ],
+                      itemBuilder: (_) => const [
+                        PopupMenuItem(
+                          value: 'edit',
+                          child: Text('Editar serie'),
+                        ),
+                        PopupMenuItem(
+                          value: 'delete',
+                          child: Text('Eliminar serie'),
+                        ),
+                      ],
                     )
                   else
                     SizedBox(
@@ -1181,10 +1214,9 @@ class _GymHomeState extends State<GymHome> {
               ),
             ),
             TextButton.icon(
-              onPressed:
-                  () => c.run(
-                    () => c.repository.startRest(workout.id, e.restSeconds),
-                  ),
+              onPressed: () => c.run(
+                () => c.repository.startRest(workout.id, e.restSeconds),
+              ),
               icon: const Icon(Icons.timer_outlined, size: 18),
               label: Text('Descansar ${e.restSeconds}s'),
             ),
@@ -1381,12 +1413,11 @@ class SetDialog extends StatefulWidget {
 
 class _SetDialogState extends State<SetDialog> {
   late final weight = TextEditingController(
-    text:
-        widget.existing != null
-            ? formatWeight(widget.existing!.weight)
-            : widget.previous != null
-            ? formatWeight(widget.previous!.weight)
-            : '',
+    text: widget.existing != null
+        ? formatWeight(widget.existing!.weight)
+        : widget.previous != null
+        ? formatWeight(widget.previous!.weight)
+        : '',
   );
   late final reps = TextEditingController(
     text: (widget.existing?.reps ?? widget.previous?.reps)?.toString() ?? '',

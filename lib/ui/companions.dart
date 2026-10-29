@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../application/ai_availability.dart';
 import '../data/ai_settings_store.dart';
 import '../data/companion_store.dart';
+import '../data/progress_repository.dart';
 import '../domain/companion.dart';
 import 'ai_settings.dart';
 import 'companion_style.dart';
@@ -14,6 +15,9 @@ class CompanionDashboard extends StatefulWidget {
     required this.onOpen,
     this.onSettings,
     this.availability,
+    this.progress,
+    this.onCompanionSettings,
+    this.onRemindersChanged,
   });
   final String profileId;
   final void Function(Companion) onOpen;
@@ -23,6 +27,16 @@ class CompanionDashboard extends StatefulWidget {
 
   /// Injectable for tests; by default it reads the profile's AI configuration.
   final AiAvailability? availability;
+
+  /// Deletes a companion's settings and reminders along with it.
+  final ProgressRepository? progress;
+
+  /// Opens «Modo y avisos» of a companion; without it the menu has no entry.
+  final void Function(Companion)? onCompanionSettings;
+
+  /// Told after reminders change here (a resume or a deleted companion), so
+  /// the phone gets a fresh snapshot.
+  final VoidCallback? onRemindersChanged;
 
   @override
   State<CompanionDashboard> createState() => _CompanionDashboardState();
@@ -35,6 +49,7 @@ class _CompanionDashboardState extends State<CompanionDashboard>
       widget.availability ??
       AiAvailability(store: AiSettingsStore(profileId: widget.profileId));
   List<Companion> companions = [];
+  Set<String> pausedIds = {};
   bool loading = true;
   String? error;
 
@@ -86,7 +101,11 @@ class _CompanionDashboardState extends State<CompanionDashboard>
         'Prueba la conexión para activar el asistente.',
         'Verificar',
       ),
-      _ => ('IA no disponible', 'Revisa el proveedor y vuelve a probar.', 'Revisar'),
+      _ => (
+        'IA no disponible',
+        'Revisa el proveedor y vuelve a probar.',
+        'Revisar',
+      ),
     };
     return Container(
       key: const Key('ai-not-connected'),
@@ -129,6 +148,9 @@ class _CompanionDashboardState extends State<CompanionDashboard>
           error = null;
         });
       }
+      // The pause marks arrive after the list, so a slow database never
+      // delays the companions themselves.
+      unawaited(loadPaused(loaded));
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -137,6 +159,28 @@ class _CompanionDashboardState extends State<CompanionDashboard>
         });
       }
     }
+  }
+
+  Future<void> loadPaused(List<Companion> loaded) async {
+    final progress = widget.progress;
+    if (progress == null) return;
+    final paused = <String>{};
+    for (final c in loaded) {
+      try {
+        if ((await progress.reminderFor(c.id))?.paused ?? false) {
+          paused.add(c.id);
+        }
+      } catch (_) {
+        // A companion whose reminder cannot be read is simply not shown paused.
+      }
+    }
+    if (mounted) setState(() => pausedIds = paused);
+  }
+
+  Future<void> resume(Companion companion) async {
+    await widget.progress?.setPaused(companion.id, paused: false);
+    widget.onRemindersChanged?.call();
+    await refresh();
   }
 
   Future<void> edit([Companion? original]) async {
@@ -160,27 +204,28 @@ class _CompanionDashboardState extends State<CompanionDashboard>
   Future<void> remove(Companion companion) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: Text('¿Borrar ${companion.name}?'),
-            content: const Text(
-              'Se borrarán su chat, archivos y conexión local de Sheets. La hoja de Google y los registros de actividad no se borrarán.',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancelar'),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('Borrar'),
-              ),
-            ],
+      builder: (context) => AlertDialog(
+        title: Text('¿Borrar ${companion.name}?'),
+        content: const Text(
+          'Se borrarán su chat, archivos y conexión local de Sheets. La hoja de Google y los registros de actividad no se borrarán.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
           ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Borrar'),
+          ),
+        ],
+      ),
     );
     if (confirmed != true) return;
     try {
+      await widget.progress?.deleteCompanion(companion.id);
       await store.delete(companion.id);
+      widget.onRemindersChanged?.call();
       await refresh();
     } catch (e) {
       if (mounted) {
@@ -211,77 +256,106 @@ class _CompanionDashboardState extends State<CompanionDashboard>
       icon: const Icon(Icons.add),
       label: const Text('Crear acompañante'),
     ),
-    body:
-        loading
-            ? const Center(child: CircularProgressIndicator())
-            : error != null
-            ? Center(child: TextButton(onPressed: refresh, child: Text(error!)))
-            : ListView(
-              padding: const EdgeInsets.fromLTRB(16, 20, 16, 104),
-              children: [
-                Text(
-                  'Tus acompañantes',
-                  style: Theme.of(context).textTheme.headlineMedium,
-                ),
-                const SizedBox(height: 6),
-                const Text(
-                  'Elige con quién trabajar. Cada uno conserva su conversación y puede usar una hoja o pestaña de Google distinta.',
-                ),
-                const SizedBox(height: 20),
-                ListenableBuilder(
-                  listenable: availability,
-                  builder:
-                      (context, _) =>
-                          switch (availability.status) {
-                            AiAvailabilityStatus.ready ||
-                            AiAvailabilityStatus.checking =>
-                              const SizedBox.shrink(),
-                            _ => aiCard(context),
-                          },
-                ),
-                if (companions.isEmpty)
-                  const Card(
-                    child: Padding(
-                      padding: EdgeInsets.all(24),
-                      child: Text(
-                        'Aún no tienes acompañantes. Crea uno para empezar.',
-                      ),
+    body: loading
+        ? const Center(child: CircularProgressIndicator())
+        : error != null
+        ? Center(
+            child: TextButton(onPressed: refresh, child: Text(error!)),
+          )
+        : ListView(
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 104),
+            children: [
+              Text(
+                'Tus acompañantes',
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'Elige con quién trabajar. Cada uno conserva su conversación y puede usar una hoja o pestaña de Google distinta.',
+              ),
+              const SizedBox(height: 20),
+              ListenableBuilder(
+                listenable: availability,
+                builder: (context, _) => switch (availability.status) {
+                  AiAvailabilityStatus.ready ||
+                  AiAvailabilityStatus.checking => const SizedBox.shrink(),
+                  _ => aiCard(context),
+                },
+              ),
+              if (companions.isEmpty)
+                const Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(24),
+                    child: Text(
+                      'Aún no tienes acompañantes. Crea uno para empezar.',
                     ),
                   ),
-                for (final companion in companions)
-                  Card(
-                    key: Key('companion-${companion.id}'),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6),
-                      child: ListTile(
-                        leading: CompanionAvatar(companion: companion),
-                        title: Text(companion.name),
-                        subtitle: Text(companion.description),
-                        onTap: () => widget.onOpen(companion),
-                        trailing: PopupMenuButton<String>(
-                          tooltip: 'Opciones de ${companion.name}',
-                          onSelected:
-                              (choice) =>
-                                  choice == 'edit'
-                                      ? edit(companion)
-                                      : remove(companion),
-                          itemBuilder:
-                              (_) => const [
-                                PopupMenuItem(
-                                  value: 'edit',
-                                  child: Text('Editar'),
+                ),
+              for (final companion in companions)
+                Card(
+                  key: Key('companion-${companion.id}'),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: ListTile(
+                      leading: CompanionAvatar(companion: companion),
+                      title: Text(companion.name),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(companion.description),
+                          if (pausedIds.contains(companion.id))
+                            Row(
+                              key: Key('paused-${companion.id}'),
+                              children: [
+                                const Icon(
+                                  Icons.pause_circle_outline,
+                                  size: 16,
                                 ),
-                                PopupMenuItem(
-                                  value: 'delete',
-                                  child: Text('Borrar'),
+                                const SizedBox(width: 4),
+                                const Flexible(
+                                  child: Text('Recordatorios en pausa'),
+                                ),
+                                TextButton(
+                                  key: Key('resume-${companion.id}'),
+                                  onPressed: () => resume(companion),
+                                  child: const Text('Reanudar'),
                                 ),
                               ],
-                        ),
+                            ),
+                        ],
+                      ),
+                      onTap: () => widget.onOpen(companion),
+                      trailing: PopupMenuButton<String>(
+                        tooltip: 'Opciones de ${companion.name}',
+                        onSelected: (choice) => switch (choice) {
+                          'edit' => edit(companion),
+                          'settings' => widget.onCompanionSettings?.call(
+                            companion,
+                          ),
+                          _ => remove(companion),
+                        },
+                        itemBuilder: (_) => [
+                          const PopupMenuItem(
+                            value: 'edit',
+                            child: Text('Editar'),
+                          ),
+                          if (widget.onCompanionSettings != null)
+                            const PopupMenuItem(
+                              key: Key('menu-companion-settings'),
+                              value: 'settings',
+                              child: Text('Modo y avisos'),
+                            ),
+                          const PopupMenuItem(
+                            value: 'delete',
+                            child: Text('Borrar'),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-              ],
-            ),
+                ),
+            ],
+          ),
   );
 }
 
@@ -315,23 +389,18 @@ class _CompanionEditorState extends State<_CompanionEditor> {
   void save() {
     try {
       final original = widget.original;
-      final value =
-          original == null
-              ? Companion.custom(
-                name: name.text,
-                prompt: prompt.text,
-              ).copyWith(
-                description: description.text,
-                icon: icon,
-                color: color,
-              )
-              : original.copyWith(
-                name: name.text,
-                description: description.text,
-                prompt: prompt.text,
-                icon: icon,
-                color: color,
-              );
+      final value = original == null
+          ? Companion.custom(
+              name: name.text,
+              prompt: prompt.text,
+            ).copyWith(description: description.text, icon: icon, color: color)
+          : original.copyWith(
+              name: name.text,
+              description: description.text,
+              prompt: prompt.text,
+              icon: icon,
+              color: color,
+            );
       Navigator.pop(context, value);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
@@ -364,15 +433,17 @@ class _CompanionEditorState extends State<_CompanionEditor> {
               maxLines: 8,
               maxLength: 8000,
               decoration: const InputDecoration(
-                labelText: 'Instrucciones y personalidad',
-                helperText:
-                    'El asistente seguirá estas instrucciones en este acompañante.',
+                labelText: 'Instrucciones para la IA (opcional)',
+                helperText: 'Se usan cuando conectes un proveedor.',
               ),
             ),
             const SizedBox(height: 16),
             Align(
               alignment: Alignment.centerLeft,
-              child: Text('Icono', style: Theme.of(context).textTheme.labelLarge),
+              child: Text(
+                'Icono',
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
             ),
             Wrap(
               spacing: 4,
@@ -390,13 +461,12 @@ class _CompanionEditorState extends State<_CompanionEditor> {
                       color: companionColor(context, color),
                     ),
                     style: IconButton.styleFrom(
-                      side:
-                          icon == entry.key
-                              ? BorderSide(
-                                color: companionColor(context, color),
-                                width: 2,
-                              )
-                              : null,
+                      side: icon == entry.key
+                          ? BorderSide(
+                              color: companionColor(context, color),
+                              width: 2,
+                            )
+                          : null,
                     ),
                   ),
               ],
@@ -404,7 +474,10 @@ class _CompanionEditorState extends State<_CompanionEditor> {
             const SizedBox(height: 8),
             Align(
               alignment: Alignment.centerLeft,
-              child: Text('Color', style: Theme.of(context).textTheme.labelLarge),
+              child: Text(
+                'Color',
+                style: Theme.of(context).textTheme.labelLarge,
+              ),
             ),
             Wrap(
               spacing: 4,

@@ -360,6 +360,12 @@ void main() {
         rendered.dispose();
       });
     }
+    // Real database I/O (templates, paused reminders) must finish so no guard
+    // timer of a sqflite transaction outlives the test.
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 200)),
+    );
+    await tester.pump();
   });
 
   testWidgets('unavailable microphone recognition preserves text input', (

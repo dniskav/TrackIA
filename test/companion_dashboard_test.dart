@@ -39,7 +39,7 @@ void main() {
       'Mi GymBro',
     );
     await tester.enterText(
-      find.widgetWithText(TextField, 'Instrucciones y personalidad'),
+      find.widgetWithText(TextField, 'Instrucciones para la IA (opcional)'),
       'Háblame de forma breve.',
     );
     await tester.tap(find.text('Guardar'));
@@ -75,10 +75,12 @@ void main() {
   ) async {
     await openDashboard(tester);
     Icon iconOf(String id) => tester.widget<Icon>(
-      find.descendant(
-        of: find.byKey(Key('companion-$id')),
-        matching: find.byType(Icon),
-      ).first,
+      find
+          .descendant(
+            of: find.byKey(Key('companion-$id')),
+            matching: find.byType(Icon),
+          )
+          .first,
     );
     expect(iconOf('gymbro').icon, Icons.fitness_center);
     expect(iconOf('enfoque').icon, Icons.hourglass_top);
@@ -98,10 +100,12 @@ void main() {
   testWidgets('light theme uses the darker companion colors', (tester) async {
     await openDashboard(tester, gymLightTheme);
     final icon = tester.widget<Icon>(
-      find.descendant(
-        of: find.byKey(const Key('companion-gymbro')),
-        matching: find.byType(Icon),
-      ).first,
+      find
+          .descendant(
+            of: find.byKey(const Key('companion-gymbro')),
+            matching: find.byType(Icon),
+          )
+          .first,
     );
     expect(icon.color, trackiaCompanionColors['orange']!.light);
   });
@@ -119,9 +123,12 @@ void main() {
     for (final id in Companion.colorIds) {
       expect(find.byKey(Key('color-$id')), findsOneWidget, reason: id);
     }
-    await tester.enterText(find.widgetWithText(TextField, 'Nombre'), 'Ciclismo');
     await tester.enterText(
-      find.widgetWithText(TextField, 'Instrucciones y personalidad'),
+      find.widgetWithText(TextField, 'Nombre'),
+      'Ciclismo',
+    );
+    await tester.enterText(
+      find.widgetWithText(TextField, 'Instrucciones para la IA (opcional)'),
       'Registra mis rutas.',
     );
     await tester.ensureVisible(find.byKey(const Key('icon-bike')));
@@ -138,9 +145,11 @@ void main() {
     // The list is lazy and the AI card pushes it down: scroll to the new card.
     await tester.scrollUntilVisible(card, 200);
     expect(
-      tester.widget<Icon>(
-        find.descendant(of: card, matching: find.byType(Icon)).first,
-      ).icon,
+      tester
+          .widget<Icon>(
+            find.descendant(of: card, matching: find.byType(Icon)).first,
+          )
+          .icon,
       Icons.directions_bike,
     );
   });
@@ -158,15 +167,16 @@ void main() {
       isTrue,
     );
     expect(
-      tester.widget<IconButton>(find.byKey(const Key('color-green'))).isSelected,
+      tester
+          .widget<IconButton>(find.byKey(const Key('color-green')))
+          .isSelected,
       isTrue,
     );
     await tester.tap(find.text('Guardar'));
     await tester.pumpAndSettle();
-    final calma =
-        (await const CompanionStore(profileId: 'local').load()).firstWhere(
-          (c) => c.id == 'calma',
-        );
+    final calma = (await const CompanionStore(
+      profileId: 'local',
+    ).load()).firstWhere((c) => c.id == 'calma');
     expect((calma.icon, calma.color), ('leaf', 'green'));
   });
 
@@ -180,12 +190,11 @@ void main() {
     );
     AiAvailability availability() => AiAvailability(
       catalog: AiModelCatalog(
-        transport:
-            (_, __) async => {
-              'data': [
-                {'id': 'test-model'},
-              ],
-            },
+        transport: (_, __) async => {
+          'data': [
+            {'id': 'test-model'},
+          ],
+        },
       ),
     );
 
@@ -238,17 +247,18 @@ void main() {
       expect(find.byKey(const Key('dashboard-settings')), findsNothing);
     });
 
-    testWidgets('an unconfigured AI shows the card and Conectar opens its setup', (
-      tester,
-    ) async {
-      FlutterSecureStorage.setMockInitialValues({});
-      await pump(tester);
-      expect(find.byKey(const Key('ai-not-connected')), findsOneWidget);
-      expect(find.text('IA sin conectar'), findsOneWidget);
-      await tester.tap(find.text('Conectar'));
-      await tester.pumpAndSettle();
-      expect(find.byType(AiSettingsScreen), findsOneWidget);
-    });
+    testWidgets(
+      'an unconfigured AI shows the card and Conectar opens its setup',
+      (tester) async {
+        FlutterSecureStorage.setMockInitialValues({});
+        await pump(tester);
+        expect(find.byKey(const Key('ai-not-connected')), findsOneWidget);
+        expect(find.text('IA sin conectar'), findsOneWidget);
+        await tester.tap(find.text('Conectar'));
+        await tester.pumpAndSettle();
+        expect(find.byType(AiSettingsScreen), findsOneWidget);
+      },
+    );
 
     testWidgets('a verified AI hides the card', (tester) async {
       FlutterSecureStorage.setMockInitialValues({});
@@ -259,7 +269,9 @@ void main() {
       expect(find.text('Tus acompañantes'), findsOneWidget);
     });
 
-    testWidgets('a saved but unverified AI still asks to connect', (tester) async {
+    testWidgets('a saved but unverified AI still asks to connect', (
+      tester,
+    ) async {
       FlutterSecureStorage.setMockInitialValues({});
       await const AiSettingsStore().save(config);
       await pump(tester);
