@@ -36,7 +36,7 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
         : null;
   }
 
-  late final Timer ticker;
+  Timer? ticker;
   bool acting = false, foreground = true;
   FocusActivity? get resting {
     final current = focus;
@@ -55,18 +55,37 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    ticker = Timer.periodic(const Duration(milliseconds: 250), (_) {
-      if (!mounted || !foreground) return;
+    c.addListener(syncTicker);
+    syncTicker();
+  }
+
+  /// The clock only shows whole seconds, and only while an interval or rest
+  /// is counting. Idle or backgrounded screens must not wake the CPU.
+  void syncTicker() {
+    final counting = focus?.running != null || resting != null;
+    if (!mounted || !foreground || !counting) {
+      ticker?.cancel();
+      ticker = null;
+      return;
+    }
+    ticker ??= Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
       setState(() {});
+      syncTicker();
     });
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) =>
-      foreground = state == AppLifecycleState.resumed;
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    foreground = state == AppLifecycleState.resumed;
+    if (foreground && mounted) setState(() {});
+    syncTicker();
+  }
+
   @override
   void dispose() {
-    ticker.cancel();
+    ticker?.cancel();
+    c.removeListener(syncTicker);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }

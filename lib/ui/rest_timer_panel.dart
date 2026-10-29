@@ -20,7 +20,7 @@ class RestTimerPanel extends StatefulWidget {
 
 class _RestTimerPanelState extends State<RestTimerPanel>
     with WidgetsBindingObserver {
-  late final Timer ticker;
+  Timer? ticker;
   bool wasRunning = false;
   bool foreground = true;
   WorkoutController get c => widget.controller;
@@ -41,13 +41,26 @@ class _RestTimerPanelState extends State<RestTimerPanel>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     wasRunning = state.runningAt(DateTime.now());
-    ticker = Timer.periodic(const Duration(milliseconds: 250), (_) => tick());
+    c.addListener(syncTicker);
+    syncTicker();
+  }
+
+  /// Ticks only while the rest countdown runs in the foreground; a paused or
+  /// idle panel, or a backgrounded app, must not wake the CPU.
+  void syncTicker() {
+    if (!mounted || !foreground || !state.runningAt(DateTime.now())) {
+      ticker?.cancel();
+      ticker = null;
+      return;
+    }
+    ticker ??= Timer.periodic(const Duration(milliseconds: 250), (_) => tick());
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState status) {
     foreground = status == AppLifecycleState.resumed;
     if (foreground) tick();
+    syncTicker();
   }
 
   void tick() {
@@ -59,11 +72,13 @@ class _RestTimerPanelState extends State<RestTimerPanel>
     }
     if (wasRunning || running) setState(() {});
     wasRunning = running;
+    syncTicker();
   }
 
   @override
   void dispose() {
-    ticker.cancel();
+    ticker?.cancel();
+    c.removeListener(syncTicker);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }

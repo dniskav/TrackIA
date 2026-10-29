@@ -427,8 +427,26 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     scheduleScrollToLatest();
   }
 
+  /// Periodic checks read encrypted storage and may reach Google Sheets, so
+  /// they only run while the app is visible; resuming checks right away.
+  void startConnectionTimer() {
+    connectionTimer?.cancel();
+    connectionTimer = Timer.periodic(const Duration(seconds: 60), (_) {
+      if (!busy && !listening) {
+        unawaited(availability.check());
+        unawaited(runSheetQueue());
+      }
+    });
+  }
+
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      startConnectionTimer();
+    } else {
+      connectionTimer?.cancel();
+      connectionTimer = null;
+    }
     if (state == AppLifecycleState.resumed) {
       unawaited(availability.check());
       unawaited(refreshLiveSheet());
@@ -1071,12 +1089,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     SheetContextStore.changes.addListener(sheetChanged);
     unawaited(availability.check());
     unawaited(recoverPhoto());
-    connectionTimer = Timer.periodic(const Duration(seconds: 60), (_) {
-      if (!busy && !listening) {
-        unawaited(availability.check());
-        unawaited(runSheetQueue());
-      }
-    });
+    startConnectionTimer();
     widget.controller.addListener(sheetActivityChanged);
     WidgetsBinding.instance.addObserver(this);
     if (widget.focusMode) {
