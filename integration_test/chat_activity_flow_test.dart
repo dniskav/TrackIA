@@ -83,12 +83,11 @@ void main() {
     );
     final availability = AiAvailability(
       catalog: AiModelCatalog(
-        transport:
-            (_, __) async => {
-              'data': [
-                {'id': 'qa-model'},
-              ],
-            },
+        transport: (_, __) async => {
+          'data': [
+            {'id': 'qa-model'},
+          ],
+        },
       ),
     );
     const config = AiConfig(
@@ -177,21 +176,13 @@ void main() {
       await const AiSettingsStore().markVerified(config);
       await c.refresh();
       await mount();
-      expect(
-        tester
-            .widget<FilledButton>(find.byKey(const Key('activity-start-stop')))
-            .onPressed,
-        isNull,
-      );
+      // With no activity prepared the panel offers a new one, not Iniciar.
+      expect(find.byKey(const Key('new-activity')), findsOneWidget);
+      expect(find.byKey(const Key('activity-start-stop')), findsNothing);
       await send('Empezamos día de push');
       expect(calls, 1);
       expect(c.focus, isNull);
-      expect(
-        tester
-            .widget<FilledButton>(find.byKey(const Key('activity-start-stop')))
-            .onPressed,
-        isNull,
-      );
+      expect(find.byKey(const Key('activity-start-stop')), findsNothing);
       await send('Empezamos con Chest Press');
       expect(calls, 2);
       expect(c.focus, isNotNull, reason: 'Preparation error: ${c.error}');

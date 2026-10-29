@@ -41,7 +41,24 @@ void main() {
     await tester.tap(find.text('Revisar importación'));
     await tester.pumpAndSettle();
     expect(find.textContaining('1 sesión nueva'), findsOneWidget);
-    expect(find.textContaining('Fila 4'), findsOneWidget);
+    // A small phone builds fewer rows: look for it below, then go back up.
+    if (find.textContaining('Fila 4').evaluate().isEmpty) {
+      await tester.scrollUntilVisible(
+        find.textContaining('Fila 4'),
+        200,
+        scrollable: find.byType(Scrollable).last,
+        maxScrolls: 20,
+      );
+      expect(find.textContaining('Fila 4'), findsOneWidget);
+      await tester.fling(
+        find.byType(Scrollable).last,
+        const Offset(0, 4000),
+        4000,
+      );
+      await tester.pumpAndSettle();
+    } else {
+      expect(find.textContaining('Fila 4'), findsOneWidget);
+    }
     await tester.tap(find.text('Empuje'));
     await tester.pumpAndSettle();
     expect(find.textContaining('60,5 kg × 8'), findsOneWidget);

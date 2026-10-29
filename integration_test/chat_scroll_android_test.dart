@@ -65,12 +65,11 @@ void main() {
       final client = _ScrollClient();
       final availability = AiAvailability(
         catalog: AiModelCatalog(
-          transport:
-              (_, __) async => {
-                'data': [
-                  {'id': 'qa-scroll'},
-                ],
-              },
+          transport: (_, __) async => {
+            'data': [
+              {'id': 'qa-scroll'},
+            ],
+          },
         ),
       );
       try {
@@ -269,7 +268,15 @@ void main() {
         await frames();
         await tester.pumpAndSettle();
         const archiveStore = ChatArchiveStore(profileId: 'local');
+        // Archiving writes to storage: a slower phone needs longer than frames().
         var active = (await archiveStore.active())!;
+        final archiveDeadline = DateTime.now().add(const Duration(seconds: 15));
+        while ((active['messages'] as List).isNotEmpty &&
+            DateTime.now().isBefore(archiveDeadline)) {
+          await tester.pump(const Duration(milliseconds: 200));
+          await Future<void>.delayed(const Duration(milliseconds: 200));
+          active = (await archiveStore.active())!;
+        }
         expect(active['messages'], isEmpty);
         expect(ChatArchiveStore.index(active), hasLength(1));
         final entry = ChatArchiveStore.index(active).single;
