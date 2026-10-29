@@ -230,6 +230,8 @@ void main() {
         find.byKey(const Key('assistant-input')),
         'Borrador sin enviar',
       );
+      await tester.tap(find.byKey(const Key('chat-menu')));
+      await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('archive-chat')));
       await drain(tester);
       final state = (await archiveStore.active())!;
@@ -259,7 +261,9 @@ void main() {
         (await archiveStore.read(entry['id'] as String))['messages'],
         hasLength(3),
       );
-      await tester.tap(find.byTooltip('Chats archivados'));
+      await tester.tap(find.byKey(const Key('chat-menu')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('menu-archives')));
       await tester.pumpAndSettle();
       await tester.tap(find.text(entry['title'] as String));
       await tester.pumpAndSettle();

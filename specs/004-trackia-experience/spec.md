@@ -351,7 +351,9 @@ cliente simulado que cada chat usa su configuración.
 **Ajustes y navegación (US2, US4)**
 
 - **FR-005**: El tablero DEBE ofrecer acceso a una pantalla de Ajustes global con: Inteligencia
-  artificial, Cuenta y datos, Google Sheets, Exportar e importar, Avisos, Apariencia y Ayuda.
+  artificial, Cuenta y datos (incluye la conexión con Google), Exportar e importar, Avisos,
+  Apariencia y Ayuda. La hoja de Google de cada acompañante se elige en el menú ⋮ de su chat:
+  no existe una pantalla global de hojas.
 - **FR-006**: El tablero DEBE mostrar una tarjeta «IA sin conectar» mientras la IA no esté
   verificada, con acceso directo a su configuración.
 - **FR-007**: El chat de un acompañante NO DEBE tener menú lateral; DEBE tener volver, selector de

@@ -1,6 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import '../application/ai_availability.dart';
+import '../data/ai_settings_store.dart';
 import '../data/companion_store.dart';
 import '../domain/companion.dart';
+import 'ai_settings.dart';
 import 'companion_style.dart';
 
 class CompanionDashboard extends StatefulWidget {
@@ -8,16 +12,28 @@ class CompanionDashboard extends StatefulWidget {
     super.key,
     required this.profileId,
     required this.onOpen,
+    this.onSettings,
+    this.availability,
   });
   final String profileId;
   final void Function(Companion) onOpen;
+
+  /// Opens the app-wide settings. Without it the dashboard shows no gear.
+  final VoidCallback? onSettings;
+
+  /// Injectable for tests; by default it reads the profile's AI configuration.
+  final AiAvailability? availability;
 
   @override
   State<CompanionDashboard> createState() => _CompanionDashboardState();
 }
 
-class _CompanionDashboardState extends State<CompanionDashboard> {
+class _CompanionDashboardState extends State<CompanionDashboard>
+    with WidgetsBindingObserver {
   late final store = CompanionStore(profileId: widget.profileId);
+  late final AiAvailability availability =
+      widget.availability ??
+      AiAvailability(store: AiSettingsStore(profileId: widget.profileId));
   List<Companion> companions = [];
   bool loading = true;
   String? error;
@@ -25,7 +41,82 @@ class _CompanionDashboardState extends State<CompanionDashboard> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    unawaited(availability.check(acceptRecentVerification: true));
     refresh();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      unawaited(availability.check(acceptRecentVerification: true));
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    if (widget.availability == null) availability.dispose();
+    super.dispose();
+  }
+
+  Future<void> connectAi() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => AiSettingsScreen(profileId: widget.profileId),
+      ),
+    );
+    if (mounted) {
+      unawaited(availability.check(acceptRecentVerification: true));
+    }
+  }
+
+  /// Shown until the assistant is verified, so configuring it never requires
+  /// opening a companion first.
+  Widget aiCard(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final (title, body, action) = switch (availability.status) {
+      AiAvailabilityStatus.unconfigured => (
+        'IA sin conectar',
+        'Elige un proveedor y un modelo.',
+        'Conectar',
+      ),
+      AiAvailabilityStatus.unverified => (
+        'IA sin verificar',
+        'Prueba la conexión para activar el asistente.',
+        'Verificar',
+      ),
+      _ => ('IA no disponible', 'Revisa el proveedor y vuelve a probar.', 'Revisar'),
+    };
+    return Container(
+      key: const Key('ai-not-connected'),
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.fromLTRB(14, 10, 8, 10),
+      decoration: BoxDecoration(
+        border: Border.all(color: scheme.primary),
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.power_off_outlined, color: scheme.primary),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: Theme.of(context).textTheme.titleSmall),
+                Text(body, style: Theme.of(context).textTheme.bodySmall),
+              ],
+            ),
+          ),
+          FilledButton(
+            onPressed: connectAi,
+            style: FilledButton.styleFrom(minimumSize: const Size(0, 40)),
+            child: Text(action),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> refresh() async {
@@ -102,7 +193,18 @@ class _CompanionDashboardState extends State<CompanionDashboard> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('TrackIA')),
+    appBar: AppBar(
+      title: const Text('TrackIA'),
+      actions: [
+        if (widget.onSettings != null)
+          IconButton(
+            key: const Key('dashboard-settings'),
+            tooltip: 'Ajustes',
+            onPressed: widget.onSettings,
+            icon: const Icon(Icons.settings_outlined),
+          ),
+      ],
+    ),
     floatingActionButton: FloatingActionButton.extended(
       key: const Key('companion-create'),
       onPressed: () => edit(),
@@ -126,6 +228,17 @@ class _CompanionDashboardState extends State<CompanionDashboard> {
                   'Elige con quién trabajar. Cada uno conserva su conversación y puede usar una hoja o pestaña de Google distinta.',
                 ),
                 const SizedBox(height: 20),
+                ListenableBuilder(
+                  listenable: availability,
+                  builder:
+                      (context, _) =>
+                          switch (availability.status) {
+                            AiAvailabilityStatus.ready ||
+                            AiAvailabilityStatus.checking =>
+                              const SizedBox.shrink(),
+                            _ => aiCard(context),
+                          },
+                ),
                 if (companions.isEmpty)
                   const Card(
                     child: Padding(

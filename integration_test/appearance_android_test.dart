@@ -24,8 +24,12 @@ void main() {
       await controller.refresh();
       final settings = ThemeSettings.instance;
       Future<void> openAppearance() async {
-        tester.state<ScaffoldState>(find.byType(Scaffold).first).openDrawer();
-        await tester.pumpAndSettle();
+        // Dashboard gear → Ajustes → Apariencia (Ajustes stays open between calls).
+        final gear = find.byKey(const Key('dashboard-settings'));
+        if (gear.evaluate().isNotEmpty) {
+          await tester.tap(gear);
+          await tester.pumpAndSettle();
+        }
         await tester.tap(find.text('Apariencia'));
         await tester.pumpAndSettle();
       }

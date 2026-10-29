@@ -13,6 +13,7 @@ import 'rest_timer_panel.dart';
 import 'data_transfer.dart';
 import 'assistant_chat.dart';
 import 'companions.dart';
+import 'settings.dart';
 import '../domain/companion.dart';
 import 'session_control.dart';
 export 'theme.dart' show gymTheme;
@@ -143,49 +144,64 @@ class _GymRootState extends State<GymRoot> {
     super.dispose();
   }
 
-  void openCompanion(Companion companion) {
-    activeCompanionId = companion.id;
-    Navigator.of(context)
-        .push(
-          MaterialPageRoute<void>(
-            builder:
-                (_) => AssistantChatScreen(
-                  key: ValueKey(companion.id),
-                  controller: widget.controller,
-                  companion: companion,
-                  focusMode: true,
-                  onTraining:
-                      () => Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder:
-                              (_) => GymHome(
-                                controller: widget.controller,
-                                onAssistant: () => Navigator.of(context).pop(),
-                              ),
-                        ),
-                      ),
-                  onData:
-                      () => Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder:
-                              (_) => DataTransferScreen(
-                                controller: widget.controller,
-                                companionId: companion.id,
-                              ),
-                        ),
+  Route<void> companionRoute(Companion companion) => MaterialPageRoute<void>(
+    builder:
+        (_) => AssistantChatScreen(
+          key: ValueKey(companion.id),
+          controller: widget.controller,
+          companion: companion,
+          focusMode: true,
+          onSwitchCompanion: switchCompanion,
+          onTraining:
+              () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder:
+                      (_) => GymHome(
+                        controller: widget.controller,
+                        onAssistant: () => Navigator.of(context).pop(),
                       ),
                 ),
-          ),
-        )
-        .then((_) {
-          activeCompanionId = null;
-        });
+              ),
+          onData:
+              () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder:
+                      (_) => DataTransferScreen(
+                        controller: widget.controller,
+                        companionId: companion.id,
+                      ),
+                ),
+              ),
+        ),
+  );
+
+  void openCompanion(Companion companion) {
+    activeCompanionId = companion.id;
+    Navigator.of(context).push(companionRoute(companion)).then((_) {
+      // A replacement already set the new companion: do not clear it.
+      if (activeCompanionId == companion.id) activeCompanionId = null;
+    });
+  }
+
+  /// Picking another companion in the chat title replaces the chat, so back
+  /// returns to the dashboard instead of stacking one chat per switch.
+  void switchCompanion(Companion companion) {
+    activeCompanionId = companion.id;
+    Navigator.of(context).pushReplacement(companionRoute(companion)).then((_) {
+      if (activeCompanionId == companion.id) activeCompanionId = null;
+    });
   }
 
   @override
   Widget build(BuildContext context) => CompanionDashboard(
     profileId: widget.controller.profileId,
     onOpen: openCompanion,
+    onSettings:
+        () => Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) => SettingsScreen(controller: widget.controller),
+          ),
+        ),
   );
 }
 

@@ -26,9 +26,9 @@ void main() {
     );
     await tester.pumpWidget(GymApp(controller: controller));
     await tester.pumpAndSettle();
-    await tester.tap(find.byIcon(Icons.menu));
+    await tester.tap(find.byKey(const Key('dashboard-settings')));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Exportar / importar'));
+    await tester.tap(find.text('Exportar e importar'));
     await tester.pumpAndSettle();
     expect(find.text('Crear y compartir copia'), findsOneWidget);
     await tester.pumpWidget(

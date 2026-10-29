@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gymia/application/ai_availability.dart';
+import 'package:gymia/data/ai_model_catalog.dart';
+import 'package:gymia/data/ai_settings_store.dart';
 import 'package:gymia/data/companion_store.dart';
+import 'package:gymia/domain/ai_config.dart';
+import 'package:gymia/ui/ai_settings.dart';
 import 'package:gymia/domain/companion.dart';
 import 'package:gymia/ui/companion_style.dart';
 import 'package:gymia/ui/companions.dart';
@@ -130,6 +135,8 @@ void main() {
     expect(saved.name, 'Ciclismo');
     expect((saved.icon, saved.color), ('bike', 'violet'));
     final card = find.byKey(Key('companion-${saved.id}'));
+    // The list is lazy and the AI card pushes it down: scroll to the new card.
+    await tester.scrollUntilVisible(card, 200);
     expect(
       tester.widget<Icon>(
         find.descendant(of: card, matching: find.byType(Icon)).first,
@@ -161,5 +168,118 @@ void main() {
           (c) => c.id == 'calma',
         );
     expect((calma.icon, calma.color), ('leaf', 'green'));
+  });
+
+  group('settings access', () {
+    const config = AiConfig(
+      service: AiService.opencodeGo,
+      baseUrl: 'https://opencode.ai/zen/go/v1',
+      model: 'test-model',
+      protocol: AiProtocol.chatCompletions,
+      apiKey: 'test-secret',
+    );
+    AiAvailability availability() => AiAvailability(
+      catalog: AiModelCatalog(
+        transport:
+            (_, __) async => {
+              'data': [
+                {'id': 'test-model'},
+              ],
+            },
+      ),
+    );
+
+    Future<void> pump(
+      WidgetTester tester, {
+      VoidCallback? onSettings,
+      AiAvailability? ai,
+    }) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: gymTheme,
+          home: CompanionDashboard(
+            profileId: 'local',
+            onOpen: (_) {},
+            onSettings: onSettings,
+            availability: ai ?? availability(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('the gear opens settings without opening any companion', (
+      tester,
+    ) async {
+      FlutterSecureStorage.setMockInitialValues({});
+      var settings = 0;
+      Companion? opened;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: gymTheme,
+          home: CompanionDashboard(
+            profileId: 'local',
+            onOpen: (c) => opened = c,
+            onSettings: () => settings++,
+            availability: availability(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('dashboard-settings')));
+      expect(settings, 1);
+      expect(opened, isNull);
+      expect(find.byTooltip('Ajustes'), findsOneWidget);
+    });
+
+    testWidgets('without a settings callback there is no gear', (tester) async {
+      FlutterSecureStorage.setMockInitialValues({});
+      await pump(tester);
+      expect(find.byKey(const Key('dashboard-settings')), findsNothing);
+    });
+
+    testWidgets('an unconfigured AI shows the card and Conectar opens its setup', (
+      tester,
+    ) async {
+      FlutterSecureStorage.setMockInitialValues({});
+      await pump(tester);
+      expect(find.byKey(const Key('ai-not-connected')), findsOneWidget);
+      expect(find.text('IA sin conectar'), findsOneWidget);
+      await tester.tap(find.text('Conectar'));
+      await tester.pumpAndSettle();
+      expect(find.byType(AiSettingsScreen), findsOneWidget);
+    });
+
+    testWidgets('a verified AI hides the card', (tester) async {
+      FlutterSecureStorage.setMockInitialValues({});
+      await const AiSettingsStore().save(config);
+      await const AiSettingsStore().markVerified(config);
+      await pump(tester);
+      expect(find.byKey(const Key('ai-not-connected')), findsNothing);
+      expect(find.text('Tus acompañantes'), findsOneWidget);
+    });
+
+    testWidgets('a saved but unverified AI still asks to connect', (tester) async {
+      FlutterSecureStorage.setMockInitialValues({});
+      await const AiSettingsStore().save(config);
+      await pump(tester);
+      expect(find.byKey(const Key('ai-not-connected')), findsOneWidget);
+      expect(find.text('IA sin verificar'), findsOneWidget);
+    });
+
+    testWidgets('the card disappears after configuring and coming back', (
+      tester,
+    ) async {
+      FlutterSecureStorage.setMockInitialValues({});
+      await pump(tester);
+      expect(find.byKey(const Key('ai-not-connected')), findsOneWidget);
+      await tester.tap(find.text('Conectar'));
+      await tester.pumpAndSettle();
+      await const AiSettingsStore().save(config);
+      await const AiSettingsStore().markVerified(config);
+      await tester.pageBack();
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('ai-not-connected')), findsNothing);
+    });
   });
 }

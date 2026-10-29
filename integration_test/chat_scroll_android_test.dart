@@ -263,6 +263,8 @@ void main() {
         // Archive a whole chat, inspect it, then let the model archive the next
         // completed exchange. None of these operations alters the workout.
         final workoutId = controller.workouts.single.id;
+        await tester.tap(find.byKey(const Key('chat-menu')));
+        await tester.pumpAndSettle();
         await tester.tap(find.byKey(const Key('archive-chat')));
         await frames();
         await tester.pumpAndSettle();
@@ -274,7 +276,9 @@ void main() {
         final document = await archiveStore.read(entry['id'] as String);
         expect(jsonEncode(document), contains('Nota mientras corre el reloj'));
         expect(controller.workouts.single.id, workoutId);
-        await tester.tap(find.byTooltip('Chats archivados'));
+        await tester.tap(find.byKey(const Key('chat-menu')));
+        await tester.pumpAndSettle();
+        await tester.tap(find.byKey(const Key('menu-archives')));
         await tester.pumpAndSettle();
         await tester.tap(find.text(entry['title'] as String));
         await tester.pumpAndSettle();

@@ -1,5 +1,3 @@
-import 'appearance.dart';
-import 'welcome.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
@@ -24,7 +22,6 @@ import '../domain/sheet_context.dart';
 import '../domain/workout.dart';
 import '../domain/ai_config.dart';
 import 'ai_settings.dart';
-import 'notification_settings.dart';
 import 'google_sheets_import.dart';
 import 'data_transfer.dart';
 import 'session_control.dart';
@@ -40,6 +37,7 @@ import '../domain/sheet_sync.dart';
 import '../application/sheet_automation.dart';
 import '../data/companion_store.dart';
 import '../domain/companion.dart';
+import 'companion_style.dart';
 
 class AssistantChatScreen extends StatefulWidget {
   const AssistantChatScreen({
@@ -51,6 +49,7 @@ class AssistantChatScreen extends StatefulWidget {
     this.focusMode = false,
     this.availability,
     this.companion,
+    this.onSwitchCompanion,
   });
   final WorkoutController controller;
   final AiClient? client;
@@ -59,6 +58,10 @@ class AssistantChatScreen extends StatefulWidget {
   final bool focusMode;
   final AiAvailability? availability;
   final Companion? companion;
+
+  /// Called when the user picks another companion from the title. The host
+  /// decides how to navigate; without it the picker only closes.
+  final void Function(Companion)? onSwitchCompanion;
   @override
   State<AssistantChatScreen> createState() => _AssistantChatScreenState();
 }
@@ -1499,6 +1502,191 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     }
   }
 
+  bool get canArchive =>
+      !(busy ||
+          listening ||
+          voiceStarting ||
+          pending != null ||
+          transcript.isEmpty);
+
+  bool get canCloseDay =>
+      companionId == 'gymbro' &&
+      widget.controller.active != null &&
+      widget.controller.focus == null;
+
+  /// Companion icon and name; tapping it switches to another companion.
+  Widget companionTitle(BuildContext context) {
+    final current = widget.companion ?? Companion.suggestions.first;
+    return InkWell(
+      key: const Key('companion-switcher'),
+      borderRadius: BorderRadius.circular(8),
+      onTap: switchCompanion,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CompanionAvatar(companion: current, radius: 14),
+            const SizedBox(width: 8),
+            Flexible(child: Text(current.name, overflow: TextOverflow.ellipsis)),
+            const Icon(Icons.expand_more),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> switchCompanion() async {
+    final current = widget.companion ?? Companion.suggestions.first;
+    final List<Companion> all;
+    try {
+      all = await CompanionStore(profileId: profileId).load();
+    } catch (_) {
+      if (mounted) setState(() => error = 'No se pudieron cargar los acompañantes.');
+      return;
+    }
+    if (!mounted) return;
+    final chosen = await showModalBottomSheet<Companion>(
+      context: context,
+      builder:
+          (sheetContext) => SafeArea(
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                for (final c in all)
+                  ListTile(
+                    key: Key('switch-to-${c.id}'),
+                    leading: CompanionAvatar(companion: c),
+                    title: Text(c.name),
+                    subtitle: c.description.isEmpty ? null : Text(c.description),
+                    trailing: c.id == current.id ? const Icon(Icons.check) : null,
+                    onTap: () => Navigator.pop(sheetContext, c),
+                  ),
+              ],
+            ),
+          ),
+    );
+    if (chosen != null && chosen.id != current.id) {
+      widget.onSwitchCompanion?.call(chosen);
+    }
+  }
+
+  PopupMenuItem<String> menuItem(
+    String key,
+    String value,
+    IconData icon,
+    String label, {
+    bool enabled = true,
+    String? detail,
+  }) => PopupMenuItem<String>(
+    key: Key(key),
+    value: value,
+    enabled: enabled,
+    child: Row(
+      children: [
+        Icon(icon, size: 20),
+        const SizedBox(width: 12),
+        Flexible(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(label),
+              if (detail != null)
+                Text(detail, style: Theme.of(context).textTheme.bodySmall),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+
+  /// Actions of this companion's chat. App-wide settings live in Ajustes.
+  Widget chatMenu() => PopupMenuButton<String>(
+    key: const Key('chat-menu'),
+    tooltip: 'Más opciones',
+    onSelected: onMenu,
+    itemBuilder:
+        (_) => [
+          if (widget.onTraining != null)
+            menuItem(
+              'menu-training',
+              'training',
+              Icons.history,
+              'Rutinas e historial',
+              enabled: aiReady,
+            ),
+          menuItem(
+            'menu-sheet-sync',
+            'sheet-sync',
+            Icons.cloud_upload_outlined,
+            'Enviar a Google Sheets',
+            enabled: !busy && !voiceStarting,
+          ),
+          menuItem(
+            'archive-chat',
+            'archive',
+            Icons.archive_outlined,
+            'Archivar chat',
+            enabled: canArchive,
+          ),
+          menuItem(
+            'menu-archives',
+            'archives',
+            Icons.inventory_2_outlined,
+            'Chats archivados',
+            enabled: !busy,
+          ),
+          menuItem(
+            'menu-sheet',
+            'sheet',
+            Icons.table_chart_outlined,
+            'Hoja cargada',
+          ),
+          if (canCloseDay)
+            menuItem(
+              'menu-close-day',
+              'close-day',
+              Icons.flag_outlined,
+              'Finalizar día',
+            ),
+          if (!canRecord && recoverablePreparation != null)
+            menuItem(
+              'menu-recover',
+              'recover',
+              Icons.restore,
+              'Recuperar preparación',
+              detail: recoverablePreparation!.definition.name,
+            ),
+        ],
+  );
+
+  void onMenu(String value) {
+    switch (value) {
+      case 'training':
+        widget.onTraining?.call();
+      case 'sheet-sync':
+        unawaited(openSheetSync());
+      case 'archive':
+        unawaited(archiveChat());
+      case 'archives':
+        unawaited(openArchives());
+      case 'sheet':
+        unawaited(manageSheet());
+      case 'close-day':
+        unawaited(closeDay());
+      case 'recover':
+        final a = recoverablePreparation;
+        if (a == null) return;
+        unawaited(
+          widget.controller.run(
+            () => widget.controller.activityRepository!
+                .resumeActivityPreparation(a.id),
+          ),
+        );
+    }
+  }
+
   bool get noticesOff =>
       notifications.supported &&
       !(notifications.enabled && notifications.granted);
@@ -1823,265 +2011,46 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     listenable: widget.controller,
     builder:
         (context, _) => Scaffold(
-          drawer:
-              widget.focusMode
-                  ? Drawer(
-                    child: SafeArea(
-                      child: ListView(
-                        children: [
-                          const ListTile(title: Text('TrackIA')),
-                          ListTile(
-                            leading: const Icon(Icons.grid_view_rounded),
-                            title: const Text('Acompañantes'),
-                            onTap: () {
-                              Navigator.pop(context);
-                              if (Navigator.of(context).canPop()) {
-                                Navigator.of(context).pop();
-                              }
-                            },
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.brightness_6_outlined),
-                            title: const Text('Apariencia'),
-                            onTap: () {
-                              Navigator.pop(context);
-                              Navigator.of(context).push(
-                                MaterialPageRoute<void>(
-                                  builder: (_) => const AppearanceScreen(),
-                                ),
-                              );
-                            },
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.help_outline_rounded),
-                            title: const Text('Ayuda y bienvenida'),
-                            onTap: () {
-                              Navigator.pop(context);
-                              Navigator.of(context).push(
-                                MaterialPageRoute<void>(
-                                  builder: (_) => const WelcomeHelpScreen(),
-                                ),
-                              );
-                            },
-                          ),
-                          if (notifications.supported)
-                            SwitchListTile(
-                              title: const Text(
-                                'Avisar al iniciar, parar y terminar el descanso',
-                              ),
-                              value: notifications.enabled,
-                              onChanged:
-                                  notifications.busy
-                                      ? null
-                                      : notifications.toggle,
-                            ),
-                          if (notifications.supported)
-                            ListTile(
-                              leading: const Icon(
-                                Icons.notifications_active_outlined,
-                              ),
-                              title: const Text('Probar notificación ahora'),
-                              subtitle: const Text(
-                                'No requiere iniciar una actividad.',
-                              ),
-                              enabled: !notifications.busy,
-                              onTap:
-                                  notifications.busy
-                                      ? null
-                                      : notifications.testNotification,
-                            ),
-                          if (notifications.supported)
-                            ListTile(
-                              key: const Key('open-notification-settings'),
-                              leading: const Icon(Icons.dark_mode_outlined),
-                              title: const Text('Avisos y No molestar'),
-                              subtitle: const Text(
-                                'Alarma, prueba y estado de No molestar.',
-                              ),
-                              onTap: () {
-                                Navigator.pop(context);
-                                Navigator.of(context).push(
-                                  MaterialPageRoute<void>(
-                                    builder:
-                                        (_) => NotificationSettingsScreen(
-                                          notifications: notifications,
-                                        ),
-                                  ),
-                                );
-                              },
-                            ),
-                          if (notifications.testStatus != null)
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                              ),
-                              child: Text(notifications.testStatus!),
-                            ),
-                          if (notifications.enabled && !notifications.exact)
-                            ListTile(
-                              title: const Text('Permitir avisos puntuales'),
-                              subtitle: const Text(
-                                'Sin este permiso Android puede retrasar el aviso.',
-                              ),
-                              onTap: notifications.allowExact,
-                            ),
-                          if (widget.onTraining != null)
-                            ListTile(
-                              leading: const Icon(Icons.history),
-                              title: const Text('Rutinas e historial'),
-                              enabled: aiReady,
-                              onTap: () {
-                                Navigator.pop(context);
-                                widget.onTraining!();
-                              },
-                            ),
-                          ListTile(
-                            leading: const Icon(Icons.account_circle_outlined),
-                            title: const Text('Cuenta y datos'),
-                            enabled: !busy,
-                            onTap: () {
-                              Navigator.pop(context);
-                              Navigator.of(context).push(
-                                MaterialPageRoute<void>(
-                                  builder: (_) => const AccountsScreen(),
-                                ),
-                              );
-                            },
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.cloud_upload_outlined),
-                            title: const Text('Enviar a Google Sheets'),
-                            enabled: !busy && !voiceStarting,
-                            onTap: () {
-                              Navigator.pop(context);
-                              unawaited(openSheetSync());
-                            },
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.archive_outlined),
-                            title: const Text('Archivar chat actual'),
-                            enabled:
-                                !busy &&
-                                !listening &&
-                                !voiceStarting &&
-                                pending == null &&
-                                transcript.isNotEmpty,
-                            onTap: () {
-                              Navigator.pop(context);
-                              unawaited(archiveChat());
-                            },
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.inventory_2_outlined),
-                            title: const Text('Chats archivados'),
-                            enabled: !busy,
-                            onTap: () {
-                              Navigator.pop(context);
-                              unawaited(openArchives());
-                            },
-                          ),
-                          ListTile(
-                            leading: const Icon(Icons.table_chart_outlined),
-                            title: const Text('Hoja cargada'),
-                            onTap: () {
-                              Navigator.pop(context);
-                              unawaited(manageSheet());
-                            },
-                          ),
-                          if (widget.onData != null)
-                            ListTile(
-                              leading: const Icon(Icons.folder_open_outlined),
-                              title: const Text('Exportar / importar'),
-                              onTap: () async {
-                                Navigator.pop(context);
-                                await widget.onData!();
-                                if (mounted) await reloadSheet();
-                              },
-                            ),
-                          ListTile(
-                            leading: const Icon(Icons.settings_outlined),
-                            title: const Text('Configurar IA'),
-                            onTap: () {
-                              Navigator.pop(context);
-                              unawaited(settings());
-                            },
-                          ),
-                          if (companionId == 'gymbro' &&
-                              widget.controller.active != null &&
-                              widget.controller.focus == null)
-                            ListTile(
-                              leading: const Icon(Icons.flag_outlined),
-                              title: const Text('Finalizar día'),
-                              onTap: () {
-                                Navigator.pop(context);
-                                unawaited(closeDay());
-                              },
-                            ),
-                          if (!canRecord && recoverablePreparation != null)
-                            ListTile(
-                              leading: const Icon(Icons.restore),
-                              title: const Text('Recuperar preparación'),
-                              subtitle: Text(
-                                recoverablePreparation!.definition.name,
-                              ),
-                              onTap: () {
-                                final a = recoverablePreparation!;
-                                Navigator.pop(context);
-                                unawaited(
-                                  widget.controller.run(
-                                    () => widget.controller.activityRepository!
-                                        .resumeActivityPreparation(a.id),
-                                  ),
-                                );
-                              },
-                            ),
-                        ],
-                      ),
-                    ),
-                  )
-                  : null,
           appBar: AppBar(
-            title: Text(widget.companion?.name ?? 'TrackIA'),
-            actions: [
-              if (!widget.focusMode)
-                IconButton(
-                  tooltip: 'Enviar a Google Sheets',
-                  onPressed: busy ? null : () => openSheetSync(),
-                  icon: const Icon(Icons.cloud_upload_outlined),
-                ),
-              IconButton(
-                key: const Key('archive-chat'),
-                tooltip: 'Archivar chat',
-                onPressed:
-                    busy ||
-                            listening ||
-                            voiceStarting ||
-                            pending != null ||
-                            transcript.isEmpty
-                        ? null
-                        : () => archiveChat(),
-                icon: const Icon(Icons.archive_outlined),
-              ),
-              IconButton(
-                tooltip: 'Chats archivados',
-                onPressed: busy ? null : openArchives,
-                icon: const Icon(Icons.inventory_2_outlined),
-              ),
-              if (widget.onData != null && !widget.focusMode)
-                IconButton(
-                  tooltip: 'Tus datos',
-                  onPressed: () async {
-                    await widget.onData!();
-                    if (mounted) await reloadSheet();
-                  },
-                  icon: const Icon(Icons.folder_open_outlined),
-                ),
-              IconButton(
-                tooltip: 'Proveedor de IA',
-                onPressed: busy ? null : settings,
-                icon: const Icon(Icons.settings_outlined),
-              ),
-            ],
+            title:
+                widget.focusMode
+                    ? companionTitle(context)
+                    : Text(widget.companion?.name ?? 'TrackIA'),
+            actions:
+                widget.focusMode
+                    ? [chatMenu()]
+                    : [
+                      IconButton(
+                        tooltip: 'Enviar a Google Sheets',
+                        onPressed: busy ? null : () => openSheetSync(),
+                        icon: const Icon(Icons.cloud_upload_outlined),
+                      ),
+                      IconButton(
+                        key: const Key('archive-chat'),
+                        tooltip: 'Archivar chat',
+                        onPressed: canArchive ? () => archiveChat() : null,
+                        icon: const Icon(Icons.archive_outlined),
+                      ),
+                      IconButton(
+                        tooltip: 'Chats archivados',
+                        onPressed: busy ? null : openArchives,
+                        icon: const Icon(Icons.inventory_2_outlined),
+                      ),
+                      if (widget.onData != null)
+                        IconButton(
+                          tooltip: 'Tus datos',
+                          onPressed: () async {
+                            await widget.onData!();
+                            if (mounted) await reloadSheet();
+                          },
+                          icon: const Icon(Icons.folder_open_outlined),
+                        ),
+                      IconButton(
+                        tooltip: 'Proveedor de IA',
+                        onPressed: busy ? null : settings,
+                        icon: const Icon(Icons.settings_outlined),
+                      ),
+                    ],
           ),
           body: SafeArea(
             child: Column(

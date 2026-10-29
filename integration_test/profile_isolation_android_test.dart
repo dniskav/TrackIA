@@ -61,8 +61,12 @@ void main() {
     }
 
     Future<void> openAccounts() async {
-      await tester.tap(find.byType(DrawerButton));
-      await tester.pumpAndSettle();
+      // Dashboard gear → Ajustes → Cuenta y datos (Ajustes may already be open).
+      final gear = find.byKey(const Key('dashboard-settings'));
+      if (gear.evaluate().isNotEmpty) {
+        await tester.tap(gear);
+        await tester.pumpAndSettle();
+      }
       await tester.tap(find.text('Cuenta y datos'));
       await tester.pumpAndSettle();
     }

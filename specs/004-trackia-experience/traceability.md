@@ -1,6 +1,6 @@
 # Traceability: TrackIA 004
 
-Generada a partir de `spec.md` y `tasks.md` el 2026-10-29. Si cambian las tareas, regenerarla y
+Generada a partir de `spec.md` y `tasks.md`. Si cambian las tareas, regenerarla y
 ejecutar `python3 scripts/validate-sdd-004.py`. Una fila no implica que el requisito esté entregado:
 el estado real es el de las casillas de `tasks.md` con su evidencia.
 
