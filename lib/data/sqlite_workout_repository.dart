@@ -11,18 +11,35 @@ import '../domain/transfer.dart';
 import '../domain/transfer_repository.dart';
 import '../domain/activity.dart';
 import '../domain/space.dart';
+import 'activity_template_repository.dart';
+import 'observation_repository.dart';
 part 'sqlite_activity_repository.dart';
 part 'trackia_migrations.dart';
 
 class SqliteWorkoutRepository
     with _SqliteActivities
     implements WorkoutRepository, TransferRepository {
-  SqliteWorkoutRepository._(this._db, this._now);
+  SqliteWorkoutRepository._(this._db, this._now, this.profileId);
   @override
   final DateTime Function() _now;
   @override
   final Database _db;
+  final String profileId;
   static const _uuid = Uuid();
+
+  /// Point records (no running clock) of this profile.
+  late final ObservationRepository observations = ObservationRepository(
+    _db,
+    _now,
+    profileId,
+  );
+
+  /// The user's saved activities and point-record shapes.
+  late final ActivityTemplateRepository templates = ActivityTemplateRepository(
+    _db,
+    _now,
+    profileId,
+  );
 
   static Future<void> _migrateV3(Database db) async {
     // Historical records have no capture-time evidence: retain nulls.
@@ -347,7 +364,7 @@ class SqliteWorkoutRepository
       await db.close();
       rethrow;
     }
-    return SqliteWorkoutRepository._(db, clock ?? DateTime.now);
+    return SqliteWorkoutRepository._(db, clock ?? DateTime.now, profileId);
   }
 
   @override

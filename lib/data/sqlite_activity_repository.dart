@@ -67,6 +67,10 @@ mixin _SqliteActivities implements ActivityRepository {
         final definition = Map<String, dynamic>.from(
           jsonDecode(row['definition'] as String) as Map,
         );
+        // The key is derived from the name until the first rename pins it, so
+        // goals and achievements keep following the same activity.
+        definition['activityKey'] =
+            ActivityDefinition.fromJson(definition).activityKey;
         definition['name'] = validName(name);
         await tx.update(
           'activities',
@@ -223,7 +227,7 @@ mixin _SqliteActivities implements ActivityRepository {
   Future<void> interpretActivityMessage(
     String messageId,
     Map<String, dynamic> metrics, {
-    List<Map<String, String>> fields = const [],
+    List<Map<String, Object>> fields = const [],
   }) => _db.transaction((tx) async {
     final rows = await tx.rawQuery(
       'SELECT m.activity_id, m.metrics, a.definition FROM activity_messages m JOIN activities a ON a.id = m.activity_id WHERE m.id = ? AND m.role = ?',
@@ -236,7 +240,7 @@ mixin _SqliteActivities implements ActivityRepository {
     final old = ActivityDefinition.fromJson(
       jsonDecode(row['definition'] as String) as Map<String, dynamic>,
     );
-    final additions = <Map<String, String>>[];
+    final additions = <Map<String, Object>>[];
     for (final field in fields) {
       final previous =
           old.fields.where((f) => f['key'] == field['key']).firstOrNull;
@@ -255,14 +259,10 @@ mixin _SqliteActivities implements ActivityRepository {
       ...old.toJson(),
       'fields': [...old.fields, ...additions],
     });
-    final allowed = definition.fields.map((f) => f['key']).toSet();
-    if (metrics.keys.any((k) => !allowed.contains(k)) ||
-        metrics.values.any(
-          (v) =>
-              !(v is num && v.isFinite ||
-                  v is bool ||
-                  v is String && v.length <= 500),
-        )) {
+    final Map<String, Object> checked;
+    try {
+      checked = validateFieldValues(definition, metrics);
+    } on ValidationException {
       throw const ValidationException(
         'La interpretación no coincide con los datos de esta actividad.',
       );
@@ -272,7 +272,7 @@ mixin _SqliteActivities implements ActivityRepository {
     await tx.update(
       'activity_messages',
       {
-        'metrics': jsonEncode({...metrics, ...deterministic}),
+        'metrics': jsonEncode({...checked, ...deterministic}),
       },
       where: 'id = ?',
       whereArgs: [messageId],
@@ -426,7 +426,10 @@ mixin _SqliteActivities implements ActivityRepository {
       'id': id,
       'workout_id': workoutId,
       'exercise_id': exerciseId,
-      'definition': jsonEncode(definition.toJson()),
+      'definition': jsonEncode({
+        ...definition.toJson(),
+        'activityKey': definition.activityKey,
+      }),
       'created_at': _now().millisecondsSinceEpoch,
     });
     return id;
@@ -519,6 +522,7 @@ mixin _SqliteActivities implements ActivityRepository {
     String role = 'user',
     String? intervalId,
     ActivityMedia? media,
+    Map<String, Object>? metrics,
   }) => _db.transaction((tx) async {
     // Assistant replies may arrive after Terminar. Keep their original target,
     // never redirect a delayed reply to the newly prepared activity.
@@ -567,7 +571,12 @@ mixin _SqliteActivities implements ActivityRepository {
       'attachment_name': media?.name,
       'attachment_mime': media?.mime,
       'metrics': jsonEncode(
-        role == 'user' ? compactStrengthMetrics(text, definition) : {},
+        role == 'user'
+            ? {
+              ...compactStrengthMetrics(text, definition),
+              if (metrics != null) ...validateFieldValues(definition, metrics),
+            }
+            : {},
       ),
     });
     if (role == 'user') {

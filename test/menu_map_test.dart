@@ -104,7 +104,9 @@ void main() {
       ),
     );
     await tester.tap(find.text('abrir'));
-    await tester.pumpAndSettle();
+    // Not pumpAndSettle: the panel loads saved activities asynchronously.
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 600));
   }
 
   Future<void> openMenu(WidgetTester tester) async {

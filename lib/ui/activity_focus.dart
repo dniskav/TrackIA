@@ -4,6 +4,9 @@ import 'package:intl/intl.dart';
 import '../application/workout_controller.dart';
 import '../domain/activity.dart';
 import '../domain/workout.dart';
+import '../data/activity_template_repository.dart';
+import 'activity_builder.dart';
+import 'instant_record.dart';
 import 'session_control.dart';
 import 'theme.dart';
 import 'timer_ring.dart';
@@ -19,6 +22,7 @@ class ActivityFocusControls extends StatefulWidget {
     this.companionId = 'gymbro',
     this.noticesOff = false,
     this.onEnableNotices,
+    this.onInstantRecorded,
   });
   final WorkoutController controller;
   final Future<void> Function() flushInput;
@@ -31,6 +35,9 @@ class ActivityFocusControls extends StatefulWidget {
   /// duration that would normally announce itself.
   final bool noticesOff;
   final VoidCallback? onEnableNotices;
+
+  /// Told what was recorded so the chat can show «Registrado: …».
+  final void Function(String)? onInstantRecorded;
   @override
   State<ActivityFocusControls> createState() => _ActivityFocusControlsState();
 }
@@ -66,6 +73,7 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
     WidgetsBinding.instance.addObserver(this);
     c.addListener(syncTicker);
     syncTicker();
+    unawaited(loadInstantTemplates());
   }
 
   /// The clock only shows whole seconds, and only while an interval or rest
@@ -93,11 +101,115 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
 
   @override
   void dispose() {
+    counterTimer?.cancel();
+    final a = focus;
+    if (a != null && pending.isNotEmpty) {
+      // Leaving the screen must not lose the taps: save them without the UI.
+      final controller = c;
+      final batch = Map<String, int>.of(pending);
+      final text = batch.entries
+          .map((e) => '${labelOf(a, e.key)}: +${e.value}')
+          .join(' · ');
+      unawaited(
+        controller.run(
+          () => controller.activityRepository!.recordActivityMessage(
+            a.id,
+            text,
+            intervalId: a.running?.id,
+            metrics: Map<String, Object>.of(batch),
+          ),
+        ),
+      );
+    }
     ticker?.cancel();
     c.removeListener(syncTicker);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
+
+  List<ActivityTemplate> instantTemplates = [];
+
+  Future<void> loadInstantTemplates() async {
+    try {
+      final all = await c.templates?.list(companionId: widget.companionId);
+      if (mounted && all != null) {
+        setState(() => instantTemplates = all.where((t) => t.instant).toList());
+      }
+    } catch (_) {
+      // Point records are optional: the bar works without the list.
+    }
+  }
+
+  /// Taps on a quick counter wait here so a burst becomes one message.
+  final pending = <String, int>{};
+  Timer? counterTimer;
+
+  static bool countsUp(Map<String, Object> field) =>
+      field['type'] == 'number' && field['aggregate'] == 'sum';
+
+  String labelOf(FocusActivity a, String key) =>
+      a.definition.fields.firstWhere((f) => f['key'] == key)['label'] as String;
+
+  void bump(String key, int delta) {
+    if (focus == null) return;
+    setState(() {
+      final next = (pending[key] ?? 0) + delta;
+      if (next <= 0) {
+        pending.remove(key);
+      } else {
+        pending[key] = next;
+      }
+    });
+    counterTimer?.cancel();
+    counterTimer = pending.isEmpty
+        ? null
+        : Timer(const Duration(seconds: 3), () => unawaited(flushCounters()));
+  }
+
+  /// Records the pending taps as a single message with their quantities (never
+  /// running totals), linked to the current or last tramo.
+  Future<void> flushCounters() async {
+    counterTimer?.cancel();
+    counterTimer = null;
+    final a = focus;
+    if (a == null || pending.isEmpty) return;
+    final batch = Map<String, int>.of(pending);
+    pending.clear();
+    if (mounted) setState(() {});
+    final text = batch.entries
+        .map((e) => '${labelOf(a, e.key)}: +${e.value}')
+        .join(' · ');
+    final ok = await c.run(
+      () => c.activityRepository!.recordActivityMessage(
+        a.id,
+        text,
+        intervalId: a.running?.id,
+        metrics: Map<String, Object>.of(batch),
+      ),
+    );
+    if (!ok && mounted) {
+      pending.addAll(batch);
+      setState(() {});
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No se pudo guardar el contador. Vuelve a intentarlo.'),
+        ),
+      );
+    }
+  }
+
+  num recordedFor(FocusActivity a, String key) {
+    final id = a.running?.id ?? a.intervals.lastOrNull?.id;
+    return a.messages
+        .where((m) => m.role == 'user' && m.intervalId == id)
+        .fold<num>(0, (sum, m) {
+          final v = m.metrics[key];
+          return v is num ? sum + v : sum;
+        });
+  }
+
+  static String shown(num value) =>
+      value == value.roundToDouble() ? value.toInt().toString() : '$value';
 
   Future<void> act() async {
     final a = focus;
@@ -106,6 +218,7 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
     setState(() => acting = true);
     try {
       if (a.running != null) {
+        await flushCounters();
         await c.run(() => c.activityRepository!.stopInterval(a.id));
         await flush();
       } else {
@@ -142,6 +255,7 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
     if (a == null || a.running != null || acting) return;
     setState(() => acting = true);
     try {
+      await flushCounters();
       if (!await flush()) return;
       if (!mounted) return;
       final end = await showDialog<DateTime>(
@@ -191,22 +305,47 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
     }
   }
 
+  /// Keeps what the user asked to save (always for a point record, which only
+  /// makes sense as a reusable shape). A failure never blocks the activity.
+  Future<void> saveChoice(ActivityChoice choice) async {
+    final templates = c.templates;
+    if (templates == null || !(choice.save || choice.instant)) return;
+    try {
+      await templates.save(
+        companionId: widget.companionId,
+        definition: choice.definition.forCompanion(widget.companionId),
+        instant: choice.instant,
+      );
+      unawaited(loadInstantTemplates());
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No se pudo guardar en tus actividades.'),
+          ),
+        );
+      }
+    }
+  }
+
   Future<void> choose() async {
     if (!await flush()) return;
     if (!mounted) return;
     final choice = await showModalBottomSheet<ActivityChoice>(
       context: context,
       isScrollControlled: true,
-      builder: (_) => ActivityChooser(controller: c),
+      builder:
+          (_) => ActivityChooser(controller: c, companionId: widget.companionId),
     );
-    if (choice != null) {
-      await c.run(() async {
-        await c.activityRepository!.prepareActivity(
-          choice.definition.forCompanion(widget.companionId),
-          exerciseId: choice.exerciseId,
-        );
-      });
-    }
+    if (choice == null) return;
+    await saveChoice(choice);
+    if (choice.instant) return recordInstant(choice.definition);
+    await c.run(() async {
+      await c.activityRepository!.prepareActivity(
+        choice.definition.forCompanion(widget.companionId),
+        exerciseId: choice.exerciseId,
+      );
+    });
   }
 
   Future<void> changePreparation() async {
@@ -216,9 +355,12 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
     final choice = await showModalBottomSheet<ActivityChoice>(
       context: context,
       isScrollControlled: true,
-      builder: (_) => ActivityChooser(controller: c),
+      builder:
+          (_) => ActivityChooser(controller: c, companionId: widget.companionId),
     );
     if (choice == null || focus?.id != a.id) return;
+    await saveChoice(choice);
+    if (choice.instant) return recordInstant(choice.definition);
     await c.run(
       () => c.activityRepository!.replaceActivityPreparation(
         a.id,
@@ -226,6 +368,61 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
         exerciseId: choice.exerciseId,
       ),
     );
+  }
+
+  /// Records one value of a point activity: no clock, no activity row.
+  Future<void> recordInstant(ActivityDefinition definition) async {
+    final observations = c.observations;
+    if (observations == null || !mounted) return;
+    final result = await showModalBottomSheet<InstantRecordResult>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => InstantRecordSheet(definition: definition),
+    );
+    if (result == null) return;
+    try {
+      await observations.record(
+        companionId: widget.companionId,
+        definition: definition.forCompanion(widget.companionId),
+        original: result.original,
+        values: result.values,
+      );
+      widget.onInstantRecorded?.call('Registrado: ${result.original}');
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No se pudo guardar el registro. Vuelve a intentarlo.'),
+          ),
+        );
+      }
+    }
+  }
+
+  /// With one point shape the sheet opens straight away; with several the
+  /// user picks first.
+  Future<void> startInstantRecord() async {
+    if (instantTemplates.length == 1) {
+      return recordInstant(instantTemplates.single.definition);
+    }
+    final picked = await showModalBottomSheet<ActivityTemplate>(
+      context: context,
+      builder:
+          (sheet) => SafeArea(
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                for (final t in instantTemplates)
+                  ListTile(
+                    leading: const Icon(Icons.touch_app_outlined),
+                    title: Text(t.definition.name),
+                    onTap: () => Navigator.pop(sheet, t),
+                  ),
+              ],
+            ),
+          ),
+    );
+    if (picked != null) await recordInstant(picked.definition);
   }
 
   Future<void> rename() async {
@@ -333,8 +530,14 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
         );
       }
       final definition = a.definition;
-      final segment = definition.companionId == 'gymbro' ? 'serie' : 'tramo';
-      final segments = definition.companionId == 'gymbro' ? 'series' : 'tramos';
+      // The activity names its own tramo; without one GymBro says «serie» and
+      // every other companion «tramo», as before.
+      final segment =
+          definition.segmentSingular ??
+          (definition.companionId == 'gymbro' ? 'serie' : 'tramo');
+      final segments =
+          definition.segmentPlural ??
+          (definition.companionId == 'gymbro' ? 'series' : 'tramos');
       final status =
           running != null
               ? definition.repeated
@@ -488,6 +691,58 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
                             ],
                           ),
                         ),
+                      if (!compact &&
+                          (running != null || a.intervals.isNotEmpty))
+                        for (final field in definition.fields.where(countsUp))
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    field['label'] as String,
+                                    style: TextStyle(
+                                      fontSize: 15,
+                                      color: scheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  key: Key('counter-dec-${field['key']}'),
+                                  tooltip: 'Quitar ${field['label']}',
+                                  onPressed:
+                                      (pending[field['key']] ?? 0) > 0
+                                          ? () => bump(field['key'] as String, -1)
+                                          : null,
+                                  icon: const Icon(Icons.remove_circle_outline),
+                                ),
+                                SizedBox(
+                                  width: 48,
+                                  child: Text(
+                                    shown(
+                                      recordedFor(a, field['key'] as String) +
+                                          (pending[field['key']] ?? 0),
+                                    ),
+                                    key: Key('counter-${field['key']}'),
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  key: Key('counter-inc-${field['key']}'),
+                                  tooltip: 'Añadir ${field['label']}',
+                                  onPressed:
+                                      enabled
+                                          ? () => bump(field['key'] as String, 1)
+                                          : null,
+                                  icon: const Icon(Icons.add_circle_outline),
+                                ),
+                              ],
+                            ),
+                          ),
                       if (!widget.hideStart || running != null)
                         Padding(
                           padding: const EdgeInsets.only(right: 8, top: 4),
@@ -592,6 +847,14 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
     final extras = [
       if (restButton != null) restButton,
       if (closingDay) finishButton,
+      if (instantTemplates.isNotEmpty && !blockedByOther)
+        OutlinedButton.icon(
+          key: const Key('record-instant'),
+          onPressed: enabled ? startInstantRecord : null,
+          icon: const Icon(Icons.edit_note),
+          label: const Text('Registrar'),
+          style: OutlinedButton.styleFrom(minimumSize: const Size(0, 44)),
+        ),
     ];
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
@@ -703,19 +966,63 @@ ActivityDefinition _legacyStrength(
 );
 
 class ActivityChoice {
-  const ActivityChoice(this.definition, [this.exerciseId]);
+  const ActivityChoice(this.definition, [this.exerciseId])
+    : instant = false,
+      save = false;
+
+  /// What the activity builder or a saved template returned.
+  const ActivityChoice.built(
+    this.definition, {
+    this.instant = false,
+    this.save = false,
+  }) : exerciseId = null;
   final ActivityDefinition definition;
   final String? exerciseId;
+
+  /// A point record with no clock: nothing is prepared, a value is recorded.
+  final bool instant;
+
+  /// Keep it among the companion's saved activities.
+  final bool save;
 }
 
-class ActivityChooser extends StatelessWidget {
-  const ActivityChooser({super.key, required this.controller});
+class ActivityChooser extends StatefulWidget {
+  const ActivityChooser({
+    super.key,
+    required this.controller,
+    this.companionId = 'gymbro',
+  });
   final WorkoutController controller;
+  final String companionId;
+  @override
+  State<ActivityChooser> createState() => _ActivityChooserState();
+}
+
+class _ActivityChooserState extends State<ActivityChooser> {
+  List<ActivityTemplate> templates = [];
+  WorkoutController get controller => widget.controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller.templates
+        ?.list(companionId: widget.companionId)
+        .then((found) {
+          if (mounted) setState(() => templates = found);
+        })
+        .catchError((Object _) {
+          // The saved list is a convenience: the chooser works without it.
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     final unique = <String, ActivityDefinition>{};
     for (final a in controller.activities) {
       unique.putIfAbsent(a.definition.name.toLowerCase(), () => a.definition);
+    }
+    for (final t in templates) {
+      unique.remove(t.definition.name.toLowerCase());
     }
     for (final w in controller.history) {
       for (final e in w.exercises) {
@@ -740,6 +1047,27 @@ class ActivityChooser extends StatelessWidget {
             Expanded(
               child: ListView(
                 children: [
+                  if (templates.isNotEmpty) ...[
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(16, 0, 16, 4),
+                      child: Text('Tus actividades'),
+                    ),
+                    for (final t in templates)
+                      ListTile(
+                        key: Key('template-${t.id}'),
+                        leading: Icon(
+                          t.instant ? Icons.touch_app_outlined : Icons.bookmark_outline,
+                        ),
+                        title: Text(t.definition.name),
+                        subtitle: Text(t.instant ? 'Registro puntual' : 'Tu actividad'),
+                        onTap:
+                            () => Navigator.pop(
+                              context,
+                              ActivityChoice.built(t.definition, instant: t.instant),
+                            ),
+                      ),
+                    const Divider(),
+                  ],
                   for (final e in controller.active?.exercises ?? <Exercise>[])
                     ListTile(
                       title: Text(e.name),
@@ -817,12 +1145,24 @@ class ActivityChooser extends StatelessWidget {
                     leading: const Icon(Icons.add),
                     title: const Text('Nueva actividad'),
                     onTap: () async {
-                      final d = await showDialog<ActivityDefinition>(
-                        context: context,
-                        builder: (_) => const NewActivityDialog(),
-                      );
-                      if (context.mounted && d != null) {
-                        Navigator.pop(context, ActivityChoice(d));
+                      final built = await Navigator.of(context)
+                          .push<ActivityBuilderResult>(
+                            MaterialPageRoute(
+                              builder:
+                                  (_) => ActivityBuilder(
+                                    companionId: widget.companionId,
+                                  ),
+                            ),
+                          );
+                      if (context.mounted && built != null) {
+                        Navigator.pop(
+                          context,
+                          ActivityChoice.built(
+                            built.definition,
+                            instant: built.instant,
+                            save: built.save,
+                          ),
+                        );
                       }
                     },
                   ),
@@ -834,121 +1174,6 @@ class ActivityChooser extends StatelessWidget {
       ),
     );
   }
-}
-
-class NewActivityDialog extends StatefulWidget {
-  const NewActivityDialog({super.key});
-  @override
-  State<NewActivityDialog> createState() => _NewActivityDialogState();
-}
-
-class _NewActivityDialogState extends State<NewActivityDialog> {
-  final name = TextEditingController();
-  final seconds = TextEditingController(text: '90');
-  final activityMinutes = TextEditingController();
-  final targetSets = TextEditingController();
-  final targetCycles = TextEditingController();
-  bool repeated = true;
-  String? error;
-  @override
-  void dispose() {
-    name.dispose();
-    seconds.dispose();
-    activityMinutes.dispose();
-    targetSets.dispose();
-    targetCycles.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Nueva actividad'),
-    content: SingleChildScrollView(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextField(
-            key: const Key('activity-name'),
-            controller: name,
-            autofocus: true,
-            decoration: const InputDecoration(labelText: 'Nombre'),
-          ),
-          SwitchListTile(
-            contentPadding: EdgeInsets.zero,
-            title: const Text('Varias series o tramos'),
-            value: repeated,
-            onChanged: (v) => setState(() => repeated = v),
-          ),
-          TextField(
-            key: const Key('activity-duration-minutes'),
-            controller: activityMinutes,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Duración de cada tramo (minutos, opcional)',
-            ),
-          ),
-          TextField(
-            controller: seconds,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(labelText: 'Descanso (segundos)'),
-          ),
-          TextField(
-            key: const Key('activity-target-sets'),
-            controller: targetSets,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Series previstas (opcional)',
-            ),
-          ),
-          TextField(
-            key: const Key('activity-target-cycles'),
-            controller: targetCycles,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(
-              labelText: 'Ciclos previstos (opcional)',
-            ),
-          ),
-          if (error != null) Text(error!),
-        ],
-      ),
-    ),
-    actions: [
-      TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: const Text('Cancelar'),
-      ),
-      FilledButton(
-        onPressed: () {
-          try {
-            Navigator.pop(
-              context,
-              ActivityDefinition(
-                name: name.text.trim(),
-                repeated: repeated,
-                restSeconds: int.tryParse(seconds.text) ?? -1,
-                activitySeconds:
-                    activityMinutes.text.trim().isEmpty
-                        ? null
-                        : (int.tryParse(activityMinutes.text.trim()) ?? -1) *
-                            60,
-                targetSets:
-                    targetSets.text.trim().isEmpty
-                        ? null
-                        : int.tryParse(targetSets.text.trim()) ?? -1,
-                targetCycles:
-                    targetCycles.text.trim().isEmpty
-                        ? null
-                        : int.tryParse(targetCycles.text.trim()) ?? -1,
-              ),
-            );
-          } on ValidationException catch (e) {
-            setState(() => error = e.message);
-          }
-        },
-        child: const Text('Preparar'),
-      ),
-    ],
-  );
 }
 
 class ActivityRestDialog extends StatefulWidget {

@@ -1687,6 +1687,15 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     }
   }
 
+  /// A point record made from the activity bar shows up as a chat line.
+  Future<void> instantRecorded(String text) async {
+    messages.add(
+      AiMessage('assistant', text, recordedAt: widget.controller.now()),
+    );
+    if (mounted) setState(() {});
+    await persist();
+  }
+
   bool get noticesOff =>
       notifications.supported &&
       !(notifications.enabled && notifications.granted);
@@ -1795,7 +1804,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
         config,
         [...history, AiMessage('user', text, attachment: media)],
         system:
-            '${contextForAi()}\nEl último mensaje del usuario corresponde a la actividad ${a.id}, tramo ${interval ?? 'sin iniciar'}. Interpreta ese mensaje aunque la pantalla actual haya cambiado. Si contiene resultados claros, añade un bloque gymia-result con JSON: {"metrics": {"clave_de_campo": valor_numérico_booleano_o_texto}}. Para una métrica nueva explícita de este mensaje puedes añadir "fields": [{"key":"clave_de_campo","label":"Etiqueta","unit":"unidad"}]. Mantén significado/unidad de los campos existentes; no los renombres. No inventes valores o métricas no expresadas, ni uses cifras de otros mensajes; objetivos y sugerencias no son resultados. Si una cifra o unidad es ambigua, pregunta en lugar de estructurarla. Las observaciones se conservan en el original; comenta lo pertinente brevemente.',
+            '${contextForAi()}\nEl último mensaje del usuario corresponde a la actividad ${a.id}, tramo ${interval ?? 'sin iniciar'}. Interpreta ese mensaje aunque la pantalla actual haya cambiado. Si contiene resultados claros, añade un bloque gymia-result con JSON: {"metrics": {"clave_de_campo": valor_numérico_booleano_o_texto}}. Para una métrica nueva explícita de este mensaje puedes añadir "fields": [{"key":"clave_de_campo","label":"Etiqueta","unit":"unidad"}]. Mantén significado/unidad de los campos existentes; no los renombres. No inventes valores o métricas no expresadas, ni uses cifras de otros mensajes; en los campos que se suman anota solo la cantidad de este mensaje, nunca un total acumulado; objetivos y sugerencias no son resultados. Si una cifra o unidad es ambigua, pregunta en lugar de estructurarla. Las observaciones se conservan en el original; comenta lo pertinente brevemente.',
         sessionId: sessionId,
         onText: receiveText,
       );
@@ -1816,7 +1825,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
                   result['metrics'] as Map<String, dynamic>,
                   fields:
                       (result['fields'] as List? ?? [])
-                          .map((f) => Map<String, String>.from(f as Map))
+                          .map((f) => Map<String, Object>.from(f as Map))
                           .toList(),
                 );
           }
@@ -2113,6 +2122,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
                                 hideStart: chatInUse,
                                 noticesOff: noticesOff,
                                 onEnableNotices: enableNotices,
+                                onInstantRecorded: instantRecorded,
                               )
                               : SessionControl(
                                 controller: widget.controller,
@@ -2462,6 +2472,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
                     hideStart: chatInUse,
                     noticesOff: noticesOff,
                     onEnableNotices: enableNotices,
+                    onInstantRecorded: instantRecorded,
                     compact: MediaQuery.viewInsetsOf(context).bottom > 0,
                   ),
                 if (notifications.error != null)

@@ -15,6 +15,7 @@ import 'package:gymia/domain/activity.dart';
 import 'package:gymia/domain/ai_config.dart';
 import 'package:gymia/domain/companion.dart';
 import 'package:gymia/ui/assistant_chat.dart';
+import 'package:gymia/ui/activity_builder.dart';
 import 'package:gymia/ui/activity_focus.dart';
 import 'package:gymia/ui/theme.dart';
 import 'package:gymia/ui/timer_ring.dart';
@@ -694,5 +695,383 @@ void main() {
     await tester.tap(find.byKey(const Key('notices-enable')));
     expect(enabled, isTrue);
     await tester.pumpWidget(const SizedBox());
+  });
+
+  group('choosing or creating an activity', () {
+    Future<void> openChooser(WidgetTester tester) async {
+      await tester.runAsync(() async {
+        await repo.finishActivity(c.focus!.id, now);
+        now = now.add(const Duration(seconds: 121));
+        await c.refresh();
+      });
+      await show(tester);
+      await tap(tester, const Key('new-activity'));
+      for (var i = 0;
+          i < 100 && find.byType(ActivityChooser).evaluate().isEmpty;
+          i++) {
+        await tester.runAsync(
+          () => Future<void>.delayed(const Duration(milliseconds: 20)),
+        );
+        await tester.pump(const Duration(milliseconds: 50));
+      }
+      for (var i = 0; i < 5; i++) {
+        await tester.runAsync(
+          () => Future<void>.delayed(const Duration(milliseconds: 10)),
+        );
+        await tester.pump(const Duration(milliseconds: 100));
+      }
+    }
+
+    // The builder sits on top of the chooser sheet; calling the real handlers
+    // avoids hit-testing through stacked routes.
+    void pressSubmit(WidgetTester tester) {
+      tester
+          .widget<FilledButton>(find.byKey(const Key('builder-submit')))
+          .onPressed!();
+    }
+
+    void toggleSave(WidgetTester tester, bool value) {
+      tester
+          .widget<CheckboxListTile>(find.byKey(const Key('builder-save')))
+          .onChanged!(value);
+    }
+
+    Future<void> revealBuilder(WidgetTester tester, String key) async {
+      await tester.scrollUntilVisible(
+        find.byKey(Key(key)),
+        300,
+        scrollable: find.byType(Scrollable).first,
+      );
+    }
+
+    Future<void> waitUntil(WidgetTester tester, bool Function() done) async {
+      for (var i = 0; i < 200 && !done(); i++) {
+        await tester.runAsync(
+          () => Future<void>.delayed(const Duration(milliseconds: 20)),
+        );
+        await tester.pump(const Duration(milliseconds: 50));
+      }
+      expect(done(), isTrue);
+    }
+
+    testWidgets('the chooser lists your saved activities of this companion first', (
+      tester,
+    ) async {
+      await tester.runAsync(() async {
+        await repo.templates.save(
+          companionId: 'gymbro',
+          definition: ActivityDefinition(name: 'Estiramientos', repeated: false, restSeconds: 0),
+        );
+        await repo.templates.save(
+          companionId: 'calma',
+          definition: ActivityDefinition(
+            name: 'Respirar',
+            repeated: false,
+            restSeconds: 0,
+            companionId: 'calma',
+          ),
+        );
+      });
+      await openChooser(tester);
+      expect(find.text('Tus actividades'), findsOneWidget);
+      expect(find.text('Estiramientos'), findsOneWidget);
+      expect(find.text('Respirar'), findsNothing);
+    });
+
+    testWidgets('choosing a saved activity prepares it', (tester) async {
+      await tester.runAsync(
+        () => repo.templates.save(
+          companionId: 'gymbro',
+          definition: ActivityDefinition(name: 'Estiramientos', repeated: false, restSeconds: 0),
+        ),
+      );
+      await openChooser(tester);
+      await tester.tap(find.text('Estiramientos'));
+      await waitUntil(tester, () => c.focus?.definition.name == 'Estiramientos');
+      expect(c.focus!.intervals, isEmpty);
+      await disposeScreen(tester);
+    });
+
+    testWidgets('Nueva actividad opens the builder and preparing saves it', (
+      tester,
+    ) async {
+      await openChooser(tester);
+      await tester.tap(find.text('Nueva actividad').last);
+      await tester.pumpAndSettle();
+      expect(find.byType(ActivityBuilder), findsOneWidget);
+      await tester.enterText(find.byKey(const Key('builder-name')), 'Leer');
+      await revealBuilder(tester, 'builder-submit');
+      pressSubmit(tester);
+      await waitUntil(tester, () => c.focus?.definition.name == 'Leer');
+      expect(c.focus!.definition.companionId, 'gymbro');
+      final saved = (await tester.runAsync(
+        () => repo.templates.list(companionId: 'gymbro'),
+      ))!;
+      expect(saved.map((t) => t.definition.name), ['Leer']);
+      expect(saved.single.instant, isFalse);
+      await disposeScreen(tester);
+    });
+
+    testWidgets('unchecking «Guardar en tus actividades» keeps it out of the list', (
+      tester,
+    ) async {
+      await openChooser(tester);
+      await tester.tap(find.text('Nueva actividad').last);
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byKey(const Key('builder-name')), 'Solo hoy');
+      await revealBuilder(tester, 'builder-save');
+      toggleSave(tester, false);
+      await tester.pump();
+      await revealBuilder(tester, 'builder-submit');
+      pressSubmit(tester);
+      await waitUntil(tester, () => c.focus?.definition.name == 'Solo hoy');
+      final saved = (await tester.runAsync(
+        () => repo.templates.list(companionId: 'gymbro'),
+      ))!;
+      expect(saved, isEmpty);
+      await disposeScreen(tester);
+    });
+
+    testWidgets('leaving the builder with Atrás changes nothing', (tester) async {
+      await openChooser(tester);
+      await tester.tap(find.text('Nueva actividad').last);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(BackButton));
+      await tester.pumpAndSettle();
+      expect(c.focus, isNull);
+      await disposeScreen(tester);
+    });
+  });
+
+  group('segment names', () {
+    Future<void> prepareAndStart(
+      WidgetTester tester,
+      ActivityDefinition definition,
+    ) async {
+      await tester.runAsync(() async {
+        await repo.finishActivity(c.focus!.id, now);
+        now = now.add(const Duration(seconds: 121));
+        await repo.prepareActivity(definition);
+        await c.refresh();
+      });
+      await show(tester);
+      await tap(tester, const Key('activity-start-stop'));
+      await waitFor(tester, () => c.focus!.running != null && !c.busy);
+    }
+
+    testWidgets('a custom name is used while running and while resting', (
+      tester,
+    ) async {
+      await prepareAndStart(
+        tester,
+        ActivityDefinition(
+          name: 'Pomodoro',
+          targetSets: 4,
+          activitySeconds: 1500,
+          segmentSingular: 'pomodoro',
+          segmentPlural: 'pomodoros',
+        ),
+      );
+      expect(find.text('Pomodoro 1 de 4'), findsOneWidget);
+      expect(find.text('Serie 1 de 4'), findsNothing);
+      await tap(tester, const Key('activity-start-stop'));
+      await waitFor(tester, () => c.focus!.running == null && !c.busy);
+      expect(find.text('1/4 pomodoros · Descanso'), findsOneWidget);
+      await disposeScreen(tester);
+    });
+
+    testWidgets('without names GymBro keeps «serie» and the others «tramo»', (
+      tester,
+    ) async {
+      await prepareAndStart(
+        tester,
+        ActivityDefinition(name: 'Fuerza', targetSets: 3),
+      );
+      expect(find.text('Serie 1 de 3'), findsOneWidget);
+      await disposeScreen(tester);
+    });
+
+    testWidgets('another companion without names says «tramo»', (tester) async {
+      await tester.runAsync(() async {
+        await repo.finishActivity(c.focus!.id, now);
+        await repo.prepareActivity(
+          ActivityDefinition(name: 'Pomodoro', targetSets: 2, companionId: 'enfoque'),
+        );
+        await c.refresh();
+      });
+      await show(tester, companion: Companion.suggestions[1]);
+      await tap(tester, const Key('activity-start-stop'));
+      await waitFor(tester, () => c.focus!.running != null && !c.busy);
+      expect(find.text('Tramo 1 de 2'), findsOneWidget);
+      await disposeScreen(tester);
+    });
+  });
+
+  group('quick counters', () {
+    final reading = ActivityDefinition(
+      name: 'Leer',
+      repeated: false,
+      restSeconds: 0,
+      fields: const [
+        {'key': 'pages', 'label': 'Páginas', 'unit': 'págs', 'type': 'number'},
+        {'key': 'best', 'label': 'Mejor marca', 'unit': '', 'type': 'number', 'aggregate': 'max'},
+        {'key': 'book', 'label': 'Libro', 'unit': '', 'type': 'text'},
+        {'key': 'goals', 'label': 'Goles', 'unit': '', 'type': 'number'},
+      ],
+    );
+
+    Future<void> prepare(WidgetTester tester, {bool start = true}) async {
+      await tester.runAsync(() async {
+        await repo.finishActivity(c.focus!.id, now);
+        now = now.add(const Duration(seconds: 121));
+        await repo.prepareActivity(reading);
+        await c.refresh();
+      });
+      await show(tester);
+      if (start) {
+        await tap(tester, const Key('activity-start-stop'));
+        await waitFor(tester, () => c.focus!.running != null && !c.busy);
+      }
+    }
+
+    Future<void> press(WidgetTester tester, String key, [int times = 1]) async {
+      for (var i = 0; i < times; i++) {
+        tester.widget<IconButton>(find.byKey(Key(key))).onPressed!();
+        await tester.pump();
+      }
+    }
+
+    Future<void> waitMessages(WidgetTester tester, int count) async {
+      await waitFor(tester, () => c.focus!.messages.length >= count && !c.busy);
+    }
+
+    testWidgets('only numeric fields that add up get a counter, and only once started', (
+      tester,
+    ) async {
+      await prepare(tester, start: false);
+      expect(find.byKey(const Key('counter-pages')), findsNothing);
+      await tap(tester, const Key('activity-start-stop'));
+      await waitFor(tester, () => c.focus!.running != null && !c.busy);
+      expect(find.byKey(const Key('counter-pages')), findsOneWidget);
+      expect(find.byKey(const Key('counter-goals')), findsOneWidget);
+      expect(find.byKey(const Key('counter-best')), findsNothing, reason: 'mejor marca no suma');
+      expect(find.byKey(const Key('counter-book')), findsNothing, reason: 'texto');
+      await disposeScreen(tester);
+    });
+
+    testWidgets('18 taps become one message when the tramo stops', (tester) async {
+      await prepare(tester);
+      await press(tester, 'counter-inc-pages', 18);
+      expect(tester.widget<Text>(find.byKey(const Key('counter-pages'))).data, '18');
+      expect(c.focus!.messages, isEmpty, reason: 'aún no se guarda');
+      await tap(tester, const Key('activity-start-stop'));
+      await waitMessages(tester, 1);
+      final m = c.focus!.messages.single;
+      expect(m.text, 'Páginas: +18');
+      expect(m.metrics, {'pages': 18});
+      expect(m.intervalId, c.focus!.intervals.last.id);
+      expect(m.role, 'user');
+      await disposeScreen(tester);
+    });
+
+    testWidgets('three seconds without taps saves the burst; the next burst is separate', (
+      tester,
+    ) async {
+      await prepare(tester);
+      await press(tester, 'counter-inc-pages', 5);
+      await tester.pump(const Duration(seconds: 3));
+      await waitMessages(tester, 1);
+      expect(c.focus!.messages.single.metrics, {'pages': 5});
+      expect(
+        tester.widget<Text>(find.byKey(const Key('counter-pages'))).data,
+        '5',
+        reason: 'se muestra lo ya guardado más lo pendiente',
+      );
+      await press(tester, 'counter-inc-pages', 3);
+      expect(tester.widget<Text>(find.byKey(const Key('counter-pages'))).data, '8');
+      await tester.pump(const Duration(seconds: 3));
+      await waitMessages(tester, 2);
+      final totals = c.focus!.messages.map((m) => m.metrics['pages']).toList();
+      expect(totals, [5, 3], reason: 'cada mensaje es una cantidad, no un total');
+      await disposeScreen(tester);
+    });
+
+    testWidgets('taps keep postponing the save', (tester) async {
+      await prepare(tester);
+      await press(tester, 'counter-inc-pages');
+      await tester.pump(const Duration(seconds: 2));
+      await press(tester, 'counter-inc-pages');
+      await tester.pump(const Duration(seconds: 2));
+      expect(c.focus!.messages, isEmpty);
+      await tester.pump(const Duration(seconds: 2));
+      await waitMessages(tester, 1);
+      expect(c.focus!.messages.single.metrics, {'pages': 2});
+      await disposeScreen(tester);
+    });
+
+    testWidgets('minus only takes back pending taps', (tester) async {
+      await prepare(tester);
+      expect(
+        tester.widget<IconButton>(find.byKey(const Key('counter-dec-pages'))).onPressed,
+        isNull,
+      );
+      await press(tester, 'counter-inc-pages', 3);
+      await press(tester, 'counter-dec-pages');
+      expect(tester.widget<Text>(find.byKey(const Key('counter-pages'))).data, '2');
+      await tester.pump(const Duration(seconds: 3));
+      await waitMessages(tester, 1);
+      expect(c.focus!.messages.single.metrics, {'pages': 2});
+      expect(
+        tester.widget<IconButton>(find.byKey(const Key('counter-dec-pages'))).onPressed,
+        isNull,
+      );
+      await disposeScreen(tester);
+    });
+
+    testWidgets('several counters in one burst share a single message', (
+      tester,
+    ) async {
+      await prepare(tester);
+      await press(tester, 'counter-inc-pages', 4);
+      await press(tester, 'counter-inc-goals', 2);
+      await tap(tester, const Key('activity-start-stop'));
+      await waitMessages(tester, 1);
+      expect(c.focus!.messages, hasLength(1));
+      expect(c.focus!.messages.single.metrics, {'pages': 4, 'goals': 2});
+      expect(c.focus!.messages.single.text, 'Páginas: +4 · Goles: +2');
+      await disposeScreen(tester);
+    });
+
+    testWidgets('counters also work during the rest and without AI', (tester) async {
+      FlutterSecureStorage.setMockInitialValues({});
+      await prepare(tester);
+      await tap(tester, const Key('activity-start-stop'));
+      await waitFor(tester, () => c.focus!.running == null && !c.busy);
+      await press(tester, 'counter-inc-pages', 2);
+      await tester.pump(const Duration(seconds: 3));
+      await waitMessages(tester, 1);
+      expect(c.focus!.messages.single.metrics, {'pages': 2});
+      expect(c.focus!.messages.single.intervalId, c.focus!.intervals.last.id);
+      await disposeScreen(tester);
+    });
+
+    testWidgets('Terminar saves what is still pending', (tester) async {
+      await prepare(tester);
+      await tap(tester, const Key('activity-start-stop'));
+      await waitFor(tester, () => c.focus!.running == null && !c.busy);
+      await press(tester, 'counter-inc-pages', 6);
+      await tap(tester, const Key('finish-activity'));
+      for (var i = 0; i < 40 && find.text('Guardar').evaluate().isEmpty; i++) {
+        await tester.runAsync(
+          () => Future<void>.delayed(const Duration(milliseconds: 20)),
+        );
+        await tester.pump(const Duration(milliseconds: 50));
+      }
+      final saved = (await tester.runAsync(() => repo.loadActivities()))!
+          .expand((a) => a.messages)
+          .where((m) => m.metrics['pages'] == 6);
+      expect(saved, hasLength(1));
+      await disposeScreen(tester);
+    });
   });
 }

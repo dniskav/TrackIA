@@ -12,15 +12,21 @@ class ActivityDefinition {
     this.targetSets,
     this.targetCycles,
     this.completedCycles = 0,
-    List<Map<String, String>> fields = const [],
+    List<Map<String, Object>> fields = const [],
     this.instructions = '',
     this.origin = 'user',
     String companionId = 'gymbro',
+    this.segmentSingular,
+    this.segmentPlural,
+    List<String> userSet = const [],
+    String? activityKey,
   }) : name = validName(name),
        companionId = validTrackiaId(companionId),
        fields = List.unmodifiable(
-         fields.map((f) => Map<String, String>.unmodifiable(f)),
-       ) {
+         fields.map((f) => Map<String, Object>.unmodifiable(_normalizeField(f))),
+       ),
+       userSet = List.unmodifiable(userSet),
+       _activityKey = activityKey {
     validName(name);
     if (restSeconds < 0 ||
         restSeconds > 1800 ||
@@ -37,17 +43,153 @@ class ActivityDefinition {
         'La propuesta de actividad no es válida.',
       );
     }
-    for (final field in fields) {
-      if (field.keys.toSet().difference({'key', 'label', 'unit'}).isNotEmpty ||
-          !field.keys.toSet().containsAll({'key', 'label', 'unit'}) ||
-          !RegExp(r'^[a-z][a-z0-9_]{0,39}$').hasMatch(field['key'] ?? '') ||
-          (field['label'] ?? '').isEmpty ||
-          (field['label'] ?? '').length > 80 ||
-          (field['unit'] ?? '').length > 30) {
-        throw const ValidationException('Los datos propuestos no son válidos.');
-      }
+    final singular = segmentSingular, plural = segmentPlural;
+    if ((singular == null) != (plural == null) ||
+        (singular != null && !_segmentName(singular)) ||
+        (plural != null && !_segmentName(plural))) {
+      throw const ValidationException(
+        'El nombre del tramo no es válido: indica singular y plural de 1 a 24 caracteres.',
+      );
+    }
+    final fieldKeys = this.fields.map((f) => f['key']).toSet();
+    if (this.userSet.toSet().length != this.userSet.length ||
+        this.userSet.any(
+          (lock) =>
+              !(_lockNames.contains(lock) ||
+                  (lock.startsWith('field:') &&
+                      fieldKeys.contains(lock.substring(6)))),
+        )) {
+      throw const ValidationException('Los datos fijados no son válidos.');
+    }
+    if (activityKey != null && (activityKey.isEmpty || activityKey.length > 80)) {
+      throw const ValidationException('La clave de la actividad no es válida.');
     }
   }
+
+  /// Properties and fields the user has set by hand. The assistant may only
+  /// propose changes to them; it never applies them on its own.
+  static const _lockNames = {
+    'name',
+    'restSeconds',
+    'activitySeconds',
+    'targetSets',
+    'targetCycles',
+    'segmentSingular',
+    'segmentPlural',
+    'instructions',
+  };
+
+  /// Keys a field may carry. `key`, `label` and `unit` are the original three;
+  /// the rest exist only on typed fields.
+  static const _fieldKeys = {
+    'key',
+    'label',
+    'unit',
+    'type',
+    'aggregate',
+    'options',
+    'min',
+    'max',
+    'countSingular',
+    'countPlural',
+  };
+  static const _typedOnly = {
+    'aggregate',
+    'options',
+    'min',
+    'max',
+    'countSingular',
+    'countPlural',
+  };
+  static const fieldTypes = {'number', 'scale', 'text', 'choice', 'boolean'};
+  static const _aggregates = <String, Set<String>>{
+    'number': {'sum', 'max', 'avg', 'none'},
+    'scale': {'avg', 'none'},
+    'text': {'distinct', 'none'},
+    'choice': {'distinct', 'none'},
+    'boolean': {'countTrue', 'none'},
+  };
+  static const _defaultAggregate = <String, String>{
+    'number': 'sum',
+    'scale': 'avg',
+    'text': 'none',
+    'choice': 'distinct',
+    'boolean': 'countTrue',
+  };
+
+  static bool _segmentName(String value) =>
+      value.trim() == value && value.isNotEmpty && value.length <= 24;
+
+  static bool _shortText(Object? value, int max) =>
+      value is String && value.isNotEmpty && value.length <= max;
+
+  /// Validates one field and fills the defaults of typed fields. A field with
+  /// no `type` is a note-only field saved before typed fields existed and is
+  /// returned exactly as it came.
+  static Map<String, Object> _normalizeField(Map<String, Object> field) {
+    const invalid = ValidationException('Los datos propuestos no son válidos.');
+    final keys = field.keys.toSet();
+    final key = field['key'], label = field['label'], unit = field['unit'];
+    if (keys.difference(_fieldKeys).isNotEmpty ||
+        !keys.containsAll({'key', 'label', 'unit'}) ||
+        key is! String ||
+        label is! String ||
+        unit is! String ||
+        !RegExp(r'^[a-z][a-z0-9_]{0,39}$').hasMatch(key) ||
+        label.isEmpty ||
+        label.length > 80 ||
+        unit.length > 30) {
+      throw invalid;
+    }
+    final type = field['type'];
+    if (type == null) {
+      if (keys.any(_typedOnly.contains)) throw invalid;
+      return Map<String, Object>.of(field);
+    }
+    if (type is! String || !fieldTypes.contains(type)) throw invalid;
+    final aggregate = field['aggregate'] ?? _defaultAggregate[type]!;
+    if (aggregate is! String || !_aggregates[type]!.contains(aggregate)) {
+      throw invalid;
+    }
+    final result = <String, Object>{
+      'key': key,
+      'label': label,
+      'unit': unit,
+      'type': type,
+      'aggregate': aggregate,
+    };
+    final options = field['options'];
+    if (type == 'choice') {
+      if (options is! List ||
+          options.isEmpty ||
+          options.length > 20 ||
+          options.any((o) => !_shortText(o, 40)) ||
+          options.toSet().length != options.length) {
+        throw invalid;
+      }
+      result['options'] = List<String>.unmodifiable(options.cast<String>());
+    } else if (options != null) {
+      throw invalid;
+    }
+    if (type == 'scale') {
+      final min = field['min'] ?? 1, max = field['max'] ?? 5;
+      if (min is! int || max is! int || min < 1 || min >= max || max > 10) {
+        throw invalid;
+      }
+      result['min'] = min;
+      result['max'] = max;
+    } else if (field.containsKey('min') || field.containsKey('max')) {
+      throw invalid;
+    }
+    for (final name in ['countSingular', 'countPlural']) {
+      final value = field[name];
+      if (value == null) continue;
+      if (!_shortText(value, 40)) throw invalid;
+      result[name] = value;
+    }
+    return result;
+  }
+
   final String name, instructions, origin, companionId;
   final bool repeated;
   final int restSeconds;
@@ -55,7 +197,20 @@ class ActivityDefinition {
   final int? targetSets;
   final int? targetCycles;
   final int completedCycles;
-  final List<Map<String, String>> fields;
+  final List<Map<String, Object>> fields;
+
+  /// Names of one tramo, e.g. «tiempo»/«tiempos». Both or neither.
+  final String? segmentSingular, segmentPlural;
+
+  /// Locked properties; see [_lockNames] and `field:<key>`.
+  final List<String> userSet;
+  final String? _activityKey;
+
+  /// Stable identity of the activity across renames. Goals and achievements
+  /// follow it; it is derived from the name until the name changes by hand.
+  String get activityKey =>
+      _activityKey ?? name.trim().replaceAll(RegExp(r'\s+'), ' ').toLowerCase();
+
   Map<String, dynamic> toJson() => {
     'name': name,
     'repeated': repeated,
@@ -68,6 +223,10 @@ class ActivityDefinition {
     'instructions': instructions,
     'origin': origin,
     'companionId': companionId,
+    if (segmentSingular != null) 'segmentSingular': segmentSingular,
+    if (segmentPlural != null) 'segmentPlural': segmentPlural,
+    if (userSet.isNotEmpty) 'userSet': userSet,
+    if (_activityKey != null) 'activityKey': _activityKey,
   };
   factory ActivityDefinition.fromJson(Map<String, dynamic> value) =>
       ActivityDefinition(
@@ -80,11 +239,17 @@ class ActivityDefinition {
         completedCycles: value['completedCycles'] as int? ?? 0,
         fields:
             (value['fields'] as List)
-                .map((f) => Map<String, String>.from(f as Map))
+                .map((f) => Map<String, Object>.from(f as Map))
                 .toList(),
         instructions: value['instructions'] as String? ?? '',
         origin: value['origin'] as String? ?? 'user',
         companionId: value['companionId'] as String? ?? 'gymbro',
+        segmentSingular: value['segmentSingular'] as String?,
+        segmentPlural: value['segmentPlural'] as String?,
+        userSet:
+            (value['userSet'] as List?)?.map((e) => e as String).toList() ??
+            const [],
+        activityKey: value['activityKey'] as String?,
       );
 
   ActivityDefinition forCompanion(String id) =>
@@ -107,6 +272,8 @@ class ActivityDefinition {
         'targetCycles',
         'fields',
         'instructions',
+        'segmentSingular',
+        'segmentPlural',
       }).isNotEmpty) {
         return null;
       }
@@ -303,6 +470,43 @@ class FocusActivity {
   };
 }
 
+/// Checks recorded values against the activity's fields. Every key must be a
+/// field of the activity and every value must suit that field's type; fields
+/// saved before types existed keep their original rules (number, boolean or
+/// text up to 500 characters). A missing key means «not recorded», never zero.
+Map<String, Object> validateFieldValues(
+  ActivityDefinition definition,
+  Map<String, Object?> values,
+) {
+  const mismatch = ValidationException(
+    'Los valores no coinciden con los datos de esta actividad.',
+  );
+  final byKey = {for (final f in definition.fields) f['key'] as String: f};
+  final result = <String, Object>{};
+  for (final entry in values.entries) {
+    final field = byKey[entry.key];
+    final value = entry.value;
+    if (field == null || value == null) throw mismatch;
+    final ok = switch (field['type']) {
+      null => value is num && value.isFinite ||
+          value is bool ||
+          value is String && value.length <= 500,
+      'number' => value is num && value.isFinite,
+      'scale' =>
+        value is int &&
+            value >= (field['min'] as int) &&
+            value <= (field['max'] as int),
+      'text' => value is String && value.length <= 500,
+      'choice' => value is String && (field['options'] as List).contains(value),
+      'boolean' => value is bool,
+      _ => false,
+    };
+    if (!ok) throw mismatch;
+    result[entry.key] = value;
+  }
+  return result;
+}
+
 /// Only a complete unambiguous strength shorthand is parsed locally. Preserve
 /// everything else as original text, without forcing it into strength metrics.
 Map<String, dynamic> compactStrengthMetrics(
@@ -348,6 +552,7 @@ abstract interface class ActivityRepository {
     String role = 'user',
     String? intervalId,
     ActivityMedia? media,
+    Map<String, Object>? metrics,
   });
   Future<void> finishActivity(
     String activityId,
@@ -374,6 +579,6 @@ abstract interface class ActivityRepository {
   Future<void> interpretActivityMessage(
     String messageId,
     Map<String, dynamic> metrics, {
-    List<Map<String, String>> fields = const [],
+    List<Map<String, Object>> fields = const [],
   });
 }

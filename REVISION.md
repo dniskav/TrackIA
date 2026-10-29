@@ -70,3 +70,17 @@ y `flutter clean` cuando convenga.
 3. Decidir nombre definitivo del paquete (3).
 4. Unificar User-Agent/versión y mejorar manejo de errores (4, 5).
 5. Dividir archivos grandes (6) y probar minificación (7).
+
+## Estado de los hallazgos (actualizado 2026-10-29)
+
+Las casillas se marcan al completar el trabajo; la evidencia está en `specs/004-trackia-experience/tasks.md`.
+
+- [x] Línea base: `flutter analyze` (11 avisos `info`) y `flutter test` (207 pruebas) medidos y commit de lo pendiente (`docs/0.3.32-LINEA-BASE.md`).
+- [ ] 1. Configurar un remoto git (los commits siguen solo en local).
+- [ ] 2. Chats y adjuntos fuera de `flutter_secure_storage` (SDD 004, tareas T079–T084; la migración v6 ya crea las tablas).
+- [ ] 3. Nombres GymIA/TrackIA: textos visibles en T093; `applicationId`, paquete y claves se conservan a propósito.
+- [ ] 4. User-Agent con versión fija (T092).
+- [ ] 5. Errores tragados (T094–T095).
+- [ ] 6. Archivos muy grandes (T096–T097); `contextForAi` ya salió de `assistant_chat.dart` (T006).
+- [ ] 7. Release sin minificar (T098–T099).
+- [x] Batería: temporizadores del panel y del descanso solo corren con cuenta atrás y la app visible; sondeo de 60 s pausado en segundo plano (commit `0256b22`). Falta medir en un móvil.

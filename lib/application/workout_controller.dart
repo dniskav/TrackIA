@@ -3,6 +3,9 @@ import '../domain/workout.dart';
 import '../domain/workout_repository.dart';
 import '../domain/routine.dart';
 import '../domain/rest_timer.dart';
+import '../data/activity_template_repository.dart';
+import '../data/observation_repository.dart';
+import '../data/sqlite_workout_repository.dart';
 import '../domain/activity.dart';
 
 class WorkoutController extends ChangeNotifier {
@@ -21,6 +24,17 @@ class WorkoutController extends ChangeNotifier {
   ActivityRepository? get activityRepository =>
       repository is ActivityRepository
           ? repository as ActivityRepository
+          : null;
+  /// The user's saved activities; null with a repository that has none.
+  ActivityTemplateRepository? get templates =>
+      repository is SqliteWorkoutRepository
+          ? (repository as SqliteWorkoutRepository).templates
+          : null;
+
+  /// Point records (no running clock); null with a repository that has none.
+  ObservationRepository? get observations =>
+      repository is SqliteWorkoutRepository
+          ? (repository as SqliteWorkoutRepository).observations
           : null;
   FocusActivity? get focus => activities.where((a) => a.active).firstOrNull;
   bool busy = false;
