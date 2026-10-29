@@ -43,7 +43,10 @@ class AiAvailability extends ChangeNotifier {
     bool acceptRecentVerification = false,
   }) async {
     final request = ++_request;
-    _set(request, AiAvailabilityStatus.checking, 'Comprobando IA…');
+    final wasReady = ready && !verify;
+    if (!wasReady) {
+      _set(request, AiAvailabilityStatus.checking, 'Comprobando IA…');
+    }
     try {
       final config = await store.load();
       if (config == null) {
@@ -76,23 +79,9 @@ class AiAvailability extends ChangeNotifier {
             );
             return;
           }
-          List<AiModelOption>? models;
-          try {
-            models = await catalog
-                .list(config)
-                .timeout(const Duration(seconds: 20));
-          } on ModelCatalogUnsupportedException {
-            // A real HTTP response proves reachability. This exact configuration
-            // was already verified by inference; do not bill for a health poll.
-          }
-          if (models != null && !models.any((m) => m.id == config.modelId)) {
-            _set(
-              request,
-              AiAvailabilityStatus.unverified,
-              'El modelo elegido no aparece en el catálogo actual. Elige otro o verifica su conexión.',
-            );
-            return;
-          }
+          // A saved successful reply verifies this exact configuration. The
+          // provider's model catalog can fail independently of inference and
+          // must never interrupt a workout or disable an already working chat.
         }
       }
       if (_disposed || request != _request) return;
@@ -104,15 +93,27 @@ class AiAvailability extends ChangeNotifier {
       _set(
         request,
         AiAvailabilityStatus.ready,
-        'IA conectada · ${config.modelId}',
+        'IA verificada · ${config.modelId}',
       );
     } on ValidationException catch (e) {
-      _set(request, AiAvailabilityStatus.unavailable, e.message);
+      if (wasReady) {
+        _set(
+          request,
+          AiAvailabilityStatus.ready,
+          'IA configurada · no se pudo actualizar el catálogo: ${e.message}',
+        );
+      } else {
+        _set(request, AiAvailabilityStatus.unavailable, e.message);
+      }
     } catch (_) {
       _set(
         request,
-        AiAvailabilityStatus.unavailable,
-        'No se pudo comprobar la conexión con la IA. Reintenta o revisa el proveedor. Tus datos se conservan.',
+        wasReady
+            ? AiAvailabilityStatus.ready
+            : AiAvailabilityStatus.unavailable,
+        wasReady
+            ? 'IA configurada · no se pudo actualizar el catálogo. Puedes seguir enviando mensajes.'
+            : 'No se pudo comprobar la conexión con la IA. Reintenta o revisa el proveedor. Tus datos se conservan.',
       );
     }
   }
@@ -120,8 +121,8 @@ class AiAvailability extends ChangeNotifier {
   void failed() {
     _set(
       ++_request,
-      AiAvailabilityStatus.unavailable,
-      'La IA no pudo responder. Revisa o verifica la conexión; tus registros se conservan.',
+      ready ? AiAvailabilityStatus.ready : AiAvailabilityStatus.unavailable,
+      'La última solicitud falló. Puedes reintentar con el mismo modelo; tus registros se conservan.',
     );
   }
 

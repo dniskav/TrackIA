@@ -11,6 +11,50 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   sqfliteFfiInit();
   test(
+    'temporary Android block preserves the notification preference',
+    () async {
+      final dir = await Directory.systemTemp.createTemp('trackia-permission-');
+      final repo = await SqliteWorkoutRepository.open(
+        factory: databaseFactoryFfi,
+        path: '${dir.path}/db.sqlite',
+      );
+      final controller = WorkoutController(repo);
+      final calls = <String>[];
+      var granted = false;
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(RestNotificationController.channel, (
+            call,
+          ) async {
+            calls.add(call.method);
+            return call.method == 'status'
+                ? {'enabled': true, 'granted': granted, 'exact': true}
+                : null;
+          });
+      final notifier = RestNotificationController(controller);
+      addTearDown(() async {
+        notifier.dispose();
+        controller.dispose();
+        await repo.close();
+        await dir.delete(recursive: true);
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+            .setMockMethodCallHandler(RestNotificationController.channel, null);
+      });
+      await repo.prepareActivity(ActivityDefinition(name: 'Pomodoro'));
+      await controller.refresh();
+      await notifier.initialize();
+      expect(notifier.enabled, isTrue);
+      expect(notifier.granted, isFalse);
+      expect(notifier.error, isNotNull);
+      expect(calls, isNot(contains('prepared')));
+      granted = true;
+      await notifier.initialize();
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+      expect(notifier.enabled, isTrue);
+      expect(notifier.granted, isTrue);
+      expect(calls, contains('prepared'));
+    },
+  );
+  test(
     'one durable rest alarm updates with adjustment and switches to running controls',
     () async {
       final dir = await Directory.systemTemp.createTemp('gymia-notification-');
@@ -71,4 +115,58 @@ void main() {
       expect(calls.last.method, 'running');
     },
   );
+  test('timed Pomodoro schedules activity and rest deadlines', () async {
+    final dir = await Directory.systemTemp.createTemp('trackia-pomodoro-');
+    var now = DateTime(2026, 10, 21, 10);
+    final repo = await SqliteWorkoutRepository.open(
+      factory: databaseFactoryFfi,
+      path: '${dir.path}/db.sqlite',
+      clock: () => now,
+    );
+    final controller = WorkoutController(repo, clock: () => now);
+    final calls = <MethodCall>[];
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(RestNotificationController.channel, (
+          call,
+        ) async {
+          calls.add(call);
+          return call.method == 'status'
+              ? {'enabled': true, 'granted': true, 'exact': true}
+              : true;
+        });
+    final notifier = RestNotificationController(controller);
+    addTearDown(() async {
+      notifier.dispose();
+      controller.dispose();
+      await repo.close();
+      await dir.delete(recursive: true);
+      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+          .setMockMethodCallHandler(RestNotificationController.channel, null);
+    });
+    await repo.prepareActivity(
+      ActivityDefinition(
+        name: 'Estudio',
+        activitySeconds: 1500,
+        restSeconds: 300,
+        targetCycles: 4,
+      ),
+    );
+    await controller.refresh();
+    await notifier.initialize();
+    await controller.run(() => repo.startInterval(controller.focus!.id));
+    await Future<void>.delayed(const Duration(milliseconds: 10));
+    final running = calls.lastWhere((call) => call.method == 'running');
+    expect(
+      running.arguments['end'],
+      now.add(const Duration(minutes: 25)).millisecondsSinceEpoch,
+    );
+    now = now.add(const Duration(minutes: 25));
+    await controller.run(() => repo.stopInterval(controller.focus!.id));
+    await Future<void>.delayed(const Duration(milliseconds: 10));
+    final rest = calls.lastWhere((call) => call.method == 'schedule');
+    expect(
+      rest.arguments['end'],
+      now.add(const Duration(minutes: 5)).millisecondsSinceEpoch,
+    );
+  });
 }

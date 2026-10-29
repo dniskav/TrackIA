@@ -194,6 +194,43 @@ void main() {
       expect((source['activities'] as List).single['messages'], hasLength(2));
     },
   );
+
+  test('sheet sources contain only their companion activities', () {
+    final date = DateTime(2026, 10, 21);
+    final workout = Workout(
+      id: 'shared-workout',
+      name: 'Sesión',
+      startedAt: date,
+      finishedAt: date.add(const Duration(hours: 1)),
+      exercises: [],
+    );
+    FocusActivity activity(String id, String companionId) => FocusActivity(
+      id: id,
+      workoutId: workout.id,
+      definition: ActivityDefinition(name: id).forCompanion(companionId),
+      createdAt: date,
+      finishedAt: date.add(const Duration(minutes: 10)),
+      intervals: [],
+      messages: [],
+    );
+    final all = [activity('gym', 'gymbro'), activity('pomodoro', 'enfoque')];
+    expect(
+      (sheetWorkoutSource(workout, all)['activities'] as List).map(
+        (a) => a['id'],
+      ),
+      ['gym'],
+    );
+    final focusSource = sheetWorkoutSource(
+      workout,
+      all,
+      companionId: 'enfoque',
+    );
+    expect((focusSource['activities'] as List).map((a) => a['id']), [
+      'pomodoro',
+    ]);
+    expect(focusSource['name'], 'pomodoro');
+    expect(focusSource['exercises'], isEmpty);
+  });
   test(
     'sync directive accepts creation without a workout and rejects incomplete or extra commands',
     () {

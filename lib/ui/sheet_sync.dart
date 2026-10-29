@@ -17,12 +17,14 @@ class SheetSyncScreen extends StatefulWidget {
   const SheetSyncScreen({
     super.key,
     required this.controller,
+    this.companionId = 'gymbro',
     this.client,
     this.workoutId,
     this.create = false,
     this.name,
   });
   final WorkoutController controller;
+  final String companionId;
   final AiClient? client;
   final String? workoutId, name;
   final bool create;
@@ -31,7 +33,10 @@ class SheetSyncScreen extends StatefulWidget {
 }
 
 class _SheetSyncScreenState extends State<SheetSyncScreen> {
-  late final service = SheetSyncService(profileId: widget.controller.profileId);
+  late final service = SheetSyncService(
+    profileId: widget.controller.profileId,
+    companionId: widget.companionId,
+  );
   final instructions = TextEditingController();
   late final name = TextEditingController(
     text: widget.name ?? 'Mis actividades TrackIA',
@@ -44,7 +49,7 @@ class _SheetSyncScreenState extends State<SheetSyncScreen> {
   bool busy = false, connected = false, sent = false;
   bool allowOverwrite = true;
   bool createdHere = false;
-  bool automatic = true;
+  late bool automatic = widget.companionId == 'gymbro';
   String? connectionMessage;
   bool clarification = false;
   String? error, modelExplanation;
@@ -53,7 +58,18 @@ class _SheetSyncScreenState extends State<SheetSyncScreen> {
   Map<String, dynamic>? snapshot;
   String? originalSource;
   List<Workout> get workouts =>
-      widget.controller.workouts.where((w) => !w.isActive).toList();
+      widget.controller.workouts.where((w) {
+        if (w.isActive) return false;
+        if (widget.companionId == 'gymbro' && w.exercises.isNotEmpty) {
+          return true;
+        }
+        return widget.controller.activities.any(
+          (a) =>
+              a.workoutId == w.id &&
+              a.definition.companionId == widget.companionId &&
+              !a.finishIssues.contains('not_started'),
+        );
+      }).toList();
   Workout? get workout => workouts.where((w) => w.id == workoutId).firstOrNull;
   @override
   void initState() {
@@ -72,7 +88,10 @@ class _SheetSyncScreenState extends State<SheetSyncScreen> {
   Future<void> loadDestination() async {
     try {
       final saved =
-          await SheetContextStore(profileId: service.profileId).load();
+          await SheetContextStore(
+            profileId: service.profileId,
+            companionId: widget.companionId,
+          ).load();
       if (!mounted) return;
       setState(() {
         if (saved?.source == 'google') {
@@ -86,7 +105,9 @@ class _SheetSyncScreenState extends State<SheetSyncScreen> {
       if (savedConnection != null && mounted) {
         setState(() {
           allowOverwrite = savedConnection['allowOverwrite'] == true;
-          automatic = savedConnection['automatic'] == true;
+          automatic =
+              widget.companionId == 'gymbro' &&
+              savedConnection['automatic'] == true;
           instructions.text = savedConnection['instructions'] as String? ?? '';
           sheet = SheetContext(
             id: savedConnection['id'] as String,
@@ -208,7 +229,10 @@ class _SheetSyncScreenState extends State<SheetSyncScreen> {
     }
     final result = await service.create(name.text);
     // Store immediately: no model, transcript or workout change is needed to recover the file.
-    await SheetContextStore(profileId: service.profileId).save(result);
+    await SheetContextStore(
+      profileId: service.profileId,
+      companionId: widget.companionId,
+    ).save(result);
     await SheetSyncService.storage.delete(key: service.creationKey);
     if (!mounted) return;
     createdHere = true;
@@ -236,7 +260,11 @@ class _SheetSyncScreenState extends State<SheetSyncScreen> {
     if (fresh == null) {
       throw const ValidationException('La sesión ya no está disponible.');
     }
-    final source = sheetWorkoutSource(fresh, widget.controller.activities);
+    final source = sheetWorkoutSource(
+      fresh,
+      widget.controller.activities,
+      companionId: widget.companionId,
+    );
     originalSource = jsonEncode(source);
     if (await service.isSynced(target, fresh.id, originalSource!)) {
       if (mounted) setState(() => sent = true);
@@ -360,7 +388,11 @@ class _SheetSyncScreenState extends State<SheetSyncScreen> {
     if (fresh == null ||
         originalSource !=
             jsonEncode(
-              sheetWorkoutSource(fresh, widget.controller.activities),
+              sheetWorkoutSource(
+                fresh,
+                widget.controller.activities,
+                companionId: widget.companionId,
+              ),
             )) {
       clearPlan();
       throw const ValidationException(
@@ -395,7 +427,10 @@ class _SheetSyncScreenState extends State<SheetSyncScreen> {
       final rows = [
         for (final r in latest['rows'] as List) List<String>.from(r as List),
       ];
-      await SheetContextStore(profileId: service.profileId).save(
+      await SheetContextStore(
+        profileId: service.profileId,
+        companionId: widget.companionId,
+      ).save(
         SheetContext(
           id: sheet!.id,
           name: sheet!.name,
@@ -503,6 +538,7 @@ class _SheetSyncScreenState extends State<SheetSyncScreen> {
                           await service.disconnectDestination();
                           await SheetContextStore(
                             profileId: service.profileId,
+                            companionId: widget.companionId,
                           ).delete();
                           connected = false;
                           clearPlan();
@@ -610,14 +646,16 @@ class _SheetSyncScreenState extends State<SheetSyncScreen> {
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   title: const Text(
-                    'Permitir envíos desde el chat y al finalizar',
+                    'Enviar sesiones automáticamente al finalizar',
                   ),
-                  subtitle: const Text(
-                    'El modelo interpreta la hoja y envía los resultados a este destino. Puedes pausarlo aquí.',
+                  subtitle: Text(
+                    widget.companionId == 'gymbro'
+                        ? 'Los envíos del chat siguen disponibles aunque pauses los automáticos.'
+                        : 'Por ahora los registros de actividad no identifican su acompañante; puedes pedir envíos y ediciones desde el chat.',
                   ),
                   value: automatic,
                   onChanged:
-                      busy
+                      busy || widget.companionId != 'gymbro'
                           ? null
                           : (v) => run(() async {
                             automatic = v;

@@ -7,17 +7,19 @@ import '../domain/sheet_context.dart';
 import '../domain/sheet_sync.dart';
 import '../domain/workout.dart';
 import 'profile_store.dart';
+import 'companion_store.dart';
 
 class SheetSyncService {
-  SheetSyncService({required this.profileId});
+  SheetSyncService({required this.profileId, this.companionId = 'gymbro'});
   final String profileId;
+  final String companionId;
   static const channel = ProfileStore.channel;
   static const storage = FlutterSecureStorage();
   UserProfile? identity;
   String get destinationKey =>
       profileStorageKey('gymia.sheet.destination.v1', profileId);
   String get creationKey =>
-      profileStorageKey('gymia.sheet.creation.v1', profileId);
+      companionStorageKey('gymia.sheet.creation.v1', profileId, companionId);
   void checkProfile() {
     if (ProfileStore.instance.activeId != profileId) {
       throw const ValidationException(
@@ -116,7 +118,7 @@ class SheetSyncService {
   }
 
   String get connectionKey =>
-      profileStorageKey('gymia.sheet.connection.v1', profileId);
+      companionStorageKey('gymia.sheet.connection.v1', profileId, companionId);
   Future<Map<String, dynamic>?> connection() async {
     checkProfile();
     final raw = await storage.read(key: connectionKey);
@@ -203,7 +205,8 @@ class SheetSyncService {
   Future<void> disconnectDestination() async {
     checkProfile();
     await storage.delete(key: connectionKey);
-    await storage.delete(key: destinationKey);
+    // OAuth identity is shared by destinations in this profile; disconnecting
+    // one companion must not revoke the others.
   }
 
   Future<List<Map<String, String>>> files() async {

@@ -2,13 +2,18 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../domain/sheet_context.dart';
-import '../domain/user_profile.dart';
+import 'companion_store.dart';
 
 class SheetContextStore {
-  const SheetContextStore({this.profileId = 'local'});
+  const SheetContextStore({
+    this.profileId = 'local',
+    this.companionId = 'gymbro',
+  });
   final String profileId;
+  final String companionId;
   static const _storage = FlutterSecureStorage();
-  String get _key => profileStorageKey('gymia.sheet.context.v1', profileId);
+  String get _key =>
+      companionStorageKey('gymia.sheet.context.v1', profileId, companionId);
   static final changes = ValueNotifier<int>(0);
 
   Future<SheetContext?> load() async {

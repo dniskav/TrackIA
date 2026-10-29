@@ -13,6 +13,7 @@ import 'package:gymia/data/ai_settings_store.dart';
 import 'package:gymia/data/sqlite_workout_repository.dart';
 import 'package:gymia/domain/activity.dart';
 import 'package:gymia/domain/ai_config.dart';
+import 'package:gymia/domain/companion.dart';
 import 'package:gymia/ui/assistant_chat.dart';
 import 'package:gymia/ui/app.dart';
 import 'package:gymia/ui/activity_focus.dart';
@@ -50,6 +51,7 @@ void main() {
       ActivityDefinition(
         name: 'Pec Fly',
         restSeconds: 120,
+        targetSets: 4,
         fields: const [
           {'key': 'weight_kg', 'label': 'Peso', 'unit': 'kg'},
           {'key': 'reps', 'label': 'Reps', 'unit': ''},
@@ -67,13 +69,18 @@ void main() {
     await repo.close();
     await dir.delete(recursive: true);
   });
-  Future<void> show(WidgetTester tester, {AiClient? client}) async {
+  Future<void> show(
+    WidgetTester tester, {
+    AiClient? client,
+    Companion? companion,
+  }) async {
     await tester.pumpWidget(
       MaterialApp(
         theme: gymTheme,
         home: AssistantChatScreen(
           controller: c,
           client: client,
+          companion: companion,
           availability: AiAvailability(
             catalog: AiModelCatalog(
               transport:
@@ -126,6 +133,7 @@ void main() {
     (tester) async {
       await show(tester);
       expect(find.text('Iniciar'), findsOneWidget);
+      expect(find.text('1/4 series · Descanso'), findsOneWidget);
       expect(find.text('Añadir serie'), findsNothing);
       expect(find.byType(ListView), findsOneWidget);
       now = now.add(const Duration(seconds: 100));
@@ -134,6 +142,7 @@ void main() {
       expect(c.focus!.messages, isEmpty);
       expect(c.focus!.restEndsAt, isNull);
       expect(find.text('Parar'), findsOneWidget);
+      expect(find.text('Serie 2 de 4'), findsOneWidget);
       now = now.add(const Duration(seconds: 30));
       await tester.enterText(find.byType(TextField), '60k 13r f');
       await tester.pump();
@@ -150,6 +159,25 @@ void main() {
       await disposeScreen(tester);
     },
   );
+
+  testWidgets('cycle controls stay separate from completed series', (
+    tester,
+  ) async {
+    await tester.runAsync(() async {
+      await repo.finishActivity((await repo.loadActivities()).single.id, now);
+      await repo.prepareActivity(
+        ActivityDefinition(name: 'Pomodoro', targetCycles: 4, restSeconds: 300),
+      );
+      await c.refresh();
+    });
+    await show(tester);
+    expect(find.text('Ciclos 0/4'), findsOneWidget);
+    await tap(tester, const Key('cycle-increment'));
+    await waitFor(tester, () => c.focus!.definition.completedCycles == 1);
+    expect(find.text('Ciclos 1/4'), findsOneWidget);
+    expect(c.focus!.intervals, isEmpty);
+    await disposeScreen(tester);
+  });
 
   testWidgets(
     'small phone hides Iniciar while composing and keeps input visible',
@@ -433,6 +461,37 @@ void main() {
       await disposeScreen(tester);
     },
   );
+  testWidgets('Enfoque proposals create activities owned by Enfoque', (
+    tester,
+  ) async {
+    await tester.runAsync(() async {
+      await repo.finishActivity(c.focus!.id, now);
+      await c.refresh();
+    });
+    await show(
+      tester,
+      companion: Companion.suggestions.firstWhere((p) => p.id == 'enfoque'),
+      client: AiClient(
+        transport:
+            (_, __, ___) async => {
+              'choices': [
+                {
+                  'message': {
+                    'content':
+                        'Preparemos un pomodoro.\n```gymia-activity\n{"name":"Pomodoro","repeated":true,"restSeconds":300,"targetCycles":4,"fields":[],"instructions":"Trabajar con pausas"}\n```',
+                  },
+                },
+              ],
+            },
+      ),
+    );
+    await tester.enterText(find.byType(TextField), 'Pomodoro de 25 minutos');
+    await tester.runAsync(() => tester.tap(find.byTooltip('Enviar')));
+    await waitFor(tester, () => c.focus?.definition.name == 'Pomodoro');
+    expect(c.focus!.definition.companionId, 'enfoque');
+    expect(c.focus!.definition.targetCycles, 4);
+    await disposeScreen(tester);
+  });
   testWidgets('canceling change keeps prepared activity and its footer', (
     tester,
   ) async {
@@ -510,6 +569,7 @@ void main() {
     final start = tester.getRect(find.byKey(const Key('activity-start-stop')));
     final finish = tester.getRect(find.byKey(const Key('finish-activity')));
     expect(find.text('Sin actividad'), findsOneWidget);
+    expect(find.text('Finalizar día'), findsOneWidget);
     expect(
       tester
           .widget<FilledButton>(find.byKey(const Key('activity-start-stop')))

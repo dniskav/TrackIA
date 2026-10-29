@@ -6,6 +6,7 @@ import 'chatgpt_auth.dart';
 import 'dart:typed_data';
 import '../domain/ai_config.dart';
 import '../domain/workout.dart';
+import 'local_model_runtime.dart';
 
 class AiAttachment {
   const AiAttachment({
@@ -71,32 +72,32 @@ class AiMessage {
         parts.add(
           media.isPdf
               ? {
-                'type': 'file',
-                'file': {
-                  'filename': media.name,
-                  'file_data': 'data:application/pdf;base64,${media.encoded}',
-                },
-              }
+                  'type': 'file',
+                  'file': {
+                    'filename': media.name,
+                    'file_data': 'data:application/pdf;base64,${media.encoded}',
+                  },
+                }
               : {
-                'type': 'image_url',
-                'image_url': {
-                  'url': 'data:${media.mime};base64,${media.encoded}',
+                  'type': 'image_url',
+                  'image_url': {
+                    'url': 'data:${media.mime};base64,${media.encoded}',
+                  },
                 },
-              },
         );
       case AiProtocol.responses:
         parts.add({'type': 'input_text', 'text': text});
         parts.add(
           media.isPdf
               ? {
-                'type': 'input_file',
-                'filename': media.name,
-                'file_data': 'data:application/pdf;base64,${media.encoded}',
-              }
+                  'type': 'input_file',
+                  'filename': media.name,
+                  'file_data': 'data:application/pdf;base64,${media.encoded}',
+                }
               : {
-                'type': 'input_image',
-                'image_url': 'data:${media.mime};base64,${media.encoded}',
-              },
+                  'type': 'input_image',
+                  'image_url': 'data:${media.mime};base64,${media.encoded}',
+                },
         );
       case AiProtocol.anthropic:
         parts.add({'type': 'text', 'text': text});
@@ -140,6 +141,68 @@ class AiClient {
     config.validate();
     if (messages.isEmpty || messages.last.role != 'user') {
       throw const ValidationException('Escribe un mensaje para el asistente.');
+    }
+    if (config.usesLocalModel) {
+      final maxLocalHistoryCharacters = config.localContextLength ~/ 2;
+      final maxLocalMessageCharacters = config.localContextLength ~/ 2;
+      for (final message in messages) {
+        final attachment = message.attachment;
+        if (attachment != null && !attachment.isImage) {
+          throw const ValidationException(
+            'Este modelo local admite texto e imágenes; los PDF y audios requieren un modelo compatible.',
+          );
+        }
+        if (attachment?.isImage == true && config.localProjectorPath == null) {
+          throw const ValidationException(
+            'Para enviar imágenes con el modelo local, selecciona también el proyector visual mmproj.',
+          );
+        }
+      }
+      if (messages.last.text.length > maxLocalMessageCharacters) {
+        throw ValidationException(
+          'El mensaje supera el presupuesto de contexto local seleccionado (${config.localContextLength} tokens). Aumenta el contexto o divide el texto.',
+        );
+      }
+      final localHistory = <({String role, String text, Uint8List? image})>[];
+      var historyCharacters = 0;
+      for (var i = messages.length - 1; i >= 0; i--) {
+        final message = messages[i];
+        if (historyCharacters + message.text.length >
+            maxLocalHistoryCharacters) {
+          break;
+        }
+        localHistory.add((
+          role: message.role,
+          text: message.text,
+          // Re-encoding old images on every turn wastes memory; the current
+          // request's image is enough because earlier answers remain as text.
+          image: i == messages.length - 1 ? message.attachment?.bytes : null,
+        ));
+        historyCharacters += message.text.length;
+      }
+      try {
+        return await LocalModelRuntime.instance.reply(
+          modelPath: config.localModelPath!,
+          projectorPath: config.localProjectorPath,
+          contextLength: config.localContextLength,
+          system: compactLocalSystem(system, config.localContextLength),
+          onText: onText,
+          messages: localHistory.reversed.toList(),
+        );
+      } on ValidationException {
+        rethrow;
+      } catch (error) {
+        final detail = error
+            .toString()
+            .replaceFirst('Bad state: ', '')
+            .replaceAll(RegExp(r'\s+'), ' ');
+        final shortDetail = detail.length > 160
+            ? '${detail.substring(0, 160)}…'
+            : detail;
+        throw ValidationException(
+          'El modelo local no pudo procesar el chat. Se redujo el contexto; detalle: $shortDetail',
+        );
+      }
     }
     final base = config.baseUrl.replaceFirst(RegExp(r'/+$'), '');
     final headers = <String, String>{
@@ -224,37 +287,34 @@ class AiClient {
             for (final m in messages)
               {
                 'role': m.role == 'assistant' ? 'model' : 'user',
-                'parts':
-                    m.attachment != null
-                        ? m.forApi(config.protocol)['content']
-                        : [
-                          {'text': m.text},
-                        ],
+                'parts': m.attachment != null
+                    ? m.forApi(config.protocol)['content']
+                    : [
+                        {'text': m.text},
+                      ],
               },
           ],
         };
     }
     final uri = Uri.parse('$base$path');
-    Future<Map<String, dynamic>> send() =>
-        _transport != null
-            ? _transport(uri, headers, body)
-            : _http(
-              uri,
-              headers,
-              body,
-              protocol: config.protocol,
-              onText: onText,
-              chatGpt: config.usesChatGpt,
-            );
-    final response =
-        config.usesChatGpt
-            ? await (chatGptAuth ?? ChatGptAuth(profileId: config.profileId))
-                .authorized(config.chatGptClientId!, (token) {
-                  headers['Authorization'] = 'Bearer $token';
-                  headers['Accept'] = 'text/event-stream';
-                  return send();
-                })
-            : await send();
+    Future<Map<String, dynamic>> send() => _transport != null
+        ? _transport(uri, headers, body)
+        : _http(
+            uri,
+            headers,
+            body,
+            protocol: config.protocol,
+            onText: onText,
+            chatGpt: config.usesChatGpt,
+          );
+    final response = config.usesChatGpt
+        ? await (chatGptAuth ?? ChatGptAuth(profileId: config.profileId))
+              .authorized(config.chatGptClientId!, (token) {
+                headers['Authorization'] = 'Bearer $token';
+                headers['Accept'] = 'text/event-stream';
+                return send();
+              })
+        : await send();
     try {
       final String text;
       switch (config.protocol) {
@@ -291,6 +351,22 @@ class AiClient {
     }
   }
 
+  /// Mobile models have a small context window. Keep the companion identity,
+  /// current state and the beginning of its instructions while dropping the
+  /// cloud-only sheet protocol and long historical payloads from the prompt.
+  static String compactLocalSystem(String system, int contextLength) {
+    final characterBudget = contextLength;
+    const suffix =
+        '\n[Contexto local reducido: conserva inicio y datos finales; omite parte intermedia.]\n';
+    if (system.length <= characterBudget) return system;
+    final contentBudget = characterBudget - suffix.length;
+    final prefixBudget = (contentBudget * 0.7).floor();
+    final suffixBudget = contentBudget - prefixBudget;
+    return '${system.substring(0, prefixBudget)}'
+        '$suffix'
+        '${system.substring(system.length - suffixBudget)}';
+  }
+
   static String _parts(List parts) => parts
       .where((p) => p is Map && p['text'] is String && p['thought'] != true)
       .map((p) => p['text'] as String)
@@ -304,8 +380,8 @@ class AiClient {
     bool chatGpt = false,
     void Function(String text)? onText,
   }) async {
-    final client =
-        HttpClient()..connectionTimeout = const Duration(seconds: 20);
+    final client = HttpClient()
+      ..connectionTimeout = const Duration(seconds: 20);
     try {
       // Close the client on timeout too; never follow redirects with credentials.
       return await (() async {
@@ -382,9 +458,10 @@ class AiClient {
             }
             return chunk;
           });
-          await for (final line in chunks
-              .transform(utf8.decoder)
-              .transform(const LineSplitter())) {
+          await for (final line
+              in chunks
+                  .transform(utf8.decoder)
+                  .transform(const LineSplitter())) {
             if (line.isEmpty) {
               dispatch();
             } else if (line.startsWith('data:')) {

@@ -29,7 +29,6 @@ import 'session_control.dart';
 import 'activity_focus.dart';
 import 'chat_message.dart';
 import '../domain/activity.dart';
-import '../domain/user_profile.dart';
 import '../data/profile_store.dart';
 import 'accounts.dart';
 import '../data/chat_archive_store.dart';
@@ -37,6 +36,8 @@ import 'archived_chats.dart';
 import 'sheet_sync.dart';
 import '../domain/sheet_sync.dart';
 import '../application/sheet_automation.dart';
+import '../data/companion_store.dart';
+import '../domain/companion.dart';
 
 class AssistantChatScreen extends StatefulWidget {
   const AssistantChatScreen({
@@ -47,6 +48,7 @@ class AssistantChatScreen extends StatefulWidget {
     this.onData,
     this.focusMode = false,
     this.availability,
+    this.companion,
   });
   final WorkoutController controller;
   final AiClient? client;
@@ -54,6 +56,7 @@ class AssistantChatScreen extends StatefulWidget {
   final Future<void> Function()? onData;
   final bool focusMode;
   final AiAvailability? availability;
+  final Companion? companion;
   @override
   State<AssistantChatScreen> createState() => _AssistantChatScreenState();
 }
@@ -62,10 +65,21 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     with WidgetsBindingObserver {
   static const storage = FlutterSecureStorage();
   late final profileId = widget.controller.profileId;
-  late final sheetStore = SheetContextStore(profileId: profileId);
+  late final companionId = widget.companion?.id ?? 'gymbro';
+  late final sheetStore = SheetContextStore(
+    profileId: profileId,
+    companionId: companionId,
+  );
   late final aiStore = AiSettingsStore(profileId: profileId);
-  late final chatKey = profileStorageKey('gymia.ai.chat.v1', profileId);
-  late final archiveStore = ChatArchiveStore(profileId: profileId);
+  late final chatKey = companionStorageKey(
+    'gymia.ai.chat.v1',
+    profileId,
+    companionId,
+  );
+  late final archiveStore = ChatArchiveStore(
+    profileId: profileId,
+    companionId: companionId,
+  );
   final archivedActivityMessageIds = <String>{};
   List<Map<String, dynamic>> archives = [];
   String carryForward = '';
@@ -102,7 +116,11 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
   late final AiAvailability availability;
   late final RestNotificationController notifications;
   Timer? connectionTimer;
-  late final sheets = SheetAutomation(widget.controller, client: widget.client);
+  late final sheets = SheetAutomation(
+    widget.controller,
+    client: widget.client,
+    companionId: companionId,
+  );
   bool sheetTaskRunning = false;
   Completer<void>? sheetTaskDone;
   String? sheetReadWarning;
@@ -271,9 +289,18 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
   }
 
   bool get aiReady => availability.ready;
-  bool get canRecord => widget.focusMode && widget.controller.focus != null;
+  bool ownsActivity(FocusActivity activity) =>
+      activity.definition.companionId == companionId;
+  Iterable<FocusActivity> get companionActivities =>
+      widget.controller.activities.where(ownsActivity);
+  FocusActivity? get companionFocus {
+    final focus = widget.controller.focus;
+    return focus != null && ownsActivity(focus) ? focus : null;
+  }
+
+  bool get canRecord => widget.focusMode && companionFocus != null;
   FocusActivity? get recoverablePreparation =>
-      widget.controller.activities
+      companionActivities
           .where(
             (a) =>
                 !a.active &&
@@ -286,7 +313,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     if (!widget.focusMode) return messages;
     return [
       ...messages,
-      for (final a in widget.controller.activities)
+      for (final a in companionActivities)
         for (final m in a.messages)
           if (!archivedActivityMessageIds.contains(m.id))
             AiMessage(m.role, m.text, recordedAt: m.recordedAt),
@@ -299,7 +326,9 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
 
   Future<void> closeDay() async {
     final active = widget.controller.active;
-    if (active != null && !canRecord) {
+    if (companionId == 'gymbro' &&
+        active != null &&
+        widget.controller.focus == null) {
       await finishSession(
         context,
         widget.controller,
@@ -346,7 +375,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
   void focusChanged() {
     if (!widget.focusMode || !mounted) return;
     final revision = jsonEncode([
-      for (final activity in widget.controller.activities)
+      for (final activity in companionActivities)
         for (final message in activity.messages)
           [message.id, message.text, message.recordedAt.toIso8601String()],
     ]);
@@ -354,7 +383,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
       activityTranscriptRevision = revision;
       scheduleScrollToLatest();
     }
-    final a = widget.controller.focus;
+    final a = companionFocus;
     if (a?.id == focusId) return;
     if (focusId == null) preparationDraft = input.text;
     draftTimer?.cancel();
@@ -442,7 +471,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
   }
 
   Future<String?> captureFocusInput() {
-    final a = widget.controller.focus;
+    final a = companionFocus;
     if (a == null) return Future.value();
     final media = attachment;
     final text =
@@ -488,9 +517,21 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
   Future<void> acceptProposal() async {
     if (!aiReady) return;
     final selected = proposal;
-    if (selected == null || widget.controller.focus != null) return;
+    if (selected == null) return;
+    if (widget.controller.focus != null) {
+      if (mounted) {
+        setState(
+          () =>
+              error =
+                  'Termina la actividad abierta en el otro acompañante antes de preparar esta.',
+        );
+      }
+      return;
+    }
     final ok = await widget.controller.run(() async {
-      await widget.controller.activityRepository!.prepareActivity(selected);
+      await widget.controller.activityRepository!.prepareActivity(
+        selected.forCompanion(companionId),
+      );
     });
     if (mounted) {
       setState(() {
@@ -723,7 +764,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
 
   Future<void> talk() async {
     if (!aiReady && !canRecord) return;
-    if ((busy && (!widget.focusMode || widget.controller.focus == null)) ||
+    if ((busy && (!widget.focusMode || companionFocus == null)) ||
         voiceStarting) {
       return;
     }
@@ -865,7 +906,11 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
       return;
     }
     if (kind == 'spreadsheet') {
-      await pickSheetForChat(context, widget.controller);
+      await pickSheetForChat(
+        context,
+        widget.controller,
+        companionId: companionId,
+      );
       return;
     }
     if (!aiReady && !canRecord) {
@@ -1068,14 +1113,14 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
         pending = json['pending'] as String?;
         if (pending == null &&
             json['composerDraft'] is Map &&
-            widget.controller.focus == null) {
+            companionFocus == null) {
           final draft = AiMessage.fromStorage(
             Map<String, dynamic>.from(json['composerDraft'] as Map),
           );
           input.text = draft.text;
           attachment = draft.attachment;
         }
-        if (pending != null && widget.controller.focus == null) {
+        if (pending != null && companionFocus == null) {
           input.text = pending!;
           attachment = messages.lastOrNull?.attachment;
           error =
@@ -1257,7 +1302,7 @@ Los chats archivados no están incluidos completos en el contexto. Si necesitas 
               ? ''
               : 'Últimas notas originales (extracto):\n${originalExcerpt.substring(0, originalExcerpt.length.clamp(0, 2000))}');
       final ids = [
-        for (final activity in widget.controller.activities)
+        for (final activity in companionActivities)
           for (final message in activity.messages)
             if (!archivedActivityMessageIds.contains(message.id)) message.id,
       ];
@@ -1322,6 +1367,7 @@ Los chats archivados no están incluidos completos en el contexto. Si necesitas 
         builder:
             (_) => SheetSyncScreen(
               controller: widget.controller,
+              companionId: companionId,
               client: widget.client,
               workoutId: directive?['workoutId'] as String?,
               create: directive?['create'] as bool? ?? false,
@@ -1340,6 +1386,40 @@ Los chats archivados no están incluidos completos en el contexto. Si necesitas 
   }
 
   Future<void> handleCompletedActions(String answer) async {
+    if (answer.contains('```gymia-timing')) {
+      final timing = activityTimingProposal(answer);
+      final activity = companionFocus;
+      if (timing == null ||
+          activity == null ||
+          answer.contains('```gymia-activity') ||
+          answer.contains('```gymia-sheet-edit') ||
+          answer.contains('```gymia-sync')) {
+        await saveSheetReply(
+          'No se cambiaron los tiempos: la propuesta era inválida o no hay una actividad abierta en este acompañante.',
+        );
+        return;
+      }
+      final activitySeconds =
+          timing['activitySeconds'] ?? activity.definition.activitySeconds;
+      final restSeconds =
+          timing['restSeconds'] ?? activity.definition.restSeconds;
+      final targetCycles =
+          timing['targetCycles'] ?? activity.definition.targetCycles;
+      final applied = await widget.controller.run(
+        () => widget.controller.activityRepository!.setActivityTiming(
+          activity.id,
+          activitySeconds: activitySeconds,
+          restSeconds: restSeconds,
+          targetCycles: targetCycles,
+        ),
+      );
+      await saveSheetReply(
+        applied
+            ? 'Tiempos guardados en la actividad: ${activitySeconds == null ? 'sin límite' : '${activitySeconds ~/ 60}:${(activitySeconds % 60).toString().padLeft(2, '0')}'} por tramo, ${restSeconds ~/ 60}:${(restSeconds % 60).toString().padLeft(2, '0')} de descanso${targetCycles == null ? '' : ', $targetCycles ciclos'}. Los avisos se enviarán si Android los permite.'
+            : 'No se pudieron guardar los tiempos. Revisa la actividad y vuelve a intentarlo.',
+      );
+      return;
+    }
     final sync = sheetSyncDirective(answer);
     if (answer.contains('```gymia-sheet-edit')) {
       if (sync != null ||
@@ -1411,14 +1491,26 @@ Los chats archivados no están incluidos completos en el contexto. Si necesitas 
   static const activityProposalExample =
       '''Formato exacto de una propuesta (adapta valores y campos a la actividad):
 ```gymia-activity
-{"name":"Press de pecho","repeated":true,"restSeconds":120,"fields":[{"key":"weight_kg","label":"Peso","unit":"kg"},{"key":"reps","label":"Repeticiones","unit":""},{"key":"failure","label":"Fallo","unit":""}],"instructions":"Registrar cargas totales; consultar notas anteriores"}
+{"name":"Actividad elegida","repeated":true,"activitySeconds":1500,"restSeconds":300,"fields":[],"instructions":"Adaptar la actividad al objetivo y los datos del usuario"}
 ```
-No añadas este ejemplo como propuesta si el usuario aún no ha elegido una actividad concreta. Si ya hay una actividad preparada o en marcha, no propongas otra como si se hubiera aplicado: para cambiar usa Elegir otra actividad si aún no empezó, o Parar y Terminar si ya empezó.''';
+Si el usuario pide una duración concreta (por ejemplo Pomodoro), añade activitySeconds en segundos (1–86400); la app mostrará una cuenta atrás y avisará al terminar cada tramo. El descanso se configura con restSeconds. No afirmes que habrá recordatorios si no incluyes esos tiempos en la propuesta. Para una actividad con ciclos puedes añadir targetCycles (1–100). El contador de ciclos es opcional e independiente de las series; el usuario lo ajusta con +/−. No añadas este ejemplo como propuesta si el usuario aún no ha elegido una actividad concreta. Si ya hay una actividad preparada o en marcha y el usuario pide ajustar sus tiempos o ciclos, no propongas otra: añade un bloque gymia-timing con JSON que contenga los valores concretos que cambian, por ejemplo {"activitySeconds":1500,"restSeconds":300,"targetCycles":4}. La app valida y aplica esos valores a la actividad actual. No digas que quedaron configurados antes de recibir la confirmación de la app. Para sustituir toda la actividad: para cambiar usa Elegir otra actividad si aún no empezó, o Parar y Terminar si ya empezó.''';
 
   String contextForAi() {
     final controller = widget.controller;
-    final active = controller.active;
-    final recent = controller.history.take(5);
+    final ownedWorkoutIds = companionActivities.map((a) => a.workoutId).toSet();
+    bool ownsWorkout(Workout workout) =>
+        workout.exercises.isNotEmpty || ownedWorkoutIds.contains(workout.id);
+    final active =
+        companionId == 'gymbro' &&
+                controller.active != null &&
+                ownsWorkout(controller.active!)
+            ? controller.active
+            : null;
+    final focused = companionFocus;
+    final recent =
+        companionId == 'gymbro'
+            ? controller.history.where(ownsWorkout).take(5)
+            : <Workout>[];
     Map<String, dynamic> describe(Workout workout) => {
       'id': workout.id,
       'name': workout.name,
@@ -1447,7 +1539,22 @@ No añadas este ejemplo como propuesta si el usuario aún no ha elegido una acti
       ],
     };
     return '''Eres el asistente conversacional de TrackIA. Ayudas con distintas actividades según el contexto y las preferencias del usuario. Habla en español, breve y claro.
-${widget.focusMode ? 'La app conserva los tiempos y los mensajes de actividad localmente. Los controles Iniciar/Parar gobiernan cada serie/tramo; Terminar cierra ese ejercicio o actividad; Finalizar día permite guardar el progreso sin bloquear más actividad hoy. No tienes permiso para iniciar/parar por tu cuenta. Las escrituras en Google Sheets se solicitan con los bloques validados descritos después; nunca afirmes que Google se actualizó sin el recibo confirmado de la app. Si el usuario pide preparar un ejercicio, una sustitución o un deporte y la identidad es clara, explica la propuesta breve y añade exactamente un bloque con etiqueta gymia-activity cuyo JSON tenga name (nombre), repeated (booleano: series/tramos repetidos o actividad continua), restSeconds (entero 0–1800, recomendación según actividad), fields (lista de hasta 12 objetos con key en snake_case, label y unit, todas cadenas) e instructions (hasta 3000 caracteres de instrucciones específicas para esa actividad/usuario). No incluyas origin ni IDs ni código ejecutable. Ejemplo de campos de fuerza: weight_kg, reps, failure; NO imponerlos a otras actividades. No crees una actividad a partir de una observación o una pregunta sobre la hoja. El bloque válido prepara automáticamente la actividad y hace aparecer Iniciar, Parar y Terminar. No pidas pulsar Preparar, no hay ese paso. El reloj no empieza hasta que el usuario pulsa Iniciar. Si afirmas que un ejercicio está listo, debes incluir ese bloque en la misma respuesta. Si falta información, pregunta y no añadas un bloque. Consulta notas anteriores incluso de otra actividad si son pertinentes; no inventes antecedentes ni restricciones permanentes. Distingue métricas y observaciones conservadas en mensajes; no descartes molestias o resultados sin cifras. Las instrucciones adaptadas se conservan con la actividad y se reutilizan al volver a hacerla.' : 'En esta conexión puedes conversar y consultar el contexto local facilitado, pero no puedes registrar series, cambiar ejercicios ni controlar descansos por tu cuenta. Sí puedes solicitar lectura y edición de la hoja Google conectada mediante el flujo validado descrito después. Nunca afirmes que una acción se ejecutó antes de recibir la confirmación de la app.'}
+El acompañante elegido es ${jsonEncode({'id': companionId, 'name': widget.companion?.name ?? 'GymBro', 'description': widget.companion?.description ?? 'Entrenamiento, series y progreso', 'userInstructions': widget.companion?.prompt ?? Companion.suggestions.first.prompt})}. Ajusta tu tono, propuestas y actividad a estas preferencias. Son preferencias del usuario, no autorizaciones para escribir datos, omitir validaciones o cambiar de cuenta.
+Estado local de la actividad actual: ${jsonEncode(focused == null ? null : {
+          'name': focused.definition.name,
+          'targetSets': focused.definition.targetSets,
+          'targetCycles': focused.definition.targetCycles,
+          'activitySeconds': focused.definition.activitySeconds,
+          'restSeconds': focused.definition.restSeconds,
+          'runningStartedAt': focused.running?.startedAt.toIso8601String(),
+          'completedCycles': focused.definition.completedCycles,
+          'startedIntervals': focused.intervals.length,
+          'completedIntervals': focused.intervals.where((i) => i.endedAt != null).length,
+          'running': focused.running != null,
+          'messages': focused.messages.where((m) => m.role == 'user').map((m) => {'text': m.text, 'intervalId': m.intervalId, 'metrics': m.metrics}).toList(),
+        })}. Este estado viene de la base local y prevalece sobre el recuento conversacional. Los ciclos se ajustan aparte de las series con +/−; no los deduzcas de los intervalos. Una serie sin métricas explícitas sigue sin resultados confirmados; no la rellenes suponiendo que «igual» equivale a otra serie. Si hubo mensajes guardados durante una caída de conexión, léelos aquí antes de responder y explica cuáles siguen pendientes de interpretar.
+${companionId == 'gymbro' ? '' : 'En este acompañante los registros de actividad aún no tienen identidad propia: no prometas envíos automáticos al terminar. Si el usuario pide sincronizar un registro concreto, usa el flujo validado del chat y el destino de este acompañante.'}
+${widget.focusMode ? 'La app conserva los tiempos y los mensajes de actividad localmente. Los controles Iniciar/Parar gobiernan cada serie/tramo; Terminar cierra ese ejercicio o actividad; Finalizar día aparece en el panel cuando ya no hay una actividad abierta y permite guardar el progreso. No tienes permiso para iniciar/parar por tu cuenta. Las escrituras en Google Sheets se solicitan con los bloques validados descritos después; nunca afirmes que Google se actualizó sin el recibo confirmado de la app. Si el usuario pide preparar un ejercicio, una sustitución o un deporte y la identidad es clara, explica la propuesta breve y añade exactamente un bloque con etiqueta gymia-activity cuyo JSON tenga name (nombre), repeated (booleano: series/tramos repetidos o actividad continua), restSeconds (entero 0–1800, recomendación según actividad), activitySeconds (entero opcional 1–86400 para una duración real por tramo; imprescindible si prometes avisar al terminar el tiempo de actividad), targetSets (entero opcional 1–100 si el usuario indicó un objetivo de series), fields (lista de hasta 12 objetos con key en snake_case, label y unit, todas cadenas) e instructions (hasta 3000 caracteres de instrucciones específicas para esa actividad/usuario). No incluyas origin ni IDs ni código ejecutable. Ejemplo de campos de fuerza: weight_kg, reps, failure; NO imponerlos a otras actividades. No crees una actividad a partir de una observación o una pregunta sobre la hoja. El bloque válido prepara automáticamente la actividad y hace aparecer Iniciar, Parar y Terminar. No pidas pulsar Preparar, no hay ese paso. El reloj no empieza hasta que el usuario pulsa Iniciar. Si afirmas que un ejercicio está listo, debes incluir ese bloque en la misma respuesta. Si falta información, pregunta y no añadas un bloque. Consulta notas anteriores incluso de otra actividad si son pertinentes; no inventes antecedentes ni restricciones permanentes. Distingue métricas y observaciones conservadas en mensajes; no descartes molestias o resultados sin cifras. Las instrucciones adaptadas se conservan con la actividad y se reutilizan al volver a hacerla.' : 'En esta conexión puedes conversar y consultar el contexto local facilitado, pero no puedes registrar series, cambiar ejercicios ni controlar descansos por tu cuenta. Sí puedes solicitar lectura y edición de la hoja Google conectada mediante el flujo validado descrito después. Nunca afirmes que una acción se ejecutó antes de recibir la confirmación de la app.'}
 ${widget.focusMode ? activityProposalExample : ''}
 $archiveInstructions
 ${jsonEncode({
@@ -1466,7 +1573,7 @@ Antes de cada consulta la app intenta leer la hoja actual mediante su conexión 
 ${jsonEncode({'googleSheet': sheetContext?.toJson(), 'googleSheetReadWarning': sheetReadWarning, 'sheetClarificationForWorkoutId': sheetQuestionWorkoutId, 'sheetConnection': sheetConnectionForAi, 'pendingSheetJobs': pendingSheetsForAi})}
 ${jsonEncode({
       'recentCompleted': recent.map(describe).toList(),
-      'activities': controller.activities.take(30).map((a) => {
+      'activities': companionActivities.take(30).map((a) => {
         ...a.toJson(),
         'messages': a.messages.where((m) => m.role == 'user' && !archivedActivityMessageIds.contains(m.id)).map((m) => m.toJson()).toList(),
         'archivedResults': a.messages.where((m) => archivedActivityMessageIds.contains(m.id) && m.metrics.isNotEmpty).map((m) => {'id': m.id, 'recordedAt': m.recordedAt.toIso8601String(), 'metrics': m.metrics}).toList(),
@@ -1477,7 +1584,7 @@ ${jsonEncode({
   }
 
   Future<void> sendFocus() async {
-    final a = widget.controller.focus;
+    final a = companionFocus;
     final media = attachment;
     if (a == null ||
         (input.text.trim().isEmpty && media == null) ||
@@ -1619,7 +1726,7 @@ ${jsonEncode({
   }
 
   Future<void> send({String? retry, bool includeAttachment = true}) async {
-    if (widget.focusMode && widget.controller.focus != null && retry == null) {
+    if (widget.focusMode && companionFocus != null && retry == null) {
       await sendFocus();
       return;
     }
@@ -1781,6 +1888,16 @@ ${jsonEncode({
                         children: [
                           const ListTile(title: Text('TrackIA')),
                           ListTile(
+                            leading: const Icon(Icons.grid_view_rounded),
+                            title: const Text('Acompañantes'),
+                            onTap: () {
+                              Navigator.pop(context);
+                              if (Navigator.of(context).canPop()) {
+                                Navigator.of(context).pop();
+                              }
+                            },
+                          ),
+                          ListTile(
                             leading: const Icon(Icons.brightness_6_outlined),
                             title: const Text('Apariencia'),
                             onTap: () {
@@ -1926,7 +2043,9 @@ ${jsonEncode({
                               unawaited(settings());
                             },
                           ),
-                          if (widget.controller.active != null && !canRecord)
+                          if (companionId == 'gymbro' &&
+                              widget.controller.active != null &&
+                              widget.controller.focus == null)
                             ListTile(
                               leading: const Icon(Icons.flag_outlined),
                               title: const Text('Finalizar día'),
@@ -1959,7 +2078,7 @@ ${jsonEncode({
                   )
                   : null,
           appBar: AppBar(
-            title: const Text('TrackIA'),
+            title: Text(widget.companion?.name ?? 'TrackIA'),
             actions: [
               if (!widget.focusMode)
                 IconButton(
@@ -2054,6 +2173,7 @@ ${jsonEncode({
                           widget.focusMode
                               ? ActivityFocusControls(
                                 controller: widget.controller,
+                                companionId: companionId,
                                 flushInput: flushFocusInput,
                                 compact:
                                     MediaQuery.viewInsetsOf(context).bottom > 0,
@@ -2195,8 +2315,7 @@ ${jsonEncode({
                                   ],
                                 ),
                               ),
-                            if (transcript.isEmpty &&
-                                widget.controller.focus == null)
+                            if (transcript.isEmpty && companionFocus == null)
                               Padding(
                                 padding: EdgeInsets.all(16),
                                 child: Text(
@@ -2223,7 +2342,7 @@ ${jsonEncode({
                               ),
                             if (proposal != null &&
                                 aiReady &&
-                                widget.controller.focus == null)
+                                companionFocus == null)
                               Card(
                                 child: Padding(
                                   padding: const EdgeInsets.all(12),
@@ -2353,7 +2472,7 @@ ${jsonEncode({
                           enabled:
                               (!busy ||
                                   (widget.focusMode &&
-                                      widget.controller.focus != null)) &&
+                                      companionFocus != null)) &&
                               (aiReady || canRecord),
                           readOnly: listening || voiceStarting,
                           minLines: 1,
@@ -2403,6 +2522,7 @@ ${jsonEncode({
                 if (widget.focusMode)
                   ActivityFocusControls(
                     controller: widget.controller,
+                    companionId: companionId,
                     flushInput: flushFocusInput,
                     aiReady: aiReady,
                     hideStart: chatInUse,
@@ -2415,7 +2535,13 @@ ${jsonEncode({
                     dense: true,
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16),
                     title: const Text('Avisos de actividad y descanso'),
-                    value: notifications.enabled,
+                    subtitle:
+                        notifications.enabled && !notifications.granted
+                            ? const Text(
+                              'Android bloquea los avisos; toca para conceder el permiso',
+                            )
+                            : null,
+                    value: notifications.enabled && notifications.granted,
                     onChanged: notifications.busy ? null : notifications.toggle,
                   ),
                 if (notifications.error != null)

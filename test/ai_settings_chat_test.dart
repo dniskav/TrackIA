@@ -16,6 +16,8 @@ import 'package:gymia/data/sheet_context_store.dart';
 import 'package:gymia/data/profile_store.dart';
 import 'package:gymia/domain/user_profile.dart';
 import 'package:gymia/domain/ai_config.dart';
+import 'package:gymia/domain/companion.dart';
+import 'package:gymia/domain/activity.dart';
 import 'package:gymia/application/workout_controller.dart';
 import 'package:gymia/data/sqlite_workout_repository.dart';
 import 'package:gymia/ui/assistant_chat.dart';
@@ -341,6 +343,8 @@ void main() {
       RepaintBoundary(key: capture, child: GymApp(controller: controller)),
     );
     await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('companion-gymbro')));
+    await tester.pumpAndSettle();
     expect(find.byKey(const Key('assistant-talk')), findsOneWidget);
     expect(tester.takeException(), isNull);
     if (const bool.fromEnvironment('GYMIA_CAPTURE')) {
@@ -405,6 +409,8 @@ void main() {
     'fresh home disables assistant and training but keeps data access',
     (tester) async {
       await tester.pumpWidget(GymApp(controller: controller));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('companion-gymbro')));
       await tester.pumpAndSettle();
       expect(find.text('Hablar con el asistente'), findsNothing);
       expect(
@@ -513,7 +519,9 @@ void main() {
 
       await open();
       expect(
-        find.text('¿Qué te gustaría hacer hoy? Cuéntame y lo organizamos juntos.'),
+        find.text(
+          '¿Qué te gustaría hacer hoy? Cuéntame y lo organizamos juntos.',
+        ),
         findsOneWidget,
       );
       await tester.enterText(find.byType(TextField), 'Hola');
@@ -531,6 +539,149 @@ void main() {
       expect(await tester.runAsync(() => repo.load()), isEmpty);
     },
   );
+
+  testWidgets('companion prompt reaches the model and chats stay separate', (
+    tester,
+  ) async {
+    await const AiSettingsStore().save(config);
+    await const AiSettingsStore().markVerified(config);
+    final contexts = <String>[];
+    final client = AiClient(
+      transport: (_, __, body) async {
+        contexts.add((body['messages'] as List).first['content'] as String);
+        return {
+          'choices': [
+            {
+              'message': {'content': 'Vamos paso a paso.'},
+            },
+          ],
+        };
+      },
+    );
+    Future<void> open(Companion companion) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: AssistantChatScreen(
+            controller: controller,
+            companion: companion,
+            client: client,
+            availability: AiAvailability(
+              catalog: AiModelCatalog(
+                transport:
+                    (_, __) async => {
+                      'data': [
+                        {'id': 'test-model'},
+                      ],
+                    },
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    final focus = Companion.suggestions
+        .firstWhere((p) => p.id == 'enfoque')
+        .copyWith(prompt: 'Usa bloques de veinte minutos.');
+    await open(focus);
+    await tester.enterText(
+      find.byKey(const Key('assistant-input')),
+      'Mi tarea',
+    );
+    await tester.tap(find.byTooltip('Enviar'));
+    await tester.pumpAndSettle();
+    expect(contexts.single, contains('Usa bloques de veinte minutos.'));
+    expect(find.text('Mi tarea'), findsWidgets);
+
+    await tester.pumpWidget(const SizedBox());
+    await open(Companion.suggestions.firstWhere((p) => p.id == 'calma'));
+    expect(find.text('Mi tarea'), findsNothing);
+    expect(find.text('Vamos paso a paso.'), findsNothing);
+  });
+
+  testWidgets('Enfoque does not show or send GymBro activity notes', (
+    tester,
+  ) async {
+    await tester.runAsync(() async {
+      final gymActivity = await repo.prepareActivity(
+        ActivityDefinition(name: 'Press de pecho'),
+      );
+      await repo.recordActivityMessage(gymActivity, 'GIMNASIO_SECRETO');
+      await controller.refresh();
+    });
+    await const AiSettingsStore().save(config);
+    await const AiSettingsStore().markVerified(config);
+    final contexts = <String>[];
+    final client = AiClient(
+      transport: (_, __, body) async {
+        contexts.add((body['messages'] as List).first['content'] as String);
+        return {
+          'choices': [
+            {
+              'message': {'content': 'Preparemos un pomodoro.'},
+            },
+          ],
+        };
+      },
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: AssistantChatScreen(
+          controller: controller,
+          companion: Companion.suggestions.firstWhere((p) => p.id == 'enfoque'),
+          focusMode: true,
+          client: client,
+          availability: AiAvailability(
+            catalog: AiModelCatalog(
+              transport:
+                  (_, __) async => {
+                    'data': [
+                      {'id': 'test-model'},
+                    ],
+                  },
+            ),
+          ),
+        ),
+      ),
+    );
+    for (
+      var i = 0;
+      i < 10 && find.text('Otro acompañante activo').evaluate().isEmpty;
+      i++
+    ) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    expect(find.text('GIMNASIO_SECRETO'), findsNothing);
+    expect(find.text('Otro acompañante activo'), findsOneWidget);
+    final sendButton =
+        find
+            .ancestor(
+              of: find.byTooltip('Enviar'),
+              matching: find.byType(IconButton),
+            )
+            .first;
+    for (var i = 0; i < 20; i++) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 50)),
+      );
+      await tester.pump();
+      if (tester.widget<IconButton>(sendButton).onPressed != null) {
+        break;
+      }
+    }
+    expect(tester.widget<IconButton>(sendButton).onPressed, isNotNull);
+    await tester.enterText(
+      find.byKey(const Key('assistant-input')),
+      'Pomodoro',
+    );
+    await tester.tap(find.byTooltip('Enviar'));
+    for (var i = 0; i < 20 && contexts.isEmpty; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+    expect(contexts.single, isNot(contains('GIMNASIO_SECRETO')));
+    expect(contexts.single, isNot(contains('Press de pecho')));
+  });
 
   testWidgets('missing configuration does not invoke API and keeps draft', (
     tester,

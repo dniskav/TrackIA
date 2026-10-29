@@ -12,6 +12,8 @@ import 'routines.dart';
 import 'rest_timer_panel.dart';
 import 'data_transfer.dart';
 import 'assistant_chat.dart';
+import 'companions.dart';
+import '../domain/companion.dart';
 import 'session_control.dart';
 export 'theme.dart' show gymTheme;
 
@@ -47,6 +49,7 @@ class _GymRootState extends State<GymRoot> {
   static const _importChannel = MethodChannel('com.gymia.app/import');
   bool takingImport = false;
   bool showingWelcome = false;
+  String? activeCompanionId;
 
   @override
   void initState() {
@@ -80,6 +83,9 @@ class _GymRootState extends State<GymRoot> {
       ).push(MaterialPageRoute<void>(builder: (_) => const WelcomeScreen()));
       showingWelcome = false;
     });
+    // The dashboard does not rebuild when an activity ends. Request a frame
+    // so the deferred route opens even if nothing else changes visually.
+    WidgetsBinding.instance.scheduleFrame();
   }
 
   Future<void> _takeIncomingImport() async {
@@ -103,6 +109,7 @@ class _GymRootState extends State<GymRoot> {
           widget.controller,
           bytes,
           name: file['name'] as String? ?? 'Hoja cargada',
+          companionId: activeCompanionId ?? 'gymbro',
         );
       }
     } on MissingPluginException {
@@ -134,26 +141,49 @@ class _GymRootState extends State<GymRoot> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) => AssistantChatScreen(
-    controller: widget.controller,
-    focusMode: true,
-    onTraining:
-        () => Navigator.of(context).push(
+  void openCompanion(Companion companion) {
+    activeCompanionId = companion.id;
+    Navigator.of(context)
+        .push(
           MaterialPageRoute<void>(
             builder:
-                (_) => GymHome(
+                (_) => AssistantChatScreen(
+                  key: ValueKey(companion.id),
                   controller: widget.controller,
-                  onAssistant: () => Navigator.of(context).pop(),
+                  companion: companion,
+                  focusMode: true,
+                  onTraining:
+                      () => Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder:
+                              (_) => GymHome(
+                                controller: widget.controller,
+                                onAssistant: () => Navigator.of(context).pop(),
+                              ),
+                        ),
+                      ),
+                  onData:
+                      () => Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder:
+                              (_) => DataTransferScreen(
+                                controller: widget.controller,
+                                companionId: companion.id,
+                              ),
+                        ),
+                      ),
                 ),
           ),
-        ),
-    onData:
-        () => Navigator.of(context).push(
-          MaterialPageRoute<void>(
-            builder: (_) => DataTransferScreen(controller: widget.controller),
-          ),
-        ),
+        )
+        .then((_) {
+          activeCompanionId = null;
+        });
+  }
+
+  @override
+  Widget build(BuildContext context) => CompanionDashboard(
+    profileId: widget.controller.profileId,
+    onOpen: openCompanion,
   );
 }
 

@@ -55,7 +55,7 @@ void main() {
   );
 
   test(
-    'catalog reconnects verified model; offline and removed model disable it without paid polling',
+    'a verified model remains usable when the model catalog is unavailable',
     () async {
       await store.save(config);
       await store.markVerified(config);
@@ -83,15 +83,17 @@ void main() {
       expect(status.ready, isTrue);
       offline = true;
       await status.check();
-      expect(status.ready, isFalse);
+      expect(status.ready, isTrue);
       offline = false;
       present = false;
       await status.check();
-      expect(status.status, AiAvailabilityStatus.unverified);
+      expect(status.ready, isTrue);
       present = true;
       await status.check();
       expect(status.ready, isTrue);
       expect(inference, 0);
+      status.failed();
+      expect(status.ready, isTrue);
     },
   );
 

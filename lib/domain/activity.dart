@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'space.dart';
 import 'workout.dart';
 
 class ActivityDefinition {
@@ -7,16 +8,28 @@ class ActivityDefinition {
     required String name,
     this.repeated = true,
     this.restSeconds = 90,
+    this.activitySeconds,
+    this.targetSets,
+    this.targetCycles,
+    this.completedCycles = 0,
     List<Map<String, String>> fields = const [],
     this.instructions = '',
     this.origin = 'user',
+    String companionId = 'gymbro',
   }) : name = validName(name),
+       companionId = validTrackiaId(companionId),
        fields = List.unmodifiable(
          fields.map((f) => Map<String, String>.unmodifiable(f)),
        ) {
     validName(name);
     if (restSeconds < 0 ||
         restSeconds > 1800 ||
+        (activitySeconds != null &&
+            (activitySeconds! < 1 || activitySeconds! > 86400)) ||
+        (targetSets != null && (targetSets! < 1 || targetSets! > 100)) ||
+        (targetCycles != null && (targetCycles! < 1 || targetCycles! > 100)) ||
+        completedCycles < 0 ||
+        completedCycles > 999 ||
         fields.length > 12 ||
         instructions.length > 3000 ||
         fields.map((f) => f['key']).toSet().length != fields.length) {
@@ -35,30 +48,47 @@ class ActivityDefinition {
       }
     }
   }
-  final String name, instructions, origin;
+  final String name, instructions, origin, companionId;
   final bool repeated;
   final int restSeconds;
+  final int? activitySeconds;
+  final int? targetSets;
+  final int? targetCycles;
+  final int completedCycles;
   final List<Map<String, String>> fields;
   Map<String, dynamic> toJson() => {
     'name': name,
     'repeated': repeated,
     'restSeconds': restSeconds,
+    if (activitySeconds != null) 'activitySeconds': activitySeconds,
+    if (targetSets != null) 'targetSets': targetSets,
+    if (targetCycles != null) 'targetCycles': targetCycles,
+    'completedCycles': completedCycles,
     'fields': fields,
     'instructions': instructions,
     'origin': origin,
+    'companionId': companionId,
   };
   factory ActivityDefinition.fromJson(Map<String, dynamic> value) =>
       ActivityDefinition(
         name: value['name'] as String,
         repeated: value['repeated'] as bool,
         restSeconds: value['restSeconds'] as int,
+        activitySeconds: value['activitySeconds'] as int?,
+        targetSets: value['targetSets'] as int?,
+        targetCycles: value['targetCycles'] as int?,
+        completedCycles: value['completedCycles'] as int? ?? 0,
         fields:
             (value['fields'] as List)
                 .map((f) => Map<String, String>.from(f as Map))
                 .toList(),
         instructions: value['instructions'] as String? ?? '',
         origin: value['origin'] as String? ?? 'user',
+        companionId: value['companionId'] as String? ?? 'gymbro',
       );
+
+  ActivityDefinition forCompanion(String id) =>
+      ActivityDefinition.fromJson({...toJson(), 'companionId': id});
 
   static ActivityDefinition? proposal(String response) {
     final matches =
@@ -72,6 +102,9 @@ class ActivityDefinition {
         'name',
         'repeated',
         'restSeconds',
+        'activitySeconds',
+        'targetSets',
+        'targetCycles',
         'fields',
         'instructions',
       }).isNotEmpty) {
@@ -81,6 +114,38 @@ class ActivityDefinition {
     } catch (_) {
       return null;
     }
+  }
+}
+
+Map<String, int>? activityTimingProposal(String response) {
+  final matches =
+      RegExp(
+        r'```gymia-timing\s*\n([\s\S]*?)```',
+      ).allMatches(response).toList();
+  if (matches.length != 1) return null;
+  try {
+    final value = jsonDecode(matches.single.group(1)!) as Map<String, dynamic>;
+    final keys = value.keys.toSet();
+    if (keys.isEmpty ||
+        keys.difference({
+          'activitySeconds',
+          'restSeconds',
+          'targetCycles',
+        }).isNotEmpty ||
+        value.values.any((v) => v is! int)) {
+      return null;
+    }
+    final activity = value['activitySeconds'] as int?;
+    final rest = value['restSeconds'] as int?;
+    final cycles = value['targetCycles'] as int?;
+    if ((activity != null && (activity < 1 || activity > 86400)) ||
+        (rest != null && (rest < 0 || rest > 1800)) ||
+        (cycles != null && (cycles < 1 || cycles > 100))) {
+      return null;
+    }
+    return value.cast<String, int>();
+  } catch (_) {
+    return null;
   }
 }
 
@@ -290,9 +355,16 @@ abstract interface class ActivityRepository {
     bool acceptConflicts = false,
   });
   Future<void> setActivityRest(String activityId, int seconds);
+  Future<void> setActivityTiming(
+    String activityId, {
+    required int? activitySeconds,
+    required int restSeconds,
+    required int? targetCycles,
+  });
   Future<ActivityMedia?> loadActivityMedia(String messageId);
   Future<void> cancelActivityPreparation(String activityId);
   Future<void> renameActivity(String activityId, String name);
+  Future<void> changeCompletedCycles(String activityId, int delta);
   Future<void> replaceActivityPreparation(
     String activityId,
     ActivityDefinition definition, {

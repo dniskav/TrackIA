@@ -5,44 +5,61 @@ import 'workout.dart';
 /// A closed, original local snapshot. Chat summaries are never an export source.
 Map<String, dynamic> sheetWorkoutSource(
   Workout workout,
-  List<FocusActivity> all,
-) => {
-  'id': workout.id,
-  'name': workout.name,
-  'startedAt': workout.startedAt.toIso8601String(),
-  'finishedAt': workout.finishedAt?.toIso8601String(),
-  'finishTimeIssues': workout.finishTimeIssues,
-  'exercises': [
-    for (final e in workout.exercises)
-      {
-        'id': e.id,
-        'name': e.name,
-        'sets': [
-          for (final s in e.sets)
-            {
-              'id': s.id,
-              'kg': s.weight / 100,
-              'reps': s.reps,
-              'recordedAt': s.recordedAt?.toIso8601String(),
-            },
-        ],
-      },
-  ],
-  'activities': [
-    for (final a in all.where(
-      (a) =>
-          a.workoutId == workout.id && !a.finishIssues.contains('not_started'),
-    ))
-      {
-        ...a.toJson(),
-        'exerciseId': a.exerciseId,
-        'draft': a.draft,
-        'messages': [
-          for (final m in a.messages.where((m) => m.role == 'user')) m.toJson(),
-        ],
-      },
-  ],
-};
+  List<FocusActivity> all, {
+  String companionId = 'gymbro',
+}) {
+  final activities =
+      all
+          .where(
+            (a) =>
+                a.workoutId == workout.id &&
+                a.definition.companionId == companionId &&
+                !a.finishIssues.contains('not_started'),
+          )
+          .toList()
+        ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+  final own = companionId != 'gymbro' && activities.isNotEmpty;
+  return {
+    'id': workout.id,
+    'name': own ? activities.first.definition.name : workout.name,
+    'startedAt':
+        (own ? activities.first.createdAt : workout.startedAt)
+            .toIso8601String(),
+    'finishedAt':
+        (own ? activities.last.finishedAt : workout.finishedAt)
+            ?.toIso8601String(),
+    'finishTimeIssues': own ? <String>[] : workout.finishTimeIssues,
+    'exercises': [
+      for (final e
+          in companionId == 'gymbro' ? workout.exercises : <Exercise>[])
+        {
+          'id': e.id,
+          'name': e.name,
+          'sets': [
+            for (final s in e.sets)
+              {
+                'id': s.id,
+                'kg': s.weight / 100,
+                'reps': s.reps,
+                'recordedAt': s.recordedAt?.toIso8601String(),
+              },
+          ],
+        },
+    ],
+    'activities': [
+      for (final a in activities)
+        {
+          ...a.toJson(),
+          'exerciseId': a.exerciseId,
+          'draft': a.draft,
+          'messages': [
+            for (final m in a.messages.where((m) => m.role == 'user'))
+              m.toJson(),
+          ],
+        },
+    ],
+  };
+}
 
 class SheetCellWrite {
   const SheetCellWrite(this.row, this.column, this.value);

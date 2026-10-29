@@ -1,24 +1,31 @@
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:uuid/uuid.dart';
-import '../domain/user_profile.dart';
 import '../domain/workout.dart';
+import 'companion_store.dart';
 
 /// Immutable archive first, then one atomic active-chat/index replacement.
 /// If either write fails the active conversation is retained and can be retried.
 class ChatArchiveStore {
   const ChatArchiveStore({
     required this.profileId,
+    this.companionId = 'gymbro',
     this.storage = const FlutterSecureStorage(),
   });
   final String profileId;
+  final String companionId;
   final FlutterSecureStorage storage;
-  String get activeKey => profileStorageKey('gymia.ai.chat.v1', profileId);
+  String get activeKey =>
+      companionStorageKey('gymia.ai.chat.v1', profileId, companionId);
   String _archiveKey(String id) {
     if (!RegExp(r'^[A-Za-z0-9_-]{1,128}$').hasMatch(id)) {
       throw const FormatException('Archivo no válido.');
     }
-    return profileStorageKey('gymia.ai.archive.v1.$id', profileId);
+    return companionStorageKey(
+      'gymia.ai.archive.v1.$id',
+      profileId,
+      companionId,
+    );
   }
 
   Future<Map<String, dynamic>?> active() async {

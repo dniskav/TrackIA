@@ -19,8 +19,9 @@ import 'package:uuid/uuid.dart';
 
 Future<void> pickSheetForChat(
   BuildContext context,
-  WorkoutController controller,
-) async {
+  WorkoutController controller, {
+  String companionId = 'gymbro',
+}) async {
   try {
     if (defaultTargetPlatform == TargetPlatform.android) {
       final file = await const MethodChannel(
@@ -36,6 +37,7 @@ Future<void> pickSheetForChat(
         controller,
         bytes,
         name: file['name'] as String? ?? 'Hoja cargada',
+        companionId: companionId,
       );
     } else {
       final result = await FilePicker.platform.pickFiles(
@@ -50,7 +52,13 @@ Future<void> pickSheetForChat(
       }
       final bytes = file.bytes ?? await File(file.path!).readAsBytes();
       if (context.mounted) {
-        await openImportDocument(context, controller, bytes, name: file.name);
+        await openImportDocument(
+          context,
+          controller,
+          bytes,
+          name: file.name,
+          companionId: companionId,
+        );
       }
     }
   } catch (e) {
@@ -73,6 +81,7 @@ Future<void> openImportDocument(
   WorkoutController controller,
   Uint8List bytes, {
   String name = 'Hoja cargada',
+  String companionId = 'gymbro',
 }) async {
   final tabs = SheetDocument.decodeCells(bytes);
   var selected = tabs.keys.first;
@@ -109,7 +118,10 @@ Future<void> openImportDocument(
     ),
   );
   if (confirmed == true) {
-    await SheetContextStore(profileId: controller.profileId).save(sheet);
+    await SheetContextStore(
+      profileId: controller.profileId,
+      companionId: companionId,
+    ).save(sheet);
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -121,8 +133,13 @@ Future<void> openImportDocument(
 }
 
 class DataTransferScreen extends StatefulWidget {
-  const DataTransferScreen({super.key, required this.controller});
+  const DataTransferScreen({
+    super.key,
+    required this.controller,
+    this.companionId = 'gymbro',
+  });
   final WorkoutController controller;
+  final String companionId;
   @override
   State<DataTransferScreen> createState() => _DataTransferScreenState();
 }
@@ -238,6 +255,7 @@ class _DataTransferScreenState extends State<DataTransferScreen> {
         widget.controller,
         bytes,
         name: file['name'] as String? ?? 'Hoja cargada',
+        companionId: widget.companionId,
       );
       return;
     }
@@ -262,6 +280,7 @@ class _DataTransferScreenState extends State<DataTransferScreen> {
       widget.controller,
       bytes,
       name: file.name,
+      companionId: widget.companionId,
     );
   });
 
@@ -281,6 +300,7 @@ class _DataTransferScreenState extends State<DataTransferScreen> {
       await run(() async {
         await SheetContextStore(
           profileId: widget.controller.profileId,
+          companionId: widget.companionId,
         ).save(sheet);
         message('Hoja cargada. Pendiente de interpretación por la IA.');
       });

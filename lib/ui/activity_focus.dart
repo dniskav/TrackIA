@@ -14,12 +14,14 @@ class ActivityFocusControls extends StatefulWidget {
     this.compact = false,
     this.aiReady = true,
     this.hideStart = false,
+    this.companionId = 'gymbro',
   });
   final WorkoutController controller;
   final Future<void> Function() flushInput;
   final bool compact;
   final bool aiReady;
   final bool hideStart;
+  final String companionId;
   @override
   State<ActivityFocusControls> createState() => _ActivityFocusControlsState();
 }
@@ -27,14 +29,25 @@ class ActivityFocusControls extends StatefulWidget {
 class _ActivityFocusControlsState extends State<ActivityFocusControls>
     with WidgetsBindingObserver {
   WorkoutController get c => widget.controller;
+  FocusActivity? get focus {
+    final activity = c.focus;
+    return activity?.definition.companionId == widget.companionId
+        ? activity
+        : null;
+  }
+
   late final Timer ticker;
   bool acting = false, foreground = true;
   FocusActivity? get resting {
-    final focus = c.focus;
-    if (focus?.running != null) return null;
-    if (focus?.restEndsAt != null) return focus;
+    final current = focus;
+    if (current?.running != null) return null;
+    if (current?.restEndsAt != null) return current;
     return c.activities
-        .where((a) => a.restEndsAt?.isAfter(c.now()) ?? false)
+        .where(
+          (a) =>
+              a.definition.companionId == widget.companionId &&
+              (a.restEndsAt?.isAfter(c.now()) ?? false),
+        )
         .firstOrNull;
   }
 
@@ -59,9 +72,9 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
   }
 
   Future<void> act() async {
-    final a = c.focus;
+    final a = focus;
     if (a == null || acting || c.busy) return;
-    if (a.running == null && (!widget.aiReady || widget.hideStart)) return;
+    if (a.running == null && widget.hideStart) return;
     setState(() => acting = true);
     try {
       if (a.running != null) {
@@ -69,7 +82,7 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
         await flush();
       } else {
         if (!await flush()) return;
-        if (c.focus?.id == a.id) {
+        if (focus?.id == a.id) {
           await c.run(() => c.activityRepository!.startInterval(a.id));
         }
       }
@@ -97,7 +110,7 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
   }
 
   Future<void> finish() async {
-    final a = c.focus;
+    final a = focus;
     if (a == null || a.running != null || acting) return;
     setState(() => acting = true);
     try {
@@ -107,7 +120,7 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
         context: context,
         builder: (_) => ActivityEndDialog(initial: c.now()),
       );
-      if (end == null || !mounted || c.focus?.id != a.id) return;
+      if (end == null || !mounted || focus?.id != a.id) return;
       final conflict =
           end.isBefore(a.createdAt) ||
           end.isAfter(c.now()) ||
@@ -151,7 +164,6 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
   }
 
   Future<void> choose() async {
-    if (!widget.aiReady) return;
     if (!await flush()) return;
     if (!mounted) return;
     final choice = await showModalBottomSheet<ActivityChoice>(
@@ -162,7 +174,7 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
     if (choice != null) {
       await c.run(() async {
         await c.activityRepository!.prepareActivity(
-          choice.definition,
+          choice.definition.forCompanion(widget.companionId),
           exerciseId: choice.exerciseId,
         );
       });
@@ -170,37 +182,37 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
   }
 
   Future<void> changePreparation() async {
-    final a = c.focus;
+    final a = focus;
     if (a == null || a.intervals.isNotEmpty || !await flush()) return;
-    if (!mounted || !widget.aiReady) return;
+    if (!mounted) return;
     final choice = await showModalBottomSheet<ActivityChoice>(
       context: context,
       isScrollControlled: true,
       builder: (_) => ActivityChooser(controller: c),
     );
-    if (choice == null || c.focus?.id != a.id) return;
+    if (choice == null || focus?.id != a.id) return;
     await c.run(
       () => c.activityRepository!.replaceActivityPreparation(
         a.id,
-        choice.definition,
+        choice.definition.forCompanion(widget.companionId),
         exerciseId: choice.exerciseId,
       ),
     );
   }
 
   Future<void> rename() async {
-    final a = c.focus;
+    final a = focus;
     if (a == null || acting || c.busy) return;
     final name = await showDialog<String>(
       context: context,
       builder: (_) => ActivityNameDialog(initial: a.definition.name),
     );
-    if (name == null || c.focus?.id != a.id) return;
+    if (name == null || focus?.id != a.id) return;
     await c.run(() => c.activityRepository!.renameActivity(a.id, name));
   }
 
   Future<void> rest() async {
-    final a = resting ?? c.focus;
+    final a = resting ?? focus;
     if (a == null) return;
     final value = await showDialog<int>(
       context: context,
@@ -211,10 +223,21 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
     }
   }
 
+  Future<void> changeCycle(int delta) async {
+    final a = focus;
+    if (a == null || a.definition.targetCycles == null || acting || c.busy) {
+      return;
+    }
+    await c.run(() => c.activityRepository!.changeCompletedCycles(a.id, delta));
+  }
+
   Future<void> closeDay() async {
     if (!await flush()) return;
     final workout = c.active;
-    if (mounted && workout != null && c.focus == null) {
+    if (mounted &&
+        workout != null &&
+        c.focus == null &&
+        widget.companionId == 'gymbro') {
       await finishSession(context, c, workout, title: 'Finalizar día');
     }
   }
@@ -223,11 +246,16 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
   Widget build(BuildContext context) => ListenableBuilder(
     listenable: c,
     builder: (context, _) {
-      final a = c.focus;
+      final a = focus;
+      final blockedByOther = c.focus != null && a == null;
       final running = a?.running;
       final compact = widget.compact;
       final enabled =
-          c.loaded && !c.busy && !acting && c.activityRepository != null;
+          c.loaded &&
+          !c.busy &&
+          !acting &&
+          !blockedByOther &&
+          c.activityRepository != null;
       final restOwner = resting;
       final remaining =
           restOwner?.restEndsAt?.difference(c.now()).inSeconds.clamp(0, 1800) ??
@@ -249,7 +277,10 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
                         children: [
                           Expanded(
                             child: Text(
-                              a?.definition.name ?? 'Sin actividad',
+                              a?.definition.name ??
+                                  (blockedByOther
+                                      ? 'Otro acompañante activo'
+                                      : 'Sin actividad'),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
@@ -278,24 +309,38 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
                   key: const Key('change-activity'),
                   tooltip: 'Elegir otra actividad',
                   onPressed:
-                      enabled &&
-                              widget.aiReady &&
-                              a != null &&
-                              a.intervals.isEmpty
+                      enabled && a != null && a.intervals.isEmpty
                           ? changePreparation
                           : null,
                   icon: const Icon(Icons.swap_horiz),
                 ),
-                TextButton(
-                  key: const Key('finish-activity'),
-                  onPressed:
-                      enabled &&
-                              running == null &&
-                              a != null &&
-                              a.intervals.isNotEmpty
-                          ? finish
-                          : null,
-                  child: const Text('Terminar'),
+                SizedBox(
+                  width: 150,
+                  child: TextButton(
+                    key: const Key('finish-activity'),
+                    onPressed:
+                        a == null &&
+                                c.active != null &&
+                                c.focus == null &&
+                                widget.companionId == 'gymbro'
+                            ? (enabled ? closeDay : null)
+                            : enabled &&
+                                running == null &&
+                                a != null &&
+                                a.intervals.isNotEmpty
+                            ? finish
+                            : null,
+                    child: Text(
+                      a == null &&
+                              c.active != null &&
+                              c.focus == null &&
+                              widget.companionId == 'gymbro'
+                          ? 'Finalizar día'
+                          : 'Terminar',
+                      maxLines: 1,
+                      softWrap: false,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -304,13 +349,17 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
                 Expanded(
                   child: Text(
                     a == null
-                        ? 'Esperando actividad'
+                        ? blockedByOther
+                            ? 'Termina la otra actividad para iniciar aquí'
+                            : 'Esperando actividad'
                         : running != null
                         ? a.definition.repeated
-                            ? 'Serie ${a.intervals.length}'
+                            ? '${a.definition.companionId == 'gymbro' ? 'Serie' : 'Tramo'} ${a.intervals.length}${a.definition.targetSets == null ? '' : ' de ${a.definition.targetSets}'}'
                             : 'En marcha'
                         : a.intervals.isEmpty
                         ? 'Listo'
+                        : a.definition.repeated
+                        ? '${a.intervals.where((i) => i.endedAt != null).length}${a.definition.targetSets == null ? '' : '/${a.definition.targetSets}'} ${a.definition.companionId == 'gymbro' ? 'series' : 'tramos'} · Descanso'
                         : 'Descanso',
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -320,11 +369,18 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
                 if (running != null)
                   Text(
                     _clock(
-                      c
-                          .now()
-                          .difference(running.startedAt)
-                          .inSeconds
-                          .clamp(0, 8640000),
+                      a!.definition.activitySeconds == null
+                          ? c
+                              .now()
+                              .difference(running.startedAt)
+                              .inSeconds
+                              .clamp(0, 8640000)
+                          : (a.definition.activitySeconds! -
+                                  c
+                                      .now()
+                                      .difference(running.startedAt)
+                                      .inSeconds)
+                              .clamp(0, a.definition.activitySeconds!),
                     ),
                     key: const Key('activity-clock'),
                     style: const TextStyle(
@@ -349,6 +405,34 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
                   ),
               ],
             ),
+            if (a?.definition.targetCycles != null)
+              Row(
+                children: [
+                  Text(
+                    'Ciclos ${a!.definition.completedCycles}/${a.definition.targetCycles}',
+                    key: const Key('cycle-count'),
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    key: const Key('cycle-decrement'),
+                    tooltip: 'Restar ciclo',
+                    onPressed:
+                        enabled && a.definition.completedCycles > 0
+                            ? () => changeCycle(-1)
+                            : null,
+                    icon: const Icon(Icons.remove_circle_outline),
+                  ),
+                  IconButton(
+                    key: const Key('cycle-increment'),
+                    tooltip: 'Añadir ciclo completado',
+                    onPressed:
+                        enabled && a.definition.completedCycles < 999
+                            ? () => changeCycle(1)
+                            : null,
+                    icon: const Icon(Icons.add_circle_outline),
+                  ),
+                ],
+              ),
             if (!widget.hideStart || running != null)
               if (compact)
                 SizedBox(
@@ -358,7 +442,7 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
                     onPressed:
                         enabled &&
                                 a != null &&
-                                (running != null || widget.aiReady)
+                                (running != null || !widget.hideStart)
                             ? act
                             : null,
                     icon: Icon(running == null ? Icons.play_arrow : Icons.stop),
@@ -379,7 +463,7 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
                       onPressed:
                           enabled &&
                                   a != null &&
-                                  (running != null || widget.aiReady)
+                                  (running != null || !widget.hideStart)
                               ? act
                               : null,
                       child:
@@ -472,10 +556,12 @@ class _ActivityNameDialogState extends State<ActivityNameDialog> {
 ActivityDefinition _legacyStrength(
   String name,
   int restSeconds, {
+  int? targetSets,
   String instructions = '',
 }) => ActivityDefinition(
   name: name,
   restSeconds: restSeconds,
+  targetSets: targetSets,
   instructions: instructions,
   fields: const [
     {'key': 'weight_kg', 'label': 'Peso', 'unit': 'kg'},
@@ -563,7 +649,16 @@ class ActivityChooser extends StatelessWidget {
                     ListTile(
                       title: Text(d.name),
                       subtitle: const Text('Volver a hacer'),
-                      onTap: () => Navigator.pop(context, ActivityChoice(d)),
+                      onTap:
+                          () => Navigator.pop(
+                            context,
+                            ActivityChoice(
+                              ActivityDefinition.fromJson({
+                                ...d.toJson(),
+                                'completedCycles': 0,
+                              }),
+                            ),
+                          ),
                     ),
                   for (final routine in controller.routines)
                     for (final e in routine.exercises)
@@ -579,6 +674,7 @@ class ActivityChooser extends StatelessWidget {
                                 _legacyStrength(
                                   e.name,
                                   e.restSeconds,
+                                  targetSets: e.targetSets,
                                   instructions:
                                       'De la rutina ${routine.name}: ${e.targetSets} series, ${e.repsMin}–${e.repsMax} repeticiones previstas. No son resultados realizados.',
                                 ),
@@ -617,12 +713,18 @@ class NewActivityDialog extends StatefulWidget {
 class _NewActivityDialogState extends State<NewActivityDialog> {
   final name = TextEditingController();
   final seconds = TextEditingController(text: '90');
+  final activityMinutes = TextEditingController();
+  final targetSets = TextEditingController();
+  final targetCycles = TextEditingController();
   bool repeated = true;
   String? error;
   @override
   void dispose() {
     name.dispose();
     seconds.dispose();
+    activityMinutes.dispose();
+    targetSets.dispose();
+    targetCycles.dispose();
     super.dispose();
   }
 
@@ -646,9 +748,33 @@ class _NewActivityDialogState extends State<NewActivityDialog> {
             onChanged: (v) => setState(() => repeated = v),
           ),
           TextField(
+            key: const Key('activity-duration-minutes'),
+            controller: activityMinutes,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              labelText: 'Duración de cada tramo (minutos, opcional)',
+            ),
+          ),
+          TextField(
             controller: seconds,
             keyboardType: TextInputType.number,
             decoration: const InputDecoration(labelText: 'Descanso (segundos)'),
+          ),
+          TextField(
+            key: const Key('activity-target-sets'),
+            controller: targetSets,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              labelText: 'Series previstas (opcional)',
+            ),
+          ),
+          TextField(
+            key: const Key('activity-target-cycles'),
+            controller: targetCycles,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              labelText: 'Ciclos previstos (opcional)',
+            ),
           ),
           if (error != null) Text(error!),
         ],
@@ -668,6 +794,19 @@ class _NewActivityDialogState extends State<NewActivityDialog> {
                 name: name.text.trim(),
                 repeated: repeated,
                 restSeconds: int.tryParse(seconds.text) ?? -1,
+                activitySeconds:
+                    activityMinutes.text.trim().isEmpty
+                        ? null
+                        : (int.tryParse(activityMinutes.text.trim()) ?? -1) *
+                            60,
+                targetSets:
+                    targetSets.text.trim().isEmpty
+                        ? null
+                        : int.tryParse(targetSets.text.trim()) ?? -1,
+                targetCycles:
+                    targetCycles.text.trim().isEmpty
+                        ? null
+                        : int.tryParse(targetCycles.text.trim()) ?? -1,
               ),
             );
           } on ValidationException catch (e) {

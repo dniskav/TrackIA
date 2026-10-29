@@ -10,6 +10,12 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.Typeface
 import android.os.Build
 import android.os.SystemClock
 import java.util.UUID
@@ -26,14 +32,47 @@ object RestNotifications {
     private const val resultRequestId = 8409
     private const val runningRequestId = 8410
     private const val stopRequestId = 8411
+    private const val activityAlarmRequestId = 8412
+    private const val activityCloseRequestId = 8413
     const val startAction = "com.gymia.app.START_REST_ACTIVITY"
     const val stopAction = "com.gymia.app.STOP_RUNNING_ACTIVITY"
     const val closeAction = "com.gymia.app.CLOSE_REST_NOTICE"
+    private val brandTeal = Color.rgb(0, 109, 126)
+    private val brandOrange = Color.rgb(255, 106, 26)
+    private fun brandIcon(): Bitmap {
+        val bitmap = Bitmap.createBitmap(192, 192, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        paint.color = brandTeal
+        canvas.drawCircle(96f, 96f, 92f, paint)
+        paint.color = brandOrange
+        val accent = Path().apply {
+            moveTo(132f, 25f)
+            lineTo(165f, 25f)
+            lineTo(165f, 58f)
+            lineTo(155f, 48f)
+            lineTo(143f, 60f)
+            lineTo(130f, 47f)
+            lineTo(142f, 35f)
+            close()
+        }
+        canvas.drawPath(accent, paint)
+        paint.color = Color.WHITE
+        paint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+        paint.textSize = 31f
+        paint.textAlign = Paint.Align.CENTER
+        val baseline = 101f - (paint.fontMetrics.ascent + paint.fontMetrics.descent) / 2f
+        canvas.drawText("TrackIA", 96f, baseline, paint)
+        return bitmap
+    }
     fun preferences(context: Context) = context.getSharedPreferences("gymia_rest", Context.MODE_PRIVATE)
+    fun runtimePermissionGranted(context: Context): Boolean =
+        Build.VERSION.SDK_INT < 33 || context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
     fun permitted(context: Context): Boolean {
         val manager = context.getSystemService(NotificationManager::class.java)
-        return (Build.VERSION.SDK_INT < 33 || context.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) &&
-            (Build.VERSION.SDK_INT < 24 || manager.areNotificationsEnabled())
+        return runtimePermissionGranted(context) &&
+            (Build.VERSION.SDK_INT < 24 || manager.areNotificationsEnabled()) &&
+            (Build.VERSION.SDK_INT < 26 || manager.getNotificationChannel(channelId)?.importance != NotificationManager.IMPORTANCE_NONE)
     }
     fun exact(context: Context): Boolean = Build.VERSION.SDK_INT < 31 ||
         context.getSystemService(AlarmManager::class.java).canScheduleExactAlarms()
@@ -41,9 +80,16 @@ object RestNotifications {
         PendingIntent.getBroadcast(context, requestId,
             Intent(context, RestAlarmReceiver::class.java).putExtra("id", id).putExtra("end", end).putExtra("name", name),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+    private fun pendingActivity(context: Context, id: String = "", end: Long = 0, name: String = ""): PendingIntent =
+        PendingIntent.getBroadcast(context, activityAlarmRequestId,
+            Intent(context, RestAlarmReceiver::class.java).putExtra("id", id).putExtra("end", end)
+                .putExtra("name", name).putExtra("kind", "activity"),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     fun cancel(context: Context) {
         context.getSystemService(AlarmManager::class.java).cancel(pending(context))
+        context.getSystemService(AlarmManager::class.java).cancel(pendingActivity(context))
         preferences(context).edit().remove("id").remove("end").remove("profileId").remove("actionNonce")
+            .remove("activityId").remove("activityEnd").remove("activityProfileId")
             .remove("preparedId").remove("preparedRevision").remove("preparedNonce")
             .remove("preparedDismissed").apply()
         preferences(context).edit().remove("runningNonce").remove("runningId").remove("runningRevision").apply()
@@ -86,6 +132,7 @@ object RestNotifications {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val builder = if (Build.VERSION.SDK_INT >= 26) Notification.Builder(context, channelId) else Notification.Builder(context)
         manager.notify(requestId, builder.setSmallIcon(R.drawable.ic_trackia)
+            .setLargeIcon(brandIcon()).setColor(brandTeal)
             .setContentTitle("Descanso terminado")
             .setContentText("$name · puedes comenzar cuando quieras")
             .setContentIntent(open).setAutoCancel(true)
@@ -122,6 +169,7 @@ object RestNotifications {
         val open = PendingIntent.getActivity(context, preparedRequestId, Intent(context, MainActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val builder = if (Build.VERSION.SDK_INT >= 26) Notification.Builder(context, channelId) else Notification.Builder(context)
         manager.notify(preparedRequestId, builder.setSmallIcon(R.drawable.ic_trackia)
+            .setLargeIcon(brandIcon()).setColor(brandTeal)
             .setContentTitle("Actividad lista").setContentText("$name · inicia cuando quieras")
             .setContentIntent(open).setAutoCancel(true)
             .addAction(R.drawable.ic_trackia, "Iniciar", start)
@@ -129,10 +177,14 @@ object RestNotifications {
             .setVisibility(Notification.VISIBILITY_PRIVATE).setDefaults(Notification.DEFAULT_ALL).build())
         return true
     }
-    fun notifyRunning(context: Context, name: String, id: String, revision: Long, profileId: String): Boolean {
+    fun notifyRunning(context: Context, name: String, id: String, revision: Long, profileId: String, end: Long): Boolean {
         if (!preferences(context).getBoolean("enabled", false) || !permitted(context)) return false
         val prefs = preferences(context)
-        if (prefs.getString("runningId", null) == id && prefs.getLong("runningRevision", 0) == revision) return true
+        if (prefs.getString("runningId", null) == id && prefs.getLong("runningRevision", 0) == revision) {
+            scheduleActivityAlarm(context, id, end, name, profileId)
+            return true
+        }
+        cancel(context)
         val manager = context.getSystemService(NotificationManager::class.java)
         if (Build.VERSION.SDK_INT >= 26) {
             manager.createNotificationChannel(NotificationChannel(channelId, "Actividad y descanso", NotificationManager.IMPORTANCE_HIGH))
@@ -149,9 +201,59 @@ object RestNotifications {
         val open = PendingIntent.getActivity(context, runningRequestId, Intent(context, MainActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val builder = if (Build.VERSION.SDK_INT >= 26) Notification.Builder(context, channelId) else Notification.Builder(context)
         manager.notify(runningRequestId, builder.setSmallIcon(R.drawable.ic_trackia)
+            .setLargeIcon(brandIcon()).setColor(brandTeal)
             .setContentTitle("Actividad en curso").setContentText(name)
             .setContentIntent(open).addAction(R.drawable.ic_trackia, "Parar", stop)
             .setVisibility(Notification.VISIBILITY_PRIVATE).setOnlyAlertOnce(true).build())
+        scheduleActivityAlarm(context, id, end, name, profileId)
+        return true
+    }
+    private fun scheduleActivityAlarm(context: Context, id: String, end: Long, name: String, profileId: String) {
+        if (end <= 0) return
+        val prefs = preferences(context)
+        if (prefs.getString("activityId", null) == id && prefs.getLong("activityEnd", 0) == end) return
+        val alarm = context.getSystemService(AlarmManager::class.java)
+        alarm.cancel(pendingActivity(context))
+        prefs.edit().putString("activityId", id).putLong("activityEnd", end)
+            .putString("activityProfileId", profileId).apply()
+        if (end <= System.currentTimeMillis()) {
+            notifyActivityFinished(context, name, id, end)
+            return
+        }
+        val trigger = SystemClock.elapsedRealtime() + (end - System.currentTimeMillis())
+        val intent = pendingActivity(context, id, end, name)
+        if (exact(context)) alarm.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, trigger, intent)
+        else alarm.setAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, trigger, intent)
+    }
+    fun notifyActivityFinished(context: Context, name: String, id: String, end: Long): Boolean {
+        val prefs = preferences(context)
+        if (!prefs.getBoolean("enabled", false) || !permitted(context) ||
+            prefs.getString("activityId", null) != id || prefs.getLong("activityEnd", 0) != end) return false
+        val nonce = prefs.getString("runningNonce", null) ?: return false
+        val manager = context.getSystemService(NotificationManager::class.java)
+        val stop = PendingIntent.getActivity(context, stopRequestId,
+            Intent(context, MainActivity::class.java).setAction(stopAction)
+                .putExtra("id", id).putExtra("end", 0L)
+                .putExtra("profileId", prefs.getString("activityProfileId", "local"))
+                .putExtra("revision", prefs.getLong("runningRevision", 0))
+                .putExtra("nonce", nonce).putExtra("kind", "running")
+                .addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        val close = PendingIntent.getBroadcast(context, activityCloseRequestId,
+            Intent(context, RestActionReceiver::class.java).setAction(closeAction)
+                .putExtra("nonce", nonce).putExtra("kind", "running"),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        val open = PendingIntent.getActivity(context, runningRequestId,
+            Intent(context, MainActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+        val builder = if (Build.VERSION.SDK_INT >= 26) Notification.Builder(context, channelId) else Notification.Builder(context)
+        manager.notify(runningRequestId, builder.setSmallIcon(R.drawable.ic_trackia)
+            .setLargeIcon(brandIcon()).setColor(brandTeal)
+            .setContentTitle("Tramo terminado").setContentText("$name · tiempo cumplido")
+            .setContentIntent(open).setAutoCancel(true)
+            .addAction(R.drawable.ic_trackia, "Parar", stop)
+            .addAction(R.drawable.ic_trackia, "Cerrar", close)
+            .setVisibility(Notification.VISIBILITY_PRIVATE).setDefaults(Notification.DEFAULT_ALL).build())
+        prefs.edit().putString("lastDeliveredId", id).putLong("lastDeliveredEnd", end).apply()
         return true
     }
     @Synchronized fun captureStartAction(context: Context, intent: Intent?): Boolean {
@@ -192,23 +294,27 @@ object RestNotifications {
             .remove("pendingActionProfile").remove("pendingActionKind").remove("pendingActionRevision")
             .remove("pendingActionRequestedAt").commit()
         val manager = context.getSystemService(NotificationManager::class.java)
+        manager.cancel(resultRequestId)
+        if (success) return true
         val open = PendingIntent.getActivity(context, resultRequestId, Intent(context, MainActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val builder = if (Build.VERSION.SDK_INT >= 26) Notification.Builder(context, channelId) else Notification.Builder(context)
+        if (Build.VERSION.SDK_INT >= 26) builder.setTimeoutAfter(10000)
         manager.notify(resultRequestId, builder.setSmallIcon(R.drawable.ic_trackia)
-            .setContentTitle(if (success) { if (kind == "running") "Actividad detenida" else "Actividad iniciada" } else "No se pudo completar la acción")
-            .setContentText(if (success) { if (kind == "running") "Puedes registrar el resultado en el chat." else "El tramo ya está en marcha." } else "Abre TrackIA y revisa la actividad actual.")
+            .setLargeIcon(brandIcon()).setColor(brandTeal)
+            .setContentTitle("No se pudo completar la acción")
+            .setContentText("Abre TrackIA y revisa la actividad actual.")
             .setContentIntent(open).setAutoCancel(true).setOnlyAlertOnce(true)
             .setVisibility(Notification.VISIBILITY_PRIVATE).build())
         return true
     }
     @Synchronized fun closeNotice(context: Context, nonce: String?, kind: String?): Boolean {
         val prefs = preferences(context)
-        if (kind !in setOf("rest", "prepared") || nonce == null ||
-            nonce != prefs.getString(if (kind == "rest") "actionNonce" else "preparedNonce", null)) return false
-        val edit = prefs.edit().remove(if (kind == "rest") "actionNonce" else "preparedNonce")
+        if (kind !in setOf("rest", "prepared", "running") || nonce == null ||
+            nonce != prefs.getString(when (kind) { "rest" -> "actionNonce"; "prepared" -> "preparedNonce"; else -> "runningNonce" }, null)) return false
+        val edit = prefs.edit().remove(when (kind) { "rest" -> "actionNonce"; "prepared" -> "preparedNonce"; else -> "runningNonce" })
         if (kind == "prepared") edit.putBoolean("preparedDismissed", true)
         edit.commit()
-        context.getSystemService(NotificationManager::class.java).cancel(if (kind == "rest") requestId else preparedRequestId)
+        context.getSystemService(NotificationManager::class.java).cancel(when (kind) { "rest" -> requestId; "prepared" -> preparedRequestId; else -> runningRequestId })
         return true
     }
     fun tapStartForTest(context: Context, prepared: Boolean): Boolean {
@@ -245,6 +351,7 @@ object RestNotifications {
         val open = PendingIntent.getActivity(context, testRequestId, Intent(context, MainActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val builder = if (Build.VERSION.SDK_INT >= 26) Notification.Builder(context, channelId) else Notification.Builder(context)
         manager.notify(testRequestId, builder.setSmallIcon(R.drawable.ic_trackia)
+            .setLargeIcon(brandIcon()).setColor(brandTeal)
             .setContentTitle("Prueba de notificaciones")
             .setContentText("TrackIA puede avisarte en este móvil.")
             .setContentIntent(open).setAutoCancel(true)
@@ -259,6 +366,12 @@ class RestAlarmReceiver : BroadcastReceiver() {
         val preferences = RestNotifications.preferences(context)
         val id = intent.getStringExtra("id") ?: return
         val end = intent.getLongExtra("end", 0)
+        if (intent.getStringExtra("kind") == "activity") {
+            if (System.currentTimeMillis() >= end) {
+                RestNotifications.notifyActivityFinished(context, intent.getStringExtra("name") ?: "Actividad", id, end)
+            }
+            return
+        }
         if (!preferences.getBoolean("enabled", false) || preferences.getString("id", null) != id || preferences.getLong("end", 0) != end) return
         if (System.currentTimeMillis() < end) return
         preferences.edit().remove("id").remove("end").apply()

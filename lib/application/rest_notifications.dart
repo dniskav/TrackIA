@@ -10,7 +10,11 @@ class RestNotificationController extends ChangeNotifier {
   final WorkoutController controller;
   final Future<void> Function()? beforeStart;
   static const channel = MethodChannel('com.gymia.app/rest-notifications');
-  bool supported = false, enabled = false, exact = false, busy = false;
+  bool supported = false,
+      enabled = false,
+      granted = false,
+      exact = false,
+      busy = false;
   String? error;
   String? testStatus;
   bool _disposed = false;
@@ -26,7 +30,12 @@ class RestNotificationController extends ChangeNotifier {
       final status = await channel.invokeMapMethod<String, dynamic>('status');
       if (_disposed) return;
       supported = status != null;
-      enabled = status?['enabled'] == true && status?['granted'] == true;
+      enabled = status?['enabled'] == true;
+      granted = status?['granted'] == true;
+      error =
+          enabled && !granted
+              ? 'Los avisos siguen activados en TrackIA, pero Android bloquea su permiso o canal de notificaciones.'
+              : null;
       exact = status?['exact'] == true;
       _scheduled = null;
       sync();
@@ -52,8 +61,9 @@ class RestNotificationController extends ChangeNotifier {
         'enabled': value,
       });
       if (_disposed) return;
-      enabled = granted == true;
-      if (value && !enabled) {
+      enabled = value;
+      this.granted = granted == true;
+      if (value && !this.granted) {
         error =
             'Permite las notificaciones de TrackIA en los ajustes de Android para recibir avisos.';
       }
@@ -211,10 +221,11 @@ class RestNotificationController extends ChangeNotifier {
     if (_disposed || !supported || !controller.loaded) return;
     final running = controller.focus?.running;
     final runningActivity = running == null ? null : controller.focus;
-    final restActivity = controller.focus?.running == null &&
-            controller.focus?.restEndsAt?.isAfter(controller.now()) == true
-        ? controller.focus
-        : null;
+    final restActivity =
+        controller.focus?.running == null &&
+                controller.focus?.restEndsAt?.isAfter(controller.now()) == true
+            ? controller.focus
+            : null;
     final end = restActivity?.restEndsAt;
     final prepared = controller.focus;
     final showPrepared =
@@ -223,11 +234,11 @@ class RestNotificationController extends ChangeNotifier {
         prepared.intervals.isEmpty &&
         prepared.restEndsAt == null;
     final spec =
-        enabled && end != null
+        enabled && granted && end != null
             ? 'rest:${restActivity!.id}:${end.millisecondsSinceEpoch}'
-            : enabled && runningActivity != null
-            ? 'running:${runningActivity.id}:${running!.startedAt.millisecondsSinceEpoch}'
-            : enabled && showPrepared
+            : enabled && granted && runningActivity != null
+            ? 'running:${runningActivity.id}:${running!.startedAt.millisecondsSinceEpoch}:${runningActivity.definition.activitySeconds}'
+            : enabled && granted && showPrepared
             ? 'prepared:${prepared.id}:${prepared.createdAt.millisecondsSinceEpoch}'
             : 'cancel';
     if (_scheduled == spec) return;
@@ -248,6 +259,11 @@ class RestNotificationController extends ChangeNotifier {
           await channel.invokeMethod<bool>('running', {
             'id': runningActivity.id,
             'revision': running!.startedAt.millisecondsSinceEpoch,
+            'end':
+                runningActivity.definition.activitySeconds == null
+                    ? 0
+                    : running.startedAt.millisecondsSinceEpoch +
+                        runningActivity.definition.activitySeconds! * 1000,
             'name': runningActivity.definition.name,
             'profileId': controller.profileId,
           });

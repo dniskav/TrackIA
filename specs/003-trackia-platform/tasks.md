@@ -71,6 +71,13 @@ forzados, la app la prepara sin iniciar; una caída de IA permite consultar y gu
 - [ ] T021 [US2] Particionar chats, borradores y adjuntos en `lib/ui/assistant_chat.dart`, y archivos en `lib/data/chat_archive_store.dart`; concesión explícita para consultas interespacio. (FR-007 FR-010).
 - [ ] T022 [US2] Añadir selector y edición de espacios en `lib/ui/spaces.dart` y acceso desde `lib/ui/app.dart` en máximo dos acciones. (FR-006 FR-018 SC-009).
 
+Incremento 0.3.29: `lib/domain/companion.dart`, `lib/data/companion_store.dart` y
+`lib/ui/companions.dart` permiten sugerencias, edición, creación, borrado y
+selección desde el tablero. Chat, archivos y destino de Sheets se guardan por
+acompañante; GymBro conserva las claves anteriores. T018–T022 siguen abiertos:
+faltan revisiones formales de personalidad, propiedad de actividades por
+espacio, repositorio de espacios y permisos de contexto entre espacios.
+
 ## Phase 5: User Story 3 — Tiempo y etapas (P1)
 
 **Goal**: Motor lineal con relojes opcionales, descanso/ciclos y acciones estables.

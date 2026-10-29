@@ -6,6 +6,7 @@ import android.provider.OpenableColumns
 import android.provider.DocumentsContract
 import android.os.Build
 import android.os.Bundle
+import android.app.ActivityManager
 import android.content.pm.ApplicationInfo
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -85,6 +86,22 @@ class MainActivity : FlutterActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "com.trackia/local-model")
+            .setMethodCallHandler { call, result ->
+                if (call.method != "memory") {
+                    result.notImplemented()
+                    return@setMethodCallHandler
+                }
+                val manager = getSystemService(ACTIVITY_SERVICE) as ActivityManager
+                val memory = ActivityManager.MemoryInfo()
+                manager.getMemoryInfo(memory)
+                result.success(mapOf(
+                    "availableBytes" to memory.availMem,
+                    "totalBytes" to memory.totalMem,
+                    "thresholdBytes" to memory.threshold,
+                    "lowMemory" to memory.lowMemory
+                ))
+            }
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "com.gymia.app/chatgpt")
             .setMethodCallHandler { call, result ->
                 try {
@@ -115,17 +132,17 @@ class MainActivity : FlutterActivity() {
             .setMethodCallHandler { call, result ->
                 try {
                     when (call.method) {
-                        "status" -> result.success(mapOf("enabled" to RestNotifications.preferences(this).getBoolean("enabled", false), "granted" to RestNotifications.permitted(this), "exact" to RestNotifications.exact(this), "lastDeliveredId" to RestNotifications.preferences(this).getString("lastDeliveredId", null), "lastDeliveredEnd" to RestNotifications.preferences(this).getLong("lastDeliveredEnd", 0)))
+                        "status" -> result.success(mapOf("enabled" to RestNotifications.preferences(this).getBoolean("enabled", false), "granted" to RestNotifications.permitted(this), "exact" to RestNotifications.exact(this), "lastDeliveredId" to RestNotifications.preferences(this).getString("lastDeliveredId", null), "lastDeliveredEnd" to RestNotifications.preferences(this).getLong("lastDeliveredEnd", 0), "scheduledRestEnd" to RestNotifications.preferences(this).getLong("end", 0), "scheduledActivityEnd" to RestNotifications.preferences(this).getLong("activityEnd", 0)))
                         "enable" -> {
                             val enabled = call.argument<Boolean>("enabled") == true
-                            if (enabled && Build.VERSION.SDK_INT >= 33 && !RestNotifications.permitted(this)) {
+                            if (enabled && !RestNotifications.runtimePermissionGranted(this)) {
                                 if (notificationPermissionResult != null) { result.error("BUSY", "Ya hay una solicitud de permiso en curso.", null) }
                                 else {
                                     notificationPermissionResult = result
                                     requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 8402)
                                 }
                             } else {
-                                RestNotifications.preferences(this).edit().putBoolean("enabled", enabled && RestNotifications.permitted(this)).apply()
+                                RestNotifications.preferences(this).edit().putBoolean("enabled", enabled).apply()
                                 if (!enabled) RestNotifications.cancel(this)
                                 result.success(enabled && RestNotifications.permitted(this))
                             }
@@ -139,7 +156,8 @@ class MainActivity : FlutterActivity() {
                             call.argument<Number>("revision")!!.toLong(), call.argument<String>("profileId") ?: "local"))
                         "running" -> result.success(RestNotifications.notifyRunning(this,
                             call.argument<String>("name") ?: "Actividad", call.argument<String>("id")!!,
-                            call.argument<Number>("revision")!!.toLong(), call.argument<String>("profileId") ?: "local"))
+                            call.argument<Number>("revision")!!.toLong(), call.argument<String>("profileId") ?: "local",
+                            call.argument<Number>("end")?.toLong() ?: 0L))
                         "cancel" -> { RestNotifications.cancel(this); result.success(null) }
                         "test" -> result.success(RestNotifications.notifyTest(this))
                         "pendingAction" -> result.success(RestNotifications.pendingAction(this))
@@ -225,7 +243,7 @@ class MainActivity : FlutterActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode != 8402) return
         val granted = RestNotifications.permitted(this)
-        RestNotifications.preferences(this).edit().putBoolean("enabled", granted).apply()
+        RestNotifications.preferences(this).edit().putBoolean("enabled", true).apply()
         notificationPermissionResult?.success(granted)
         notificationPermissionResult = null
     }

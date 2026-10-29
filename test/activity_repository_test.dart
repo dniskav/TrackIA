@@ -36,6 +36,67 @@ void main() {
   );
 
   test(
+    'activities keep their companion; legacy records belong to GymBro',
+    () async {
+      final id = await repo.prepareActivity(
+        ActivityDefinition(name: 'Pomodoro').forCompanion('enfoque'),
+      );
+      expect(
+        (await repo.loadActivities())
+            .singleWhere((a) => a.id == id)
+            .definition
+            .companionId,
+        'enfoque',
+      );
+      expect(
+        ActivityDefinition.fromJson({
+          'name': 'Ejercicio anterior',
+          'repeated': true,
+          'restSeconds': 90,
+          'fields': <Map<String, String>>[],
+        }).companionId,
+        'gymbro',
+      );
+    },
+  );
+
+  test(
+    'cycle counter is optional, persistent and independent of series',
+    () async {
+      final id = await repo.prepareActivity(
+        ActivityDefinition(
+          name: 'Pomodoro',
+          targetCycles: 4,
+          restSeconds: 300,
+          repeated: true,
+        ),
+      );
+      await repo.changeCompletedCycles(id, 1);
+      await repo.startInterval(id);
+      now = now.add(const Duration(minutes: 25));
+      await repo.stopInterval(id);
+      var activity = (await repo.loadActivities()).single;
+      expect(activity.definition.completedCycles, 1);
+      expect(activity.intervals.length, 1);
+      await repo.changeCompletedCycles(id, -1);
+      activity = (await repo.loadActivities()).single;
+      expect(activity.definition.completedCycles, 0);
+      expect(activity.intervals.length, 1);
+      await expectLater(
+        repo.changeCompletedCycles(id, -1),
+        throwsA(isA<ValidationException>()),
+      );
+      await repo.close();
+      repo = await SqliteWorkoutRepository.open(
+        factory: databaseFactoryFfi,
+        path: '${dir.path}/test.sqlite',
+        clock: () => now,
+      );
+      expect((await repo.loadActivities()).single.definition.targetCycles, 4);
+    },
+  );
+
+  test(
     'stop fixes end and rest atomically; early/late restart does not wait or duplicate',
     () async {
       final id = await repo.prepareActivity(strength);
@@ -376,6 +437,48 @@ void main() {
         all.singleWhere((a) => a.id == id).messages.single.text,
         'Conservar mi nota',
       );
+    },
+  );
+  test(
+    'model timing change updates an active Pomodoro and its next rest',
+    () async {
+      expect(
+        activityTimingProposal(
+          '```gymia-timing\n{"activitySeconds":1500,"restSeconds":300,"targetCycles":4}\n```',
+        ),
+        {'activitySeconds': 1500, 'restSeconds': 300, 'targetCycles': 4},
+      );
+      expect(
+        activityTimingProposal('```gymia-timing\n{"activitySeconds":0}\n```'),
+        isNull,
+      );
+      final id = await repo.prepareActivity(
+        ActivityDefinition(name: 'Estudio', restSeconds: 90),
+      );
+      await repo.startInterval(id);
+      await repo.setActivityTiming(
+        id,
+        activitySeconds: 1500,
+        restSeconds: 300,
+        targetCycles: 4,
+      );
+      var activity = (await repo.loadActivities()).singleWhere(
+        (a) => a.id == id,
+      );
+      expect(activity.definition.activitySeconds, 1500);
+      expect(activity.definition.targetCycles, 4);
+      now = now.add(const Duration(minutes: 25));
+      await repo.stopInterval(id);
+      activity = (await repo.loadActivities()).singleWhere((a) => a.id == id);
+      expect(activity.restEndsAt, now.add(const Duration(minutes: 5)));
+      await repo.setActivityTiming(
+        id,
+        activitySeconds: 1200,
+        restSeconds: 600,
+        targetCycles: 4,
+      );
+      activity = (await repo.loadActivities()).singleWhere((a) => a.id == id);
+      expect(activity.restEndsAt, now.add(const Duration(minutes: 10)));
     },
   );
 }

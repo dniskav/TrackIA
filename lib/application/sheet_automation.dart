@@ -8,18 +8,25 @@ import '../data/sheet_plan_service.dart';
 import '../domain/sheet_context.dart';
 import '../domain/sheet_sync.dart';
 import '../domain/workout.dart';
-import '../domain/user_profile.dart';
+import '../data/companion_store.dart';
 import 'workout_controller.dart';
 
 /// All remote work stays on the captured profile/account/destination. No popup
 /// authorization or new destination can be inferred from model output.
 class SheetAutomation {
-  SheetAutomation(this.controller, {this.client});
+  SheetAutomation(this.controller, {this.client, this.companionId = 'gymbro'});
   final WorkoutController controller;
   final AiClient? client;
-  late final service = SheetSyncService(profileId: controller.profileId);
-  String get queueKey =>
-      profileStorageKey('gymia.sheet.jobs.v1', controller.profileId);
+  final String companionId;
+  late final service = SheetSyncService(
+    profileId: controller.profileId,
+    companionId: companionId,
+  );
+  String get queueKey => companionStorageKey(
+    'gymia.sheet.jobs.v1',
+    controller.profileId,
+    companionId,
+  );
   String? lastReadError;
   bool busy = false;
   Future<Map<String, dynamic>?> connect() async {
@@ -28,7 +35,10 @@ class SheetAutomation {
       // Upgrade an already-authorized 0.3.19 destination silently. Without an
       // existing grant this exits with reconnect required, never opens OAuth.
       final sheet =
-          await SheetContextStore(profileId: controller.profileId).load();
+          await SheetContextStore(
+            profileId: controller.profileId,
+            companionId: companionId,
+          ).load();
       if (sheet == null || sheet.source != 'google') return null;
       if (controller.profileId == 'local' &&
           await SheetSyncService.storage.read(key: service.destinationKey) ==
@@ -37,7 +47,12 @@ class SheetAutomation {
       }
       await service.authorize(interactive: false);
       final snapshot = await service.snapshot(sheet);
-      await service.bind(sheet, snapshot, allowOverwrite: true);
+      await service.bind(
+        sheet,
+        snapshot,
+        allowOverwrite: true,
+        automatic: companionId == 'gymbro',
+      );
       config = await service.connection();
     } else {
       await service.authorize(interactive: false);
@@ -99,7 +114,10 @@ class SheetAutomation {
       ],
       interpretationPending: false,
     );
-    await SheetContextStore(profileId: controller.profileId).save(fresh);
+    await SheetContextStore(
+      profileId: controller.profileId,
+      companionId: companionId,
+    ).save(fresh);
     return fresh;
   }
 
@@ -236,6 +254,9 @@ class SheetAutomation {
   }
 
   Future<void> enqueueCompleted() async {
+    // Legacy workouts have no companion ID. Keep their automatic destination
+    // on GymBro until activity ownership is recorded explicitly.
+    if (companionId != 'gymbro') return;
     final config = await service.connection();
     if (config == null || config['automatic'] != true) return;
     final after = DateTime.parse(config['automaticAfter'] as String);
@@ -311,7 +332,16 @@ class SheetAutomation {
     }
     final activities =
         await controller.activityRepository?.loadActivities() ?? [];
-    final source = sheetWorkoutSource(workout, activities);
+    final source = sheetWorkoutSource(
+      workout,
+      activities,
+      companionId: companionId,
+    );
+    if (companionId != 'gymbro' && (source['activities'] as List).isEmpty) {
+      throw const ValidationException(
+        'La sesión no tiene actividades de este acompañante para enviar.',
+      );
+    }
     final version = jsonEncode(source);
     final sheet = target(config);
     if (service.identity!.subject != config['subject']) {
@@ -342,7 +372,13 @@ class SheetAutomation {
       final currentActivities =
           await controller.activityRepository?.loadActivities() ?? [];
       if (current == null ||
-          jsonEncode(sheetWorkoutSource(current, currentActivities)) !=
+          jsonEncode(
+                sheetWorkoutSource(
+                  current,
+                  currentActivities,
+                  companionId: companionId,
+                ),
+              ) !=
               version) {
         throw const ValidationException(
           'El entrenamiento cambió mientras se preparaba el envío. Se conserva pendiente.',

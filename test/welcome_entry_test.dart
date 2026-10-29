@@ -93,6 +93,7 @@ void main() {
       );
       await tester.pump();
     }
+    await tester.pumpAndSettle();
     expect(find.byType(WelcomeScreen), findsOneWidget);
     await tester.pumpWidget(const SizedBox());
     controller.dispose();

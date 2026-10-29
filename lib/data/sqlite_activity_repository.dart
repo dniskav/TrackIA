@@ -33,6 +33,34 @@ Future<void> _migrateV4(Database db) async {
 
 mixin _SqliteActivities implements ActivityRepository {
   @override
+  Future<void> changeCompletedCycles(String activityId, int delta) =>
+      _db.transaction((tx) async {
+        if (delta != 1 && delta != -1) {
+          throw const ValidationException('El cambio de ciclos no es válido.');
+        }
+        final row = await _activeActivity(tx, activityId);
+        final definition = Map<String, dynamic>.from(
+          jsonDecode(row['definition'] as String) as Map,
+        );
+        if (definition['targetCycles'] is! int) {
+          throw const ValidationException('Esta actividad no usa ciclos.');
+        }
+        final next = (definition['completedCycles'] as int? ?? 0) + delta;
+        if (next < 0 || next > 999) {
+          throw const ValidationException(
+            'El contador de ciclos está fuera de rango.',
+          );
+        }
+        definition['completedCycles'] = next;
+        await tx.update(
+          'activities',
+          {'definition': jsonEncode(definition)},
+          where: 'id = ?',
+          whereArgs: [activityId],
+        );
+      });
+
+  @override
   Future<void> renameActivity(String activityId, String name) =>
       _db.transaction((tx) async {
         final row = await _activeActivity(tx, activityId);
@@ -652,4 +680,51 @@ mixin _SqliteActivities implements ActivityRepository {
           whereArgs: [activityId],
         );
       });
+
+  @override
+  Future<void> setActivityTiming(
+    String activityId, {
+    required int? activitySeconds,
+    required int restSeconds,
+    required int? targetCycles,
+  }) => _db.transaction((tx) async {
+    final row = await _activeActivity(tx, activityId);
+    final old = ActivityDefinition.fromJson(
+      jsonDecode(row['definition'] as String) as Map<String, dynamic>,
+    );
+    final definition = ActivityDefinition.fromJson({
+      ...old.toJson(),
+      'activitySeconds': activitySeconds,
+      'restSeconds': restSeconds,
+      'targetCycles': targetCycles,
+    });
+    final intervals = await tx.query(
+      'activity_intervals',
+      where: 'activity_id = ?',
+      whereArgs: [activityId],
+      orderBy: 'started_at DESC, rowid DESC',
+      limit: 1,
+    );
+    final lastEnd = intervals.firstOrNull?['ended_at'] as int?;
+    await tx.update(
+      'activities',
+      {
+        'definition': jsonEncode(definition.toJson()),
+        'rest_ends_at':
+            row['rest_ends_at'] != null && lastEnd != null && restSeconds > 0
+                ? lastEnd + restSeconds * 1000
+                : null,
+      },
+      where: 'id = ?',
+      whereArgs: [activityId],
+    );
+    if (row['rest_ends_at'] != null && lastEnd != null) {
+      await tx.update(
+        'activity_intervals',
+        {'rest_seconds': restSeconds},
+        where: 'id = ?',
+        whereArgs: [intervals.single['id']],
+      );
+    }
+  });
 }

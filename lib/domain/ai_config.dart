@@ -14,6 +14,7 @@ enum AiService {
   minimax,
   kimi,
   custom,
+  local,
 }
 
 extension AiServiceInfo on AiService {
@@ -29,6 +30,7 @@ extension AiServiceInfo on AiService {
     AiService.minimax => 'MiniMax',
     AiService.kimi => 'Kimi / Moonshot',
     AiService.custom => 'API personalizada',
+    AiService.local => 'Modelo local · en este móvil',
   };
   String get baseUrl => switch (this) {
     AiService.opencodeGo => 'https://opencode.ai/zen/go/v1',
@@ -41,6 +43,7 @@ extension AiServiceInfo on AiService {
     AiService.minimax => 'https://api.minimax.io/v1',
     AiService.kimi => 'https://api.moonshot.ai/v1',
     AiService.custom => '',
+    AiService.local => '',
   };
   AiProtocol get defaultProtocol => switch (this) {
     AiService.openai || AiService.chatgpt => AiProtocol.responses,
@@ -82,13 +85,19 @@ class AiConfig {
     required this.apiKey,
     this.chatGptClientId,
     this.profileId = 'local',
+    this.localModelPath,
+    this.localProjectorPath,
+    this.localContextLength = 8192,
   });
   final AiService service;
   final String baseUrl, model, apiKey;
   final AiProtocol protocol;
   final String? chatGptClientId;
+  final String? localModelPath, localProjectorPath;
+  final int localContextLength;
   final String profileId;
   bool get usesChatGpt => service == AiService.chatgpt;
+  bool get usesLocalModel => service == AiService.local;
 
   String get modelId => switch (service) {
     AiService.opencodeGo => model.replaceFirst(RegExp(r'^opencode-go/'), ''),
@@ -100,10 +109,26 @@ class AiConfig {
   // only the latter as native multimodal. Unknown models are not blocked.
   String? get imageInputWarning =>
       modelId.toLowerCase().split('/').last == 'glm-5.3'
-          ? 'GLM-5.3 admite solo texto. Para imágenes prueba glm-5.3-flash con Chat Completions, o configura otro modelo con visión. Tu mensaje y adjunto se conservan.'
-          : null;
+      ? 'GLM-5.3 admite solo texto. Para imágenes prueba glm-5.3-flash con Chat Completions, o configura otro modelo con visión. Tu mensaje y adjunto se conservan.'
+      : null;
 
   void validate({bool requireModel = true}) {
+    if (usesLocalModel) {
+      if (localModelPath == null || localModelPath!.isEmpty) {
+        throw const ValidationException('Selecciona un modelo GGUF local.');
+      }
+      if (requireModel && model.trim().isEmpty) {
+        throw const ValidationException(
+          'Selecciona el archivo del modelo local.',
+        );
+      }
+      if (localContextLength < 1024 || localContextLength > 32768) {
+        throw const ValidationException(
+          'El contexto local debe estar entre 1024 y 32768 tokens.',
+        );
+      }
+      return;
+    }
     if (usesChatGpt &&
         (baseUrl != AiService.chatgpt.baseUrl ||
             protocol != AiProtocol.responses ||
@@ -147,6 +172,9 @@ class AiConfig {
     'apiKey': apiKey,
     if (usesChatGpt) 'chatGptClientId': chatGptClientId,
     if (usesChatGpt) 'profileId': profileId,
+    if (localModelPath != null) 'localModelPath': localModelPath,
+    if (localProjectorPath != null) 'localProjectorPath': localProjectorPath,
+    if (usesLocalModel) 'localContextLength': localContextLength,
   };
   factory AiConfig.fromJson(Map<String, dynamic> value) => AiConfig(
     service: AiService.values.byName(value['service'] as String),
@@ -156,5 +184,8 @@ class AiConfig {
     apiKey: value['apiKey'] as String,
     chatGptClientId: value['chatGptClientId'] as String?,
     profileId: value['profileId'] as String? ?? 'local',
+    localModelPath: value['localModelPath'] as String?,
+    localProjectorPath: value['localProjectorPath'] as String?,
+    localContextLength: value['localContextLength'] as int? ?? 2048,
   );
 }

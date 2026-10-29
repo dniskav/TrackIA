@@ -44,10 +44,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           'Tus registros se guardan en el móvil. Puedes conectar Google Sheets cuando quieras y revisar el estado de cada envío.',
     ),
     (
-      icon: Icons.tune_outlined,
-      title: 'A tu manera',
+      icon: Icons.people_outline_rounded,
+      title: 'Tus acompañantes',
       body:
-          'Elige tema claro u oscuro y consulta tus chats archivados. Esta guía siempre estará disponible en Ayuda.',
+          'Elige GymBro, Enfoque, Calma o Diario. Puedes editar sus instrucciones, crear otros y conectar una hoja o pestaña de Google distinta para cada uno.',
     ),
   ];
 
