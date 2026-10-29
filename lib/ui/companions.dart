@@ -1,3 +1,6 @@
+import 'companion_creator.dart';
+import '../data/ai_client.dart';
+import '../data/activity_template_repository.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../application/ai_availability.dart';
@@ -22,6 +25,8 @@ class CompanionDashboard extends StatefulWidget {
     this.onRemindersChanged,
     this.progressService,
     this.onProgress,
+    this.templates,
+    this.aiClient,
   });
   final String profileId;
   final void Function(Companion) onOpen;
@@ -47,6 +52,12 @@ class CompanionDashboard extends StatefulWidget {
 
   /// Opens «Progreso» of a companion.
   final void Function(Companion)? onProgress;
+
+  /// Where a new companion's first activity is saved when it is created.
+  final ActivityTemplateRepository? templates;
+
+  /// Injectable for tests: the client used by «Crear con ayuda de la IA».
+  final AiClient? aiClient;
 
   @override
   State<CompanionDashboard> createState() => _CompanionDashboardState();
@@ -84,6 +95,29 @@ class _CompanionDashboardState extends State<CompanionDashboard>
     WidgetsBinding.instance.removeObserver(this);
     if (widget.availability == null) availability.dispose();
     super.dispose();
+  }
+
+  /// «Crear acompañante»: by hand or with the AI's help. Without the progress
+  /// repository (no database) only the plain editor is offered.
+  Future<void> create() async {
+    final progress = widget.progress;
+    if (progress == null) return edit();
+    final made = await Navigator.of(context).push<Companion>(
+      MaterialPageRoute(
+        builder: (_) => CompanionCreatorScreen(
+          store: store,
+          progress: progress,
+          templates: widget.templates,
+          availability: availability,
+          aiStore: AiSettingsStore(profileId: widget.profileId),
+          client: widget.aiClient,
+          onOpenAiSettings: connectAi,
+        ),
+      ),
+    );
+    if (made == null) return;
+    widget.onRemindersChanged?.call();
+    await refresh();
   }
 
   Future<void> connectAi() async {
@@ -317,7 +351,7 @@ class _CompanionDashboardState extends State<CompanionDashboard>
     ),
     floatingActionButton: FloatingActionButton.extended(
       key: const Key('companion-create'),
-      onPressed: () => edit(),
+      onPressed: create,
       icon: const Icon(Icons.add),
       label: const Text('Crear acompañante'),
     ),

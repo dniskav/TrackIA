@@ -131,16 +131,16 @@ class ReminderScheduler {
   Future<Map<String, Object?>> buildSnapshot() async {
     final now = _clock();
     final today = DateTime(now.year, now.month, now.day);
-    final names = {for (final c in await companions()) c.id: c.name};
+    final known = {for (final c in await companions()) c.id: c};
     final entries = <Map<String, Object?>>[];
     for (var reminder in await progress.activeReminders()) {
-      final name = names[reminder.companionId];
-      if (name == null) continue;
+      final companion = known[reminder.companionId];
+      if (companion == null) continue;
       final done = await (doneDays ?? progress.sessionDays)(
         reminder.companionId,
       );
       reminder = await _applyPause(reminder, done, today, now);
-      entries.add(_entry(reminder, name, done, today).toJson());
+      entries.add(_entry(reminder, companion, done, today).toJson());
     }
     return {
       'version': 1,
@@ -188,7 +188,7 @@ class ReminderScheduler {
 
   ReminderEntry _entry(
     Reminder reminder,
-    String name,
+    Companion companion,
     Set<String> done,
     DateTime today,
   ) {
@@ -217,7 +217,7 @@ class ReminderScheduler {
     return ReminderEntry(
       id: reminder.id,
       companionId: reminder.companionId,
-      companionName: name,
+      companionName: companion.name,
       days: reminder.days,
       windowStartMin: reminder.windowStartMin,
       windowEndMin: reminder.windowEndMin,
@@ -234,6 +234,7 @@ class ReminderScheduler {
       templates: ReminderTemplates.defaults(
         tone: reminder.tone,
         companionId: reminder.companionId,
+        custom: companion.reminderCopy,
       ),
     );
   }

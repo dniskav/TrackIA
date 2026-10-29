@@ -226,6 +226,9 @@ class _GymRootState extends State<GymRoot> {
       focusMode: true,
       onSwitchCompanion: switchCompanion,
       onCompanionSettings: () => openCompanionSettings(companion),
+      progressService: progressService,
+      onProgress: () => openProgress(companion),
+      onRemindersChanged: () => unawaited(reminders?.sync()),
       onTraining: () => Navigator.of(context).push(
         MaterialPageRoute<void>(
           builder: (_) => GymHome(
@@ -266,6 +269,7 @@ class _GymRootState extends State<GymRoot> {
   Widget build(BuildContext context) => CompanionDashboard(
     profileId: widget.controller.profileId,
     progress: widget.controller.progress,
+    templates: widget.controller.templates,
     onCompanionSettings: openCompanionSettings,
     progressService: progressService,
     onProgress: openProgress,

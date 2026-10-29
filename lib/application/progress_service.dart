@@ -39,6 +39,12 @@ class ProgressService {
   final ProgressRepository progress;
   final DateTime Function() _clock;
 
+  /// Consecutive done days that make the game suggestion appear (research D15).
+  static const suggestionDays = 5;
+
+  /// The key under which «No volver a sugerir» is remembered.
+  static const gameSuggestion = 'game';
+
   String get today => reminderDay(_clock());
 
   static String dayOf(DateTime moment) => reminderDay(moment);
@@ -181,5 +187,38 @@ class ProgressService {
       }
     }
     return out;
+  }
+
+  /// Whether to offer game mode: the companion is in reminder mode, has
+  /// [suggestionDays] done days in a row and the user never said no.
+  Future<bool> gameSuggestionDue(String companionId) async {
+    final settings = await progress.settings(companionId);
+    if (settings.game ||
+        settings.dismissedSuggestions.contains(gameSuggestion)) {
+      return false;
+    }
+    final done = await doneDays(companionId);
+    return engine.streak(done, today: today, freeDays: 0).current >=
+        suggestionDays;
+  }
+
+  /// «No volver a sugerir»: remembered in the companion's settings.
+  Future<void> dismissGameSuggestion(String companionId) async {
+    final settings = await progress.settings(companionId);
+    if (settings.dismissedSuggestions.contains(gameSuggestion)) return;
+    await progress.saveSettings(
+      settings.copyWith(
+        dismissedSuggestions: [
+          ...settings.dismissedSuggestions,
+          gameSuggestion,
+        ],
+      ),
+    );
+  }
+
+  /// «Activar»: the companion moves to game mode.
+  Future<void> activateGame(String companionId) async {
+    final settings = await progress.settings(companionId);
+    await progress.saveSettings(settings.copyWith(mode: 'game'));
   }
 }

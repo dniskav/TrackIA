@@ -1,4 +1,5 @@
 import 'package:uuid/uuid.dart';
+import 'reminder.dart';
 import 'space.dart';
 import 'workout.dart';
 
@@ -10,12 +11,14 @@ class Companion {
     required String prompt,
     String? icon,
     String? color,
+    ReminderTemplates? reminderCopy,
   }) : id = validTrackiaId(id),
        name = validName(name),
        description = description.trim(),
        prompt = prompt.trim(),
        icon = _validChoice(icon ?? _defaultIcon(id), iconIds, 'icono'),
-       color = _validChoice(color ?? _defaultColor(id), colorIds, 'color') {
+       color = _validChoice(color ?? _defaultColor(id), colorIds, 'color'),
+       reminderCopy = _validCopy(reminderCopy) {
     if (this.prompt.length > 8000) {
       throw const FormatException(
         'Las instrucciones no pueden superar los 8000 caracteres.',
@@ -83,12 +86,30 @@ class Companion {
   final String icon;
   final String color;
 
+  /// Reminder texts of this companion; each list that is given replaces the
+  /// default one (`trackia-reminder-copy`). Null when it has none.
+  final ReminderTemplates? reminderCopy;
+
+  static ReminderTemplates? _validCopy(ReminderTemplates? copy) {
+    if (copy == null) return null;
+    final all = [...copy.windowStart, ...copy.lastCall, ...copy.inactive];
+    if (all.isEmpty) return null;
+    if (copy.windowStart.length > 5 ||
+        copy.lastCall.length > 5 ||
+        copy.inactive.length > 5 ||
+        all.any((t) => t.trim().isEmpty || t.length > 140)) {
+      throw const FormatException('Los textos de recordatorio no son válidos.');
+    }
+    return copy;
+  }
+
   Companion copyWith({
     String? name,
     String? description,
     String? prompt,
     String? icon,
     String? color,
+    Object? reminderCopy = _keep,
   }) => Companion(
     id: id,
     name: name ?? this.name,
@@ -96,7 +117,12 @@ class Companion {
     prompt: prompt ?? this.prompt,
     icon: icon ?? this.icon,
     color: color ?? this.color,
+    reminderCopy: identical(reminderCopy, _keep)
+        ? this.reminderCopy
+        : reminderCopy as ReminderTemplates?,
   );
+
+  static const _keep = Object();
 
   Map<String, dynamic> toJson() => {
     'id': id,
@@ -105,6 +131,7 @@ class Companion {
     'prompt': prompt,
     'icon': icon,
     'color': color,
+    if (reminderCopy != null) 'reminderCopy': reminderCopy!.toJson(),
   };
 
   factory Companion.fromJson(Map<String, dynamic> json) => Companion(
@@ -114,6 +141,11 @@ class Companion {
     prompt: json['prompt'] as String,
     icon: json['icon'] as String?,
     color: json['color'] as String?,
+    reminderCopy: json['reminderCopy'] is Map
+        ? ReminderTemplates.fromJson(
+            Map<String, dynamic>.from(json['reminderCopy'] as Map),
+          )
+        : null,
   );
 
   static Companion custom({required String name, required String prompt}) =>

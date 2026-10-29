@@ -16,6 +16,7 @@ import 'package:gymia/domain/ai_config.dart';
 import 'package:gymia/domain/activity.dart';
 import 'package:gymia/domain/companion.dart';
 import 'package:gymia/domain/progress.dart';
+import 'package:gymia/application/assistant_context.dart';
 import 'package:gymia/ui/assistant_chat.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -365,6 +366,63 @@ void main() {
           File('test/fixtures/assistant_context_$name.txt').readAsStringSync(),
           contains(instruction),
         );
+      }
+    });
+  });
+
+  group('blocks the AI may use', () {
+    test('creating a companion gets the exact script and the block format', () {
+      final text = buildCompanionCreationContext();
+      expect(
+        text,
+        contains(
+          'Ayuda a crear un acompañante de seguimiento. Haz como máximo tres preguntas breves, de una en una: qué quiere seguir, con qué frecuencia y si quiere aviso. Después ofrece estos tres niveles con una línea cada uno: Solo recordatorio; Metas y rachas (recomendado); Juego completo con logros. Cuando el usuario elija, responde con un único bloque trackia-companion. No inventes datos del usuario.',
+        ),
+      );
+      expect(text, contains('trackia-companion'));
+      for (final key in [
+        'name',
+        'mode',
+        'description',
+        'prompt',
+        'icon',
+        'color',
+        'activity',
+        'goal',
+        'reminder',
+      ]) {
+        expect(text, contains(key));
+      }
+      for (final id in Companion.iconIds.followedBy(Companion.colorIds)) {
+        expect(text, contains(id));
+      }
+      // The other blocks are not described where they are not accepted.
+      expect(text, isNot(contains('trackia-achievement')));
+      expect(text, isNot(contains('gymia-activity')));
+    });
+
+    test('game mode describes goal, achievement and reminder texts', () {
+      for (final kind in [
+        'trackia-goal',
+        'trackia-achievement',
+        'trackia-reminder-copy',
+      ]) {
+        expect(gameBlocksInstructions, contains(kind));
+      }
+      expect(gameBlocksInstructions, contains('{dias}'));
+      expect(
+        gameBlocksInstructions,
+        contains('la app lo muestra como tarjeta'),
+      );
+    });
+
+    test('the golden contexts never mention them (reminder mode)', () {
+      for (final name in ['gymbro', 'gymbro_focus', 'custom_focus']) {
+        final golden = File(
+          'test/fixtures/assistant_context_$name.txt',
+        ).readAsStringSync();
+        expect(golden, isNot(contains('trackia-goal')));
+        expect(golden, isNot(contains('trackia-companion')));
       }
     });
   });

@@ -8,6 +8,7 @@ import 'package:gymia/application/reminder_scheduler.dart';
 import 'package:gymia/data/sqlite_workout_repository.dart';
 import 'package:gymia/domain/activity.dart';
 import 'package:gymia/domain/companion.dart';
+import 'package:gymia/domain/reminder.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
@@ -264,6 +265,29 @@ void main() {
       expect(calls.where((c) => c.method == 'sync'), hasLength(1));
     },
   );
+
+  test('a companion\'s own reminder texts replace the default ones', () async {
+    companions = [
+      Companion(
+        id: 'lectura',
+        name: 'Lectura',
+        description: '',
+        prompt: '',
+        reminderCopy: ReminderTemplates(
+          windowStart: const ['{nombre} te espera.'],
+          lastCall: const [],
+          inactive: const [],
+        ),
+      ),
+    ];
+    await remind('lectura');
+    await make().sync();
+    final templates = entries().single['templates'] as Map;
+    expect(templates['windowStart'], ['{nombre} te espera.']);
+    // The lists it does not give keep the defaults.
+    expect((templates['lastCall'] as List).first, contains('tiempo'));
+    expect(templates['inactive'], isNotEmpty);
+  });
 
   test('an unsupported platform sends nothing', () async {
     await remind('lectura');

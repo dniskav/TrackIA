@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gymia/domain/reminder.dart';
 import 'package:gymia/data/companion_store.dart';
 import 'package:gymia/data/sheet_context_store.dart';
 import 'package:gymia/data/sheet_sync_service.dart';
@@ -228,6 +229,89 @@ void main() {
     test('the allowed IDs match the contract and the theme palette', () {
       expect(Companion.iconIds, hasLength(16));
       expect(Companion.colorIds, trackiaCompanionColors.keys.toSet());
+    });
+  });
+
+  group('reminder copy', () {
+    final copy = ReminderTemplates(
+      windowStart: const ['{nombre}: ¡vamos!'],
+      lastCall: const [],
+      inactive: const ['Hace {dias} días.'],
+    );
+
+    test('is optional and round-trips', () {
+      final plain = Companion(id: 'a', name: 'A', description: '', prompt: '');
+      expect(plain.reminderCopy, isNull);
+      expect(plain.toJson().containsKey('reminderCopy'), isFalse);
+      final withCopy = Companion(
+        id: 'a',
+        name: 'A',
+        description: '',
+        prompt: '',
+        reminderCopy: copy,
+      );
+      final again = Companion.fromJson(withCopy.toJson());
+      expect(again.reminderCopy!.windowStart, ['{nombre}: ¡vamos!']);
+      expect(again.reminderCopy!.lastCall, isEmpty);
+      expect(again.reminderCopy!.inactive, ['Hace {dias} días.']);
+    });
+
+    test('copyWith keeps it, replaces it or clears it', () {
+      final c = Companion(
+        id: 'a',
+        name: 'A',
+        description: '',
+        prompt: '',
+        reminderCopy: copy,
+      );
+      expect(c.copyWith(name: 'B').reminderCopy, isNotNull);
+      expect(c.copyWith(reminderCopy: null).reminderCopy, isNull);
+    });
+
+    test('an empty copy is no copy; invalid texts are refused', () {
+      final empty = ReminderTemplates(
+        windowStart: const [],
+        lastCall: const [],
+        inactive: const [],
+      );
+      expect(
+        Companion(
+          id: 'a',
+          name: 'A',
+          description: '',
+          prompt: '',
+          reminderCopy: empty,
+        ).reminderCopy,
+        isNull,
+      );
+      expect(
+        () => Companion(
+          id: 'a',
+          name: 'A',
+          description: '',
+          prompt: '',
+          reminderCopy: ReminderTemplates(
+            windowStart: List.filled(6, 'x'),
+            lastCall: const [],
+            inactive: const [],
+          ),
+        ),
+        throwsFormatException,
+      );
+      expect(
+        () => Companion(
+          id: 'a',
+          name: 'A',
+          description: '',
+          prompt: '',
+          reminderCopy: ReminderTemplates(
+            windowStart: ['a' * 141],
+            lastCall: const [],
+            inactive: const [],
+          ),
+        ),
+        throwsFormatException,
+      );
     });
   });
 }
