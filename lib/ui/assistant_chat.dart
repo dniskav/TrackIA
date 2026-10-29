@@ -1,3 +1,4 @@
+import '../data/chat_store.dart';
 import '../application/progress_service.dart';
 import 'activity_summary.dart';
 import 'dart:convert';
@@ -10,7 +11,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/rendering.dart' show ScrollDirection;
 import 'package:intl/intl.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:uuid/uuid.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import '../application/assistant_context.dart';
@@ -78,6 +78,7 @@ class AssistantChatScreen extends StatefulWidget {
     this.onCompanionSettings,
     this.progressService,
     this.onProgress,
+    this.chatStore,
   });
   final WorkoutController controller;
   final AiClient? client;
@@ -101,13 +102,16 @@ class AssistantChatScreen extends StatefulWidget {
 
   /// Opens «Progreso» of this chat's companion.
   final VoidCallback? onProgress;
+
+  /// Where this chat and its archives are kept (SQLite and files, FR-040). The
+  /// app passes it; without it the chat uses the old secure-storage keys.
+  final ChatStore? chatStore;
   @override
   State<AssistantChatScreen> createState() => _AssistantChatScreenState();
 }
 
 class _AssistantChatScreenState extends State<AssistantChatScreen>
     with WidgetsBindingObserver {
-  static const storage = FlutterSecureStorage();
   late final profileId = widget.controller.profileId;
   late final companionId = widget.companion?.id ?? 'gymbro';
   late final sheetStore = SheetContextStore(
@@ -115,14 +119,10 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     companionId: companionId,
   );
   late final aiStore = AiSettingsStore(profileId: profileId);
-  late final chatKey = companionStorageKey(
-    'gymia.ai.chat.v1',
-    profileId,
-    companionId,
-  );
   late final archiveStore = ChatArchiveStore(
     profileId: profileId,
     companionId: companionId,
+    chats: widget.chatStore,
   );
   final archivedActivityMessageIds = <String>{};
   List<Map<String, dynamic>> archives = [];
@@ -1135,10 +1135,9 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
 
   Future<void> load() async {
     try {
-      final value = await storage.read(key: chatKey);
+      final json = await archiveStore.active();
       if (!mounted) return;
-      if (value != null) {
-        final json = jsonDecode(value) as Map<String, dynamic>;
+      if (json != null) {
         sessionId = json['sessionId'] as String;
         sheetQuestionWorkoutId = json['sheetQuestionWorkoutId'] as String?;
         archives = ChatArchiveStore.index(json);
@@ -1201,7 +1200,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
         'El chat supera 20 MB; no se pudo guardar completo.',
       );
     }
-    await storage.write(key: chatKey, value: value);
+    await archiveStore.saveActive(chatState());
   }
 
   Map<String, dynamic> chatState({bool includeDraft = false}) => {

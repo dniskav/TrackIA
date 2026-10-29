@@ -120,6 +120,8 @@ class _GymRootState extends State<GymRoot> {
     super.initState();
     widget.controller.addListener(_maybeWelcome);
     reminders?.attach(widget.controller);
+    // Attachments no chat refers to any more (a deleted companion) go away.
+    unawaited(widget.controller.chats?.gcMedia());
     unawaited(reminders?.sync());
     _importChannel.setMethodCallHandler((call) async {
       if (call.method == 'importReady') await _takeIncomingImport();
@@ -219,6 +221,7 @@ class _GymRootState extends State<GymRoot> {
     builder: (_) => AssistantChatScreen(
       key: ValueKey(companion.id),
       controller: widget.controller,
+      chatStore: widget.controller.chats,
       companion: companion,
       focusMode: true,
       onSwitchCompanion: switchCompanion,
@@ -433,7 +436,10 @@ class _GymHomeState extends State<GymHome> {
                     widget.onAssistant ??
                     () => Navigator.of(context).push(
                       MaterialPageRoute<void>(
-                        builder: (_) => AssistantChatScreen(controller: c),
+                        builder: (_) => AssistantChatScreen(
+                          controller: c,
+                          chatStore: c.chats,
+                        ),
                       ),
                     ),
                 icon: Icon(

@@ -32,14 +32,18 @@ class TrackiaV5Fixture {
         id TEXT NOT NULL, profile_id TEXT NOT NULL, name TEXT NOT NULL,
         revision INTEGER NOT NULL CHECK(revision > 0),
         PRIMARY KEY(profile_id, id))''');
-      await db.execute('''CREATE TABLE trackia_legacy_workout_scope (
+      await db.execute(
+        '''CREATE TABLE trackia_legacy_workout_scope (
         workout_id TEXT PRIMARY KEY REFERENCES workouts(id) ON DELETE CASCADE,
         profile_id TEXT NOT NULL, space_id TEXT NOT NULL,
-        FOREIGN KEY(profile_id, space_id) REFERENCES trackia_spaces(profile_id, id))''');
-      await db.execute('''CREATE TABLE trackia_legacy_activity_scope (
+        FOREIGN KEY(profile_id, space_id) REFERENCES trackia_spaces(profile_id, id))''',
+      );
+      await db.execute(
+        '''CREATE TABLE trackia_legacy_activity_scope (
         activity_id TEXT PRIMARY KEY REFERENCES activities(id) ON DELETE CASCADE,
         profile_id TEXT NOT NULL, space_id TEXT NOT NULL,
-        FOREIGN KEY(profile_id, space_id) REFERENCES trackia_spaces(profile_id, id))''');
+        FOREIGN KEY(profile_id, space_id) REFERENCES trackia_spaces(profile_id, id))''',
+      );
       await db.setVersion(5);
     } finally {
       await db.close();
@@ -66,7 +70,7 @@ class LegacyChatFixture {
         'attachment': {
           'name': 'nota.png',
           'mime': 'image/png',
-          'data': attachmentBase64,
+          'bytes': attachmentBase64,
         },
       },
     ],

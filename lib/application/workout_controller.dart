@@ -4,6 +4,7 @@ import '../domain/workout_repository.dart';
 import '../domain/routine.dart';
 import '../domain/rest_timer.dart';
 import '../data/activity_template_repository.dart';
+import '../data/chat_store.dart';
 import '../data/observation_repository.dart';
 import '../data/progress_repository.dart';
 import '../data/sqlite_workout_repository.dart';
@@ -36,6 +37,12 @@ class WorkoutController extends ChangeNotifier {
   ObservationRepository? get observations =>
       repository is SqliteWorkoutRepository
       ? (repository as SqliteWorkoutRepository).observations
+      : null;
+
+  /// Chats and archives in SQLite; null with a repository that has none (the
+  /// chat then keeps using secure storage).
+  ChatStore? get chats => repository is SqliteWorkoutRepository
+      ? (repository as SqliteWorkoutRepository).chats
       : null;
 
   /// Companion settings and reminders; null with a repository that has none.

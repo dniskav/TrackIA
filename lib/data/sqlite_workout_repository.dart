@@ -12,6 +12,7 @@ import '../domain/transfer_repository.dart';
 import '../domain/activity.dart';
 import '../domain/space.dart';
 import 'activity_template_repository.dart';
+import 'chat_store.dart';
 import 'progress_repository.dart';
 import 'observation_repository.dart';
 part 'sqlite_activity_repository.dart';
@@ -34,6 +35,9 @@ class SqliteWorkoutRepository
     _now,
     profileId,
   );
+
+  /// Chats and chat archives of this profile, with attachments as files.
+  late final ChatStore chats = ChatStore(_db, _now, profileId);
 
   /// Companion settings and reminders of this profile.
   late final ProgressRepository progress = ProgressRepository(

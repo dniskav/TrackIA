@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:gymia/data/welcome_settings_store.dart';
 import 'package:gymia/main.dart';
 import 'package:gymia/data/profile_store.dart';
 import 'package:gymia/data/sheet_context_store.dart';
@@ -67,15 +68,24 @@ void main() {
         await tester.tap(gear);
         await tester.pumpAndSettle();
       }
+      // Ajustes is a list: the entry can be below the first screen.
+      await tester.scrollUntilVisible(
+        find.text('Cuenta y datos'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
       await tester.tap(find.text('Cuenta y datos'));
       await tester.pumpAndSettle();
     }
 
     try {
+      // The automatic welcome would cover the dashboard on a fresh install.
+      WelcomeSettings.instance.offeredThisLaunch = true;
       await tester.pumpWidget(Bootstrap(databaseDirectory: dir.path));
       await settle();
-      final localController =
-          tester.widget<GymApp>(find.byType(GymApp)).controller;
+      final localController = tester
+          .widget<GymApp>(find.byType(GymApp))
+          .controller;
       await localController.run(
         () async =>
             localController.repository.start('Histórico que no se migra'),

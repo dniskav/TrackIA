@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'helpers/real_io.dart';
 import 'package:gymia/data/ai_client.dart';
 import 'package:gymia/data/ai_model_catalog.dart';
 import 'package:gymia/application/ai_availability.dart';
@@ -66,12 +67,11 @@ void main() {
           focusMode: true,
           availability: AiAvailability(
             catalog: AiModelCatalog(
-              transport:
-                  (_, __) async => {
-                    'data': [
-                      {'id': 'test-model'},
-                    ],
-                  },
+              transport: (_, __) async => {
+                'data': [
+                  {'id': 'test-model'},
+                ],
+              },
             ),
           ),
         ),
@@ -119,14 +119,13 @@ void main() {
       await tester.pumpWidget(
         app(
           AiClient(
-            transport:
-                (_, __, ___) async => {
-                  'choices': [
-                    {
-                      'message': {'content': 'Recibido'},
-                    },
-                  ],
+            transport: (_, __, ___) async => {
+              'choices': [
+                {
+                  'message': {'content': 'Recibido'},
                 },
+              ],
+            },
           ),
         ),
       );
@@ -196,9 +195,9 @@ void main() {
               'read' =>
                 failRefresh
                     ? throw PlatformException(
-                      code: 'GOOGLE_NETWORK',
-                      message: 'Sin conexión con Google.',
-                    )
+                        code: 'GOOGLE_NETWORK',
+                        message: 'Sin conexión con Google.',
+                      )
                     : rows,
               _ => throw StateError('Unexpected ${call.method}'),
             },
@@ -235,12 +234,11 @@ void main() {
           availability: AiAvailability(
             store: aiStore,
             catalog: AiModelCatalog(
-              transport:
-                  (_, __) async => {
-                    'data': [
-                      {'id': 'test-model'},
-                    ],
-                  },
+              transport: (_, __) async => {
+                'data': [
+                  {'id': 'test-model'},
+                ],
+              },
             ),
           ),
         ),
@@ -315,15 +313,14 @@ void main() {
   ) async {
     if (const bool.fromEnvironment('GYMIA_CAPTURE')) {
       await tester.runAsync(() async {
-        for (final entry
-            in {
-              'Roboto':
-                  '.tools/flutter/engine/src/flutter/third_party/txt/third_party/fonts/Roboto-Regular.ttf',
-              'Ahem':
-                  '.tools/flutter/engine/src/flutter/third_party/txt/third_party/fonts/Roboto-Regular.ttf',
-              'MaterialIcons':
-                  '.tools/flutter/bin/cache/artifacts/material_fonts/MaterialIcons-Regular.otf',
-            }.entries) {
+        for (final entry in {
+          'Roboto':
+              '.tools/flutter/engine/src/flutter/third_party/txt/third_party/fonts/Roboto-Regular.ttf',
+          'Ahem':
+              '.tools/flutter/engine/src/flutter/third_party/txt/third_party/fonts/Roboto-Regular.ttf',
+          'MaterialIcons':
+              '.tools/flutter/bin/cache/artifacts/material_fonts/MaterialIcons-Regular.otf',
+        }.entries) {
           final loader = FontLoader(entry.key);
           loader.addFont(
             File(entry.value).readAsBytes().then(ByteData.sublistView),
@@ -340,10 +337,14 @@ void main() {
     });
     const capture = Key('home-capture');
     await tester.pumpWidget(
-      RepaintBoundary(key: capture, child: GymApp(controller: controller)),
+      RepaintBoundary(
+        key: capture,
+        child: GymApp(controller: controller),
+      ),
     );
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('companion-gymbro')));
+    await realIo(tester);
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('assistant-talk')), findsOneWidget);
     expect(tester.takeException(), isNull);
@@ -386,12 +387,11 @@ void main() {
           controller: controller,
           availability: AiAvailability(
             catalog: AiModelCatalog(
-              transport:
-                  (_, __) async => {
-                    'data': [
-                      {'id': 'test-model'},
-                    ],
-                  },
+              transport: (_, __) async => {
+                'data': [
+                  {'id': 'test-model'},
+                ],
+              },
             ),
           ),
         ),
@@ -417,6 +417,7 @@ void main() {
       await tester.pumpWidget(GymApp(controller: controller));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('companion-gymbro')));
+      await realIo(tester);
       await tester.pumpAndSettle();
       expect(find.text('Hablar con el asistente'), findsNothing);
       expect(
@@ -509,12 +510,11 @@ void main() {
               client: client,
               availability: AiAvailability(
                 catalog: AiModelCatalog(
-                  transport:
-                      (_, __) async => {
-                        'data': [
-                          {'id': 'test-model'},
-                        ],
-                      },
+                  transport: (_, __) async => {
+                    'data': [
+                      {'id': 'test-model'},
+                    ],
+                  },
                 ),
               ),
             ),
@@ -573,12 +573,11 @@ void main() {
             client: client,
             availability: AiAvailability(
               catalog: AiModelCatalog(
-                transport:
-                    (_, __) async => {
-                      'data': [
-                        {'id': 'test-model'},
-                      ],
-                    },
+                transport: (_, __) async => {
+                  'data': [
+                    {'id': 'test-model'},
+                  ],
+                },
               ),
             ),
           ),
@@ -640,12 +639,11 @@ void main() {
           client: client,
           availability: AiAvailability(
             catalog: AiModelCatalog(
-              transport:
-                  (_, __) async => {
-                    'data': [
-                      {'id': 'test-model'},
-                    ],
-                  },
+              transport: (_, __) async => {
+                'data': [
+                  {'id': 'test-model'},
+                ],
+              },
             ),
           ),
         ),
@@ -660,13 +658,12 @@ void main() {
     }
     expect(find.text('GIMNASIO_SECRETO'), findsNothing);
     expect(find.text('Otro acompañante activo'), findsOneWidget);
-    final sendButton =
-        find
-            .ancestor(
-              of: find.byTooltip('Enviar'),
-              matching: find.byType(IconButton),
-            )
-            .first;
+    final sendButton = find
+        .ancestor(
+          of: find.byTooltip('Enviar'),
+          matching: find.byType(IconButton),
+        )
+        .first;
     for (var i = 0; i < 20; i++) {
       await tester.runAsync(
         () => Future<void>.delayed(const Duration(milliseconds: 50)),
@@ -706,12 +703,11 @@ void main() {
           client: client,
           availability: AiAvailability(
             catalog: AiModelCatalog(
-              transport:
-                  (_, __) async => {
-                    'data': [
-                      {'id': 'test-model'},
-                    ],
-                  },
+              transport: (_, __) async => {
+                'data': [
+                  {'id': 'test-model'},
+                ],
+              },
             ),
           ),
         ),

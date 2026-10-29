@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:uuid/uuid.dart';
 import '../domain/workout.dart';
+import 'chat_store.dart';
 import 'companion_store.dart';
 
 /// Immutable archive first, then one atomic active-chat/index replacement.
@@ -11,8 +12,13 @@ class ChatArchiveStore {
     required this.profileId,
     this.companionId = 'gymbro',
     this.storage = const FlutterSecureStorage(),
+    this.chats,
   });
   final String profileId;
+
+  /// Where chats live now (SQLite and files, FR-040). Without it the old
+  /// secure-storage keys are used, as before.
+  final ChatStore? chats;
   final String companionId;
   final FlutterSecureStorage storage;
   String get activeKey =>
@@ -29,8 +35,17 @@ class ChatArchiveStore {
   }
 
   Future<Map<String, dynamic>?> active() async {
+    final store = chats;
+    if (store != null) return store.readActive(storage, companionId);
     final raw = await storage.read(key: activeKey);
     return raw == null ? null : jsonDecode(raw) as Map<String, dynamic>;
+  }
+
+  /// Replaces the active chat.
+  Future<void> saveActive(Map<String, dynamic> state) async {
+    final store = chats;
+    if (store != null) return store.saveActive(companionId, state);
+    await storage.write(key: activeKey, value: jsonEncode(state));
   }
 
   static List<Map<String, dynamic>> index(Map<String, dynamic>? state) => [
@@ -76,10 +91,9 @@ class ChatArchiveStore {
     final id = const Uuid().v4();
     final entry = <String, dynamic>{
       'id': id,
-      'title':
-          title.trim().isEmpty
-              ? 'Conversación'
-              : title.trim().substring(0, title.trim().length.clamp(0, 100)),
+      'title': title.trim().isEmpty
+          ? 'Conversación'
+          : title.trim().substring(0, title.trim().length.clamp(0, 100)),
       'createdAt': DateTime.now().toIso8601String(),
       'summary': summary,
       'reason': reason,
@@ -104,15 +118,25 @@ class ChatArchiveStore {
       'pending': null,
       'deferredArchive': null,
       'archives': [...index(state), entry],
-      'archivedActivityMessageIds':
-          {
-            ...List<String>.from(
-              state['archivedActivityMessageIds'] as List? ?? [],
-            ),
-            ...activityMessageIds,
-          }.toList(),
+      'archivedActivityMessageIds': {
+        ...List<String>.from(
+          state['archivedActivityMessageIds'] as List? ?? [],
+        ),
+        ...activityMessageIds,
+      }.toList(),
       'carryForward': summary,
     };
+    final store = chats;
+    if (store != null) {
+      // Archive and new active chat change together or not at all.
+      await store.saveArchiveAndActive(
+        companionId,
+        id,
+        jsonDecode(document) as Map<String, dynamic>,
+        next,
+      );
+      return next;
+    }
     await storage.write(key: _archiveKey(id), value: document);
     await storage.write(key: activeKey, value: jsonEncode(next));
     return next;
@@ -124,6 +148,16 @@ class ChatArchiveStore {
       throw const ValidationException(
         'Este chat no pertenece al perfil activo.',
       );
+    }
+    final store = chats;
+    if (store != null) {
+      final stored = await store.readArchive(storage, companionId, id);
+      if (stored == null) {
+        throw const ValidationException(
+          'No se pudo recuperar el chat archivado.',
+        );
+      }
+      return stored;
     }
     final raw = await storage.read(key: _archiveKey(id));
     if (raw == null) {
@@ -174,10 +208,9 @@ class ChatArchiveStore {
 }
 
 Map<String, dynamic>? chatDirective(String answer, String kind) {
-  final blocks =
-      RegExp(
-        '```gymia-$kind\\s*\\n([\\s\\S]*?)```',
-      ).allMatches(answer).toList();
+  final blocks = RegExp(
+    '```gymia-$kind\\s*\\n([\\s\\S]*?)```',
+  ).allMatches(answer).toList();
   if (blocks.length != 1) return null;
   try {
     final value = jsonDecode(blocks.single.group(1)!) as Map<String, dynamic>;
