@@ -7,6 +7,13 @@ por Fairdrop y conserva el nombre visible GymIA.
 
 El SDD vigente de la evolución está en [003-trackia-platform/spec.md](003-trackia-platform/spec.md).
 
+La mejora de experiencia acordada el 2026-10-29 (identidad visual, ajustes globales, actividades
+abiertas, recordatorios, juego opcional, avisos con No molestar y deuda de `REVISION.md`) está en
+[004-trackia-experience/spec.md](004-trackia-experience/spec.md), con [plan](004-trackia-experience/plan.md),
+[tareas](004-trackia-experience/tasks.md) y [validación](004-trackia-experience/quickstart.md).
+Amplía 003 y absorbe sus tareas T007 y T020. Estado: diseño, sin implementar. Validar con
+`python3 scripts/validate-sdd-004.py`.
+
 - [Visión actual](00-product/vision.md) y [hoja de ruta](00-product/development-plan.md).
 - [Constitución](../.specify/memory/constitution.md).
 - [Investigación](003-trackia-platform/research.md), [plan](003-trackia-platform/plan.md)
