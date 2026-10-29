@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
 import '../data/welcome_settings_store.dart';
+import 'trackia_mark.dart';
 
 class WelcomeScreen extends StatefulWidget {
-  const WelcomeScreen({super.key, this.settings});
+  const WelcomeScreen({
+    super.key,
+    this.settings,
+    this.preselectNeverAgain = false,
+  });
 
   final WelcomeSettings? settings;
+
+  /// The automatic entry starts with «No volver a mostrar» checked, so the
+  /// guide appears once unless the user chooses to keep it. The manual entry
+  /// reflects the saved preference instead.
+  final bool preselectNeverAgain;
 
   @override
   State<WelcomeScreen> createState() => _WelcomeScreenState();
@@ -15,7 +25,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       widget.settings ?? WelcomeSettings.instance;
   final PageController pages = PageController();
   int index = 0;
-  late bool doNotShowAgain = !settings.autoShow;
+  late bool doNotShowAgain =
+      widget.preselectNeverAgain || !settings.autoShow;
   bool saving = false;
 
   static const slides = <({IconData icon, String title, String body})>[
@@ -123,15 +134,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     children: [
                       const SizedBox(height: 24),
                       if (i == 0)
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.asset(
-                            'assets/branding/trackia-logo.png',
-                            key: const Key('welcome-trackia-logo'),
-                            width: 190,
-                            height: 190,
-                            fit: BoxFit.contain,
-                          ),
+                        const TrackiaMark(
+                          key: Key('welcome-trackia-logo'),
+                          size: 120,
                         )
                       else
                         Icon(

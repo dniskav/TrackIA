@@ -76,11 +76,13 @@ Hechos comprobados leyendo el código. El agente DEBE releer cada punto antes de
    `trackia.companions.v1` por perfil (`lib/data/companion_store.dart:19`).
 3. **Menú del chat**: menú lateral en `lib/ui/assistant_chat.dart` (≈1895–2075) y acciones de la
    barra (≈2098–2132). Ver «Mapa de menús».
-4. **Creación manual**: ya existe. El botón ⇄ del panel llama a `choose()`
-   (`lib/ui/activity_focus.dart:185`) → `ActivityChooser` → «Nueva actividad» →
-   `NewActivityDialog` (línea ≈727) con Nombre, «Varias series o tramos», duración por tramo,
-   descanso (segundos) y «Series previstas». No depende de la IA (el parámetro `aiReady` de
-   `ActivityFocusControls` se declara pero no se usa). El problema es de visibilidad y vocabulario.
+4. **Creación manual**: el selector de actividades existe (`ActivityChooser`, con «Nueva actividad» →
+   `NewActivityDialog`, línea ≈727: Nombre, «Varias series o tramos», duración por tramo, descanso en
+   segundos y «Series previstas»), pero **solo es alcanzable para reemplazar una actividad ya preparada**:
+   el botón ⇄ (`changePreparation`, `lib/ui/activity_focus.dart`) está desactivado sin actividad y
+   `choose()` (línea 185) no tiene ningún llamador. Sin IA y sin actividad preparada no hay forma de
+   crear una. T020 añade el acceso («Nueva actividad» en la barra compacta). Corregido el 2026-10-29:
+   la versión anterior de este punto afirmaba que el camino manual ya era alcanzable.
 5. **Definición de actividad**: `ActivityDefinition` (`lib/domain/activity.dart:6`) con `name`,
    `repeated`, `restSeconds`, `activitySeconds`, `targetSets`, `targetCycles`, `completedCycles`,
    `fields` (mapas con exactamente `key`, `label`, `unit`; máx. 12), `instructions`, `origin`,

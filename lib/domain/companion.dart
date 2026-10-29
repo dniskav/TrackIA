@@ -8,10 +8,14 @@ class Companion {
     required String name,
     required String description,
     required String prompt,
+    String? icon,
+    String? color,
   }) : id = validTrackiaId(id),
        name = validName(name),
        description = description.trim(),
-       prompt = prompt.trim() {
+       prompt = prompt.trim(),
+       icon = _validChoice(icon ?? _defaultIcon(id), iconIds, 'icono'),
+       color = _validChoice(color ?? _defaultColor(id), colorIds, 'color') {
     if (this.prompt.isEmpty || this.prompt.length > 8000) {
       throw const FormatException(
         'Las instrucciones deben tener entre 1 y 8000 caracteres.',
@@ -19,24 +23,77 @@ class Companion {
     }
   }
 
+  /// IDs from specs/004-trackia-experience/contracts/visual-tokens.md.
+  static const iconIds = {
+    'barbell',
+    'hourglass',
+    'leaf',
+    'notebook',
+    'sparkles',
+    'book',
+    'water',
+    'run',
+    'bike',
+    'ball',
+    'music',
+    'brush',
+    'work',
+    'pill',
+    'heart',
+    'school',
+  };
+  static const colorIds = {'teal', 'orange', 'green', 'amber', 'crimson', 'violet'};
+
+  static const _suggestedIcons = {
+    'gymbro': 'barbell',
+    'enfoque': 'hourglass',
+    'calma': 'leaf',
+    'diario': 'notebook',
+  };
+  static const _suggestedColors = {
+    'gymbro': 'orange',
+    'enfoque': 'teal',
+    'calma': 'green',
+    'diario': 'amber',
+  };
+  static String _defaultIcon(String id) => _suggestedIcons[id] ?? 'sparkles';
+  static String _defaultColor(String id) => _suggestedColors[id] ?? 'teal';
+  static String _validChoice(String value, Set<String> allowed, String what) {
+    if (!allowed.contains(value)) {
+      throw FormatException('El $what elegido no es válido.');
+    }
+    return value;
+  }
+
   final String id;
   final String name;
   final String description;
   final String prompt;
+  final String icon;
+  final String color;
 
-  Companion copyWith({String? name, String? description, String? prompt}) =>
-      Companion(
-        id: id,
-        name: name ?? this.name,
-        description: description ?? this.description,
-        prompt: prompt ?? this.prompt,
-      );
+  Companion copyWith({
+    String? name,
+    String? description,
+    String? prompt,
+    String? icon,
+    String? color,
+  }) => Companion(
+    id: id,
+    name: name ?? this.name,
+    description: description ?? this.description,
+    prompt: prompt ?? this.prompt,
+    icon: icon ?? this.icon,
+    color: color ?? this.color,
+  );
 
   Map<String, dynamic> toJson() => {
     'id': id,
     'name': name,
     'description': description,
     'prompt': prompt,
+    'icon': icon,
+    'color': color,
   };
 
   factory Companion.fromJson(Map<String, dynamic> json) => Companion(
@@ -44,6 +101,8 @@ class Companion {
     name: json['name'] as String,
     description: json['description'] as String? ?? '',
     prompt: json['prompt'] as String,
+    icon: json['icon'] as String?,
+    color: json['color'] as String?,
   );
 
   static Companion custom({required String name, required String prompt}) =>

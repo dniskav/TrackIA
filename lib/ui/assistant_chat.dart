@@ -1499,6 +1499,12 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     }
   }
 
+  bool get noticesOff =>
+      notifications.supported &&
+      !(notifications.enabled && notifications.granted);
+  VoidCallback? get enableNotices =>
+      notifications.busy ? null : () => unawaited(notifications.toggle(true));
+
   String contextForAi() => buildAssistantContext(
     AssistantContextInput(
       controller: widget.controller,
@@ -2136,6 +2142,8 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
                                     MediaQuery.viewInsetsOf(context).bottom > 0,
                                 aiReady: aiReady,
                                 hideStart: chatInUse,
+                                noticesOff: noticesOff,
+                                onEnableNotices: enableNotices,
                               )
                               : SessionControl(
                                 controller: widget.controller,
@@ -2483,23 +2491,9 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
                     flushInput: flushFocusInput,
                     aiReady: aiReady,
                     hideStart: chatInUse,
+                    noticesOff: noticesOff,
+                    onEnableNotices: enableNotices,
                     compact: MediaQuery.viewInsetsOf(context).bottom > 0,
-                  ),
-                if (widget.focusMode &&
-                    notifications.supported &&
-                    MediaQuery.viewInsetsOf(context).bottom == 0)
-                  SwitchListTile(
-                    dense: true,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                    title: const Text('Avisos de actividad y descanso'),
-                    subtitle:
-                        notifications.enabled && !notifications.granted
-                            ? const Text(
-                              'Android bloquea los avisos; toca para conceder el permiso',
-                            )
-                            : null,
-                    value: notifications.enabled && notifications.granted,
-                    onChanged: notifications.busy ? null : notifications.toggle,
                   ),
                 if (notifications.error != null)
                   Text(notifications.error!, maxLines: 2),

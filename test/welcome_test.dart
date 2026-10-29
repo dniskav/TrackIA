@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gymia/data/welcome_settings_store.dart';
+import 'package:gymia/ui/trackia_mark.dart';
 import 'package:gymia/ui/welcome.dart';
 
 void main() {
@@ -177,6 +178,72 @@ void main() {
       await tester.pump();
       expect(tester.takeException(), isNull);
       expect(find.text('Omitir'), findsOneWidget);
+    }
+  });
+
+  group('automatic entry', () {
+    Future<({WelcomeSettings settings, Map<String, String> values})> open(
+      WidgetTester tester, {
+      required bool preselect,
+    }) async {
+      final store = memoryStore();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: WelcomeScreen(
+            settings: store.settings,
+            preselectNeverAgain: preselect,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      return store;
+    }
+
+    bool checked(WidgetTester tester) =>
+        tester
+            .widget<CheckboxListTile>(find.byKey(const Key('welcome-never-again')))
+            .value!;
+
+    testWidgets('starts checked and skipping stops it from reappearing', (
+      tester,
+    ) async {
+      final store = await open(tester, preselect: true);
+      expect(checked(tester), isTrue);
+      await tester.tap(find.byKey(const Key('welcome-skip')));
+      await tester.pumpAndSettle();
+      expect(store.settings.autoShow, isFalse);
+    });
+
+    testWidgets('unchecking keeps the guide for the next launch', (tester) async {
+      final store = await open(tester, preselect: true);
+      await tester.tap(find.byKey(const Key('welcome-never-again')));
+      await tester.pump();
+      expect(checked(tester), isFalse);
+      await tester.tap(find.byKey(const Key('welcome-skip')));
+      await tester.pumpAndSettle();
+      expect(store.settings.autoShow, isTrue);
+    });
+
+    testWidgets('the manual entry still reflects the saved preference', (
+      tester,
+    ) async {
+      await open(tester, preselect: false);
+      expect(checked(tester), isFalse);
+    });
+  });
+
+  testWidgets('the first slide draws the logo with theme colors, not an image', (
+    tester,
+  ) async {
+    final store = memoryStore();
+    for (final theme in [ThemeData.dark(), ThemeData.light()]) {
+      await tester.pumpWidget(
+        MaterialApp(theme: theme, home: WelcomeScreen(settings: store.settings)),
+      );
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('welcome-trackia-logo')), findsOneWidget);
+      expect(find.byType(TrackiaMark), findsOneWidget);
+      expect(find.byType(Image), findsNothing);
     }
   });
 }

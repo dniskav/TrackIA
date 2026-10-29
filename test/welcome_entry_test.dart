@@ -42,7 +42,14 @@ void main() {
       await tester.pump();
     }
     expect(find.byType(WelcomeScreen), findsOneWidget);
-    await tester.tap(find.byKey(const Key('welcome-never-again')));
+    // The automatic entry starts with «No volver a mostrar» checked, so
+    // skipping once is enough to stop it from coming back.
+    expect(
+      tester
+          .widget<CheckboxListTile>(find.byKey(const Key('welcome-never-again')))
+          .value,
+      isTrue,
+    );
     await tester.tap(find.text('Omitir'));
     await tester.pump();
     expect(preference.autoShow, isFalse);

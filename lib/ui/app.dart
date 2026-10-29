@@ -78,9 +78,11 @@ class _GymRootState extends State<GymRoot> {
     showingWelcome = true;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (!mounted) return;
-      await Navigator.of(
-        context,
-      ).push(MaterialPageRoute<void>(builder: (_) => const WelcomeScreen()));
+      await Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => const WelcomeScreen(preselectNeverAgain: true),
+        ),
+      );
       showingWelcome = false;
     });
     // The dashboard does not rebuild when an activity ends. Request a frame
@@ -461,7 +463,7 @@ class _GymHomeState extends State<GymHome> {
                     selectedIndex: tab,
                     onDestinationSelected:
                         (value) => setState(() => tab = value),
-                    backgroundColor: ink,
+                    backgroundColor: Theme.of(context).colorScheme.surface,
                     destinations: const [
                       NavigationDestination(
                         icon: Icon(Icons.grid_view_rounded),
@@ -523,7 +525,7 @@ class _GymHomeState extends State<GymHome> {
         Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: lime,
+            color: Theme.of(context).colorScheme.primary,
             borderRadius: BorderRadius.circular(24),
           ),
           child: Column(
@@ -534,21 +536,24 @@ class _GymHomeState extends State<GymHome> {
                 children: [
                   Text(
                     active == null ? 'TU PRÓXIMA SESIÓN' : 'SESIÓN EN CURSO',
-                    style: const TextStyle(
-                      color: ink,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onPrimary,
                       fontSize: 11,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1.2,
                     ),
                   ),
-                  const Icon(Icons.fitness_center_rounded, color: ink),
+                  Icon(
+                    Icons.fitness_center_rounded,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
                 ],
               ),
               const SizedBox(height: 20),
               Text(
                 active?.name ?? '¿Vamos a entrenar?',
-                style: const TextStyle(
-                  color: ink,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimary,
                   fontSize: 27,
                   fontWeight: FontWeight.w800,
                   height: 1.15,
@@ -559,15 +564,18 @@ class _GymHomeState extends State<GymHome> {
                 active == null
                     ? 'Añade tus ejercicios y registra cada serie.'
                     : '${_activitiesFor(active)} actividades · ${_recordsFor(active)} registros',
-                style: const TextStyle(color: Color(0xFF39452B), height: 1.4),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onPrimary,
+                  height: 1.4,
+                ),
               ),
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
                 child: FilledButton.icon(
                   style: FilledButton.styleFrom(
-                    backgroundColor: ink,
-                    foregroundColor: lime,
+                    backgroundColor: Theme.of(context).colorScheme.onPrimary,
+                    foregroundColor: Theme.of(context).colorScheme.primary,
                   ),
                   onPressed:
                       active == null

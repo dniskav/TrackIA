@@ -47,3 +47,7 @@ SC-008: cuatro combinaciones (Omitir/Empezar × casilla marcada/sin marcar), tre
 por combinación, más reapertura manual y cambio en ajustes. Añadir cierre sin confirmar,
 fallo de persistencia, actualización sin reactivación, actividad activa, archivo entrante,
 lectura accesible y ambos temas. Preferencias de dispositivo según C13.
+
+Enmendado por 004 FR-022: la casilla «No volver a mostrar» aparece marcada en la entrada
+automática, de modo que Omitir o Empezar sin tocarla deja `autoShow=false`. La entrada manual
+(Ajustes → Ayuda → Ver bienvenida) sigue reflejando `!autoShow`.

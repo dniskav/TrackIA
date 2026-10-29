@@ -15,8 +15,9 @@ import 'package:gymia/domain/activity.dart';
 import 'package:gymia/domain/ai_config.dart';
 import 'package:gymia/domain/companion.dart';
 import 'package:gymia/ui/assistant_chat.dart';
-import 'package:gymia/ui/app.dart';
 import 'package:gymia/ui/activity_focus.dart';
+import 'package:gymia/ui/theme.dart';
+import 'package:gymia/ui/timer_ring.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -557,7 +558,7 @@ void main() {
     await disposeScreen(tester);
   });
 
-  testWidgets('idle and prepared footer keep the same button positions', (
+  testWidgets('idle bar offers a new activity and the prepared panel shows Iniciar', (
     tester,
   ) async {
     await tester.runAsync(() async {
@@ -566,24 +567,27 @@ void main() {
       await c.refresh();
     });
     await show(tester);
-    final start = tester.getRect(find.byKey(const Key('activity-start-stop')));
-    final finish = tester.getRect(find.byKey(const Key('finish-activity')));
     expect(find.text('Sin actividad'), findsOneWidget);
+    expect(find.text('Registra una cuando quieras'), findsOneWidget);
     expect(find.text('Finalizar día'), findsOneWidget);
+    expect(find.byKey(const Key('new-activity')), findsOneWidget);
+    expect(find.byKey(const Key('activity-start-stop')), findsNothing);
+    expect(find.text('Esperando actividad'), findsNothing);
     expect(
       tester
-          .widget<FilledButton>(find.byKey(const Key('activity-start-stop')))
+          .widget<OutlinedButton>(find.byKey(const Key('new-activity')))
           .onPressed,
-      isNull,
+      isNotNull,
     );
     await tester.runAsync(() async {
       await repo.prepareActivity(ActivityDefinition(name: 'Chest Press'));
       await c.refresh();
     });
     await tester.pumpAndSettle();
-    expect(tester.getRect(find.byKey(const Key('activity-start-stop'))), start);
-    expect(tester.getRect(find.byKey(const Key('finish-activity'))), finish);
+    expect(find.byKey(const Key('new-activity')), findsNothing);
     expect(find.text('Chest Press'), findsOneWidget);
+    expect(find.text('Iniciar'), findsOneWidget);
+    expect(find.byKey(const Key('finish-activity')), findsOneWidget);
     expect(
       tester
           .widget<FilledButton>(find.byKey(const Key('activity-start-stop')))
@@ -591,5 +595,104 @@ void main() {
       isNotNull,
     );
     await disposeScreen(tester);
+  });
+
+  testWidgets('a new activity can be created from the idle bar without AI', (
+    tester,
+  ) async {
+    FlutterSecureStorage.setMockInitialValues({});
+    await tester.runAsync(() async {
+      await repo.finishActivity(c.focus!.id, now);
+      now = now.add(const Duration(seconds: 121));
+      await c.refresh();
+    });
+    await show(tester);
+    final button = tester.widget<OutlinedButton>(
+      find.byKey(const Key('new-activity')),
+    );
+    expect(button.onPressed, isNotNull);
+    await tap(tester, const Key('new-activity'));
+    // choose() flushes the draft through the real database first.
+    for (var i = 0;
+        i < 100 && find.byType(ActivityChooser).evaluate().isEmpty;
+        i++) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 20)),
+      );
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+    expect(find.byType(ActivityChooser), findsOneWidget);
+    await disposeScreen(tester);
+  });
+
+  testWidgets('Iniciar is teal, Parar is crimson and a running tramo shows the ring', (
+    tester,
+  ) async {
+    await show(tester);
+    Color? fill() =>
+        tester
+            .widget<FilledButton>(find.byKey(const Key('activity-start-stop')))
+            .style!
+            .backgroundColor!
+            .resolve({});
+    expect(fill(), brandTeal);
+    expect(find.byType(TimerRing), findsNothing);
+    now = now.add(const Duration(seconds: 100));
+    await tap(tester, const Key('activity-start-stop'));
+    await waitFor(tester, () => c.focus!.running != null && !c.busy);
+    expect(fill(), brandCrimson);
+    final ring = tester.widget<TimerRing>(find.byType(TimerRing));
+    expect(ring.total, isNull, reason: 'Pec Fly no tiene duración: cronómetro');
+    expect(find.text('Parar'), findsOneWidget);
+    await disposeScreen(tester);
+  });
+
+  testWidgets('a timed tramo counts down inside the ring', (tester) async {
+    await tester.runAsync(() async {
+      await repo.finishActivity(c.focus!.id, now);
+      await repo.prepareActivity(
+        ActivityDefinition(
+          name: 'Pomodoro',
+          activitySeconds: 1500,
+          restSeconds: 300,
+        ),
+      );
+      await c.refresh();
+    });
+    await show(tester);
+    await tap(tester, const Key('activity-start-stop'));
+    await waitFor(tester, () => c.focus!.running != null && !c.busy);
+    now = now.add(const Duration(minutes: 10, seconds: 55));
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pump(const Duration(seconds: 1));
+    final ring = tester.widget<TimerRing>(find.byType(TimerRing));
+    expect(ring.total, const Duration(minutes: 25));
+    expect(ring.elapsed, greaterThanOrEqualTo(const Duration(minutes: 10)));
+    expect(find.text('14:05'), findsOneWidget);
+    await disposeScreen(tester);
+  });
+
+  testWidgets('with notices off the panel offers to turn them on', (
+    tester,
+  ) async {
+    var enabled = false;
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: gymTheme,
+        home: Scaffold(
+          body: ActivityFocusControls(
+            controller: c,
+            flushInput: () async {},
+            noticesOff: true,
+            onEnableNotices: () => enabled = true,
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    expect(find.text('Avisos desactivados'), findsOneWidget);
+    await tester.tap(find.byKey(const Key('notices-enable')));
+    expect(enabled, isTrue);
+    await tester.pumpWidget(const SizedBox());
   });
 }

@@ -5,6 +5,8 @@ import '../application/workout_controller.dart';
 import '../domain/activity.dart';
 import '../domain/workout.dart';
 import 'session_control.dart';
+import 'theme.dart';
+import 'timer_ring.dart';
 
 class ActivityFocusControls extends StatefulWidget {
   const ActivityFocusControls({
@@ -15,6 +17,8 @@ class ActivityFocusControls extends StatefulWidget {
     this.aiReady = true,
     this.hideStart = false,
     this.companionId = 'gymbro',
+    this.noticesOff = false,
+    this.onEnableNotices,
   });
   final WorkoutController controller;
   final Future<void> Function() flushInput;
@@ -22,6 +26,11 @@ class ActivityFocusControls extends StatefulWidget {
   final bool aiReady;
   final bool hideStart;
   final String companionId;
+
+  /// Shows «Avisos desactivados · Activar» when the activity has a rest or a
+  /// duration that would normally announce itself.
+  final bool noticesOff;
+  final VoidCallback? onEnableNotices;
   @override
   State<ActivityFocusControls> createState() => _ActivityFocusControlsState();
 }
@@ -279,235 +288,339 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
       final remaining =
           restOwner?.restEndsAt?.difference(c.now()).inSeconds.clamp(0, 1800) ??
           0;
+      final scheme = Theme.of(context).colorScheme;
+      final closingDay =
+          a == null &&
+          c.active != null &&
+          c.focus == null &&
+          widget.companionId == 'gymbro';
+      final finishButton = TextButton(
+        key: const Key('finish-activity'),
+        onPressed:
+            closingDay
+                ? (enabled ? closeDay : null)
+                : enabled &&
+                    running == null &&
+                    a != null &&
+                    a.intervals.isNotEmpty
+                ? finish
+                : null,
+        child: Text(
+          closingDay ? 'Finalizar día' : 'Terminar',
+          maxLines: 1,
+          softWrap: false,
+        ),
+      );
+      final restButton = TextButton(
+        key: const Key('activity-rest'),
+        onPressed: enabled && (a != null || restOwner != null) ? rest : null,
+        child: Text(
+          restOwner == null
+              ? a == null
+                  ? '—'
+                  : '${a.definition.restSeconds}s'
+              : '${_clock(remaining)} · ${restOwner.definition.restSeconds}s',
+        ),
+      );
+      if (a == null) {
+        return _idleBar(
+          context,
+          blockedByOther: blockedByOther,
+          enabled: enabled,
+          closingDay: closingDay,
+          finishButton: finishButton,
+          restButton: restOwner == null ? null : restButton,
+        );
+      }
+      final definition = a.definition;
+      final segment = definition.companionId == 'gymbro' ? 'serie' : 'tramo';
+      final segments = definition.companionId == 'gymbro' ? 'series' : 'tramos';
+      final status =
+          running != null
+              ? definition.repeated
+                  ? '${segment[0].toUpperCase()}${segment.substring(1)} ${a.intervals.length}${definition.targetSets == null ? '' : ' de ${definition.targetSets}'}'
+                  : 'En marcha'
+              : a.intervals.isEmpty
+              ? 'Listo'
+              : definition.repeated
+              ? '${a.intervals.where((i) => i.endedAt != null).length}${definition.targetSets == null ? '' : '/${definition.targetSets}'} $segments · Descanso'
+              : 'Descanso';
+      final elapsed =
+          running == null
+              ? Duration.zero
+              : c.now().difference(running.startedAt);
+      final total =
+          definition.activitySeconds == null
+              ? null
+              : Duration(seconds: definition.activitySeconds!);
+      final canAct =
+          enabled && (running != null || !widget.hideStart);
       return Padding(
-        padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+        padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: ColoredBox(
+            color: scheme.surface,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  height: 3,
+                  color: running != null ? brandOrange : Colors.transparent,
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 4, 8, 12),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: InkWell(
+                              key: const Key('rename-activity'),
+                              onTap: enabled ? rename : null,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8,
+                                ),
+                                child: Row(
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        definition.name,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Icon(Icons.edit_outlined, size: 18),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            key: const Key('change-activity'),
+                            tooltip: 'Elegir otra actividad',
+                            onPressed:
+                                enabled && a.intervals.isEmpty
+                                    ? changePreparation
+                                    : null,
+                            icon: const Icon(Icons.swap_horiz),
+                          ),
+                          finishButton,
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                status,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: scheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ),
+                            if (running != null && compact)
+                              Text(
+                                _clock(
+                                  total == null
+                                      ? elapsed.inSeconds.clamp(0, 8640000)
+                                      : (total - elapsed).inSeconds.clamp(
+                                        0,
+                                        total.inSeconds,
+                                      ),
+                                ),
+                                key: const Key('activity-clock'),
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            if (running == null) restButton,
+                          ],
+                        ),
+                      ),
+                      if (running != null && !compact)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          child: TimerRing(
+                            key: const Key('activity-clock'),
+                            elapsed: elapsed,
+                            total: total,
+                          ),
+                        ),
+                      if (definition.targetCycles != null)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: Row(
+                            children: [
+                              Text(
+                                'Ciclos ${definition.completedCycles}/${definition.targetCycles}',
+                                key: const Key('cycle-count'),
+                              ),
+                              const Spacer(),
+                              IconButton(
+                                key: const Key('cycle-decrement'),
+                                tooltip: 'Restar ciclo',
+                                onPressed:
+                                    enabled && definition.completedCycles > 0
+                                        ? () => changeCycle(-1)
+                                        : null,
+                                icon: const Icon(Icons.remove_circle_outline),
+                              ),
+                              IconButton(
+                                key: const Key('cycle-increment'),
+                                tooltip: 'Añadir ciclo completado',
+                                onPressed:
+                                    enabled && definition.completedCycles < 999
+                                        ? () => changeCycle(1)
+                                        : null,
+                                icon: const Icon(Icons.add_circle_outline),
+                              ),
+                            ],
+                          ),
+                        ),
+                      if (!widget.hideStart || running != null)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8, top: 4),
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: FilledButton.icon(
+                              key: const Key('activity-start-stop'),
+                              style:
+                                  running == null
+                                      ? startButtonStyle(context)
+                                      : stopButtonStyle(context),
+                              onPressed: canAct ? act : null,
+                              icon: Icon(
+                                running == null ? Icons.play_arrow : Icons.stop,
+                              ),
+                              label: Text(running == null ? 'Iniciar' : 'Parar'),
+                            ),
+                          ),
+                        ),
+                      if (widget.noticesOff &&
+                          !compact &&
+                          (definition.restSeconds > 0 ||
+                              definition.activitySeconds != null))
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  'Avisos desactivados',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: scheme.onSurfaceVariant,
+                                  ),
+                                ),
+                              ),
+                              TextButton(
+                                key: const Key('notices-enable'),
+                                onPressed: widget.onEnableNotices,
+                                child: const Text('Activar'),
+                              ),
+                            ],
+                          ),
+                        ),
+                      if (c.error != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Text(
+                            c.error!,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    },
+  );
+
+  /// No activity: a thin bar that works without AI and offers to create one.
+  Widget _idleBar(
+    BuildContext context, {
+    required bool blockedByOther,
+    required bool enabled,
+    required bool closingDay,
+    required Widget finishButton,
+    required Widget? restButton,
+  }) {
+    final scheme = Theme.of(context).colorScheme;
+    final compact = widget.compact;
+    final title = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          blockedByOther ? 'Otro acompañante activo' : 'Sin actividad',
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+        ),
+        if (!compact)
+          Text(
+            blockedByOther
+                ? 'Termina la otra actividad para iniciar aquí'
+                : 'Registra una cuando quieras',
+            style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant),
+          ),
+      ],
+    );
+    final newButton = OutlinedButton.icon(
+      key: const Key('new-activity'),
+      onPressed: enabled ? choose : null,
+      icon: const Icon(Icons.add),
+      label: const Text('Nueva actividad'),
+      style: OutlinedButton.styleFrom(minimumSize: const Size(0, 44)),
+    );
+    // Closing the day or resting adds buttons; they wrap instead of overflowing
+    // on narrow screens or with large system fonts.
+    final extras = [
+      if (restButton != null) restButton,
+      if (closingDay) finishButton,
+    ];
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(16, 10, 12, 10),
+        decoration: BoxDecoration(
+          color: scheme.surface,
+          borderRadius: BorderRadius.circular(16),
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Row(
               children: [
-                Expanded(
-                  child: InkWell(
-                    key: const Key('rename-activity'),
-                    onTap: enabled && a != null ? rename : null,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              a?.definition.name ??
-                                  (blockedByOther
-                                      ? 'Otro acompañante activo'
-                                      : 'Sin actividad'),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                          ),
-                          Icon(
-                            Icons.edit_outlined,
-                            size: 18,
-                            color:
-                                a == null
-                                    ? Theme.of(
-                                      context,
-                                    ).colorScheme.onSurfaceVariant
-                                    : null,
-                          ),
-                          const SizedBox(width: 8),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                IconButton(
-                  key: const Key('change-activity'),
-                  tooltip: 'Elegir otra actividad',
-                  onPressed:
-                      enabled && a != null && a.intervals.isEmpty
-                          ? changePreparation
-                          : null,
-                  icon: const Icon(Icons.swap_horiz),
-                ),
-                SizedBox(
-                  width: 150,
-                  child: TextButton(
-                    key: const Key('finish-activity'),
-                    onPressed:
-                        a == null &&
-                                c.active != null &&
-                                c.focus == null &&
-                                widget.companionId == 'gymbro'
-                            ? (enabled ? closeDay : null)
-                            : enabled &&
-                                running == null &&
-                                a != null &&
-                                a.intervals.isNotEmpty
-                            ? finish
-                            : null,
-                    child: Text(
-                      a == null &&
-                              c.active != null &&
-                              c.focus == null &&
-                              widget.companionId == 'gymbro'
-                          ? 'Finalizar día'
-                          : 'Terminar',
-                      maxLines: 1,
-                      softWrap: false,
-                    ),
-                  ),
-                ),
+                Expanded(child: title),
+                if (!blockedByOther && extras.isEmpty)
+                  Flexible(child: newButton),
               ],
             ),
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    a == null
-                        ? blockedByOther
-                            ? 'Termina la otra actividad para iniciar aquí'
-                            : 'Esperando actividad'
-                        : running != null
-                        ? a.definition.repeated
-                            ? '${a.definition.companionId == 'gymbro' ? 'Serie' : 'Tramo'} ${a.intervals.length}${a.definition.targetSets == null ? '' : ' de ${a.definition.targetSets}'}'
-                            : 'En marcha'
-                        : a.intervals.isEmpty
-                        ? 'Listo'
-                        : a.definition.repeated
-                        ? '${a.intervals.where((i) => i.endedAt != null).length}${a.definition.targetSets == null ? '' : '/${a.definition.targetSets}'} ${a.definition.companionId == 'gymbro' ? 'series' : 'tramos'} · Descanso'
-                        : 'Descanso',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                  ),
+            if (extras.isNotEmpty)
+              Align(
+                alignment: Alignment.centerRight,
+                child: Wrap(
+                  alignment: WrapAlignment.end,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 8,
+                  children: [...extras, if (!blockedByOther) newButton],
                 ),
-                if (running != null)
-                  Text(
-                    _clock(
-                      a!.definition.activitySeconds == null
-                          ? c
-                              .now()
-                              .difference(running.startedAt)
-                              .inSeconds
-                              .clamp(0, 8640000)
-                          : (a.definition.activitySeconds! -
-                                  c
-                                      .now()
-                                      .difference(running.startedAt)
-                                      .inSeconds)
-                              .clamp(0, a.definition.activitySeconds!),
-                    ),
-                    key: const Key('activity-clock'),
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                if (running == null)
-                  TextButton(
-                    key: const Key('activity-rest'),
-                    onPressed:
-                        enabled && (a != null || restOwner != null)
-                            ? rest
-                            : null,
-                    child: Text(
-                      restOwner == null
-                          ? a == null
-                              ? '—'
-                              : '${a.definition.restSeconds}s'
-                          : '${_clock(remaining)} · ${restOwner.definition.restSeconds}s',
-                    ),
-                  ),
-              ],
-            ),
-            if (a?.definition.targetCycles != null)
-              Row(
-                children: [
-                  Text(
-                    'Ciclos ${a!.definition.completedCycles}/${a.definition.targetCycles}',
-                    key: const Key('cycle-count'),
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    key: const Key('cycle-decrement'),
-                    tooltip: 'Restar ciclo',
-                    onPressed:
-                        enabled && a.definition.completedCycles > 0
-                            ? () => changeCycle(-1)
-                            : null,
-                    icon: const Icon(Icons.remove_circle_outline),
-                  ),
-                  IconButton(
-                    key: const Key('cycle-increment'),
-                    tooltip: 'Añadir ciclo completado',
-                    onPressed:
-                        enabled && a.definition.completedCycles < 999
-                            ? () => changeCycle(1)
-                            : null,
-                    icon: const Icon(Icons.add_circle_outline),
-                  ),
-                ],
               ),
-            if (!widget.hideStart || running != null)
-              if (compact)
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    key: const Key('activity-start-stop'),
-                    onPressed:
-                        enabled &&
-                                a != null &&
-                                (running != null || !widget.hideStart)
-                            ? act
-                            : null,
-                    icon: Icon(running == null ? Icons.play_arrow : Icons.stop),
-                    label: Text(running == null ? 'Iniciar' : 'Parar'),
-                  ),
-                )
-              else
-                Align(
-                  alignment: Alignment.center,
-                  child: SizedBox.square(
-                    dimension: compact ? 48 : 108,
-                    child: FilledButton(
-                      key: const Key('activity-start-stop'),
-                      style: FilledButton.styleFrom(
-                        shape: const CircleBorder(),
-                        padding: EdgeInsets.zero,
-                      ),
-                      onPressed:
-                          enabled &&
-                                  a != null &&
-                                  (running != null || !widget.hideStart)
-                              ? act
-                              : null,
-                      child:
-                          compact
-                              ? Icon(
-                                running == null ? Icons.play_arrow : Icons.stop,
-                                semanticLabel:
-                                    running == null ? 'Iniciar' : 'Parar',
-                                size: 24,
-                              )
-                              : Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    running == null
-                                        ? Icons.play_arrow
-                                        : Icons.stop,
-                                    size: compact ? 24 : 36,
-                                  ),
-                                  Text(running == null ? 'Iniciar' : 'Parar'),
-                                ],
-                              ),
-                    ),
-                  ),
-                ),
             if (c.error != null)
               Padding(
                 padding: const EdgeInsets.only(top: 4),
@@ -519,9 +632,9 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
               ),
           ],
         ),
-      );
-    },
-  );
+      ),
+    );
+  }
 }
 
 String _clock(int seconds) =>

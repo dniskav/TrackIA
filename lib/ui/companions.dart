@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../data/companion_store.dart';
 import '../domain/companion.dart';
+import 'companion_style.dart';
 
 class CompanionDashboard extends StatefulWidget {
   const CompanionDashboard({
@@ -140,9 +141,7 @@ class _CompanionDashboardState extends State<CompanionDashboard> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 6),
                       child: ListTile(
-                        leading: const CircleAvatar(
-                          child: Icon(Icons.auto_awesome_outlined),
-                        ),
+                        leading: CompanionAvatar(companion: companion),
                         title: Text(companion.name),
                         subtitle: Text(companion.description),
                         onTap: () => widget.onOpen(companion),
@@ -189,6 +188,8 @@ class _CompanionEditorState extends State<_CompanionEditor> {
   late final prompt = TextEditingController(
     text: widget.original?.prompt ?? '',
   );
+  late String icon = widget.original?.icon ?? 'sparkles';
+  late String color = widget.original?.color ?? 'teal';
 
   @override
   void dispose() {
@@ -206,11 +207,17 @@ class _CompanionEditorState extends State<_CompanionEditor> {
               ? Companion.custom(
                 name: name.text,
                 prompt: prompt.text,
-              ).copyWith(description: description.text)
+              ).copyWith(
+                description: description.text,
+                icon: icon,
+                color: color,
+              )
               : original.copyWith(
                 name: name.text,
                 description: description.text,
                 prompt: prompt.text,
+                icon: icon,
+                color: color,
               );
       Navigator.pop(context, value);
     } catch (e) {
@@ -248,6 +255,64 @@ class _CompanionEditorState extends State<_CompanionEditor> {
                 helperText:
                     'El asistente seguirá estas instrucciones en este acompañante.',
               ),
+            ),
+            const SizedBox(height: 16),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text('Icono', style: Theme.of(context).textTheme.labelLarge),
+            ),
+            Wrap(
+              spacing: 4,
+              runSpacing: 4,
+              children: [
+                for (final entry in companionIcons.entries)
+                  IconButton(
+                    key: Key('icon-${entry.key}'),
+                    tooltip: entry.key,
+                    isSelected: icon == entry.key,
+                    onPressed: () => setState(() => icon = entry.key),
+                    icon: Icon(entry.value),
+                    selectedIcon: Icon(
+                      entry.value,
+                      color: companionColor(context, color),
+                    ),
+                    style: IconButton.styleFrom(
+                      side:
+                          icon == entry.key
+                              ? BorderSide(
+                                color: companionColor(context, color),
+                                width: 2,
+                              )
+                              : null,
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text('Color', style: Theme.of(context).textTheme.labelLarge),
+            ),
+            Wrap(
+              spacing: 4,
+              runSpacing: 4,
+              children: [
+                for (final id in Companion.colorIds)
+                  IconButton(
+                    key: Key('color-$id'),
+                    tooltip: id,
+                    isSelected: color == id,
+                    onPressed: () => setState(() => color = id),
+                    icon: Icon(
+                      Icons.circle,
+                      color: companionColor(context, id),
+                    ),
+                    selectedIcon: Icon(
+                      Icons.check_circle,
+                      color: companionColor(context, id),
+                    ),
+                  ),
+              ],
             ),
           ],
         ),
