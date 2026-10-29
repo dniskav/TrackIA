@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:crypto/crypto.dart';
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jose/jose.dart';
@@ -24,7 +25,7 @@ class ChatGptFailure extends ValidationException {
   @override
   String get message => switch (code) {
     'subscription_sharing_user_not_eligible' =>
-      'Esta cuenta o espacio de ChatGPT no es elegible para usar su plan en GymIA. Puedes elegir otro proveedor.',
+      'Esta cuenta o espacio de ChatGPT no es elegible para usar su plan en TrackIA. Puedes elegir otro proveedor.',
     'subscription_sharing_usage_limit_exceeded' =>
       'Has alcanzado un límite de uso de ChatGPT. Revisa Uso en los ajustes de ChatGPT antes de volver a enviar.',
     'subscription_sharing_unsupported_capability' =>
@@ -35,6 +36,8 @@ class ChatGptFailure extends ValidationException {
       'ChatGPT no autoriza esta integración o permiso. Tus otros proveedores siguen disponibles.',
     'no_plan' =>
       'Cuenta conectada, pero no has autorizado el uso del plan ChatGPT. Actívalo en ajustes de IA o elige otro proveedor.',
+    'connection' =>
+      'No se pudo conectar con ChatGPT. Revisa la red y vuelve a intentarlo.',
     'cancelled' => 'Conexión con ChatGPT cancelada.',
     'access_denied' =>
       'No se concedió el permiso de ChatGPT. Puedes continuar con otro proveedor.',
@@ -52,7 +55,7 @@ class ChatGptFailure extends ValidationException {
     'subscription_sharing_invalid_user' =>
       'La sesión de ChatGPT ya no es válida. Vuelve a conectar la cuenta desde ajustes de IA.',
     'invalid_client' =>
-      'ChatGPT no aceptó el registro de GymIA. Vuelve a conectar o usa otro proveedor.',
+      'ChatGPT no aceptó el registro de TrackIA. Vuelve a conectar o usa otro proveedor.',
     _ => switch (status) {
       401 =>
         'ChatGPT rechazó la sesión o el permiso. Revisa la conexión de la cuenta.',
@@ -162,7 +165,7 @@ class ChatGptCallback {
       request.response.headers.contentType = ContentType.html;
       request.response.write(
         valid
-            ? '<!doctype html><meta charset="utf-8"><title>GymIA</title><p>Respuesta recibida. Vuelve a GymIA para comprobar la conexión.</p>'
+            ? '<!doctype html><meta charset="utf-8"><title>TrackIA</title><p>Respuesta recibida. Vuelve a TrackIA para comprobar la conexión.</p>'
             : 'Retorno no válido.',
       );
       await request.response.close();
@@ -392,7 +395,9 @@ class ChatGptAuth {
       return ChatGptAccount(data);
     } on ValidationException {
       rethrow;
-    } catch (_) {
+    } catch (error) {
+      // Only the error type: messages can carry URLs with codes or tokens.
+      debugPrint('ChatGPT connect failed: ${error.runtimeType}');
       throw const ChatGptFailure('connection');
     } finally {
       await callback.close();
@@ -695,7 +700,8 @@ class ChatGptAuth {
       })().timeout(const Duration(seconds: 25));
     } on ChatGptFailure {
       rethrow;
-    } catch (_) {
+    } catch (error) {
+      debugPrint('ChatGPT request failed: ${error.runtimeType}');
       throw const ChatGptFailure('connection');
     } finally {
       client.close(force: true);

@@ -282,7 +282,7 @@ class SheetDocument {
       return SheetDocument({'CSV': CsvSheet.parse(utf8.decode(bytes))});
     } catch (_) {
       throw const ValidationException(
-        'No se pudo leer esa hoja. En Google Sheets usa «Enviar una copia» como Excel o CSV y elige GymIA.',
+        'No se pudo leer esa hoja. En Google Sheets usa «Enviar una copia» como Excel o CSV y elige TrackIA.',
       );
     }
   }

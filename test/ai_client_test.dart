@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:gymia/data/app_info.dart';
 import 'package:gymia/domain/ai_config.dart';
 import 'package:gymia/domain/workout.dart';
 import 'package:gymia/data/ai_client.dart';
@@ -344,7 +345,7 @@ void main() {
             uri.toString(),
             'https://opencode.ai/zen/go/v1/chat/completions',
           );
-          expect(headers['User-Agent'], 'GymIA/0.3.14');
+          expect(headers['User-Agent'], trackiaUserAgent);
           expect(headers['Authorization'], 'Bearer test-secret');
           sessions.add(headers['x-opencode-session']!);
           expect(body['messages'], [

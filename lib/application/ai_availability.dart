@@ -62,7 +62,7 @@ class AiAvailability extends ChangeNotifier {
         await client.reply(
           config,
           const [AiMessage('user', 'Responde OK.')],
-          system: 'Comprobación de conexión de GymIA. Responde brevemente.',
+          system: 'Comprobación de conexión de TrackIA. Responde brevemente.',
           sessionId: 'gymia-connection-check',
         );
         if (_disposed || request != _request) return;

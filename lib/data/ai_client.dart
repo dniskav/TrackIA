@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'dart:convert';
 import 'dart:io';
 import 'ai_stream_response.dart';
+import 'app_info.dart';
 import 'chatgpt_auth.dart';
 import 'dart:typed_data';
 import '../domain/ai_config.dart';
@@ -209,7 +211,7 @@ class AiClient {
     final headers = <String, String>{
       'Content-Type': 'application/json; charset=utf-8',
       'Accept': 'application/json',
-      'User-Agent': 'GymIA/0.3.14',
+      'User-Agent': trackiaUserAgent,
     };
     if (config.service == AiService.opencodeGo ||
         config.service == AiService.opencodeZen) {
@@ -345,7 +347,8 @@ class AiClient {
       return text.trim();
     } on ValidationException {
       rethrow;
-    } catch (_) {
+    } catch (error) {
+      debugPrint('AI response unreadable: ${error.runtimeType}');
       throw const ValidationException(
         'El modelo no devolvió texto legible. Revisa el modelo y su formato de API.',
       );
@@ -514,7 +517,8 @@ class AiClient {
       throw const ValidationException(
         'El proveedor devolvió una respuesta que no se pudo leer. Vuelve a intentarlo.',
       );
-    } catch (_) {
+    } catch (error) {
+      debugPrint('AI request failed: ${error.runtimeType}');
       throw const ValidationException(
         'No se pudo conectar con la API. Comprueba tu conexión y configuración.',
       );

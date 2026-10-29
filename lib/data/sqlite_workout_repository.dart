@@ -939,7 +939,7 @@ class SqliteWorkoutRepository
       return result;
     } catch (_) {
       throw const ValidationException(
-        'La copia no es un archivo GymIA válido (formato 1, 2 o 3).',
+        'La copia no es un archivo de TrackIA válido (formato 1, 2 o 3).',
       );
     }
   }

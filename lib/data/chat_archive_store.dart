@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:uuid/uuid.dart';
 import '../domain/workout.dart';
@@ -240,7 +241,8 @@ Map<String, dynamic>? chatDirective(String answer, String kind) {
       return null;
     }
     return value;
-  } catch (_) {
+  } catch (error) {
+    debugPrint('Chat archive entry rejected: ${error.runtimeType}');
     return null;
   }
 }

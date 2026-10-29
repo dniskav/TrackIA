@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'dart:convert';
 import 'dart:io';
 import '../domain/ai_config.dart';
+import 'app_info.dart';
 import 'chatgpt_auth.dart';
 import '../domain/workout.dart';
 
@@ -50,7 +52,7 @@ class AiModelCatalog {
     );
     final headers = <String, String>{
       'Accept': 'application/json',
-      'User-Agent': 'GymIA/0.3.14',
+      'User-Agent': trackiaUserAgent,
     };
     if (nativeAnthropic) {
       headers['x-api-key'] = config.apiKey;
@@ -265,7 +267,8 @@ class AiModelCatalog {
       })().timeout(const Duration(seconds: 30));
     } on ValidationException {
       rethrow;
-    } catch (_) {
+    } catch (error) {
+      debugPrint('Model list failed: ${error.runtimeType}');
       // Never expose server bodies, URLs containing credentials or HTTP errors.
       throw const ValidationException(
         'No se pudo obtener la lista de modelos. Revisa la conexión y vuelve a intentarlo; también puedes indicar el modelo manualmente.',

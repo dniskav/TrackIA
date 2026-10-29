@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jose/jose.dart';
@@ -474,6 +475,33 @@ void main() {
       ),
     );
   });
+  test(
+    'an unexpected connect error becomes a Spanish message and logs only its type',
+    () async {
+      final logs = <String>[];
+      final original = debugPrint;
+      debugPrint = (message, {wrapWidth}) => logs.add(message ?? '');
+      addTearDown(() => debugPrint = original);
+      final auth = ChatGptAuth(
+        profileId: 'local',
+        timeout: const Duration(seconds: 3),
+        browser: (uri) async {
+          throw StateError('${uri.toString()} code=SECRET-CODE');
+        },
+      );
+      await expectLater(
+        auth.connect(),
+        throwsA(
+          isA<ChatGptFailure>()
+              .having((e) => e.code, 'code', 'connection')
+              .having((e) => e.message, 'message', contains('ChatGPT')),
+        ),
+      );
+      expect(logs.join('\n'), contains('StateError'));
+      expect(logs.join('\n'), isNot(contains('SECRET-CODE')));
+      expect(logs.join('\n'), isNot(contains('https://')));
+    },
+  );
   test(
     'timeout closes the callback and a changed issued client never replaces saved credentials',
     () async {

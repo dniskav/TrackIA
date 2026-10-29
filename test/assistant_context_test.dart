@@ -337,6 +337,8 @@ void main() {
             restSeconds: 0,
           ),
           original: 'Hoy',
+          // The progress clock is fixed, so the observation must not use the real one.
+          observedAt: DateTime(2026, 10, 29, 9),
         );
       });
       final prompt = await systemWithProgress(tester);

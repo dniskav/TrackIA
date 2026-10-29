@@ -38,7 +38,8 @@ class WelcomeSettings extends ChangeNotifier {
         autoShow = data['autoShow'] != false;
         seenVersion = data['seenVersion'] as int?;
         completedAt = DateTime.tryParse(data['completedAt'] as String? ?? '');
-      } catch (_) {
+      } catch (error) {
+        debugPrint('Welcome settings unreadable: ${error.runtimeType}');
         autoShow = true;
         seenVersion = null;
         completedAt = null;
