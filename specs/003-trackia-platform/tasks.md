@@ -67,7 +67,7 @@ forzados, la app la prepara sin iniciar; una caída de IA permite consultar y gu
 - [ ] T017 [P] [US2] Escribir pruebas del compositor, celda hostil, personalidad y permisos en `test/assistant_context_test.dart`. (FR-008 FR-009 FR-037).
 - [ ] T018 [US2] Implementar revisiones de personalidad sugerida/custom en `lib/domain/persona.dart` y edición en `lib/ui/persona_settings.dart`; aplicar C02/C03 definidos en tareas de base. (FR-008 FR-009).
 - [ ] T019 [US2] Implementar repositorio de espacios en `lib/data/space_repository.dart` y controlador en `lib/application/space_controller.dart`; capturar ámbito y recuperar estado por clave. (FR-006 FR-007).
-- [ ] T020 [US2] Extraer contextForAi de `lib/ui/assistant_chat.dart` a `lib/application/assistant_context.dart`; separar instrucciones base, personalidad, hechos y fuentes con procedencia. (FR-007 FR-008 FR-009 FR-010 FR-037).
+- [ ] T020 [US2] (contextForAi ya extraído a `lib/application/assistant_context.dart` por 004 T006; resto pendiente) Extraer contextForAi de `lib/ui/assistant_chat.dart` a `lib/application/assistant_context.dart`; separar instrucciones base, personalidad, hechos y fuentes con procedencia. (FR-007 FR-008 FR-009 FR-010 FR-037).
 - [ ] T021 [US2] Particionar chats, borradores y adjuntos en `lib/ui/assistant_chat.dart`, y archivos en `lib/data/chat_archive_store.dart`; concesión explícita para consultas interespacio. (FR-007 FR-010).
 - [ ] T022 [US2] Añadir selector y edición de espacios en `lib/ui/spaces.dart` y acceso desde `lib/ui/app.dart` en máximo dos acciones. (FR-006 FR-018 SC-009).
 

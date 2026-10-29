@@ -48,7 +48,7 @@ void main() {
         final saved = await File('$path.pre-trackia-v4.json').readAsString();
         expect(jsonDecode(saved), jsonDecode(fixture.backupV3));
         final dbAfter = await databaseFactoryFfi.openDatabase(path);
-        expect(await dbAfter.getVersion(), 5);
+        expect(await dbAfter.getVersion(), 6);
         expect(
           await dbAfter.query(
             'trackia_spaces',

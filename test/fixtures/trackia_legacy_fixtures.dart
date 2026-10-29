@@ -74,6 +74,19 @@ class TrackiaLegacyFixture {
       // Produce an actual v4 schema from the compatible legacy tables.
       final db = await factory.openDatabase(path);
       try {
+        for (final table in const [
+          'trackia_achievement_unlocks',
+          'trackia_achievements',
+          'trackia_goals',
+          'trackia_reminders',
+          'trackia_companion_settings',
+          'trackia_activity_templates',
+          'trackia_observations',
+          'trackia_chat_archives',
+          'trackia_chats',
+        ]) {
+          await db.execute('DROP TABLE IF EXISTS $table');
+        }
         await db.execute('DROP TABLE IF EXISTS trackia_legacy_activity_scope');
         await db.execute('DROP TABLE IF EXISTS trackia_legacy_workout_scope');
         await db.execute('DROP TABLE IF EXISTS trackia_spaces');

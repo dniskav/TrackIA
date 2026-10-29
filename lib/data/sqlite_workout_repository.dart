@@ -296,7 +296,7 @@ class SqliteWorkoutRepository
     final db = await f.openDatabase(
       dbPath,
       options: OpenDatabaseOptions(
-        version: 5,
+        version: 6,
         onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON'),
         onCreate: (db, version) async {
           await db.execute('''CREATE TABLE workouts (
@@ -322,6 +322,7 @@ class SqliteWorkoutRepository
           await _migrateV3(db);
           await _migrateV4(db);
           await _createTrackiaV5(db);
+          await _createTrackiaV6(db);
         },
         onUpgrade: (db, old, next) async {
           if (old < 2) await _migrateV2(db);
@@ -330,6 +331,12 @@ class SqliteWorkoutRepository
           if (old < 5) {
             await _backupBeforeTrackiaV5(db, dbPath);
             await _createTrackiaV5(db);
+          }
+          if (old < 6) {
+            if (old >= 5) {
+              await _backupBeforeTrackiaV5(db, dbPath, 'pre-trackia-v6.json');
+            }
+            await _createTrackiaV6(db);
           }
         },
       ),
