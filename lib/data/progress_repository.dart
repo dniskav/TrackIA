@@ -1,9 +1,11 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:sqflite/sqflite.dart';
 import 'package:uuid/uuid.dart';
 
 import '../application/progress_engine.dart';
+import '../domain/ai_config.dart';
 import '../domain/observation.dart';
 import '../domain/progress.dart';
 import '../domain/reminder.dart';
@@ -22,6 +24,7 @@ class CompanionSettings {
     this.cheersEnabled = true,
     this.freeDaysPerWeek = 1,
     this.dismissedSuggestions = const [],
+    this.aiOverride,
     this.revision = 0,
   });
 
@@ -31,6 +34,9 @@ class CompanionSettings {
   final bool goalsEnabled, streaksEnabled, achievementsEnabled, cheersEnabled;
   final int freeDaysPerWeek;
   final List<String> dismissedSuggestions;
+
+  /// US11: this companion's model instead of the profile's; `null` = default.
+  final AiOverride? aiOverride;
 
   /// 0 while nothing has been saved: the defaults of an existing companion.
   final int revision;
@@ -45,6 +51,8 @@ class CompanionSettings {
     bool? cheersEnabled,
     int? freeDaysPerWeek,
     List<String>? dismissedSuggestions,
+    AiOverride? aiOverride,
+    bool clearAiOverride = false,
   }) => CompanionSettings(
     companionId: companionId,
     mode: mode ?? this.mode,
@@ -54,6 +62,7 @@ class CompanionSettings {
     cheersEnabled: cheersEnabled ?? this.cheersEnabled,
     freeDaysPerWeek: freeDaysPerWeek ?? this.freeDaysPerWeek,
     dismissedSuggestions: dismissedSuggestions ?? this.dismissedSuggestions,
+    aiOverride: clearAiOverride ? null : aiOverride ?? this.aiOverride,
     revision: revision,
   );
 }
@@ -101,6 +110,10 @@ class ProgressRepository {
         'cheers_enabled': value.cheersEnabled ? 1 : 0,
         'free_days_per_week': value.freeDaysPerWeek,
         'dismissed_suggestions': jsonEncode(value.dismissedSuggestions),
+        'ai_override':
+            value.aiOverride == null
+                ? null
+                : jsonEncode(value.aiOverride!.toJson()),
         'updated_at': _now().millisecondsSinceEpoch,
       };
       final changed = await tx.rawUpdate(
@@ -131,8 +144,20 @@ class ProgressRepository {
         dismissedSuggestions: List<String>.from(
           jsonDecode(row['dismissed_suggestions'] as String) as List,
         ),
+        aiOverride: _readOverride(row['ai_override']),
         revision: row['revision'] as int,
       );
+
+  /// A damaged value is treated as no exception: the default setup still works.
+  static AiOverride? _readOverride(Object? raw) {
+    if (raw is! String) return null;
+    try {
+      return AiOverride.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+    } catch (error) {
+      debugPrint('AI override unreadable: ${error.runtimeType}');
+      return null;
+    }
+  }
 
   // --- Reminders ------------------------------------------------------------
 

@@ -127,7 +127,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.auto_awesome_outlined,
                 title: 'Inteligencia artificial',
                 subtitle: aiState,
-                screen: AiSettingsScreen(profileId: widget.controller.profileId),
+                screen: AiSettingsScreen(
+                  profileId: widget.controller.profileId,
+                  progress: widget.controller.progress,
+                ),
               ),
               section(context, 'Tus datos'),
               row(

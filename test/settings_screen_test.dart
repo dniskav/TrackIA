@@ -127,6 +127,11 @@ void main() {
     };
     for (final entry in destinations.entries) {
       await tester.tap(find.text(entry.key));
+      await tester.pump();
+      // «Por acompañante» in the AI screen reads SQLite on opening.
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 300)),
+      );
       await tester.pumpAndSettle();
       expect(
         find.byType(entry.value),

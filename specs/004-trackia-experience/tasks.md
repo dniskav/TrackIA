@@ -313,10 +313,14 @@ crea todo; inválido no crea nada).
 
 **Independent Test / Checkpoint**: `test/ai_override_test.dart` con cliente simulado.
 
-- [ ] T100 [P] [US11] Escribir `test/ai_override_test.dart`: sin excepción se usa la configuración por defecto; con excepción, la del acompañante; las claves siguen solo en secure storage. (FR-046)
-- [ ] T101 [US11] Resolver la configuración efectiva en `lib/data/ai_settings_store.dart` usando `ai_override` (solo proveedor y modelo) de `trackia_companion_settings`; las credenciales siguen siendo del perfil. (FR-046)
-- [ ] T102 [US11] Añadir «Por acompañante» en la pantalla de IA de `lib/ui/ai_settings.dart` (lista de acompañantes con «Por defecto» o el modelo elegido). (FR-046)
-- [ ] T103 [US11] Documentar en `docs/0.3.32-IA-POR-ACOMPANANTE.md`. (FR-046)
+- [x] T100 [P] [US11] Escribir `test/ai_override_test.dart`: sin excepción se usa la configuración por defecto; con excepción, la del acompañante; las claves siguen solo en secure storage. (FR-046)
+  - Evidencia: test/ai_override_test.dart, 7 pruebas OK (por defecto, excepción, borrado, otro proveedor ignorado, la base solo guarda proveedor y modelo, valor con clave rechazado, protocolo según modelo)
+- [x] T101 [US11] Resolver la configuración efectiva en `lib/data/ai_settings_store.dart` usando `ai_override` (solo proveedor y modelo) de `trackia_companion_settings`; las credenciales siguen siendo del perfil. (FR-046)
+  - Evidencia: AiOverride y AiConfig.withOverride en lib/domain/ai_config.dart; CompanionSettings.aiOverride persistido en ai_override (JSON estricto, sin claves); AiSettingsStore(exception) aplica la excepción en load y loadDefault devuelve la del perfil; el chat del acompañante la usa. Credenciales solo del perfil
+- [x] T102 [US11] Añadir «Por acompañante» en la pantalla de IA de `lib/ui/ai_settings.dart` (lista de acompañantes con «Por defecto» o el modelo elegido). (FR-046)
+  - Evidencia: lib/ui/ai_per_companion.dart y sección «Por acompañante» en AiSettingsScreen (se abre desde Ajustes); test/ai_per_companion_test.dart, 3 pruebas OK. Las pruebas destaparon un fallo real (controlador del diálogo descartado antes de tiempo) y se corrigió
+- [x] T103 [US11] Documentar en `docs/0.3.32-IA-POR-ACOMPANANTE.md`. (FR-046)
+  - Evidencia: docs/0.3.32-IA-POR-ACOMPANANTE.md (funcionamiento, reglas, pruebas y límites; falta el recorrido en el teléfono del propietario)
 
 ## Phase 12: Cierre
 

@@ -128,7 +128,30 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     profileId: profileId,
     companionId: companionId,
   );
-  late final aiStore = AiSettingsStore(profileId: profileId);
+  // The companion's own model (US11), if it has one; the key is the profile's.
+  // Read once on opening: sending a message must not wait on the database.
+  AiOverride? aiOverride;
+  late final Future<void> aiOverrideReady = readAiOverride();
+  late final aiStore = AiSettingsStore(
+    profileId: profileId,
+    exception: () async {
+      // Normally already read; never hold the message back for long.
+      await aiOverrideReady.timeout(
+        const Duration(milliseconds: 500),
+        onTimeout: () {},
+      );
+      return aiOverride;
+    },
+  );
+
+  Future<void> readAiOverride() async {
+    try {
+      aiOverride =
+          (await widget.controller.progress?.settings(companionId))?.aiOverride;
+    } catch (error) {
+      debugPrint('AI override not read: ${error.runtimeType}');
+    }
+  }
   late final archiveStore = ChatArchiveStore(
     profileId: profileId,
     companionId: companionId,
@@ -1116,6 +1139,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
   @override
   void initState() {
     super.initState();
+    unawaited(aiOverrideReady);
     input.addListener(composerChanged);
     composerFocus.addListener(composerChanged);
     availability =

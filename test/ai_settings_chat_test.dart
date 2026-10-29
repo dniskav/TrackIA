@@ -86,6 +86,9 @@ void main() {
           ),
         ),
       );
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 150)),
+      ); // Opening the chat reads SQLite (companion settings, templates).
       await tester.pumpAndSettle();
       await tester.enterText(
         find.byKey(const Key('assistant-input')),
@@ -129,6 +132,9 @@ void main() {
           ),
         ),
       );
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 150)),
+      ); // Opening the chat reads SQLite (companion settings, templates).
       await tester.pumpAndSettle();
       expect(
         tester
@@ -244,6 +250,9 @@ void main() {
         ),
       );
       await tester.pumpWidget(app());
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 150)),
+      ); // The chat reads its companion's settings from SQLite on opening.
       await tester.pumpAndSettle();
       await tester.enterText(find.byType(TextField), 'Mi borrador pendiente');
       await tester.tap(find.byKey(const Key('assistant-sheet')));
@@ -270,6 +279,9 @@ void main() {
 
       await tester.pumpWidget(const SizedBox());
       await tester.pumpWidget(app());
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 150)),
+      ); // The chat reads its companion's settings from SQLite on opening.
       await tester.pumpAndSettle();
       expect(find.text('Hoja · Registro2026'), findsOneWidget);
       await tester.enterText(
@@ -583,6 +595,9 @@ void main() {
           ),
         ),
       );
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 150)),
+      ); // The chat reads its companion's settings from SQLite on opening.
       await tester.pumpAndSettle();
     }
 

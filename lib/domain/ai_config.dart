@@ -189,3 +189,63 @@ class AiConfig {
     localContextLength: value['localContextLength'] as int? ?? 2048,
   );
 }
+
+/// A companion's exception to the profile's AI setup: only which model of the
+/// same provider to use. Credentials never live here; they belong to the profile.
+class AiOverride {
+  AiOverride({required this.service, required String model})
+    : model = model.trim() {
+    if (this.model.isEmpty ||
+        this.model.length > 200 ||
+        this.model.contains(RegExp(r'\s'))) {
+      throw const ValidationException(
+        'Introduce el identificador exacto del modelo.',
+      );
+    }
+  }
+
+  final AiService service;
+  final String model;
+
+  Map<String, dynamic> toJson() => {'provider': service.name, 'modelId': model};
+
+  /// Strict: any other key (an API key, for instance) rejects the whole value.
+  factory AiOverride.fromJson(Map<String, dynamic> value) {
+    if (value.keys.toSet().difference({'provider', 'modelId'}).isNotEmpty ||
+        value['provider'] is! String ||
+        value['modelId'] is! String) {
+      throw const FormatException('Excepción de IA no válida.');
+    }
+    return AiOverride(
+      service: AiService.values.byName(value['provider'] as String),
+      model: value['modelId'] as String,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      other is AiOverride && other.service == service && other.model == model;
+
+  @override
+  int get hashCode => Object.hash(service, model);
+}
+
+extension AiConfigOverride on AiConfig {
+  /// The profile's setup with the companion's model. An exception for another
+  /// provider is ignored: this profile holds no credentials for it.
+  AiConfig withOverride(AiOverride? exception) {
+    if (exception == null || exception.service != service) return this;
+    return AiConfig(
+      service: service,
+      baseUrl: baseUrl,
+      model: exception.model,
+      protocol: service.protocolForModel(exception.model),
+      apiKey: apiKey,
+      chatGptClientId: chatGptClientId,
+      profileId: profileId,
+      localModelPath: localModelPath,
+      localProjectorPath: localProjectorPath,
+      localContextLength: localContextLength,
+    );
+  }
+}

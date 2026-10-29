@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'helpers/real_io.dart';
 import 'package:gymia/application/ai_availability.dart';
 import 'package:gymia/application/workout_controller.dart';
 import 'package:gymia/data/ai_client.dart';
@@ -98,14 +99,11 @@ void main() {
       ),
     );
     await tester.tap(find.text('abrir'));
-    // Not pumpAndSettle: the panel loads saved activities asynchronously.
-    // The template load of T042 uses a real sqflite transaction whose watchdog
-    // timer stays pending if the chat is disposed mid-query, so finish the IO
-    // first.
-    await tester.runAsync(() async {
-      await Future<void>.delayed(const Duration(milliseconds: 150));
-    });
-    await tester.pump();
+    // Not pumpAndSettle: the panel loads saved activities asynchronously. Its
+    // template load and the companion's AI settings use real sqflite
+    // transactions whose watchdog timer stays pending if the chat is disposed
+    // mid-query, so alternate frames and real waiting until they finish.
+    await realIo(tester, 25);
     await tester.pump(const Duration(milliseconds: 600));
   }
 

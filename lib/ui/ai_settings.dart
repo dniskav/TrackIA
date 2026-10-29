@@ -8,9 +8,11 @@ import '../data/chatgpt_auth.dart';
 import '../data/ai_model_catalog.dart';
 import '../data/ai_settings_store.dart';
 import '../data/local_model_preflight.dart';
+import '../data/progress_repository.dart';
 import '../domain/ai_config.dart';
 import '../domain/workout.dart';
 import 'package:uuid/uuid.dart';
+import 'ai_per_companion.dart';
 
 class AiSettingsScreen extends StatefulWidget {
   const AiSettingsScreen({
@@ -19,8 +21,12 @@ class AiSettingsScreen extends StatefulWidget {
     this.client,
     this.profileId = 'local',
     this.chatGptAuth,
+    this.progress,
   });
   final String profileId;
+
+  /// With it, the screen lists «Por acompañante» (US11).
+  final ProgressRepository? progress;
   final ChatGptAuth? chatGptAuth;
   final AiModelCatalog? catalog;
   final AiClient? client;
@@ -880,6 +886,11 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
           Padding(
             padding: const EdgeInsets.only(top: 16),
             child: Text(status!),
+          ),
+        if (widget.progress != null)
+          AiPerCompanionSection(
+            profileId: widget.profileId,
+            progress: widget.progress!,
           ),
       ],
     ),

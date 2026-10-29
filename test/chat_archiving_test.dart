@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'helpers/real_io.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:gymia/application/ai_availability.dart';
 import 'package:gymia/application/workout_controller.dart';
@@ -121,6 +122,8 @@ void main() {
         ),
       ),
     );
+    // The chat reads its companion's settings from SQLite on opening.
+    await realIo(tester, 25);
     await tester.pumpAndSettle();
   }
 

@@ -4,11 +4,22 @@ import '../domain/ai_config.dart';
 import '../domain/user_profile.dart';
 
 class AiSettingsStore {
-  const AiSettingsStore({this.profileId = 'local'});
+  const AiSettingsStore({this.profileId = 'local', this.exception});
   final String profileId;
+
+  /// A companion's model for this profile's provider (US11). Only `load`
+  /// applies it; the credentials still come from this profile's secure storage.
+  final Future<AiOverride?> Function()? exception;
   static const _storage = FlutterSecureStorage();
   String get _key => profileStorageKey('gymia.ai.config.v1', profileId);
   Future<AiConfig?> load() async {
+    final config = await loadDefault();
+    if (config == null || exception == null) return config;
+    return config.withOverride(await exception!());
+  }
+
+  /// The profile's own setup, without any companion exception.
+  Future<AiConfig?> loadDefault() async {
     final source = await _storage.read(key: _key);
     final config =
         source == null
@@ -29,7 +40,7 @@ class AiSettingsStore {
         'La conexión ChatGPT pertenece a otro perfil.',
       );
     }
-    final previous = await load();
+    final previous = await loadDefault();
     if (previous?.toJson().toString() != config.toJson().toString()) {
       await _storage.delete(key: '$_key.verified');
     }
