@@ -18,6 +18,11 @@ import 'trackia_rename.dart';
 part 'sqlite_activity_repository.dart';
 part 'trackia_migrations.dart';
 
+/// The format written by the app, and the ones it still reads: copies made
+/// while the app was called GymIA keep restoring.
+const backupFormat = 'trackia-backup';
+const legacyBackupFormats = {'trackia-backup', 'gymia-backup'};
+
 class SqliteWorkoutRepository
     with _SqliteActivities
     implements WorkoutRepository, TransferRepository {
@@ -811,7 +816,7 @@ class SqliteWorkoutRepository
       tables[table] = await tx.query(table);
     }
     final source = jsonEncode({
-      'format': 'gymia-backup',
+      'format': backupFormat,
       'version': 3,
       'tables': tables,
     });
@@ -830,7 +835,7 @@ class SqliteWorkoutRepository
     try {
       final root = jsonDecode(source);
       if (root is! Map ||
-          root['format'] != 'gymia-backup' ||
+          !legacyBackupFormats.contains(root['format']) ||
           ![1, 2, 3].contains(root['version']) ||
           root['tables'] is! Map) {
         throw const FormatException();

@@ -30,7 +30,7 @@ void main() {
         await db.close();
       }
       final backup = jsonDecode(fixture.backupV3) as Map<String, dynamic>;
-      expect(backup['format'], 'gymia-backup');
+      expect(backup['format'], 'trackia-backup');
       expect(backup['version'], 3);
       final tables = backup['tables'] as Map<String, dynamic>;
       expect((tables['workouts'] as List).single['id'], fixture.workoutId);

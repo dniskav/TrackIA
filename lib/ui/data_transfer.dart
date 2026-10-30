@@ -192,7 +192,7 @@ class _DataTransferScreenState extends State<DataTransferScreen> {
     final file = File(
       p.join(
         folder.path,
-        'gymia-copia-${DateFormat('yyyyMMdd-HHmm').format(DateTime.now())}.json',
+        'trackia-copia-${DateFormat('yyyyMMdd-HHmm').format(DateTime.now())}.json',
       ),
     );
     await file.writeAsString(json, flush: true);

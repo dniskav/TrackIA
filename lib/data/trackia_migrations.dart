@@ -121,7 +121,7 @@ Future<void> _backupBeforeTrackiaV5(
   final pending = File('${target.path}.tmp');
   final sink = pending.openWrite();
   try {
-    sink.write('{"format":"gymia-backup","version":3,"tables":{');
+    sink.write('{"format":"trackia-backup","version":3,"tables":{');
     var firstTable = true;
     for (final table in SqliteWorkoutRepository._backupTables.keys) {
       if (!firstTable) sink.write(',');

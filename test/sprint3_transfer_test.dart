@@ -149,4 +149,24 @@ void main() {
     expect(preview.workouts.single.exercises.single.sets.first.weight, 6050);
     expect(parseCsvDate('46302').year, greaterThan(2025));
   });
+
+  test('a copy made while the app was called GymIA still restores', () async {
+    final routine = await repo.saveRoutine(
+      name: 'Pierna',
+      exercises: [const RoutineExerciseDraft(name: 'Sentadilla')],
+    );
+    final current = await repo.createBackupJson();
+    expect(jsonDecode(current)['format'], 'trackia-backup');
+    final legacy = jsonDecode(current) as Map<String, dynamic>
+      ..['format'] = 'gymia-backup';
+    await repo.deleteRoutine(routine);
+    await repo.restoreBackupJson(jsonEncode(legacy));
+    expect((await repo.loadRoutines()).single.id, routine);
+    expect(
+      () => repo.restoreBackupJson(
+        jsonEncode(legacy..['format'] = 'otra-aplicacion-backup'),
+      ),
+      throwsA(isA<ValidationException>()),
+    );
+  });
 }
