@@ -1,4 +1,5 @@
 import 'dart:convert';
+import '../domain/block_names.dart';
 import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:uuid/uuid.dart';
@@ -209,9 +210,7 @@ class ChatArchiveStore {
 }
 
 Map<String, dynamic>? chatDirective(String answer, String kind) {
-  final blocks = RegExp(
-    '```gymia-$kind\\s*\\n([\\s\\S]*?)```',
-  ).allMatches(answer).toList();
+  final blocks = blockPattern(kind).allMatches(answer).toList();
   if (blocks.length != 1) return null;
   try {
     final value = jsonDecode(blocks.single.group(1)!) as Map<String, dynamic>;

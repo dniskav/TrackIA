@@ -38,7 +38,7 @@ extension _ChatArchive on _AssistantChatScreenState {
 
   Future<void> maybeArchive(String answer) async {
     final directive = chatDirective(answer, 'archive');
-    if (directive == null && answer.contains('```gymia-archive') && mounted) {
+    if (directive == null && hasBlock(answer, 'archive') && mounted) {
       update(
         () => error =
             'El modelo pidió archivar con datos incompletos. El chat sigue abierto.',
@@ -181,14 +181,14 @@ extension _ChatArchive on _AssistantChatScreenState {
 
   Future<void> handleCompletedActions(String answer) async {
     await handleGameBlocks(answer);
-    if (answer.contains('```gymia-timing')) {
+    if (hasBlock(answer, 'timing')) {
       final timing = activityTimingProposal(answer);
       final activity = companionFocus;
       if (timing == null ||
           activity == null ||
-          answer.contains('```gymia-activity') ||
-          answer.contains('```gymia-sheet-edit') ||
-          answer.contains('```gymia-sync')) {
+          hasBlock(answer, 'activity') ||
+          hasBlock(answer, 'sheet-edit') ||
+          hasBlock(answer, 'sync')) {
         await saveSheetReply(
           'No se cambiaron los tiempos: la propuesta era inválida o no hay una actividad abierta en este acompañante.',
         );
@@ -258,10 +258,10 @@ extension _ChatArchive on _AssistantChatScreenState {
       return;
     }
     final sync = sheetSyncDirective(answer);
-    if (answer.contains('```gymia-sheet-edit')) {
+    if (hasBlock(answer, 'sheet-edit')) {
       if (sync != null ||
-          answer.contains('```gymia-activity') ||
-          answer.contains('```gymia-archive')) {
+          hasBlock(answer, 'activity') ||
+          hasBlock(answer, 'archive')) {
         await saveSheetReply(
           'No se modificó Google Sheets: el asistente mezcló dos operaciones. Pídele una sola edición concreta.',
         );
@@ -287,7 +287,7 @@ extension _ChatArchive on _AssistantChatScreenState {
           await synchronizeSheet(sync['workoutId'] as String);
         }
       }
-    } else if (answer.contains('```gymia-sync')) {
+    } else if (hasBlock(answer, 'sync')) {
       if (mounted) {
         update(
           () => error =

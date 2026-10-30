@@ -22,6 +22,13 @@ class CapabilityRegistry {
 
   final Map<String, int> _supported;
   static final current = CapabilityRegistry({
+    'trackia-activity': 1,
+    'trackia-result': 1,
+    'trackia-archive': 1,
+    'trackia-recall': 1,
+    'trackia-sync': 1,
+    'trackia-sheet-plan': 1,
+    // The names from when the app was called GymIA still count.
     'gymia-activity': 1,
     'gymia-result': 1,
     'gymia-archive': 1,

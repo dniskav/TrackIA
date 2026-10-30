@@ -75,7 +75,7 @@ extension _ChatSheet on _AssistantChatScreenState {
       .reversed
       .map(
         (m) =>
-            '${m.role}: ${m.text.replaceAll(RegExp(r"```gymia-[\s\S]*?(?:```|$)"), "")}',
+            '${m.role}: ${m.text.replaceAll(hiddenBlockPattern, "")}',
       )
       .join('\n');
 

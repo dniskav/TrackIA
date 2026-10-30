@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'block_names.dart';
 import 'dart:typed_data';
 import 'space.dart';
 import 'workout.dart';
@@ -263,9 +264,7 @@ class ActivityDefinition {
       ActivityDefinition.fromJson({...toJson(), 'companionId': id});
 
   static ActivityDefinition? proposal(String response) {
-    final matches = RegExp(
-      r'```gymia-activity\s*\n([\s\S]*?)```',
-    ).allMatches(response).toList();
+    final matches = blockPattern('activity').allMatches(response).toList();
     if (matches.length != 1) return null;
     try {
       final json = jsonDecode(matches.single.group(1)!) as Map<String, dynamic>;
@@ -291,9 +290,7 @@ class ActivityDefinition {
 }
 
 Map<String, int>? activityTimingProposal(String response) {
-  final matches = RegExp(
-    r'```gymia-timing\s*\n([\s\S]*?)```',
-  ).allMatches(response).toList();
+  final matches = blockPattern('timing').allMatches(response).toList();
   if (matches.length != 1) return null;
   try {
     final value = jsonDecode(matches.single.group(1)!) as Map<String, dynamic>;

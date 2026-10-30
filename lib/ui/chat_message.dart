@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../domain/block_names.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 
 class ChatMessageBody extends StatelessWidget {
@@ -14,7 +15,7 @@ class ChatMessageBody extends StatelessWidget {
   Widget build(BuildContext context) {
     if (!assistant) return SelectableText(text);
     final visible =
-        text.replaceAll(RegExp(r'```gymia-[\s\S]*?(?:```|$)'), '').trim();
+        text.replaceAll(hiddenBlockPattern, '').trim();
     final colors = Theme.of(context).colorScheme;
     final textStyle = Theme.of(
       context,

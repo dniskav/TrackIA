@@ -142,7 +142,7 @@ class SheetAutomation {
         answer,
         snapshot,
         allowOverwrite: config['allowOverwrite'] == true,
-        fence: 'gymia-sheet-edit',
+        fence: 'sheet-edit',
         requireExpected: true,
       );
       final live = await service.connection();

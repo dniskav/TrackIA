@@ -30,6 +30,7 @@ import 'proposal_card.dart';
 import '../domain/sheet_context.dart';
 import '../domain/workout.dart';
 import '../domain/ai_config.dart';
+import '../domain/block_names.dart';
 import 'ai_settings.dart';
 import 'google_sheets_import.dart';
 import 'data_transfer.dart';

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'block_names.dart';
 import 'activity.dart';
 import 'workout.dart';
 
@@ -97,13 +98,13 @@ class SheetSyncPlan {
     String response,
     Map<String, dynamic> snapshot, {
     bool allowOverwrite = false,
-    String fence = 'gymia-sheet-plan',
+    String fence = 'sheet-plan',
     bool requireExpected = false,
   }) {
     final matches =
-        RegExp('```$fence\\s*\\n([\\s\\S]*?)```').allMatches(response).toList();
+        blockPattern(fence).allMatches(response).toList();
     if (matches.isEmpty &&
-        !response.contains('```$fence') &&
+        !hasBlock(response, fence) &&
         response.trim().isNotEmpty) {
       throw SheetClarification(response.trim());
     }
@@ -220,7 +221,7 @@ class SheetSyncPlan {
 
 Map<String, dynamic>? sheetSyncDirective(String answer) {
   final matches =
-      RegExp(r'```gymia-sync\s*\n([\s\S]*?)```').allMatches(answer).toList();
+      blockPattern('sync').allMatches(answer).toList();
   if (matches.length != 1) return null;
   try {
     final json = jsonDecode(matches.single[1]!) as Map<String, dynamic>;

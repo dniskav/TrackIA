@@ -130,13 +130,13 @@ extension _ChatSend on _AssistantChatScreenState {
         config,
         [...history, AiMessage('user', text, attachment: media)],
         system:
-            '${contextForAi()}\nEl último mensaje del usuario corresponde a la actividad ${a.id}, tramo ${interval ?? 'sin iniciar'}. Interpreta ese mensaje aunque la pantalla actual haya cambiado. Si contiene resultados claros, añade un bloque gymia-result con JSON: {"metrics": {"clave_de_campo": valor_numérico_booleano_o_texto}}. Para una métrica nueva explícita de este mensaje puedes añadir "fields": [{"key":"clave_de_campo","label":"Etiqueta","unit":"unidad"}]. Mantén significado/unidad de los campos existentes; no los renombres. No inventes valores o métricas no expresadas, ni uses cifras de otros mensajes; en los campos que se suman anota solo la cantidad de este mensaje, nunca un total acumulado; objetivos y sugerencias no son resultados. Si una cifra o unidad es ambigua, pregunta en lugar de estructurarla. Las observaciones se conservan en el original; comenta lo pertinente brevemente.',
+            '${contextForAi()}\nEl último mensaje del usuario corresponde a la actividad ${a.id}, tramo ${interval ?? 'sin iniciar'}. Interpreta ese mensaje aunque la pantalla actual haya cambiado. Si contiene resultados claros, añade un bloque trackia-result con JSON: {"metrics": {"clave_de_campo": valor_numérico_booleano_o_texto}}. Para una métrica nueva explícita de este mensaje puedes añadir "fields": [{"key":"clave_de_campo","label":"Etiqueta","unit":"unidad"}]. Mantén significado/unidad de los campos existentes; no los renombres. No inventes valores o métricas no expresadas, ni uses cifras de otros mensajes; en los campos que se suman anota solo la cantidad de este mensaje, nunca un total acumulado; objetivos y sugerencias no son resultados. Si una cifra o unidad es ambigua, pregunta en lugar de estructurarla. Las observaciones se conservan en el original; comenta lo pertinente brevemente.',
         sessionId: sessionId,
         onText: receiveText,
       );
       await aiStore.markVerified(config);
       final block = RegExp(
-        r'```gymia-result\s*\n([\s\S]*?)```',
+        r'```trackia-result\s*\n([\s\S]*?)```',
       ).allMatches(answer).toList();
       if (block.length == 1) {
         try {
@@ -266,11 +266,11 @@ extension _ChatSend on _AssistantChatScreenState {
         onText: receiveText,
       );
       if (!mounted) return;
-      if (widget.focusMode && !answer.contains('```gymia-sheet-edit')) {
+      if (widget.focusMode && !hasBlock(answer, 'sheet-edit')) {
         proposal = ActivityDefinition.proposal(answer);
       }
       if (widget.focusMode &&
-          answer.contains('```gymia-activity') &&
+          hasBlock(answer, 'activity') &&
           proposal == null) {
         error =
             'El modelo envió una propuesta incompleta. Pídele que prepare de nuevo el ejercicio para mostrar Iniciar.';

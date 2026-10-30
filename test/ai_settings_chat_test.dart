@@ -504,7 +504,7 @@ void main() {
           sessions.add(headers['x-opencode-session']!);
           final context = (body['messages'] as List).first['content'] as String;
           expect(context, contains('no puedes registrar series'));
-          expect(context, contains('gymia-sheet-edit'));
+          expect(context, contains('trackia-sheet-edit'));
           return {
             'choices': [
               {
