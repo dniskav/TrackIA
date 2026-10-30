@@ -120,7 +120,7 @@ void main() {
         ),
       );
       await storage.write(
-        key: profileStorageKey('gymia.ai.chat.v1', a.id),
+        key: profileStorageKey('trackia.ai.chat.v1', a.id),
         value:
             '{"sessionId":"qa-a","messages":[{"role":"user","content":"Mensaje privado de A"}],"pending":null}',
       );
@@ -199,7 +199,7 @@ void main() {
       TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
           .setMockMethodCallHandler(ProfileStore.channel, null);
       for (final profile in [a, b]) {
-        for (final key in ['gymia.sheet.context.v1', 'gymia.ai.chat.v1']) {
+        for (final key in ['trackia.sheet.context.v1', 'trackia.ai.chat.v1']) {
           await storage.delete(key: profileStorageKey(key, profile.id));
         }
       }

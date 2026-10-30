@@ -46,7 +46,7 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
     addTearDown(tester.view.resetViewInsets);
     FlutterSecureStorage.setMockInitialValues({
-      'gymia.ai.chat.v1': jsonEncode({
+      'trackia.ai.chat.v1': jsonEncode({
         'sessionId': 'scroll-test',
         'messages': [
           for (var i = 0; i < 90; i++)

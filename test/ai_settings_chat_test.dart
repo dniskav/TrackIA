@@ -104,7 +104,7 @@ void main() {
       final saved =
           jsonDecode(
                 (await const FlutterSecureStorage().read(
-                  key: 'gymia.ai.chat.v1',
+                  key: 'trackia.ai.chat.v1',
                 ))!,
               )
               as Map;
@@ -148,7 +148,7 @@ void main() {
       final completed =
           jsonDecode(
                 (await const FlutterSecureStorage().read(
-                  key: 'gymia.ai.chat.v1',
+                  key: 'trackia.ai.chat.v1',
                 ))!,
               )
               as Map;

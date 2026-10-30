@@ -458,7 +458,7 @@ void main() {
       );
       expect(
         await tester.runAsync(() => const FlutterSecureStorage().readAll()),
-        isNot(contains('gymia.ai.chat.v1')),
+        isNot(contains('trackia.ai.chat.v1')),
       );
       await tester.pumpWidget(const SizedBox());
     });

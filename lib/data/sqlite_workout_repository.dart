@@ -1,4 +1,3 @@
-import 'package:path/path.dart' as p;
 import 'dart:convert';
 import 'dart:io';
 import 'package:sqflite/sqflite.dart';
@@ -15,6 +14,7 @@ import 'activity_template_repository.dart';
 import 'chat_store.dart';
 import 'progress_repository.dart';
 import 'observation_repository.dart';
+import 'trackia_rename.dart';
 part 'sqlite_activity_repository.dart';
 part 'trackia_migrations.dart';
 
@@ -320,7 +320,13 @@ class SqliteWorkoutRepository
   }) async {
     validTrackiaId(profileId);
     final f = factory ?? databaseFactory;
-    final dbPath = path ?? p.join(await f.getDatabasesPath(), 'gymia.sqlite');
+    final dbPath =
+        path ??
+        await resolveDatabasePath(
+          await f.getDatabasesPath(),
+          'local',
+          factory: f,
+        );
     final db = await f.openDatabase(
       dbPath,
       options: OpenDatabaseOptions(

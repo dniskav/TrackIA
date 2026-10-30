@@ -65,9 +65,9 @@ class ChatStore {
   final _verifiedThisRun = <String>{};
 
   String _chatKey(String companionId) =>
-      companionStorageKey('gymia.ai.chat.v1', profileId, companionId);
+      companionStorageKey('trackia.ai.chat.v1', profileId, companionId);
   String _archiveKey(String companionId, String id) =>
-      companionStorageKey('gymia.ai.archive.v1.$id', profileId, companionId);
+      companionStorageKey('trackia.ai.archive.v1.$id', profileId, companionId);
   String _archiveRowId(String companionId, String id) =>
       '$profileId:$companionId:$id';
 

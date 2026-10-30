@@ -20,9 +20,9 @@ void main() {
   ) async {
     const profile = 'local';
     const companion = 'lectura';
-    final chatKey = companionStorageKey('gymia.ai.chat.v1', profile, companion);
+    final chatKey = companionStorageKey('trackia.ai.chat.v1', profile, companion);
     final archiveKey = companionStorageKey(
-      'gymia.ai.archive.v1.archivo-1',
+      'trackia.ai.archive.v1.archivo-1',
       profile,
       companion,
     );

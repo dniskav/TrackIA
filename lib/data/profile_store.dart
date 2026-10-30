@@ -11,7 +11,7 @@ class ProfileStore extends ChangeNotifier {
   static final instance = ProfileStore._();
   static const storage = FlutterSecureStorage();
   static const channel = MethodChannel('com.gymia.app/google-sheets');
-  static const registryKey = 'gymia.profiles.v1';
+  static const registryKey = 'trackia.profiles.v1';
   String _activeId = 'local';
   final Map<String, UserProfile> _profiles = {};
   bool busy = false;

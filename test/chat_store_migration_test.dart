@@ -25,12 +25,12 @@ void main() {
   final now = DateTime(2026, 10, 29, 9);
 
   final chatKey = companionStorageKey(
-    'gymia.ai.chat.v1',
+    'trackia.ai.chat.v1',
     LegacyChatFixture.profileId,
     LegacyChatFixture.companionId,
   );
   final archiveKey = companionStorageKey(
-    'gymia.ai.archive.v1.${LegacyChatFixture.archiveId}',
+    'trackia.ai.archive.v1.${LegacyChatFixture.archiveId}',
     LegacyChatFixture.profileId,
     LegacyChatFixture.companionId,
   );
@@ -61,9 +61,9 @@ void main() {
     Map<String, dynamic>? chat,
     bool withArchive = true,
   }) async {
-    final key = companionStorageKey('gymia.ai.chat.v1', profile, companion);
+    final key = companionStorageKey('trackia.ai.chat.v1', profile, companion);
     final aKey = companionStorageKey(
-      'gymia.ai.archive.v1.${LegacyChatFixture.archiveId}',
+      'trackia.ai.archive.v1.${LegacyChatFixture.archiveId}',
       profile,
       companion,
     );
@@ -291,7 +291,7 @@ void main() {
       // «enfoque» was never opened, so its legacy keys are untouched.
       expect(
         await storage.read(
-          key: companionStorageKey('gymia.ai.chat.v1', 'local', 'enfoque'),
+          key: companionStorageKey('trackia.ai.chat.v1', 'local', 'enfoque'),
         ),
         isNotNull,
       );

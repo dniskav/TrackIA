@@ -26,15 +26,15 @@ void main() {
       tester.testTextInput.register();
       const storage = FlutterSecureStorage();
       const keys = [
-        'gymia.profiles.v1',
-        'gymia.ai.config.v1',
-        'gymia.ai.config.v1.verified',
-        'gymia.ai.chat.v1',
-        'gymia.sheet.context.v1',
-        'gymia.sheet.destination.v1',
-        'gymia.sheet.creation.v1',
-        'gymia.sheet.connection.v1',
-        'gymia.sheet.jobs.v1',
+        'trackia.profiles.v1',
+        'trackia.ai.config.v1',
+        'trackia.ai.config.v1.verified',
+        'trackia.ai.chat.v1',
+        'trackia.sheet.context.v1',
+        'trackia.sheet.destination.v1',
+        'trackia.sheet.creation.v1',
+        'trackia.sheet.connection.v1',
+        'trackia.sheet.jobs.v1',
       ];
       final saved = <String, String?>{};
       for (final key in keys) {
@@ -226,7 +226,7 @@ void main() {
         await drain();
         expect(find.byType(SheetSyncScreen), findsNothing);
         final chat =
-            jsonDecode((await storage.read(key: 'gymia.ai.chat.v1'))!) as Map;
+            jsonDecode((await storage.read(key: 'trackia.ai.chat.v1'))!) as Map;
         expect(jsonEncode(chat).contains('Google Sheets confirmado'), true);
         expect(ProfileStore.instance.activeId, 'local');
         expect(tester.takeException(), null);

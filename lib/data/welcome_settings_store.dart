@@ -14,7 +14,7 @@ class WelcomeSettings extends ChangeNotifier {
                const FlutterSecureStorage().write(key: key, value: value));
 
   static final instance = WelcomeSettings();
-  static const storageKey = 'gymia.welcome.auto_show.v1';
+  static const storageKey = 'trackia.welcome.auto_show.v1';
   static const contentVersion = 1;
   final Future<String?> Function(String) _read;
   final Future<void> Function(String, String) _write;

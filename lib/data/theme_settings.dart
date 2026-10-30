@@ -5,7 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class ThemeSettings extends ChangeNotifier {
   ThemeSettings();
   static final instance = ThemeSettings();
-  static const storageKey = 'gymia.appearance.v1'; // Preference name, not a credential. gitleaks:allow
+  static const storageKey = 'trackia.appearance.v1'; // Preference name, not a credential. gitleaks:allow
   static const _storage = FlutterSecureStorage();
   ThemeMode mode = ThemeMode.dark;
   bool busy = false;

@@ -28,10 +28,10 @@ void main() {
     // storage on Android. This is not a live LLM/provider validation.
     const storage = FlutterSecureStorage();
     const keys = [
-      'gymia.ai.config.v1',
-      'gymia.ai.config.v1.verified',
-      'gymia.ai.chat.v1',
-      'gymia.sheet.context.v1',
+      'trackia.ai.config.v1',
+      'trackia.ai.config.v1.verified',
+      'trackia.ai.chat.v1',
+      'trackia.sheet.context.v1',
     ];
     final saved = <String, String?>{};
     for (final key in keys) {

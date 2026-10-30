@@ -13,7 +13,7 @@ class SheetContextStore {
   final String companionId;
   static const _storage = FlutterSecureStorage();
   String get _key =>
-      companionStorageKey('gymia.sheet.context.v1', profileId, companionId);
+      companionStorageKey('trackia.sheet.context.v1', profileId, companionId);
   static final changes = ValueNotifier<int>(0);
 
   Future<SheetContext?> load() async {

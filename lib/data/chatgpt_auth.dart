@@ -222,7 +222,7 @@ class ChatGptAuth {
       '$identityScopes offline_access resource.invoke chatgpt.tokens.use.direct';
   static final Map<String, Future<void>> _locks = {};
   static final Map<String, int> _epochs = {};
-  String get _key => profileStorageKey('gymia.chatgpt.accounts.v1', profileId);
+  String get _key => profileStorageKey('trackia.chatgpt.accounts.v1', profileId);
   int get _epoch => _epochs[_key] ?? 0;
   ChatGptCallback? _pending;
   bool _connecting = false;
@@ -265,12 +265,12 @@ class ChatGptAuth {
           .map((v) => ChatGptAccount(Map<String, dynamic>.from(v as Map)))
           .toList();
   Future<String> _host() => _locked(() async {
-    const key = 'gymia.chatgpt.host.v1';
+    const key = 'trackia.chatgpt.host.v1';
     var host = await storage.read(key: key);
     host ??= 'urn:uuid:${const Uuid().v4()}';
     await storage.write(key: key, value: host);
     return host;
-  }, key: 'gymia.chatgpt.host.v1');
+  }, key: 'trackia.chatgpt.host.v1');
   Future<ChatGptAccount> account(String id) async {
     final row = (await _read())[id];
     if (row is! Map) throw const ChatGptFailure('reconnect');

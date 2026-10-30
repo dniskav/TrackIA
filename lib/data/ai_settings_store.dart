@@ -11,7 +11,7 @@ class AiSettingsStore {
   /// applies it; the credentials still come from this profile's secure storage.
   final Future<AiOverride?> Function()? exception;
   static const _storage = FlutterSecureStorage();
-  String get _key => profileStorageKey('gymia.ai.config.v1', profileId);
+  String get _key => profileStorageKey('trackia.ai.config.v1', profileId);
   Future<AiConfig?> load() async {
     final config = await loadDefault();
     if (config == null || exception == null) return config;

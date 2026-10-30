@@ -38,7 +38,7 @@ void main() {
     apiKey: 'fake-key',
   );
   final legacyKey = companionStorageKey(
-    'gymia.ai.chat.v1',
+    'trackia.ai.chat.v1',
     LegacyChatFixture.profileId,
     LegacyChatFixture.companionId,
   );

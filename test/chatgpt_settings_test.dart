@@ -14,7 +14,7 @@ void main() {
   const config = AiConfig(service:AiService.chatgpt,baseUrl:ChatGptAuth.resource,
     model:'qa-model',protocol:AiProtocol.responses,apiKey:'',chatGptClientId:'oaiapp_test');
   Future<void> seed() async {
-    await ChatGptAuth.storage.write(key:'gymia.chatgpt.accounts.v1',value:jsonEncode({'oaiapp_test':{
+    await ChatGptAuth.storage.write(key:'trackia.chatgpt.accounts.v1',value:jsonEncode({'oaiapp_test':{
       'client_id':'oaiapp_test','subject':'person','email':'qa@example.test',
       'access_token':'fixture-access','refresh_token':'fixture-refresh',
       'scopes':ChatGptAuth.planScopes.split(' '),

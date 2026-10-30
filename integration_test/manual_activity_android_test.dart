@@ -23,9 +23,9 @@ void main() {
   ) async {
     const storage = FlutterSecureStorage();
     for (final key in const [
-      'gymia.ai.config.v1',
-      'gymia.ai.config.v1.verified',
-      'gymia.ai.chat.v1',
+      'trackia.ai.config.v1',
+      'trackia.ai.config.v1.verified',
+      'trackia.ai.chat.v1',
     ]) {
       await storage.delete(key: key);
     }
@@ -292,9 +292,9 @@ void main() {
       await dir.delete(recursive: true);
     } finally {
       for (final key in const [
-        'gymia.ai.config.v1',
-        'gymia.ai.config.v1.verified',
-        'gymia.ai.chat.v1',
+        'trackia.ai.config.v1',
+        'trackia.ai.config.v1.verified',
+        'trackia.ai.chat.v1',
       ]) {
         await storage.delete(key: key);
       }

@@ -18,7 +18,7 @@ void main() {
     'Android loopback OAuth verifies identity, stores securely, uses plan and disconnects',
     (tester) async {
       const profile = 'qa-chatgpt-android';
-      const accountKey = 'gymia.chatgpt.accounts.v1.profile.$profile';
+      const accountKey = 'trackia.chatgpt.accounts.v1.profile.$profile';
       const storage = FlutterSecureStorage();
       await storage.delete(key: accountKey);
       await const AiSettingsStore(profileId: profile).delete();

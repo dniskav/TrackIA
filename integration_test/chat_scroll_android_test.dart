@@ -45,10 +45,10 @@ void main() {
       tester.testTextInput.register();
       const storage = FlutterSecureStorage();
       const keys = [
-        'gymia.ai.config.v1',
-        'gymia.ai.config.v1.verified',
-        'gymia.ai.chat.v1',
-        'gymia.sheet.context.v1',
+        'trackia.ai.config.v1',
+        'trackia.ai.config.v1.verified',
+        'trackia.ai.chat.v1',
+        'trackia.sheet.context.v1',
       ];
       final saved = <String, String?>{};
       for (final key in keys) {
@@ -86,7 +86,7 @@ void main() {
           (await const AiSettingsStore().load())!,
         );
         await storage.write(
-          key: 'gymia.ai.chat.v1',
+          key: 'trackia.ai.chat.v1',
           value: jsonEncode({
             'sessionId': 'android-scroll-qa',
             'messages': [
@@ -319,7 +319,7 @@ void main() {
         for (final entry in ChatArchiveStore.index(
           await archiveStore.active(),
         )) {
-          await storage.delete(key: 'gymia.ai.archive.v1.${entry['id']}');
+          await storage.delete(key: 'trackia.ai.archive.v1.${entry['id']}');
         }
         for (final key in keys) {
           if (saved[key] == null) {

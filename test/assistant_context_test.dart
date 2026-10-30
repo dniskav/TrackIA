@@ -172,7 +172,7 @@ void main() {
       WidgetTester tester,
     ) async {
       final key = companionStorageKey(
-        'gymia.ai.chat.v1',
+        'trackia.ai.chat.v1',
         controller.profileId,
         'gymbro',
       );

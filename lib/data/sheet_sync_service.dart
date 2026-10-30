@@ -17,9 +17,9 @@ class SheetSyncService {
   static const storage = FlutterSecureStorage();
   UserProfile? identity;
   String get destinationKey =>
-      profileStorageKey('gymia.sheet.destination.v1', profileId);
+      profileStorageKey('trackia.sheet.destination.v1', profileId);
   String get creationKey =>
-      companionStorageKey('gymia.sheet.creation.v1', profileId, companionId);
+      companionStorageKey('trackia.sheet.creation.v1', profileId, companionId);
   void checkProfile() {
     if (ProfileStore.instance.activeId != profileId) {
       throw const ValidationException(
@@ -118,7 +118,7 @@ class SheetSyncService {
   }
 
   String get connectionKey =>
-      companionStorageKey('gymia.sheet.connection.v1', profileId, companionId);
+      companionStorageKey('trackia.sheet.connection.v1', profileId, companionId);
   Future<Map<String, dynamic>?> connection() async {
     checkProfile();
     final raw = await storage.read(key: connectionKey);

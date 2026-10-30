@@ -23,7 +23,7 @@ class SheetAutomation {
     companionId: companionId,
   );
   String get queueKey => companionStorageKey(
-    'gymia.sheet.jobs.v1',
+    'trackia.sheet.jobs.v1',
     controller.profileId,
     companionId,
   );

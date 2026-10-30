@@ -28,15 +28,15 @@ void main() {
       tester.testTextInput.register();
       const storage = FlutterSecureStorage();
       const keys = [
-        'gymia.profiles.v1',
-        'gymia.ai.config.v1',
-        'gymia.ai.config.v1.verified',
-        'gymia.ai.chat.v1',
-        'gymia.sheet.context.v1',
-        'gymia.sheet.destination.v1',
-        'gymia.sheet.creation.v1',
-        'gymia.sheet.connection.v1',
-        'gymia.sheet.jobs.v1',
+        'trackia.profiles.v1',
+        'trackia.ai.config.v1',
+        'trackia.ai.config.v1.verified',
+        'trackia.ai.chat.v1',
+        'trackia.sheet.context.v1',
+        'trackia.sheet.destination.v1',
+        'trackia.sheet.creation.v1',
+        'trackia.sheet.connection.v1',
+        'trackia.sheet.jobs.v1',
       ];
       final saved = <String, String?>{};
       for (final key in keys) {
@@ -74,7 +74,7 @@ void main() {
         email: 'qa@example.test',
       );
       await storage.write(
-        key: 'gymia.sheet.destination.v1',
+        key: 'trackia.sheet.destination.v1',
         value: jsonEncode(dest.toJson()),
       );
       final snapshot = <String, dynamic>{
@@ -244,7 +244,7 @@ void main() {
           calls.where((c) => c.method == 'writeWorkout'),
           hasLength(2),
           reason:
-              'jobs=${await storage.read(key: 'gymia.sheet.jobs.v1')}, config=${await service.connection()}',
+              'jobs=${await storage.read(key: 'trackia.sheet.jobs.v1')}, config=${await service.connection()}',
         );
         expect(calls.where((c) => c.method == 'connectIdentity'), isEmpty);
         expect((await repo.load()), hasLength(2));
@@ -263,7 +263,7 @@ void main() {
         expect(tester.takeException(), null);
         expect(
           jsonEncode(
-            jsonDecode((await storage.read(key: 'gymia.ai.chat.v1'))!),
+            jsonDecode((await storage.read(key: 'trackia.ai.chat.v1'))!),
           ),
           contains('Google Sheets confirmado'),
         );

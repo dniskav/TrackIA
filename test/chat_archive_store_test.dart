@@ -18,7 +18,7 @@ class _FailCommit extends FlutterSecureStorage {
     MacOsOptions? mOptions,
     WindowsOptions? wOptions,
   }) {
-    if (key.contains('gymia.ai.chat.v1')) throw StateError('disk full');
+    if (key.contains('trackia.ai.chat.v1')) throw StateError('disk full');
     return super.write(key: key, value: value);
   }
 }

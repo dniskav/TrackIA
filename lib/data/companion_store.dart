@@ -57,7 +57,7 @@ class CompanionStore {
   Future<void> delete(String id) async {
     final items = await load();
     await save(items.where((item) => item.id != id).toList());
-    final chatKey = companionStorageKey('gymia.ai.chat.v1', profileId, id);
+    final chatKey = companionStorageKey('trackia.ai.chat.v1', profileId, id);
     final raw = await storage.read(key: chatKey);
     if (raw != null) {
       final state = jsonDecode(raw) as Map<String, dynamic>;
@@ -67,7 +67,7 @@ class CompanionStore {
             RegExp(r'^[A-Za-z0-9_-]{1,128}$').hasMatch(archiveId)) {
           await storage.delete(
             key: companionStorageKey(
-              'gymia.ai.archive.v1.$archiveId',
+              'trackia.ai.archive.v1.$archiveId',
               profileId,
               id,
             ),
@@ -76,11 +76,11 @@ class CompanionStore {
       }
     }
     for (final base in [
-      'gymia.ai.chat.v1',
-      'gymia.sheet.context.v1',
-      'gymia.sheet.connection.v1',
-      'gymia.sheet.creation.v1',
-      'gymia.sheet.jobs.v1',
+      'trackia.ai.chat.v1',
+      'trackia.sheet.context.v1',
+      'trackia.sheet.connection.v1',
+      'trackia.sheet.creation.v1',
+      'trackia.sheet.jobs.v1',
     ]) {
       await storage.delete(key: companionStorageKey(base, profileId, id));
     }

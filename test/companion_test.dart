@@ -46,15 +46,15 @@ void main() {
     'GymBro keeps legacy keys; other companions keep Sheets separate',
     () async {
       expect(
-        companionStorageKey('gymia.ai.chat.v1', 'local', 'gymbro'),
-        'gymia.ai.chat.v1',
+        companionStorageKey('trackia.ai.chat.v1', 'local', 'gymbro'),
+        'trackia.ai.chat.v1',
       );
       expect(
         SheetSyncService(profileId: 'local').connectionKey,
-        'gymia.sheet.connection.v1',
+        'trackia.sheet.connection.v1',
       );
       final other = SheetSyncService(profileId: 'local', companionId: 'calma');
-      expect(other.connectionKey, isNot('gymia.sheet.connection.v1'));
+      expect(other.connectionKey, isNot('trackia.sheet.connection.v1'));
 
       final gym = SheetContextStore(profileId: 'local');
       final calm = SheetContextStore(profileId: 'local', companionId: 'calma');
@@ -83,12 +83,12 @@ void main() {
       const store = CompanionStore(profileId: 'local');
       await store.load();
       final gymChat = companionStorageKey(
-        'gymia.ai.chat.v1',
+        'trackia.ai.chat.v1',
         'local',
         'gymbro',
       );
       final calmChat = companionStorageKey(
-        'gymia.ai.chat.v1',
+        'trackia.ai.chat.v1',
         'local',
         'calma',
       );

@@ -119,8 +119,8 @@ void main() {
     await ChatGptAuth.storage.write(
       key:
           profile == 'local'
-              ? 'gymia.chatgpt.accounts.v1'
-              : 'gymia.chatgpt.accounts.v1.profile.$profile',
+              ? 'trackia.chatgpt.accounts.v1'
+              : 'trackia.chatgpt.accounts.v1.profile.$profile',
       value: jsonEncode({
         id: {
           'client_id': id,

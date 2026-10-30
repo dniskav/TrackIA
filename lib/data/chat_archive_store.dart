@@ -23,13 +23,13 @@ class ChatArchiveStore {
   final String companionId;
   final FlutterSecureStorage storage;
   String get activeKey =>
-      companionStorageKey('gymia.ai.chat.v1', profileId, companionId);
+      companionStorageKey('trackia.ai.chat.v1', profileId, companionId);
   String _archiveKey(String id) {
     if (!RegExp(r'^[A-Za-z0-9_-]{1,128}$').hasMatch(id)) {
       throw const FormatException('Archivo no válido.');
     }
     return companionStorageKey(
-      'gymia.ai.archive.v1.$id',
+      'trackia.ai.archive.v1.$id',
       profileId,
       companionId,
     );

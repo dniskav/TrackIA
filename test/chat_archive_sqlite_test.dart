@@ -214,7 +214,7 @@ void main() {
       };
       FlutterSecureStorage.setMockInitialValues({
         archive.activeKey: jsonEncode(old),
-        'gymia.ai.archive.v1.${LegacyChatFixture.archiveId}': jsonEncode(
+        'trackia.ai.archive.v1.${LegacyChatFixture.archiveId}': jsonEncode(
           LegacyChatFixture.archive(),
         ),
       });

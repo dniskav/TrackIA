@@ -4,9 +4,9 @@ import 'application/workout_controller.dart';
 import 'ui/app.dart';
 import 'ui/theme.dart' show gymLightTheme;
 import 'data/profile_store.dart';
+import 'data/trackia_rename.dart';
 import 'data/theme_settings.dart';
 import 'data/welcome_settings_store.dart';
-import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
 
 void main() {
@@ -42,6 +42,8 @@ class _BootstrapState extends State<Bootstrap> {
   late Future<WorkoutController> future = _open();
   Future<WorkoutController> _open({bool loadRegistry = true}) async {
     if (loadRegistry) {
+      // Before anything reads a preference: GymIA's keys become TrackIA's.
+      await migrateStorageKeys();
       try {
         await ThemeSettings.instance.load();
       } catch (_) {
@@ -56,13 +58,8 @@ class _BootstrapState extends State<Bootstrap> {
     }
     final id = profiles.activeId;
     if (controllers.containsKey(id)) return controllers[id]!;
-    final path =
-        id == 'local' && widget.databaseDirectory == null
-            ? null
-            : p.join(
-              widget.databaseDirectory ?? await getDatabasesPath(),
-              id == 'local' ? 'gymia.sqlite' : 'gymia-$id.sqlite',
-            );
+    final directory = widget.databaseDirectory ?? await getDatabasesPath();
+    final path = await resolveDatabasePath(directory, id);
     final repository = await SqliteWorkoutRepository.open(
       path: path,
       profileId: id,

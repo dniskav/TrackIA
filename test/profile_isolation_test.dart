@@ -64,7 +64,7 @@ void main() {
     'local data remains unclaimed; two Google accounts retain separate sheets and secrets',
     () async {
       await const SheetContextStore().save(sheet('legacy'));
-      await storage.write(key: 'gymia.ai.chat.v1', value: 'legacy chat');
+      await storage.write(key: 'trackia.ai.chat.v1', value: 'legacy chat');
       await profiles.connect();
       final aSheets = SheetContextStore(profileId: a.id);
       final aSettings = AiSettingsStore(profileId: a.id);
@@ -81,7 +81,7 @@ void main() {
       await aSettings.save(config);
       await aSettings.markVerified(config);
       await storage.write(
-        key: profileStorageKey('gymia.ai.chat.v1', a.id),
+        key: profileStorageKey('trackia.ai.chat.v1', a.id),
         value: 'a chat',
       );
       next = b;
@@ -90,7 +90,7 @@ void main() {
       expect(await SheetContextStore(profileId: b.id).load(), isNull);
       expect(await AiSettingsStore(profileId: b.id).load(), isNull);
       expect(
-        await storage.read(key: profileStorageKey('gymia.ai.chat.v1', b.id)),
+        await storage.read(key: profileStorageKey('trackia.ai.chat.v1', b.id)),
         isNull,
       );
       await SheetContextStore(profileId: b.id).save(sheet('b'));
@@ -103,7 +103,7 @@ void main() {
       expect(await aSettings.isVerified(config), isTrue);
       await profiles.useLocal();
       expect((await const SheetContextStore().load())!.id, 'legacy');
-      expect(await storage.read(key: 'gymia.ai.chat.v1'), 'legacy chat');
+      expect(await storage.read(key: 'trackia.ai.chat.v1'), 'legacy chat');
       expect(profiles.profiles.length, 2);
       final registry = jsonDecode(
         (await storage.read(key: ProfileStore.registryKey))!,

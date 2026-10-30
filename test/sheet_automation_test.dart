@@ -41,7 +41,7 @@ void main() {
   final prompts = <String>[];
   setUp(() async {
     FlutterSecureStorage.setMockInitialValues({
-      'gymia.sheet.destination.v1': jsonEncode(identity.toJson()),
+      'trackia.sheet.destination.v1': jsonEncode(identity.toJson()),
     });
     await ProfileStore.instance.load();
     calls.clear();

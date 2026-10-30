@@ -55,7 +55,7 @@ void main() {
     payloads.clear();
     reply = 'Respuesta';
     FlutterSecureStorage.setMockInitialValues({
-      'gymia.ai.chat.v1': jsonEncode({
+      'trackia.ai.chat.v1': jsonEncode({
         'sessionId': 'archive-qa',
         'messages': [
           const AiMessage('user', 'Detalle antiguo único').forStorage(),
@@ -141,7 +141,7 @@ void main() {
     'model archive waits while user reads history and runs when returning to the tail',
     (tester) async {
       await const FlutterSecureStorage().write(
-        key: 'gymia.ai.chat.v1',
+        key: 'trackia.ai.chat.v1',
         value: jsonEncode({
           'sessionId': 'reading-archive',
           'messages': [
@@ -360,7 +360,7 @@ void main() {
       ); // Google connection precedes creation controls.
       expect(find.byKey(const Key('sync-connect')), findsOneWidget);
       expect(
-        await const FlutterSecureStorage().read(key: 'gymia.sheet.creation.v1'),
+        await const FlutterSecureStorage().read(key: 'trackia.sheet.creation.v1'),
         null,
       );
       await tester.pageBack();
@@ -391,7 +391,7 @@ void main() {
     await drain(tester);
     expect(find.byType(SheetSyncScreen), findsNothing);
     expect(
-      await const FlutterSecureStorage().read(key: 'gymia.sheet.creation.v1'),
+      await const FlutterSecureStorage().read(key: 'trackia.sheet.creation.v1'),
       null,
     );
     await tester.pumpWidget(const SizedBox());
@@ -418,7 +418,7 @@ void main() {
       );
       const secure = FlutterSecureStorage();
       await secure.write(
-        key: 'gymia.sheet.destination.v1',
+        key: 'trackia.sheet.destination.v1',
         value: jsonEncode(dest.toJson()),
       );
       final sheet = SheetContext(
@@ -508,7 +508,7 @@ void main() {
       ]);
       expect(bodies, hasLength(2));
       expect(
-        jsonEncode(jsonDecode((await secure.read(key: 'gymia.ai.chat.v1'))!)),
+        jsonEncode(jsonDecode((await secure.read(key: 'trackia.ai.chat.v1'))!)),
         contains('Google Sheets confirmado'),
       );
       expect((await tester.runAsync(repo.load))!.single.id, id);
@@ -524,7 +524,7 @@ void main() {
       );
       const secure = FlutterSecureStorage();
       await secure.write(
-        key: 'gymia.sheet.destination.v1',
+        key: 'trackia.sheet.destination.v1',
         value: jsonEncode(dest.toJson()),
       );
       final sheet = SheetContext(
@@ -599,7 +599,7 @@ void main() {
       expect(google.where((c) => c.method == 'writeWorkout'), hasLength(1));
       expect(find.byType(SheetSyncScreen), findsNothing);
       expect(
-        jsonEncode(jsonDecode((await secure.read(key: 'gymia.ai.chat.v1'))!)),
+        jsonEncode(jsonDecode((await secure.read(key: 'trackia.ai.chat.v1'))!)),
         contains('Google Sheets confirmó la edición'),
       );
       await tester.pumpWidget(const SizedBox());
