@@ -171,6 +171,16 @@ void main() {
     });
 
     test(
+      'an empty journal left by a clean close does not stop the rename',
+      () async {
+        await legacyDatabase('gymia.sqlite');
+        File('${dir.path}/gymia.sqlite-journal').writeAsBytesSync([]);
+        expect(await migrateDatabaseFile(dir.path, 'local'), isTrue);
+        expect(File('${dir.path}/trackia.sqlite').existsSync(), isTrue);
+      },
+    );
+
+    test(
       'a pending journal keeps the old file in use instead of an empty database',
       () async {
         await legacyDatabase('gymia.sqlite');

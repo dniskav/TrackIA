@@ -102,8 +102,10 @@ Future<bool> migrateDatabaseFile(
   try {
     // A write-ahead log would hold changes the main file does not have yet.
     await beforeCopy?.call(source.path);
-    for (final suffix in ['-wal', '-shm', '-journal']) {
-      if (await File(source.path + suffix).exists()) {
+    // An empty one is what SQLite leaves behind after a clean close.
+    for (final suffix in ['-wal', '-journal']) {
+      final extra = File(source.path + suffix);
+      if (await extra.exists() && await extra.length() > 0) {
         debugPrint('Database rename skipped: ${source.path}$suffix is pending');
         return false;
       }
@@ -111,6 +113,7 @@ Future<bool> migrateDatabaseFile(
     if (await temporary.exists()) await temporary.delete();
     await source.copy(temporary.path);
     if (await temporary.length() != await source.length()) {
+      debugPrint('Database rename skipped: the copy has another size');
       await temporary.delete();
       return false;
     }
@@ -133,7 +136,7 @@ Future<void> checkpointDatabase(String path, {DatabaseFactory? factory}) async {
     options: OpenDatabaseOptions(singleInstance: false),
   );
   try {
-    await db.execute('PRAGMA wal_checkpoint(TRUNCATE)');
+    await db.rawQuery('PRAGMA wal_checkpoint(TRUNCATE)');
   } finally {
     await db.close();
   }
