@@ -47,6 +47,8 @@ import '../application/sheet_automation.dart';
 import '../data/companion_store.dart';
 import '../domain/companion.dart';
 import 'companion_style.dart';
+
+part 'chat/chat_game.dart';
 part 'chat/chat_sheet.dart';
 
 /// Mensaje de confirmación tras guardar tiempos propuestos por la IA. Lo no
@@ -438,37 +440,6 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     captureTail = task.then((_) {});
     unawaited(captureTail.catchError((_) {}));
     return task;
-  }
-
-  Future<void> acceptProposal() async {
-    if (!aiReady) return;
-    final selected = proposal;
-    if (selected == null) return;
-    if (widget.controller.focus != null) {
-      if (mounted) {
-        setState(
-          () => error =
-              'Termina la actividad abierta en el otro acompañante antes de preparar esta.',
-        );
-      }
-      return;
-    }
-    final ok = await widget.controller.run(() async {
-      await widget.controller.activityRepository!.prepareActivity(
-        selected.forCompanion(companionId),
-      );
-    });
-    if (mounted) {
-      setState(() {
-        if (ok) {
-          proposal = null;
-        } else {
-          error =
-              widget.controller.error ??
-              'No se pudo preparar la actividad. Vuelve a intentarlo.';
-        }
-      });
-    }
   }
 
   void scrollToLatest() {
@@ -1222,38 +1193,6 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     }
   }
 
-  /// Aplica lo propuesto en la tarjeta FR-023; sigue siendo un cambio de
-  /// origen assistant («Aplicar» lo confirma).
-  Future<void> applyLockedProposal() async {
-    final card = lockedProposals;
-    final activity = companionFocus;
-    if (card == null || activity == null) return;
-    final values = {for (final p in card) p.property: p.proposedValue};
-    setState(() => lockedProposals = null);
-    final applied = await widget.controller.run(
-      () => widget.controller.activityRepository!.setActivityTiming(
-        activity.id,
-        activitySeconds:
-            values['activitySeconds'] ?? activity.definition.activitySeconds,
-        restSeconds: values['restSeconds'] ?? activity.definition.restSeconds,
-        targetCycles:
-            values['targetCycles'] ?? activity.definition.targetCycles,
-        source: 'assistant',
-      ),
-    );
-    final descanso = values['restSeconds'] ?? activity.definition.restSeconds;
-    await saveSheetReply(
-      applied
-          ? 'Aplicado: ${descanso ~/ 60}:${(descanso % 60).toString().padLeft(2, '0')} de descanso.'
-          : 'No se pudo aplicar la propuesta. Revisa la actividad.',
-    );
-  }
-
-  void ignoreLockedProposal() {
-    setState(() => lockedProposals = null);
-    saveSheetReply('Propuesta ignorada; lo fijado por ti sigue igual.');
-  }
-
   bool get canArchive =>
       !(busy ||
           listening ||
@@ -1489,121 +1428,6 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
   bool gameSuggestionDue = false;
   bool suggestionHidden = false;
 
-  Future<void> refreshProgress() async {
-    final service = widget.progressService;
-    if (service == null) return;
-    try {
-      final state = await service.state(companionId);
-      if (!mounted) return;
-      final today = service.today;
-      progressContext = state.settings.game
-          ? {
-              'mode': 'game',
-              'currentStreak': state.streak.current,
-              'bestStreak': state.streak.best,
-              'todayGoal': state.goal == null
-                  ? null
-                  : {
-                      'value': state.goalProgress?.value,
-                      'target': state.goal!.target,
-                      'met': state.goalProgress?.met,
-                      'minimumMet': state.goalProgress?.minimumMet,
-                    },
-              'unlockedToday': [
-                for (final a in state.achievements)
-                  if (a.unlock != null &&
-                      ProgressService.dayOf(a.unlock!.unlockedAt) == today)
-                    a.title,
-              ],
-            }
-          : null;
-      final due = state.settings.game
-          ? false
-          : await service.gameSuggestionDue(companionId);
-      if (mounted) setState(() => gameSuggestionDue = due);
-    } catch (_) {
-      // The context simply goes without progress this time.
-    }
-  }
-
-  Future<Map<String, String>> fieldLabels(ProgressService service) async => {
-    for (final f in await service.progress.typedFields(companionId))
-      '${f['key']}': '${f['label']}',
-  };
-
-  /// The activities of this companion a goal or achievement may refer to.
-  Future<Set<String>> activityKeys() async => {
-    for (final a in companionActivities) a.definition.activityKey,
-    for (final t
-        in await widget.controller.templates?.list(companionId: companionId) ??
-            const [])
-      t.definition.activityKey,
-  };
-
-  /// `trackia-goal`, `trackia-achievement` and `trackia-reminder-copy` become
-  /// cards in game mode; a rejected block leaves the reply and says so. Nothing
-  /// is saved until the user taps «Añadir».
-  Future<void> handleGameBlocks(String answer) async {
-    final service = widget.progressService;
-    if (service == null) return;
-    const kinds = ['goal', 'achievement', 'reminder-copy'];
-    if (!kinds.any((k) => mentionsBlock(answer, k))) return;
-    final settings = await service.progress.settings(companionId);
-    if (!settings.game || !mounted) return;
-    final labels = await fieldLabels(service);
-    final keys = await activityKeys();
-    final cards = <GameProposalData>[];
-    var rejected = false;
-
-    if (mentionsBlock(answer, 'goal')) {
-      final goal = parseGoalBlock(answer, activityKeys: keys);
-      if (goal == null) {
-        rejected = true;
-      } else {
-        cards.add(
-          GameProposalData(
-            kind: 'goal',
-            title: 'Meta propuesta: ${goalText(goal.rule, labels)}',
-            lines: const [],
-            payload: goal,
-          ),
-        );
-      }
-    }
-    if (mentionsBlock(answer, 'achievement')) {
-      final achievement = parseAchievementBlock(answer, activityKeys: keys);
-      if (achievement == null) {
-        rejected = true;
-      } else {
-        cards.add(
-          GameProposalData(
-            kind: 'achievement',
-            title: 'Logro propuesto: ${achievement.title}',
-            lines: [ruleText(achievement.rule, labels)],
-            payload: achievement,
-          ),
-        );
-      }
-    }
-    if (mentionsBlock(answer, 'reminder-copy')) {
-      final copy = parseReminderCopyBlock(answer);
-      if (copy == null) {
-        rejected = true;
-      } else {
-        cards.add(
-          GameProposalData(
-            kind: 'copy',
-            title: 'Textos de recordatorio propuestos',
-            lines: await copyExamples(service, copy, labels),
-            payload: copy,
-          ),
-        );
-      }
-    }
-    if (rejected) await saveSheetReply(blockRejectedText);
-    if (cards.isNotEmpty && mounted) setState(() => gameCards = cards);
-  }
-
   /// Up to two of the proposed texts, filled in with this companion's data.
   Future<List<String>> copyExamples(
     ProgressService service,
@@ -1648,90 +1472,6 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
         if (c != card) c,
     ],
   );
-
-  Future<void> addGameCard(GameProposalData card) async {
-    final service = widget.progressService;
-    if (service == null || gameBusy) return;
-    setState(() => gameBusy = true);
-    String result;
-    try {
-      switch (card.kind) {
-        case 'goal':
-          final goal = card.payload as GoalProposal;
-          await service.progress.saveGoal(
-            companionId,
-            goal.rule,
-            origin: 'assistant',
-          );
-          result = 'Meta añadida. La verás en tu progreso.';
-        case 'achievement':
-          final proposal = card.payload as AchievementProposal;
-          // Only the rule is created; an unlock always comes from saved data.
-          final added = await service.progress.ensureAchievements(companionId, [
-            GeneratedAchievement(
-              rule: proposal.rule,
-              title: proposal.title,
-              icon: proposal.icon,
-              ruleHash: ruleHash(proposal.rule),
-            ),
-          ], origin: 'assistant');
-          result = added > 0
-              ? 'Logro añadido: ${proposal.title}.'
-              : 'Ya tenías un logro con esa regla.';
-        default:
-          final copy = card.payload as ReminderTemplates;
-          final store = CompanionStore(profileId: profileId);
-          final current = (await store.load()).firstWhere(
-            (c) => c.id == companionId,
-          );
-          final old = current.reminderCopy;
-          List<String> pick(List<String> mine, List<String>? before) =>
-              mine.isNotEmpty ? mine : (before ?? const []);
-          await store.upsert(
-            current.copyWith(
-              reminderCopy: ReminderTemplates(
-                windowStart: pick(copy.windowStart, old?.windowStart),
-                lastCall: pick(copy.lastCall, old?.lastCall),
-                inactive: pick(copy.inactive, old?.inactive),
-              ),
-            ),
-          );
-          widget.onRemindersChanged?.call();
-          result = 'Textos de recordatorio guardados.';
-      }
-    } catch (_) {
-      result = 'No se pudo guardar la propuesta.';
-    }
-    if (!mounted) return;
-    setState(() {
-      gameBusy = false;
-      gameCards = [
-        for (final c in gameCards)
-          if (c != card) c,
-      ];
-    });
-    await saveSheetReply(result);
-    unawaited(refreshProgress());
-  }
-
-  Future<void> activateGameMode() async {
-    final service = widget.progressService;
-    if (service == null) return;
-    await service.activateGame(companionId);
-    if (!mounted) return;
-    setState(() => gameSuggestionDue = false);
-    await saveSheetReply(
-      'Modo Juego activado. Verás tus metas, rachas y logros.',
-    );
-    unawaited(refreshProgress());
-  }
-
-  Future<void> neverSuggestGame() async {
-    final service = widget.progressService;
-    if (service == null) return;
-    await service.dismissGameSuggestion(companionId);
-    if (mounted) setState(() => gameSuggestionDue = false);
-  }
 
   /// «Sesión terminada» in game mode, with the records and achievements the
   /// activity brought (FR-035).
