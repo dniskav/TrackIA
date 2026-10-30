@@ -149,3 +149,48 @@ no prueba todavía las demás historias del SDD, consentimiento real de proveedo
 - La captura recibida por Fairdrop mostró una negativa del modelo a editar Sheets. La instrucción anterior restringía la escritura desde el chat a sesiones finalizadas. Ahora el asistente puede proponer `gymia-sheet-edit` para una modificación concreta en la pestaña conectada, incluso sin sesión. Si la petición carece de dato o destino, pregunta cuál es el cambio.
 - Antes de escribir, la app lee Google de nuevo y compara cada valor anterior mostrado, identidad de cuenta y pestaña, permiso de sobrescritura, fórmulas y celdas combinadas. El motor conserva la protección de recibo e idempotencia; la respuesta del chat solo confirma una edición si la lectura posterior coincide. Las pruebas de servicio y de chat usan transporte Google controlado; la escritura real en la hoja del usuario queda pendiente de su prueba.
 - Flutter analyze sin incidencias y 185 pruebas aprobadas. APK `releases/trackia-0.3.28.apk`, SHA-256 `8d111a495ff4a57511d82509384c72ddf5601d89284d964828a92f2aaf268ed3`, paquete `com.gymia.app`, versionCode 31. Misma firma que 0.3.27, instalada con `adb install -r` sobre esa versión y abierta en el emulador.
+
+## SDD 004 · cierre y estado real (2026-10-30)
+
+Resultado de T104–T106. Rama `feat/004-fases-5-6` (contiene las fases 4 a 11; sin push). Nada se marca
+como entregado sin evidencia.
+
+### Resultados
+
+- `flutter analyze`: 11 avisos informativos (los mismos de antes; deprecaciones de `Radio` y
+  `DropdownButtonFormField.value` y una llave que falta). Sin errores ni advertencias.
+- `flutter test`: **665 pruebas aprobadas**.
+- `python3 scripts/validate-sdd-004.py`: OK (47 FR, 8 SC, 11 historias, 107 tareas; 103 hechas).
+- Pruebas de `integration_test/` en `emulator-5556` (Android 35), cada archivo por separado:
+
+| Prueba | Emulador | Teléfono (Xiaomi 2107113SG, Android 14) |
+|---|---|---|
+| alarm_style, appearance, chat_activity_flow, chat_migration, chatgpt, companion_creator, football_match, pomodoro, profile_isolation, progress, reminders, rest_notification, sheet_automation, sheet_sync, trackia_large_media, transfer_flow, wear_notification_action, workout_flow | aprobadas | las del paquete `phone_suite_test` (13) aprobadas |
+| chat_scroll | aprobada al repetir; falló una vez en la pasada completa | aprobada |
+| manual_activity | **intermitente**: una pasada aprobada y varias fallidas (no encuentra «Guardar» del diálogo de fin o falla un `single`) | no ejecutada aquí; aprobada en el emulador antes de las fases 10 y 11 |
+| routine_flow | **falla**: `controller.routines.single` queda vacío justo tras «Guardar rutina» | aprobada |
+
+`routine_flow` falla igual en el commit `d443707`, anterior a este trabajo: es un problema del propio
+test en el emulador (tiempos y desplazamiento), no una regresión. Se probó a esperar el guardado y la
+lista y apareció otro fallo de desplazamiento más adelante, así que no se dejó un arreglo a medias.
+Queda como **pendiente** hacer ese test robusto al emulador.
+
+### Entregado, con evidencia
+
+- US1 avisos con No molestar: emulador y teléfono (Prioridad suena; Silencio total lo explica). T014 hecha.
+- US2 ajustes globales, US4 identidad visual, US3 actividades a mano sin IA, US5 edición manual,
+  US6 recordatorios (aviso y día hecho en emulador y teléfono), US7 metas/rachas/logros, US9 chats fuera
+  de secure storage con migración verificada, US8 creación asistida, US10 mantenimiento y US11 IA por
+  acompañante: tests de Dart y de integración según las tablas de `tasks.md`.
+
+### Pendiente
+
+- **T064/T065**: el reinicio real del móvil con un recordatorio programado (la difusión de arranque no
+  se puede enviar desde adb) y el uso real durante dos días. `[OWNER]`.
+- **T099**: compilar el release firmado con R8, instalarlo sobre la versión anterior y comprobar. R8
+  está configurado pero **no se ha ejecutado** sobre el release. `[OWNER]`.
+- **T107**: recorridos R1–R8 en el teléfono del propietario y aceptación. `[OWNER]`.
+- Robustez de `routine_flow` y `manual_activity` en emulador (arriba).
+- Backlog de producto: IA sin fricción de entrada (la IA es el núcleo; asistente guiado para la clave
+  gratuita y caminos sin clave primero). Necesita historia SDD antes de implementarse.
+- El número de versión sigue siendo 0.3.31+34 mientras las notas y documentos se llaman 0.3.32.

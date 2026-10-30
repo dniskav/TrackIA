@@ -328,9 +328,12 @@ crea todo; inválido no crea nada).
 
 **Goal**: regresión completa, trazabilidad y aceptación del propietario.
 
-- [ ] T104 Ejecutar `analyze`, `test` y todas las pruebas de `integration_test/` listadas en `quickstart.md` y registrar resultados en `docs/TRACKIA-QA.md`. (SC-008)
-- [ ] T105 Ejecutar `python3 scripts/validate-sdd-004.py` y corregir cualquier fallo de formato o trazabilidad en `specs/004-trackia-experience/tasks.md`. (SC-008)
-- [ ] T106 Actualizar `specs/README.md` y `docs/TRACKIA-QA.md` con el estado real (entregado, pendiente y `[OWNER]`), sin marcar como entregado nada sin evidencia. (SC-008 FR-047)
+- [x] T104 Ejecutar `analyze`, `test` y todas las pruebas de `integration_test/` listadas en `quickstart.md` y registrar resultados en `docs/TRACKIA-QA.md`. (SC-008)
+  - Evidencia: analyze 11 avisos informativos (sin cambios); flutter test 665 OK; integración en emulator-5556: 18 de 21 archivos OK, chat_scroll intermitente, manual_activity intermitente y routine_flow falla (también en d443707, pasa en el teléfono). Detalle honesto en docs/TRACKIA-QA.md
+- [x] T105 Ejecutar `python3 scripts/validate-sdd-004.py` y corregir cualquier fallo de formato o trazabilidad en `specs/004-trackia-experience/tasks.md`. (SC-008)
+  - Evidencia: python3 scripts/validate-sdd-004.py → OK (47 FR, 8 SC, 11 historias, 107 tareas)
+- [x] T106 Actualizar `specs/README.md` y `docs/TRACKIA-QA.md` con el estado real (entregado, pendiente y `[OWNER]`), sin marcar como entregado nada sin evidencia. (SC-008 FR-047)
+  - Evidencia: specs/README.md y docs/TRACKIA-QA.md con entregado, pendiente y [OWNER]; nada marcado sin evidencia
 - [ ] T107 [OWNER] Recorridos R1–R8 de `quickstart.md` en el teléfono del propietario y aceptación anotada en `docs/TRACKIA-QA.md`. (SC-001 SC-002 SC-003)
 
 ## Hallazgos fuera de alcance
