@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/domain/activity.dart';
-import 'package:gymia/ui/assistant_chat.dart';
+import 'package:trackia/domain/activity.dart';
+import 'package:trackia/ui/assistant_chat.dart';
 
 void main() {
   final definition = ActivityDefinition(

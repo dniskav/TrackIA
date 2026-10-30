@@ -1,11 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/data/ai_client.dart';
-import 'package:gymia/data/local_model_preflight.dart';
-import 'package:gymia/data/local_model_runtime.dart';
-import 'package:gymia/domain/ai_config.dart';
-import 'package:gymia/domain/workout.dart';
+import 'package:trackia/data/ai_client.dart';
+import 'package:trackia/data/local_model_preflight.dart';
+import 'package:trackia/data/local_model_runtime.dart';
+import 'package:trackia/domain/ai_config.dart';
+import 'package:trackia/domain/workout.dart';
 
 void main() {
   test('local model hides completed and partial think blocks', () {

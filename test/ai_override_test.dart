@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/data/ai_settings_store.dart';
-import 'package:gymia/data/sqlite_workout_repository.dart';
-import 'package:gymia/domain/ai_config.dart';
-import 'package:gymia/domain/workout.dart';
+import 'package:trackia/data/ai_settings_store.dart';
+import 'package:trackia/data/sqlite_workout_repository.dart';
+import 'package:trackia/domain/ai_config.dart';
+import 'package:trackia/domain/workout.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {

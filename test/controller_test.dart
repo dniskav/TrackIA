@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/application/workout_controller.dart';
-import 'package:gymia/domain/workout.dart';
-import 'package:gymia/domain/routine.dart';
-import 'package:gymia/domain/rest_timer.dart';
-import 'package:gymia/domain/workout_repository.dart';
+import 'package:trackia/application/workout_controller.dart';
+import 'package:trackia/domain/workout.dart';
+import 'package:trackia/domain/routine.dart';
+import 'package:trackia/domain/rest_timer.dart';
+import 'package:trackia/domain/workout_repository.dart';
 
 class ReadRepository extends Fake implements WorkoutRepository {
   @override

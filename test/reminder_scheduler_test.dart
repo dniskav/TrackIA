@@ -4,11 +4,11 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/application/reminder_scheduler.dart';
-import 'package:gymia/data/sqlite_workout_repository.dart';
-import 'package:gymia/domain/activity.dart';
-import 'package:gymia/domain/companion.dart';
-import 'package:gymia/domain/reminder.dart';
+import 'package:trackia/application/reminder_scheduler.dart';
+import 'package:trackia/data/sqlite_workout_repository.dart';
+import 'package:trackia/domain/activity.dart';
+import 'package:trackia/domain/companion.dart';
+import 'package:trackia/domain/reminder.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {

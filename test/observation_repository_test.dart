@@ -1,11 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/data/observation_repository.dart';
-import 'package:gymia/data/sqlite_workout_repository.dart';
-import 'package:gymia/domain/activity.dart';
-import 'package:gymia/domain/observation.dart';
-import 'package:gymia/domain/workout.dart';
+import 'package:trackia/data/observation_repository.dart';
+import 'package:trackia/data/sqlite_workout_repository.dart';
+import 'package:trackia/domain/activity.dart';
+import 'package:trackia/domain/observation.dart';
+import 'package:trackia/domain/workout.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {

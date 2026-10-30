@@ -47,10 +47,10 @@ class GymRoot extends StatefulWidget {
   const GymRoot({super.key, required this.controller});
   final WorkoutController controller;
   @override
-  State<GymRoot> createState() => _GymRootState();
+  State<GymRoot> createState() => _TrackiaRootState();
 }
 
-class _GymRootState extends State<GymRoot> {
+class _TrackiaRootState extends State<GymRoot> {
   static const _importChannel = MethodChannel('com.gymia.app/import');
   bool takingImport = false;
   bool showingWelcome = false;

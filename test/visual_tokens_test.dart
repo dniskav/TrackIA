@@ -2,7 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/ui/theme.dart';
+import 'package:trackia/ui/theme.dart';
 
 double _channel(int v) {
   final c = v / 255;

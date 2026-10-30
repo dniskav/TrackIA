@@ -4,13 +4,13 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:jose/jose.dart';
-import 'package:gymia/data/chatgpt_auth.dart';
-import 'package:gymia/data/ai_client.dart';
-import 'package:gymia/data/ai_model_catalog.dart';
-import 'package:gymia/data/ai_settings_store.dart';
-import 'package:gymia/domain/ai_config.dart';
-import 'package:gymia/ui/ai_settings.dart';
-import 'package:gymia/ui/theme.dart';
+import 'package:trackia/data/chatgpt_auth.dart';
+import 'package:trackia/data/ai_client.dart';
+import 'package:trackia/data/ai_model_catalog.dart';
+import 'package:trackia/data/ai_settings_store.dart';
+import 'package:trackia/domain/ai_config.dart';
+import 'package:trackia/ui/ai_settings.dart';
+import 'package:trackia/ui/theme.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();

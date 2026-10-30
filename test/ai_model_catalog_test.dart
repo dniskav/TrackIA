@@ -2,11 +2,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/data/ai_model_catalog.dart';
-import 'package:gymia/data/ai_settings_store.dart';
-import 'package:gymia/domain/ai_config.dart';
-import 'package:gymia/domain/workout.dart';
-import 'package:gymia/ui/ai_settings.dart';
+import 'package:trackia/data/ai_model_catalog.dart';
+import 'package:trackia/data/ai_settings_store.dart';
+import 'package:trackia/domain/ai_config.dart';
+import 'package:trackia/domain/workout.dart';
+import 'package:trackia/ui/ai_settings.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:gymia/application/workout_controller.dart';
-import 'package:gymia/data/sqlite_workout_repository.dart';
-import 'package:gymia/data/theme_settings.dart';
-import 'package:gymia/ui/app.dart';
+import 'package:trackia/application/workout_controller.dart';
+import 'package:trackia/data/sqlite_workout_repository.dart';
+import 'package:trackia/data/theme_settings.dart';
+import 'package:trackia/ui/app.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();

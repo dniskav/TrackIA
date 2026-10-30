@@ -5,7 +5,7 @@ import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:gymia/data/sqlite_workout_repository.dart';
+import 'package:trackia/data/sqlite_workout_repository.dart';
 
 import '../test/fixtures/trackia_legacy_fixtures.dart';
 

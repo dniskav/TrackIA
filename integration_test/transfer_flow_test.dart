@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:sqflite/sqflite.dart';
-import 'package:gymia/application/workout_controller.dart';
-import 'package:gymia/data/sqlite_workout_repository.dart';
-import 'package:gymia/domain/transfer.dart';
-import 'package:gymia/ui/app.dart';
-import 'package:gymia/ui/data_transfer.dart';
+import 'package:trackia/application/workout_controller.dart';
+import 'package:trackia/data/sqlite_workout_repository.dart';
+import 'package:trackia/domain/transfer.dart';
+import 'package:trackia/ui/app.dart';
+import 'package:trackia/ui/data_transfer.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();

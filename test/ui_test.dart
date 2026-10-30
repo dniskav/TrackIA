@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/ui/app.dart';
+import 'package:trackia/ui/app.dart';
 
 void main() {
   testWidgets('series dialog validates before returning a record', (

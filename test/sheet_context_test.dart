@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:gymia/domain/sheet_context.dart';
-import 'package:gymia/domain/workout.dart';
-import 'package:gymia/data/sheet_context_store.dart';
+import 'package:trackia/domain/sheet_context.dart';
+import 'package:trackia/domain/workout.dart';
+import 'package:trackia/data/sheet_context_store.dart';
 
 void main() {
   setUp(() => FlutterSecureStorage.setMockInitialValues({}));

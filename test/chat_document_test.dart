@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:excel/excel.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/data/ai_client.dart';
-import 'package:gymia/domain/ai_config.dart';
-import 'package:gymia/domain/transfer.dart';
+import 'package:trackia/data/ai_client.dart';
+import 'package:trackia/domain/ai_config.dart';
+import 'package:trackia/domain/transfer.dart';
 
 void main() {
   test(

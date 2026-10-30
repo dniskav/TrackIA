@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/data/welcome_settings_store.dart';
-import 'package:gymia/ui/trackia_mark.dart';
-import 'package:gymia/ui/welcome.dart';
+import 'package:trackia/data/welcome_settings_store.dart';
+import 'package:trackia/ui/trackia_mark.dart';
+import 'package:trackia/ui/welcome.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

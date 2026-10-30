@@ -2,16 +2,16 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/application/ai_availability.dart';
-import 'package:gymia/application/progress_service.dart';
-import 'package:gymia/data/ai_model_catalog.dart';
-import 'package:gymia/data/progress_repository.dart';
-import 'package:gymia/data/sqlite_workout_repository.dart';
-import 'package:gymia/domain/activity.dart';
-import 'package:gymia/domain/companion.dart';
-import 'package:gymia/domain/progress.dart';
-import 'package:gymia/ui/companions.dart';
-import 'package:gymia/ui/theme.dart';
+import 'package:trackia/application/ai_availability.dart';
+import 'package:trackia/application/progress_service.dart';
+import 'package:trackia/data/ai_model_catalog.dart';
+import 'package:trackia/data/progress_repository.dart';
+import 'package:trackia/data/sqlite_workout_repository.dart';
+import 'package:trackia/domain/activity.dart';
+import 'package:trackia/domain/companion.dart';
+import 'package:trackia/domain/progress.dart';
+import 'package:trackia/ui/companions.dart';
+import 'package:trackia/ui/theme.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {

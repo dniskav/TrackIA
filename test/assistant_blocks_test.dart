@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/domain/assistant_blocks.dart';
+import 'package:trackia/domain/assistant_blocks.dart';
 
 /// Rule 7 of contracts/assistant-blocks.md for every block: valid, each
 /// required key missing, an extra key, lower and upper limits, two blocks and

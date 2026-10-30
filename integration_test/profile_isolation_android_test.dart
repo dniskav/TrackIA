@@ -4,14 +4,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:gymia/data/welcome_settings_store.dart';
-import 'package:gymia/main.dart';
-import 'package:gymia/data/profile_store.dart';
-import 'package:gymia/data/sheet_context_store.dart';
-import 'package:gymia/domain/sheet_context.dart';
-import 'package:gymia/domain/user_profile.dart';
-import 'package:gymia/ui/accounts.dart';
-import 'package:gymia/ui/app.dart';
+import 'package:trackia/data/welcome_settings_store.dart';
+import 'package:trackia/main.dart';
+import 'package:trackia/data/profile_store.dart';
+import 'package:trackia/data/sheet_context_store.dart';
+import 'package:trackia/domain/sheet_context.dart';
+import 'package:trackia/domain/user_profile.dart';
+import 'package:trackia/ui/accounts.dart';
+import 'package:trackia/ui/app.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();

@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/domain/rest_timer.dart';
-import 'package:gymia/domain/routine.dart';
-import 'package:gymia/domain/workout.dart';
+import 'package:trackia/domain/rest_timer.dart';
+import 'package:trackia/domain/routine.dart';
+import 'package:trackia/domain/workout.dart';
 
 void main() {
   test('countdown rounds up and never displays negative time', () {

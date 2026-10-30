@@ -5,8 +5,8 @@ import 'package:crypto/crypto.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:gymia/data/companion_store.dart';
-import 'package:gymia/data/sqlite_workout_repository.dart';
+import 'package:trackia/data/companion_store.dart';
+import 'package:trackia/data/sqlite_workout_repository.dart';
 
 /// SC-007 on a real Android device: a chat with a large image kept the old way
 /// (Keystore-backed secure storage) is copied to SQLite and files in the first

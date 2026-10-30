@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/data/ai_client.dart';
-import 'package:gymia/data/chat_archive_store.dart';
-import 'package:gymia/domain/workout.dart';
+import 'package:trackia/data/ai_client.dart';
+import 'package:trackia/data/chat_archive_store.dart';
+import 'package:trackia/domain/workout.dart';
 
 class _FailCommit extends FlutterSecureStorage {
   @override

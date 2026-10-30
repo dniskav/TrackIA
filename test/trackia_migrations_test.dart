@@ -3,8 +3,8 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/data/sqlite_workout_repository.dart';
-import 'package:gymia/domain/workout.dart';
+import 'package:trackia/data/sqlite_workout_repository.dart';
+import 'package:trackia/domain/workout.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'fixtures/trackia_legacy_fixtures.dart';

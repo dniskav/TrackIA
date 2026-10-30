@@ -5,13 +5,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:gymia/data/profile_store.dart';
-import 'package:gymia/data/ai_settings_store.dart';
-import 'package:gymia/data/sheet_context_store.dart';
-import 'package:gymia/data/sqlite_workout_repository.dart';
-import 'package:gymia/domain/ai_config.dart';
-import 'package:gymia/domain/sheet_context.dart';
-import 'package:gymia/domain/user_profile.dart';
+import 'package:trackia/data/profile_store.dart';
+import 'package:trackia/data/ai_settings_store.dart';
+import 'package:trackia/data/sheet_context_store.dart';
+import 'package:trackia/data/sqlite_workout_repository.dart';
+import 'package:trackia/domain/ai_config.dart';
+import 'package:trackia/domain/sheet_context.dart';
+import 'package:trackia/domain/user_profile.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

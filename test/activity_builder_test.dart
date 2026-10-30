@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/ui/activity_builder.dart';
-import 'package:gymia/ui/theme.dart';
+import 'package:trackia/ui/activity_builder.dart';
+import 'package:trackia/ui/theme.dart';
 
 void main() {
   ActivityBuilderResult? result;

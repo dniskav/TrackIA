@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:gymia/data/sqlite_workout_repository.dart';
-import 'package:gymia/domain/activity.dart';
+import 'package:trackia/data/sqlite_workout_repository.dart';
+import 'package:trackia/domain/activity.dart';
 import 'package:sqflite/sqflite.dart';
 
 /// Synthetic, deliberately non-personal v4 database and v3 backup pair.

@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:gymia/data/sqlite_workout_repository.dart';
-import 'package:gymia/application/workout_controller.dart';
-import 'package:gymia/domain/routine.dart';
-import 'package:gymia/domain/workout.dart';
+import 'package:trackia/data/sqlite_workout_repository.dart';
+import 'package:trackia/application/workout_controller.dart';
+import 'package:trackia/domain/routine.dart';
+import 'package:trackia/domain/workout.dart';
 
 void main() {
   sqfliteFfiInit();

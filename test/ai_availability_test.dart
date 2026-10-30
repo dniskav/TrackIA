@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:gymia/application/ai_availability.dart';
-import 'package:gymia/data/ai_client.dart';
-import 'package:gymia/data/ai_model_catalog.dart';
-import 'package:gymia/data/ai_settings_store.dart';
-import 'package:gymia/domain/ai_config.dart';
+import 'package:trackia/application/ai_availability.dart';
+import 'package:trackia/data/ai_client.dart';
+import 'package:trackia/data/ai_model_catalog.dart';
+import 'package:trackia/data/ai_settings_store.dart';
+import 'package:trackia/domain/ai_config.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

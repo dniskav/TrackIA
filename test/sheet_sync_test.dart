@@ -2,13 +2,13 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/data/profile_store.dart';
-import 'package:gymia/data/sheet_sync_service.dart';
-import 'package:gymia/domain/activity.dart';
-import 'package:gymia/domain/sheet_context.dart';
-import 'package:gymia/domain/sheet_sync.dart';
-import 'package:gymia/domain/user_profile.dart';
-import 'package:gymia/domain/workout.dart';
+import 'package:trackia/data/profile_store.dart';
+import 'package:trackia/data/sheet_sync_service.dart';
+import 'package:trackia/domain/activity.dart';
+import 'package:trackia/domain/sheet_context.dart';
+import 'package:trackia/domain/sheet_sync.dart';
+import 'package:trackia/domain/user_profile.dart';
+import 'package:trackia/domain/workout.dart';
 
 Map<String, dynamic> syncSnapshot({
   List<List<String>>? rows,

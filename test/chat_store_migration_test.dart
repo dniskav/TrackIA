@@ -5,9 +5,9 @@ import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/data/chat_store.dart';
-import 'package:gymia/data/companion_store.dart';
-import 'package:gymia/data/sqlite_workout_repository.dart';
+import 'package:trackia/data/chat_store.dart';
+import 'package:trackia/data/companion_store.dart';
+import 'package:trackia/data/sqlite_workout_repository.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'fixtures/trackia_v6_fixtures.dart';

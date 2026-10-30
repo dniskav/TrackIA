@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/ui/chat_message.dart';
-import 'package:gymia/ui/theme.dart';
+import 'package:trackia/ui/chat_message.dart';
+import 'package:trackia/ui/theme.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 
 void main() {

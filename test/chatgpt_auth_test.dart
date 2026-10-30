@@ -5,13 +5,13 @@ import 'package:flutter/foundation.dart' show debugPrint;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jose/jose.dart';
-import 'package:gymia/data/chatgpt_auth.dart';
-import 'package:gymia/data/ai_client.dart';
-import 'package:gymia/data/ai_model_catalog.dart';
-import 'package:gymia/data/ai_settings_store.dart';
-import 'package:gymia/data/ai_stream_response.dart';
-import 'package:gymia/domain/ai_config.dart';
-import 'package:gymia/domain/workout.dart';
+import 'package:trackia/data/chatgpt_auth.dart';
+import 'package:trackia/data/ai_client.dart';
+import 'package:trackia/data/ai_model_catalog.dart';
+import 'package:trackia/data/ai_settings_store.dart';
+import 'package:trackia/data/ai_stream_response.dart';
+import 'package:trackia/domain/ai_config.dart';
+import 'package:trackia/domain/workout.dart';
 
 class _LoopbackClient implements HttpClient {
   _LoopbackClient(this.client, this.uri);

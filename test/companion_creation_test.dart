@@ -2,12 +2,12 @@ import 'dart:io';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/application/companion_creation.dart';
-import 'package:gymia/data/companion_store.dart';
-import 'package:gymia/data/sqlite_workout_repository.dart';
-import 'package:gymia/domain/activity.dart';
-import 'package:gymia/domain/assistant_blocks.dart';
-import 'package:gymia/domain/progress.dart';
+import 'package:trackia/application/companion_creation.dart';
+import 'package:trackia/data/companion_store.dart';
+import 'package:trackia/data/sqlite_workout_repository.dart';
+import 'package:trackia/domain/activity.dart';
+import 'package:trackia/domain/assistant_blocks.dart';
+import 'package:trackia/domain/progress.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {

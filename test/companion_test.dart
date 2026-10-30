@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/domain/reminder.dart';
-import 'package:gymia/data/companion_store.dart';
-import 'package:gymia/data/sheet_context_store.dart';
-import 'package:gymia/data/sheet_sync_service.dart';
-import 'package:gymia/domain/companion.dart';
-import 'package:gymia/domain/sheet_context.dart';
-import 'package:gymia/ui/theme.dart';
+import 'package:trackia/domain/reminder.dart';
+import 'package:trackia/data/companion_store.dart';
+import 'package:trackia/data/sheet_context_store.dart';
+import 'package:trackia/data/sheet_sync_service.dart';
+import 'package:trackia/domain/companion.dart';
+import 'package:trackia/domain/sheet_context.dart';
+import 'package:trackia/ui/theme.dart';
 
 void main() {
   setUp(() => FlutterSecureStorage.setMockInitialValues({}));

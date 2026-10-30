@@ -4,13 +4,13 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:gymia/application/ai_availability.dart';
-import 'package:gymia/application/workout_controller.dart';
-import 'package:gymia/data/ai_client.dart';
-import 'package:gymia/data/sqlite_workout_repository.dart';
-import 'package:gymia/ui/activity_focus.dart' show ActivityChooser;
-import 'package:gymia/ui/assistant_chat.dart';
-import 'package:gymia/ui/theme.dart';
+import 'package:trackia/application/ai_availability.dart';
+import 'package:trackia/application/workout_controller.dart';
+import 'package:trackia/data/ai_client.dart';
+import 'package:trackia/data/sqlite_workout_repository.dart';
+import 'package:trackia/ui/activity_focus.dart' show ActivityChooser;
+import 'package:trackia/ui/assistant_chat.dart';
+import 'package:trackia/ui/theme.dart';
 
 /// R3 of specs/004-trackia-experience/quickstart.md: build and record two
 /// activities by hand with no AI at all. Real UI, SQLite and secure storage on

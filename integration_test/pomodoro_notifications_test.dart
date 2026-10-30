@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:gymia/application/rest_notifications.dart';
-import 'package:gymia/application/workout_controller.dart';
-import 'package:gymia/data/sqlite_workout_repository.dart';
-import 'package:gymia/domain/activity.dart';
+import 'package:trackia/application/rest_notifications.dart';
+import 'package:trackia/application/workout_controller.dart';
+import 'package:trackia/data/sqlite_workout_repository.dart';
+import 'package:trackia/domain/activity.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();

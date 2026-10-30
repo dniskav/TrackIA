@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:gymia/domain/reminder.dart';
+import 'package:trackia/domain/reminder.dart';
 
 /// R6 of specs/004-trackia-experience/quickstart.md, the part that runs inside
 /// the app: a snapshot with a window one minute away posts a notice on

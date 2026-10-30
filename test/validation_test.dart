@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/domain/workout.dart';
+import 'package:trackia/domain/workout.dart';
 
 void main() {
   test('weights accept comma/dot and roundtrip exactly', () {

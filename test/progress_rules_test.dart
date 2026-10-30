@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/domain/progress.dart';
-import 'package:gymia/domain/workout.dart';
+import 'package:trackia/domain/progress.dart';
+import 'package:trackia/domain/workout.dart';
 
 void main() {
   final pages = {

@@ -3,16 +3,16 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:gymia/application/ai_availability.dart';
-import 'package:gymia/data/ai_client.dart';
-import 'package:gymia/data/ai_model_catalog.dart';
-import 'package:gymia/data/ai_settings_store.dart';
-import 'package:gymia/data/companion_store.dart';
-import 'package:gymia/data/sqlite_workout_repository.dart';
-import 'package:gymia/domain/ai_config.dart';
-import 'package:gymia/domain/companion.dart';
-import 'package:gymia/ui/companion_creator.dart';
-import 'package:gymia/ui/theme.dart';
+import 'package:trackia/application/ai_availability.dart';
+import 'package:trackia/data/ai_client.dart';
+import 'package:trackia/data/ai_model_catalog.dart';
+import 'package:trackia/data/ai_settings_store.dart';
+import 'package:trackia/data/companion_store.dart';
+import 'package:trackia/data/sqlite_workout_repository.dart';
+import 'package:trackia/domain/ai_config.dart';
+import 'package:trackia/domain/companion.dart';
+import 'package:trackia/ui/companion_creator.dart';
+import 'package:trackia/ui/theme.dart';
 
 /// R8 of specs/004-trackia-experience/quickstart.md on Android: with a verified
 /// AI, «Crear acompañante → Con ayuda de la IA» shows a sheet and Crear saves

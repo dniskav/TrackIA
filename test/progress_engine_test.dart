@@ -1,9 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/application/progress_engine.dart';
-import 'package:gymia/domain/observation.dart';
-import 'package:gymia/domain/progress.dart';
+import 'package:trackia/application/progress_engine.dart';
+import 'package:trackia/domain/observation.dart';
+import 'package:trackia/domain/progress.dart';
 
 void main() {
   // Thursday 2026-10-29, ISO week 2026-W44 (Monday is 2026-10-26).

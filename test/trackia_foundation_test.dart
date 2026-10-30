@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/application/capability_registry.dart';
-import 'package:gymia/domain/activity_definition.dart';
-import 'package:gymia/domain/space.dart';
-import 'package:gymia/domain/workout.dart';
+import 'package:trackia/application/capability_registry.dart';
+import 'package:trackia/domain/activity_definition.dart';
+import 'package:trackia/domain/space.dart';
+import 'package:trackia/domain/workout.dart';
 
 void main() {
   test('a space has an immutable owner and rejects a foreign scope', () {

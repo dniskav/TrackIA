@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/domain/activity.dart';
-import 'package:gymia/domain/workout.dart';
+import 'package:trackia/domain/activity.dart';
+import 'package:trackia/domain/workout.dart';
 
 // JSON written by the app before typed fields existed (captured 2026-10-29).
 const _legacyStrength =

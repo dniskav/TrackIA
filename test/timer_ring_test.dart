@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/ui/theme.dart';
-import 'package:gymia/ui/timer_ring.dart';
+import 'package:trackia/ui/theme.dart';
+import 'package:trackia/ui/timer_ring.dart';
 
 Widget _host(Widget child, [ThemeData? theme]) => MaterialApp(
   theme: theme ?? gymTheme,

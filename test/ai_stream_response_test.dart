@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/data/ai_stream_response.dart';
-import 'package:gymia/domain/ai_config.dart';
-import 'package:gymia/domain/workout.dart';
+import 'package:trackia/data/ai_stream_response.dart';
+import 'package:trackia/domain/ai_config.dart';
+import 'package:trackia/domain/workout.dart';
 
 void main() {
   test('Responses text excludes reasoning and requires completed output', () {

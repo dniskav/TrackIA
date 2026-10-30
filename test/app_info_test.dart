@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/data/app_info.dart';
+import 'package:trackia/data/app_info.dart';
 
 void main() {
   test('trackiaVersion matches pubspec.yaml', () {

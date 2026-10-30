@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/application/ai_availability.dart';
-import 'package:gymia/data/ai_model_catalog.dart';
-import 'package:gymia/data/ai_settings_store.dart';
-import 'package:gymia/data/companion_store.dart';
-import 'package:gymia/domain/ai_config.dart';
-import 'package:gymia/ui/ai_settings.dart';
-import 'package:gymia/domain/companion.dart';
-import 'package:gymia/ui/companion_style.dart';
-import 'package:gymia/ui/companions.dart';
-import 'package:gymia/ui/theme.dart';
+import 'package:trackia/application/ai_availability.dart';
+import 'package:trackia/data/ai_model_catalog.dart';
+import 'package:trackia/data/ai_settings_store.dart';
+import 'package:trackia/data/companion_store.dart';
+import 'package:trackia/domain/ai_config.dart';
+import 'package:trackia/ui/ai_settings.dart';
+import 'package:trackia/domain/companion.dart';
+import 'package:trackia/ui/companion_style.dart';
+import 'package:trackia/ui/companions.dart';
+import 'package:trackia/ui/theme.dart';
 
 void main() {
   testWidgets('dashboard selects, edits and deletes a companion', (

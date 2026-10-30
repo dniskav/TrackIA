@@ -4,14 +4,14 @@ import 'dart:typed_data';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gymia/data/ai_client.dart';
-import 'package:gymia/data/chat_archive_store.dart';
-import 'package:gymia/data/chat_store.dart';
-import 'package:gymia/domain/workout.dart';
+import 'package:trackia/data/ai_client.dart';
+import 'package:trackia/data/chat_archive_store.dart';
+import 'package:trackia/data/chat_store.dart';
+import 'package:trackia/domain/workout.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'fixtures/trackia_v6_fixtures.dart';
-import 'package:gymia/data/sqlite_workout_repository.dart';
+import 'package:trackia/data/sqlite_workout_repository.dart';
 
 /// The same guarantees as test/chat_archive_store_test.dart, on the SQLite store.
 void main() {

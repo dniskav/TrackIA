@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:gymia/application/ai_availability.dart';
-import 'package:gymia/application/workout_controller.dart';
-import 'package:gymia/data/ai_model_catalog.dart';
-import 'package:gymia/data/sqlite_workout_repository.dart';
-import 'package:gymia/domain/activity.dart';
-import 'package:gymia/ui/assistant_chat.dart';
-import 'package:gymia/ui/theme.dart';
+import 'package:trackia/application/ai_availability.dart';
+import 'package:trackia/application/workout_controller.dart';
+import 'package:trackia/data/ai_model_catalog.dart';
+import 'package:trackia/data/sqlite_workout_repository.dart';
+import 'package:trackia/domain/activity.dart';
+import 'package:trackia/ui/assistant_chat.dart';
+import 'package:trackia/ui/theme.dart';
 
 /// FR-023: el panel muestra un candado junto a lo que el usuario fijó a mano y
 /// tocarlo lo libera.
