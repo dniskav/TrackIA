@@ -51,6 +51,22 @@ void main() {
         await tester.pumpAndSettle();
       }
 
+      // The editor shows «Guardando…» until the save ends and the screen closes;
+      // a slower device or emulator needs real time for that.
+      Future<void> saveRoutine() async {
+        await tap('Guardar rutina');
+        for (
+          var i = 0;
+          i < 100 && find.text('Guardando…').evaluate().isNotEmpty;
+          i++
+        ) {
+          await tester.runAsync(
+            () => Future<void>.delayed(const Duration(milliseconds: 100)),
+          );
+          await tester.pumpAndSettle();
+        }
+      }
+
       Future<void> exercise(String name) async {
         await tap('Añadir ejercicio a rutina');
         await tester.enterText(
@@ -69,7 +85,7 @@ void main() {
       await reveal(move);
       await tester.tap(move);
       await tester.pumpAndSettle();
-      await tap('Guardar rutina');
+      await saveRoutine();
       expect(controller.routines.single.exercises.first.name, 'Remo');
 
       await tester.tap(find.byTooltip('Opciones de Pierna A'));
@@ -83,7 +99,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.enterText(find.byKey(const Key('target-sets')), '2');
       await tap('Guardar ejercicio');
-      await tap('Guardar rutina');
+      await saveRoutine();
       await tap('Entrenar');
       expect(controller.active!.setCount, 0);
       expect(controller.active!.exercises.first.targetSets, 2);

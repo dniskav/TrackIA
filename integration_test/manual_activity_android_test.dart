@@ -81,6 +81,10 @@ void main() {
         await t.pump();
         return;
       }
+      await waitUntil(
+        () => find.byType(Scrollable).evaluate().isNotEmpty,
+        'scrollable',
+      );
       final list = find.byType(Scrollable).first;
       await t.scrollUntilVisible(target, 300, scrollable: list, maxScrolls: 40);
       await t.pump();
@@ -131,6 +135,10 @@ void main() {
         if (type != 'number') {
           await tester.tap(find.byKey(const Key('field-type')));
           await tester.pumpAndSettle();
+          await waitUntil(
+            () => find.text('Texto').evaluate().isNotEmpty,
+            'type menu',
+          );
           await tester.tap(find.text('Texto').last);
           await tester.pumpAndSettle();
         }
@@ -178,6 +186,7 @@ void main() {
       await tester.pumpAndSettle();
       await waitUntil(() => c.focus?.running != null && !c.busy, 'run');
       final inc = find.byKey(const Key('counter-inc-paginas'));
+      await waitUntil(() => inc.evaluate().isNotEmpty, 'counter');
       for (var i = 0; i < 18; i++) {
         await tester.ensureVisible(inc);
         await tester.tap(inc);
@@ -200,6 +209,10 @@ void main() {
       await tester.tap(find.byKey(const Key('finish-activity')));
       await tester.pumpAndSettle();
       // The end dialog asks for the closing time; accept the default.
+      await waitUntil(
+        () => find.text('Guardar').evaluate().isNotEmpty,
+        'end dialog',
+      );
       await tester.tap(find.text('Guardar'));
       await tester.pumpAndSettle();
       await waitUntil(

@@ -14,7 +14,7 @@ abiertas, recordatorios, juego opcional, avisos con No molestar y deuda de `REVI
 Amplía 003 y absorbe sus tareas T007 y T020. Estado (2026-10-30): fases 0 a 12 implementadas con tests
 (665 pruebas de Dart y pruebas de integración en emulador y en un teléfono real); 103 de 107 tareas hechas.
 Pendientes: T064 y T065 (reinicio real del móvil), T099 (release firmado con R8) y T107 (aceptación del
-propietario), todas `[OWNER]`, además de dos pruebas de integración frágiles en emulador. El detalle y la
+propietario), todas `[OWNER]`. El detalle y la
 evidencia están en [tasks.md](004-trackia-experience/tasks.md) y en [docs/TRACKIA-QA.md](../docs/TRACKIA-QA.md). Validar con `python3 scripts/validate-sdd-004.py`.
 
 - [Visión actual](00-product/vision.md) y [hoja de ruta](00-product/development-plan.md).

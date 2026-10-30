@@ -166,14 +166,15 @@ como entregado sin evidencia.
 | Prueba | Emulador | Teléfono (Xiaomi 2107113SG, Android 14) |
 |---|---|---|
 | alarm_style, appearance, chat_activity_flow, chat_migration, chatgpt, companion_creator, football_match, pomodoro, profile_isolation, progress, reminders, rest_notification, sheet_automation, sheet_sync, trackia_large_media, transfer_flow, wear_notification_action, workout_flow | aprobadas | las del paquete `phone_suite_test` (13) aprobadas |
-| chat_scroll | aprobada al repetir; falló una vez en la pasada completa | aprobada |
-| manual_activity | **intermitente**: una pasada aprobada y varias fallidas (no encuentra «Guardar» del diálogo de fin o falla un `single`) | no ejecutada aquí; aprobada en el emulador antes de las fases 10 y 11 |
-| routine_flow | **falla**: `controller.routines.single` queda vacío justo tras «Guardar rutina» | aprobada |
+| chat_scroll | aprobada (varias veces); algunos fallos coincidieron con el emulador caído | aprobada |
+| manual_activity | aprobada 4 de 4 tras añadir esperas (diálogo de fin, menú de tipo, lista, contador) | aprobada en el emulador antes de las fases 10 y 11 |
+| routine_flow | aprobada 4 de 4 tras esperar a que termine «Guardando…» | aprobada |
 
-`routine_flow` falla igual en el commit `d443707`, anterior a este trabajo: es un problema del propio
-test en el emulador (tiempos y desplazamiento), no una regresión. Se probó a esperar el guardado y la
-lista y apareció otro fallo de desplazamiento más adelante, así que no se dejó un arreglo a medias.
-Queda como **pendiente** hacer ese test robusto al emulador.
+`routine_flow` fallaba también en `d443707`, anterior a este trabajo, así que no era una regresión: el test
+seguía sin esperar a que el editor acabase de guardar. `manual_activity` fallaba cuando el emulador iba
+lento porque buscaba botones antes de que existieran. Ambos se arreglaron solo en el test, sin tocar la app.
+Algunas ejecuciones posteriores fallaron porque el emulador perdió su servicio `activity` o quedó
+`offline` (adb); con el emulador sano pasan. `emulator-5556` quedó inestable y se usó `emulator-5554`.
 
 ### Entregado, con evidencia
 
@@ -190,7 +191,6 @@ Queda como **pendiente** hacer ese test robusto al emulador.
 - **T099**: compilar el release firmado con R8, instalarlo sobre la versión anterior y comprobar. R8
   está configurado pero **no se ha ejecutado** sobre el release. `[OWNER]`.
 - **T107**: recorridos R1–R8 en el teléfono del propietario y aceptación. `[OWNER]`.
-- Robustez de `routine_flow` y `manual_activity` en emulador (arriba).
 - Backlog de producto: IA sin fricción de entrada (la IA es el núcleo; asistente guiado para la clave
   gratuita y caminos sin clave primero). Necesita historia SDD antes de implementarse.
 - El número de versión sigue siendo 0.3.31+34 mientras las notas y documentos se llaman 0.3.32.
