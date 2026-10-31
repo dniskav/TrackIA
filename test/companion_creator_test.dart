@@ -333,6 +333,20 @@ void main() {
       await tester.pumpWidget(const SizedBox());
     });
 
+    testWidgets('Markdown in a reply is drawn, not shown as asterisks', (
+      tester,
+    ) async {
+      replies = ['Tu **lectura diaria** a las 18:00.\n\n\n\n- uno'];
+      await goAssisted(tester);
+      await say(tester, 'Hola');
+      expect(find.textContaining('**'), findsNothing);
+      expect(
+        find.textContaining('lectura diaria', findRichText: true),
+        findsOneWidget,
+      );
+      await tester.pumpWidget(const SizedBox());
+    });
+
     testWidgets('Descartar closes the sheet and the talk goes on', (
       tester,
     ) async {

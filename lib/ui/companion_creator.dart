@@ -13,6 +13,7 @@ import '../domain/assistant_blocks.dart';
 import '../domain/companion.dart';
 import '../domain/reminder.dart';
 import '../domain/workout.dart';
+import 'chat_message.dart';
 import 'companion_style.dart';
 import 'rule_text.dart';
 
@@ -594,6 +595,7 @@ class _CompanionAssistedScreenState extends State<CompanionAssistedScreen> {
 
   static String visible(String answer) => answer
       .replaceAll(RegExp(r'```(?:trackia|gymia)-[a-z-]+[\s\S]*?```'), '')
+      .replaceAll(RegExp(r'\n{3,}'), '\n\n')
       .trim();
 
   Future<void> send() async {
@@ -701,7 +703,10 @@ class _CompanionAssistedScreenState extends State<CompanionAssistedScreen> {
                     child: Card(
                       child: Padding(
                         padding: const EdgeInsets.all(12),
-                        child: Text(visible(m.text)),
+                        child: ChatMessageBody(
+                          text: visible(m.text),
+                          assistant: m.role != 'user',
+                        ),
                       ),
                     ),
                   ),
