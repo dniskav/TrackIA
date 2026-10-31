@@ -21,8 +21,9 @@ void main() {
     await tester.runAsync(() async {
       final now = DateTime.now();
       final minute = now.hour * 60 + now.minute;
-      if (minute > 1300)
+      if (minute > 1300) {
         throw StateError('Ejecuta esta prueba antes de las 21:40.');
+      }
       final snapshot = {
         'version': 1,
         'profileId': 'reboot-qa',
