@@ -49,15 +49,15 @@ void main() {
     await launch(tester, store.settings);
 
     expect(find.byKey(const Key('welcome-dot-0')), findsOneWidget);
-    expect(find.byKey(const Key('welcome-dot-4')), findsOneWidget);
-    expect(find.text('Paso 1 de 5'), findsOneWidget);
+    expect(find.byKey(const Key('welcome-dot-5')), findsOneWidget);
+    expect(find.text('Paso 1 de 6'), findsOneWidget);
 
     await tester.drag(
       find.byKey(const Key('welcome-pages')),
       const Offset(-500, 0),
     );
     await tester.pumpAndSettle();
-    expect(find.text('Paso 2 de 5'), findsOneWidget);
+    expect(find.text('Paso 2 de 6'), findsOneWidget);
     expect(find.text('Habla o escribe'), findsOneWidget);
 
     await tester.drag(
@@ -65,7 +65,7 @@ void main() {
       const Offset(500, 0),
     );
     await tester.pumpAndSettle();
-    expect(find.text('Paso 1 de 5'), findsOneWidget);
+    expect(find.text('Paso 1 de 6'), findsOneWidget);
     expect(find.byKey(const Key('welcome-trackia-logo')), findsOneWidget);
     expect(find.text('Bienvenido'), findsOneWidget);
   });
@@ -78,16 +78,16 @@ void main() {
           final store = memoryStore();
           await store.settings.load();
           await launch(tester, store.settings);
-          expect(find.text('Paso 1 de 5'), findsOneWidget);
+          expect(find.text('Paso 1 de 6'), findsOneWidget);
           if (suppress) {
             await tester.tap(find.byKey(const Key('welcome-never-again')));
             await tester.pump();
           }
           if (finishAtEnd) {
-            for (var step = 1; step < 5; step++) {
+            for (var step = 1; step < 6; step++) {
               await tester.tap(find.byKey(const Key('welcome-next')));
               await tester.pumpAndSettle();
-              expect(find.text('Paso ${step + 1} de 5'), findsOneWidget);
+              expect(find.text('Paso ${step + 1} de 6'), findsOneWidget);
             }
             await tester.tap(find.text('Empezar'));
           } else {

@@ -25,8 +25,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       widget.settings ?? WelcomeSettings.instance;
   final PageController pages = PageController();
   int index = 0;
-  late bool doNotShowAgain =
-      widget.preselectNeverAgain || !settings.autoShow;
+  late bool doNotShowAgain = widget.preselectNeverAgain || !settings.autoShow;
   bool saving = false;
 
   static const slides = <({IconData icon, String title, String body})>[
@@ -60,6 +59,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       body:
           'Elige GymBro, Enfoque, Calma o Diario. Puedes editar sus instrucciones, crear otros y conectar una hoja o pestaña de Google distinta para cada uno.',
     ),
+    (
+      icon: Icons.notifications_active_outlined,
+      title: 'Modo y avisos',
+      body:
+          'Cada acompañante tiene su modo. Abre su menú (⋮) y pulsa «Modo y avisos»: con Recordatorio solo te avisa a la hora que elijas; con Juego añade metas, rachas y logros. Para que los avisos de descanso suenen aunque tengas No molestar, ve a Ajustes → Avisos.',
+    ),
   ];
 
   @override
@@ -78,23 +83,22 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       if (!mounted) return;
       final leave = await showDialog<bool>(
         context: context,
-        builder:
-            (context) => AlertDialog(
-              title: const Text('No se pudo guardar la elección'),
-              content: const Text(
-                'Puedes volver a intentarlo o continuar. Si continúas, la bienvenida podría aparecer al abrir la app de nuevo.',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context, false),
-                  child: const Text('Reintentar'),
-                ),
-                FilledButton(
-                  onPressed: () => Navigator.pop(context, true),
-                  child: const Text('Continuar sin guardar'),
-                ),
-              ],
+        builder: (context) => AlertDialog(
+          title: const Text('No se pudo guardar la elección'),
+          content: const Text(
+            'Puedes volver a intentarlo o continuar. Si continúas, la bienvenida podría aparecer al abrir la app de nuevo.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Reintentar'),
             ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Continuar sin guardar'),
+            ),
+          ],
+        ),
       );
       if (leave == true && mounted) Navigator.of(context).pop();
     } finally {
@@ -177,10 +181,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       width: active ? 20 : 8,
                       height: 8,
                       decoration: BoxDecoration(
-                        color:
-                            active
-                                ? Theme.of(context).colorScheme.primary
-                                : Theme.of(context).colorScheme.outlineVariant,
+                        color: active
+                            ? Theme.of(context).colorScheme.primary
+                            : Theme.of(context).colorScheme.outlineVariant,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -200,11 +203,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   'Si la dejas sin marcar, verás esta guía al abrir la app. Puedes cambiarlo en Ayuda.',
                 ),
                 value: doNotShowAgain,
-                onChanged:
-                    saving
-                        ? null
-                        : (value) =>
-                            setState(() => doNotShowAgain = value ?? false),
+                onChanged: saving
+                    ? null
+                    : (value) =>
+                          setState(() => doNotShowAgain = value ?? false),
               ),
             ),
           ),
@@ -224,26 +226,24 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 if (index > 0)
                   TextButton(
                     key: const Key('welcome-back'),
-                    onPressed:
-                        saving
-                            ? null
-                            : () => pages.previousPage(
-                              duration: const Duration(milliseconds: 220),
-                              curve: Curves.easeOut,
-                            ),
+                    onPressed: saving
+                        ? null
+                        : () => pages.previousPage(
+                            duration: const Duration(milliseconds: 220),
+                            curve: Curves.easeOut,
+                          ),
                     child: const Text('Anterior'),
                   ),
                 FilledButton(
                   key: const Key('welcome-next'),
-                  onPressed:
-                      saving
-                          ? null
-                          : index == slides.length - 1
-                          ? finish
-                          : () => pages.nextPage(
-                            duration: const Duration(milliseconds: 220),
-                            curve: Curves.easeOut,
-                          ),
+                  onPressed: saving
+                      ? null
+                      : index == slides.length - 1
+                      ? finish
+                      : () => pages.nextPage(
+                          duration: const Duration(milliseconds: 220),
+                          curve: Curves.easeOut,
+                        ),
                   child: Text(
                     index == slides.length - 1 ? 'Empezar' : 'Siguiente',
                   ),
@@ -268,47 +268,44 @@ class WelcomeHelpScreen extends StatelessWidget {
       appBar: AppBar(title: const Text('Ayuda y bienvenida')),
       body: ListenableBuilder(
         listenable: preference,
-        builder:
-            (context, _) => ListView(
-              children: [
-                SwitchListTile(
-                  key: const Key('welcome-auto-show'),
-                  title: const Text('Mostrar bienvenida al abrir'),
-                  subtitle: const Text(
-                    'Tu elección se guarda en este dispositivo.',
-                  ),
-                  value: preference.autoShow,
-                  onChanged:
-                      preference.busy
-                          ? null
-                          : (value) async {
-                            try {
-                              await preference.select(value);
-                            } catch (_) {
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      'No se pudo guardar la preferencia.',
-                                    ),
-                                  ),
-                                );
-                              }
-                            }
-                          },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.slideshow_outlined),
-                  title: const Text('Ver bienvenida'),
-                  onTap:
-                      () => Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          builder: (_) => WelcomeScreen(settings: preference),
-                        ),
-                      ),
-                ),
-              ],
+        builder: (context, _) => ListView(
+          children: [
+            SwitchListTile(
+              key: const Key('welcome-auto-show'),
+              title: const Text('Mostrar bienvenida al abrir'),
+              subtitle: const Text(
+                'Tu elección se guarda en este dispositivo.',
+              ),
+              value: preference.autoShow,
+              onChanged: preference.busy
+                  ? null
+                  : (value) async {
+                      try {
+                        await preference.select(value);
+                      } catch (_) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                'No se pudo guardar la preferencia.',
+                              ),
+                            ),
+                          );
+                        }
+                      }
+                    },
             ),
+            ListTile(
+              leading: const Icon(Icons.slideshow_outlined),
+              title: const Text('Ver bienvenida'),
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => WelcomeScreen(settings: preference),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
