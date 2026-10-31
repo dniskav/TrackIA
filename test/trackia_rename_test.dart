@@ -190,5 +190,29 @@ void main() {
         expect(File('${dir.path}/trackia.sqlite').existsSync(), isFalse);
       },
     );
+
+    test(
+      'a journal with the SQLite header is pending work and stops the rename',
+      () async {
+        await legacyDatabase('gymia.sqlite');
+        File('${dir.path}/gymia.sqlite-journal').writeAsBytesSync([
+          0xd9, 0xd5, 0x05, 0xf9, 0x20, 0xa1, 0x63, 0xd7, 1, 2, 3, //
+        ]);
+        expect(await migrateDatabaseFile(dir.path, 'local'), isFalse);
+        expect(File('${dir.path}/trackia.sqlite').existsSync(), isFalse);
+      },
+    );
+
+    test(
+      'a journal kept at full size with a zeroed header does not stop it',
+      () async {
+        await legacyDatabase('gymia.sqlite');
+        File(
+          '${dir.path}/gymia.sqlite-journal',
+        ).writeAsBytesSync(List.filled(512, 0));
+        expect(await migrateDatabaseFile(dir.path, 'local'), isTrue);
+        expect(File('${dir.path}/trackia.sqlite').existsSync(), isTrue);
+      },
+    );
   });
 }

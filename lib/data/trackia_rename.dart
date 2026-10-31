@@ -103,12 +103,14 @@ Future<bool> migrateDatabaseFile(
     // A write-ahead log would hold changes the main file does not have yet.
     await beforeCopy?.call(source.path);
     // An empty one is what SQLite leaves behind after a clean close.
-    for (final suffix in ['-wal', '-journal']) {
-      final extra = File(source.path + suffix);
-      if (await extra.exists() && await extra.length() > 0) {
-        debugPrint('Database rename skipped: ${source.path}$suffix is pending');
-        return false;
-      }
+    final wal = File('${source.path}-wal');
+    if (await wal.exists() && await wal.length() > 0) {
+      debugPrint('Database rename skipped: ${source.path}-wal is pending');
+      return false;
+    }
+    if (await _hasHotJournal(File('${source.path}-journal'))) {
+      debugPrint('Database rename skipped: ${source.path}-journal is pending');
+      return false;
     }
     if (await temporary.exists()) await temporary.delete();
     await source.copy(temporary.path);
@@ -125,6 +127,23 @@ Future<bool> migrateDatabaseFile(
       if (await temporary.exists()) await temporary.delete();
     } catch (_) {}
     return false;
+  }
+}
+
+/// Whether a rollback journal still has changes to undo. SQLite marks one
+/// with a magic header; after a clean close it zeroes the header (some Android
+/// phones keep the file at full size instead of deleting it), so a non-empty
+/// file without the magic is no pending work.
+Future<bool> _hasHotJournal(File journal) async {
+  if (!await journal.exists() || await journal.length() == 0) return false;
+  final reader = await journal.open();
+  try {
+    final head = await reader.read(8);
+    const magic = [0xd9, 0xd5, 0x05, 0xf9, 0x20, 0xa1, 0x63, 0xd7];
+    return head.length == 8 &&
+        List.generate(8, (i) => head[i] == magic[i]).every((same) => same);
+  } finally {
+    await reader.close();
   }
 }
 
