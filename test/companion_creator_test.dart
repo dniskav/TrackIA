@@ -336,10 +336,13 @@ void main() {
     testWidgets('Markdown in a reply is drawn, not shown as asterisks', (
       tester,
     ) async {
-      replies = ['Tu **lectura diaria** a las 18:00.\n\n\n\n- uno'];
+      replies = [
+        'Tu **lectura diaria** y _lorem ipsum_ a las 18:00.\n\n\n\n- uno',
+      ];
       await goAssisted(tester);
       await say(tester, 'Hola');
       expect(find.textContaining('**'), findsNothing);
+      expect(find.textContaining('_lorem', findRichText: true), findsNothing);
       expect(
         find.textContaining('lectura diaria', findRichText: true),
         findsOneWidget,

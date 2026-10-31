@@ -194,3 +194,28 @@ Algunas ejecuciones posteriores fallaron porque el emulador perdió su servicio 
 - Backlog de producto: IA sin fricción de entrada (la IA es el núcleo; asistente guiado para la clave
   gratuita y caminos sin clave primero). Necesita historia SDD antes de implementarse.
 - El número de versión sigue siendo 0.3.31+34 mientras las notas y documentos se llaman 0.3.32.
+
+## IA real en el teléfono: crear un acompañante (2026-10-31)
+
+Xiaomi 2107113SG, release 0.3.32+35 con tu proveedor de IA real, «Crear acompañante → Con ayuda de
+la IA». Encontró tres fallos que los tests con IA simulada no podían ver:
+
+1. El chat de creación mostraba el Markdown tal cual (`**negrita**`, `_cursiva_`). Ahora usa el
+   mismo dibujo que el chat principal (`ChatMessageBody`).
+2. La IA propuso `minimum` igual a `target` y la app rechazó toda la propuesta («mínimo fuera de
+   rango»). El prompt no decía que debe ser menor.
+3. Después falló la meta (`per` distinto de `period`) y el aviso (`start` = `end`). Las reglas
+   están ahora escritas en el prompt, con ejemplos, y un test comprueba que esos ejemplos pasan el
+   validador real (`test/assistant_context_test.dart`).
+
+Resultado final: con «aviso a las 18:00 todos los días» y «juego completo con logros», la app
+muestra la tarjeta (meta 1 sesión al día, nivel Juego completo, aviso 18:00–19:00) y **Crear** guarda
+el acompañante «Lectura prueba». Se deja en la lista para que el propietario lo borre; tiene un
+recordatorio diario a las 18:00 que se cancela al borrarlo.
+
+Pendiente de producto (no hecho): cuando la IA rechaza una propuesta, el usuario solo ve «La propuesta
+no es válida» y no puede reintentar con el motivo; conviene devolver el motivo a la IA.
+
+Batería (mismo teléfono, 9 min 42 s, 8 min 9 s con pantalla apagada, app en segundo plano):
+0,0008 mAh estimados y 60 ms de CPU en primer plano; casi todo el tiempo en estado «cached», sin
+wakelocks. No se midió un entrenamiento largo con pantalla encendida.

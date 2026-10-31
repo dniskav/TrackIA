@@ -14,6 +14,7 @@ import 'package:trackia/data/companion_store.dart';
 import 'package:trackia/data/sqlite_workout_repository.dart';
 import 'package:trackia/domain/ai_config.dart';
 import 'package:trackia/domain/activity.dart';
+import 'package:trackia/domain/assistant_blocks.dart';
 import 'package:trackia/domain/companion.dart';
 import 'package:trackia/domain/progress.dart';
 import 'package:trackia/application/assistant_context.dart';
@@ -373,6 +374,31 @@ void main() {
   });
 
   group('blocks the AI may use', () {
+    test('a proposal built from the prompt examples is accepted', () {
+      final text = buildCompanionCreationContext();
+      const reminder =
+          '{"days":["mon","tue","wed","thu","fri","sat","sun"],"start":"18:00","end":"19:00","tone":"cheer"}';
+      expect(text, contains(reminder));
+      final proposal = parseCompanionBlock(
+        '```trackia-companion\n{"name":"Lectura","mode":"game","goal":'
+        '{"metric":{"source":"time","per":"day"},"period":"day","target":20},'
+        '"reminder":$reminder}\n```',
+      );
+      expect(proposal, isNotNull);
+      expect(proposal!.reminder!.startMin, 18 * 60);
+    });
+
+    test('the goal examples in the creation prompt pass the real validator', () {
+      final text = buildCompanionCreationContext();
+      for (final example in [
+        '{"metric":{"source":"time","per":"day"},"period":"day","target":20}',
+        '{"metric":{"source":"sessions","per":"day"},"period":"day","target":1}',
+      ]) {
+        expect(text, contains(example));
+        expect(GoalRule.tryParse(jsonDecode(example)), isNotNull);
+      }
+    });
+
     test('creating a companion gets the exact script and the block format', () {
       final text = buildCompanionCreationContext();
       expect(
