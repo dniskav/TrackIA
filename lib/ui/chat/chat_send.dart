@@ -135,9 +135,7 @@ extension _ChatSend on _AssistantChatScreenState {
         onText: receiveText,
       );
       await aiStore.markVerified(config);
-      final block = RegExp(
-        r'```trackia-result\s*\n([\s\S]*?)```',
-      ).allMatches(answer).toList();
+      final block = blockPattern('result').allMatches(answer).toList();
       if (block.length == 1) {
         try {
           final result =

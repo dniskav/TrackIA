@@ -592,8 +592,9 @@ class _CompanionAssistedScreenState extends State<CompanionAssistedScreen> {
     super.dispose();
   }
 
-  static String visible(String answer) =>
-      answer.replaceAll(RegExp(r'```trackia-[a-z-]+[\s\S]*?```'), '').trim();
+  static String visible(String answer) => answer
+      .replaceAll(RegExp(r'```(?:trackia|gymia)-[a-z-]+[\s\S]*?```'), '')
+      .trim();
 
   Future<void> send() async {
     final text = input.text.trim();
