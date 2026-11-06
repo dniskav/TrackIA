@@ -3,7 +3,7 @@
 Fecha: 20/10/2026. Código base: 0.3.20+23.
 
 Licencia MIT, copyright 2026 Dniskav. Repositorio público de destino:
-https://github.com/dniskav/gymia
+https://github.com/dniskav/TrackIA
 
 La publicación parte de una instantánea revisada del código, con historial nuevo.
 El historial privado de desarrollo se conserva por separado. No se incluyen APK,

@@ -5,7 +5,7 @@ reglas y persistencia entre Android e iOS. Esta entrega distribuye Android.
 
 ## Código abierto
 
-Repositorio: [dniskav/gymia](https://github.com/dniskav/gymia).
+Repositorio: [dniskav/TrackIA](https://github.com/dniskav/TrackIA).
 
 Código original bajo [licencia MIT](LICENSE), copyright 2026 Dniskav.
 Puedes usarlo, modificarlo y distribuirlo según esa licencia. Las dependencias
