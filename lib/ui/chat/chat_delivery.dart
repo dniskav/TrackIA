@@ -44,6 +44,7 @@ extension _ChatDelivery on _AssistantChatScreenState {
         }
       }
     }
+    if (raw['obsolete'] == true) obsoleteMessages.add(message);
     final responseTo = raw['responseTo'];
     final responseRevision = raw['responseRevisionId'];
     if (message.role == 'assistant' &&
@@ -71,7 +72,8 @@ extension _ChatDelivery on _AssistantChatScreenState {
     if (pending != null && companionFocus == null) {
       input.text = pending!;
       attachment = messages.lastOrNull?.attachment;
-      error = 'Tu mensaje quedó guardado sin respuesta. Puedes volver a enviarlo.';
+      error =
+          'Tu mensaje quedó guardado sin respuesta. Puedes volver a enviarlo.';
     }
   }
 
@@ -97,9 +99,7 @@ extension _ChatDelivery on _AssistantChatScreenState {
           chatId: sessionId,
           createdAt: createdAt,
           currentRevisionId: revisionId,
-          attachmentRefs: [
-            if (media != null) ChatStore.hashOf(media.bytes),
-          ],
+          attachmentRefs: [if (media != null) ChatStore.hashOf(media.bytes)],
         ),
         MessageRevision(
           id: revisionId,
@@ -200,6 +200,7 @@ extension _ChatDelivery on _AssistantChatScreenState {
         'delivery': (deliveryStates[id] ?? MessageDelivery.pending).name,
       });
     }
+    if (obsoleteMessages.contains(message)) result['obsolete'] = true;
     final response = responseLinks[message];
     if (response != null) {
       result['responseTo'] = response.messageId;
@@ -214,13 +215,19 @@ extension _ChatDelivery on _AssistantChatScreenState {
     outgoingRevisionTexts.clear();
     durableTranscriptIds.clear();
     responseLinks.clear();
+    obsoleteMessages.clear();
     deliveryStates.clear();
     pending = null;
   }
 
   List<AiMessage> durableHistory(AiMessage outgoing, String outgoingId) {
     final candidates = messages
-        .where((message) => message != outgoing && message.role != 'event')
+        .where(
+          (message) =>
+              message != outgoing &&
+              message.role != 'event' &&
+              !obsoleteMessages.contains(message),
+        )
         .toList(growable: false);
     final recentStart = candidates.length > 20 ? candidates.length - 20 : 0;
     final history = <AiMessage>[];
@@ -228,7 +235,8 @@ extension _ChatDelivery on _AssistantChatScreenState {
       final message = candidates[index];
       final id = outgoingMessageIds[message];
       final state = id == null ? null : deliveryStates[id];
-      final unresolved = id != outgoingId &&
+      final unresolved =
+          id != outgoingId &&
           state != null &&
           state != MessageDelivery.answered;
       if (index >= recentStart || unresolved) history.add(message);
@@ -237,6 +245,41 @@ extension _ChatDelivery on _AssistantChatScreenState {
       history.removeAt(0);
     }
     return history;
+  }
+
+  /// Tras editar un mensaje ya respondido, la conversación activa se reconstruye
+  /// hasta ese mensaje: la respuesta a la revisión anterior y los mensajes
+  /// posteriores ya contestados se marcan obsoletos (no entran en el contexto
+  /// ni se ven; siguen guardados) y se deja una línea de evento. Los posteriores
+  /// sin resolver se respetan para no perder texto que nunca se envió.
+  bool continueFromEditedMessage(
+    AiMessage edited,
+    MessageDeliveryItem attempt,
+  ) {
+    final stale = responseLinks.entries.any(
+      (e) =>
+          e.value.messageId == attempt.message.id &&
+          e.value.revisionId != attempt.revision.id &&
+          !obsoleteMessages.contains(e.key),
+    );
+    if (!stale) return false;
+    final start = messages.indexOf(edited);
+    if (start < 0) return false;
+    for (final message in messages.skip(start + 1)) {
+      if (message.role == 'event') continue;
+      final id = outgoingMessageIds[message];
+      final state = id == null ? null : deliveryStates[id];
+      if (state != null && state != MessageDelivery.answered) continue;
+      obsoleteMessages.add(message);
+    }
+    messages.add(
+      AiMessage(
+        'event',
+        'Conversación continuada desde el mensaje editado',
+        recordedAt: widget.controller.now(),
+      ),
+    );
+    return true;
   }
 
   Future<void> sendDurable({
@@ -273,7 +316,10 @@ extension _ChatDelivery on _AssistantChatScreenState {
     if (retryMessageId != null) {
       item = await repository.loadItem(retryMessageId);
       if (item == null || item.message.chatId != sessionId) {
-        update(() => error = 'El mensaje pertenece a otro chat y no se enviará aquí.');
+        update(
+          () =>
+              error = 'El mensaje pertenece a otro chat y no se enviará aquí.',
+        );
         return;
       }
       if (!MessageDeliveryPolicy.canRetry(item.message.delivery)) {
@@ -295,7 +341,8 @@ extension _ChatDelivery on _AssistantChatScreenState {
       if (outgoing == null) {
         final last = messages.lastOrNull;
         final display = durableDisplayText(text, media);
-        final reuse = previousPending == text &&
+        final reuse =
+            previousPending == text &&
             last?.role == 'user' &&
             last?.text == display &&
             last?.attachment?.mime == media?.mime &&
@@ -315,9 +362,7 @@ extension _ChatDelivery on _AssistantChatScreenState {
             chatId: sessionId,
             createdAt: createdAt,
             currentRevisionId: revisionId,
-            attachmentRefs: [
-              if (media != null) ChatStore.hashOf(media.bytes),
-            ],
+            attachmentRefs: [if (media != null) ChatStore.hashOf(media.bytes)],
           ),
           revision: MessageRevision(
             id: revisionId,
@@ -406,6 +451,10 @@ extension _ChatDelivery on _AssistantChatScreenState {
           .where((message) => outgoingMessageIds[message] == attempt.message.id)
           .first;
       syncPendingFromDelivery();
+      if (retryMessageId != null &&
+          continueFromEditedMessage(outgoing, attempt)) {
+        if (mounted) update(() {});
+      }
       await persist();
 
       final expectedTargetActivity = widget.focusMode ? companionFocus : null;
@@ -441,7 +490,9 @@ extension _ChatDelivery on _AssistantChatScreenState {
       );
       if (answerStatus == MessageAnswerStatus.superseded) {
         final latest = await repository.loadItem(attempt.message.id);
-        if (latest != null) deliveryStates[latest.message.id] = latest.message.delivery;
+        if (latest != null) {
+          deliveryStates[latest.message.id] = latest.message.delivery;
+        }
       } else {
         deliveryStates[attempt.message.id] = MessageDelivery.answered;
       }
@@ -544,7 +595,8 @@ extension _ChatDelivery on _AssistantChatScreenState {
     try {
       await persist();
     } catch (_) {
-      error = 'La respuesta llegó, pero no se pudo guardar la conversación en el móvil.';
+      error =
+          'La respuesta llegó, pero no se pudo guardar la conversación en el móvil.';
     }
   }
 
@@ -555,7 +607,9 @@ extension _ChatDelivery on _AssistantChatScreenState {
         .map((raw) => Map<String, dynamic>.from(raw as Map))
         .toList();
     for (final raw in rawMessages) {
-      if (raw['id'] == messageId) raw['delivery'] = deliveryStates[messageId]?.name;
+      if (raw['id'] == messageId) {
+        raw['delivery'] = deliveryStates[messageId]?.name;
+      }
     }
     state['messages'] = rawMessages;
     final queue = await messageRevisions!.queue(chatId);

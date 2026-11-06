@@ -210,6 +210,9 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
   final outgoingRevisionTexts = <AiMessage, String>{};
   final durableTranscriptIds = <String>{};
   final responseLinks = <AiMessage, ({String messageId, String revisionId})>{};
+  // Respuestas y mensajes que ya no forman parte del contexto activo (tras
+  // editar un mensaje anterior). Se conservan en el payload, solo se ocultan.
+  final obsoleteMessages = <AiMessage>{};
   final deliveryStates = <String, MessageDelivery>{};
   final expandedMessageIds = <String>{};
   bool get hasDeliveryBacklog => deliveryStates.values.any(
@@ -270,9 +273,13 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
           )
           .firstOrNull;
   List<AiMessage> get transcript {
-    if (!widget.focusMode) return messages;
+    final visible = [
+      for (final m in messages)
+        if (!obsoleteMessages.contains(m)) m,
+    ];
+    if (!widget.focusMode) return visible;
     return [
-      ...messages,
+      ...visible,
       for (final a in companionActivities)
         for (final m in a.messages)
           if (!archivedActivityMessageIds.contains(m.id))

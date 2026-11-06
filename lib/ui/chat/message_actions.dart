@@ -12,8 +12,9 @@ extension _MessageActions on _AssistantChatScreenState {
       companionColor(context, widget.companion?.color ?? 'orange'),
       scheme,
     );
-    final VoidCallback? toggle =
-        isUser && id != null ? () => toggleMessageActions(id) : null;
+    final VoidCallback? toggle = isUser && id != null
+        ? () => toggleMessageActions(id)
+        : null;
     const big = Radius.circular(18);
     const small = Radius.circular(4);
     return Align(
@@ -43,7 +44,10 @@ extension _MessageActions on _AssistantChatScreenState {
               key: id == null ? null : Key('message-tap-$id'),
               onTap: toggle,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
                 child: DefaultTextStyle.merge(
                   style: TextStyle(
                     color: isUser ? userBubbleTextColor : scheme.onSurface,
@@ -157,39 +161,23 @@ extension _MessageActions on _AssistantChatScreenState {
     final item = await repository.loadItem(id);
     if (!mounted) return;
     if (item == null || item.message.chatId != sessionId) return;
-    final editor = TextEditingController(text: item.revision.text);
-    final edited = await showDialog<String>(
+    // El controller vive dentro del diálogo (_EditMessageDialog): se destruye
+    // cuando su árbol se desmonta, no antes (evitaba '_dependents.isEmpty').
+    final sendBlocker = !aiReady
+        ? 'La IA no está lista.'
+        : busy
+        ? 'Hay un envío en curso.'
+        : null;
+    final result = await showDialog<_EditResult>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Editar mensaje'),
-        content: TextField(
-          key: const Key('edit-message-input'),
-          controller: editor,
-          autofocus: true,
-          minLines: 3,
-          maxLines: 8,
-          maxLength: MessageRevision.maxTextLength,
-          decoration: const InputDecoration(
-            labelText: 'Texto corregido',
-            helperText: 'La versión original se conserva en el historial.',
-          ),
-        ),
-        actions: [
-          TextButton(
-            key: const Key('cancel-edit-message'),
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            key: const Key('save-edit-message'),
-            onPressed: () => Navigator.pop(dialogContext, editor.text),
-            child: const Text('Guardar edición'),
-          ),
-        ],
+      builder: (dialogContext) => _EditMessageDialog(
+        initialText: item.revision.text,
+        sendBlocker: sendBlocker,
       ),
     );
-    editor.dispose();
-    if (edited == null || !mounted) return;
+    final edited = result?.text;
+    if (result == null || edited == null) return;
+    if (!mounted) return;
     try {
       final latest = await repository.loadItem(id);
       if (latest == null || latest.revision.id != item.revision.id) {
@@ -225,10 +213,22 @@ extension _MessageActions on _AssistantChatScreenState {
       replaceOutgoingFromItem(message, updated);
       syncPendingFromDelivery();
       await persist();
-      update(
-        () =>
-            error = 'Edición guardada. Usa Reenviar para enviar esta versión.',
-      );
+      if (result.send && !busy && aiReady) {
+        update(() => error = null);
+        // Decisión de contexto: send(retryMessageId) manda al modelo la
+        // revisión vigente (la editada) y, como la respuesta anterior está
+        // enlazada a otra revisión, sendDurable descarta del contexto esa
+        // respuesta y los mensajes posteriores (los marca obsoletos, sin
+        // borrar nada) y deja una línea de evento. La nueva respuesta se
+        // enlaza a la nueva revisión.
+        await send(retryMessageId: id);
+      } else {
+        update(
+          () => error = result.send
+              ? 'Edición guardada, pero no se pudo enviar ahora. Usa Reenviar cuando puedas.'
+              : 'Edición guardada. Usa Reenviar para enviar esta versión.',
+        );
+      }
     } on ValidationException catch (e) {
       update(() => error = e.message);
     } on ArgumentError {
@@ -284,5 +284,89 @@ extension _MessageActions on _AssistantChatScreenState {
     } catch (_) {
       if (mounted) update(() => error = 'No se pudo abrir el historial.');
     }
+  }
+}
+
+class _EditResult {
+  const _EditResult(this.text, {required this.send});
+  final String text;
+  final bool send;
+}
+
+/// Diálogo de edición con su propio controller (creado en initState y
+/// destruido en dispose) para no liberarlo mientras el TextField se anima.
+class _EditMessageDialog extends StatefulWidget {
+  const _EditMessageDialog({required this.initialText, this.sendBlocker});
+  final String initialText;
+  final String? sendBlocker;
+
+  @override
+  State<_EditMessageDialog> createState() => _EditMessageDialogState();
+}
+
+class _EditMessageDialogState extends State<_EditMessageDialog> {
+  late final TextEditingController editor = TextEditingController(
+    text: widget.initialText,
+  );
+
+  @override
+  void dispose() {
+    editor.dispose();
+    super.dispose();
+  }
+
+  void close({required bool send}) =>
+      Navigator.pop(context, _EditResult(editor.text, send: send));
+
+  @override
+  Widget build(BuildContext context) {
+    final blocker = widget.sendBlocker;
+    return AlertDialog(
+      title: const Text('Editar mensaje'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextField(
+            key: const Key('edit-message-input'),
+            controller: editor,
+            autofocus: true,
+            minLines: 3,
+            maxLines: 8,
+            maxLength: MessageRevision.maxTextLength,
+            decoration: const InputDecoration(
+              labelText: 'Texto corregido',
+              helperText: 'La versión original se conserva en el historial.',
+            ),
+          ),
+          if (blocker != null)
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: Text(
+                'No se puede enviar ahora: $blocker',
+                key: const Key('edit-send-blocker'),
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          key: const Key('cancel-edit-message'),
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancelar'),
+        ),
+        TextButton(
+          key: const Key('save-edit-message'),
+          onPressed: () => close(send: false),
+          child: const Text('Guardar'),
+        ),
+        FilledButton(
+          key: const Key('save-send-edit-message'),
+          onPressed: blocker == null ? () => close(send: true) : null,
+          child: const Text('Guardar y enviar'),
+        ),
+      ],
+    );
   }
 }

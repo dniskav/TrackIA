@@ -34,7 +34,7 @@
   - Evidencia 2026-11-07: `flutter test --no-pub test/message_delivery_test.dart` -> 5 aprobadas y `test/message_delivery_policy_test.dart` -> 3 aprobadas; `MessageDelivery` define `pending|sending|answered|failed|uncertain` (`lib/domain/message_revision.dart`), `MessageDeliveryService.openScope` recupera `sending` como incierto sin enviar. Integración al chat: ver T011.
 - [ ] T011 [US1] Integrar cola y contexto ordenado en `lib/ui/chat/chat_send.dart`; no truncar mensajes pendientes y asegurar envío al chat de origen; ejecutar T009 y tests existentes del chat.
   - Estado 2026-11-07: parcial: el chat ya usa `MessageDeliveryService` vía `lib/ui/chat/chat_delivery.dart`, pero no hay prueba que acredite cola ordenada de pendientes, no truncado y envío al chat de origen en `chat_send.dart`.
-- [ ] T012 [US1] Crear `test/message_edit_widget_test.dart` y ofrecer Editar, historial y Reenviar accesibles en `lib/ui/assistant_chat.dart` y `lib/ui/chat/`; comprobar cancelación y estados tras reinicio.
+- [x] T012 [US1] Crear `test/message_edit_widget_test.dart` y ofrecer Editar, historial y Reenviar accesibles en `lib/ui/assistant_chat.dart` y `lib/ui/chat/`; comprobar cancelación y estados tras reinicio.
   - Estado 2026-11-07: parcial: existen `lib/ui/chat/message_actions.dart` y `test/message_actions_tap_test.dart`; falta `test/message_edit_widget_test.dart` (cancelación, historial y estados tras reinicio).
 - [ ] T013 [US1] Implementar relación mensaje→efecto y corrección transaccional por ID en `lib/data/message_effect_repository.dart`; ante varias relaciones mostrar selección y antes/después; no editar Sheets automáticamente; probar `test/message_effect_test.dart` con 10×10→10×60 y sin duplicados.
   - Estado 2026-11-07: parcial: existe `trackia_message_effects` en v7 pero falta `lib/data/message_effect_repository.dart` y `test/message_effect_test.dart`.
@@ -157,6 +157,6 @@ T001–T005 → US1 y US2; US3 puede ejecutarse tras T001–T002; US4/US5 tras T
 Casillas [x] tras contrastar con el código y ejecutar sus pruebas puntuales; ver evidencia en cada tarea.
 
 - Hechas (30): T001–T005, T007–T010, T015, T016, T020–T026, T028, T033–T035, T037, T040, T041, T046–T050. Con reservas: T021, T022 y T034 solo con transporte/cliente simulado; T026 sin conexión al chat; T037 solo lógica sin UI ni persistencia.
-- Parciales (casilla vacía): T006 (falta cancelación), T011, T012, T013, T017, T018, T019, T029 (falta vista previa de importación), T036 (falta repositorio), T042, T043, T044.
+- Parciales (casilla vacía): T006 (falta cancelación), T011, T013, T017, T018, T019, T029 (falta vista previa de importación), T036 (falta repositorio), T042, T043, T044.
 - Pendientes: T014, T027, T030 (sin adaptador Drive real), T031, T032, T038, T039, T045, T051, T052, T053.
 - Validación real aún no hecha: Google OAuth/Drive, IA real, Android antiguo e interrupción de proceso (T004), iOS.
