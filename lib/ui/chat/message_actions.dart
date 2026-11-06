@@ -16,42 +16,60 @@ extension _MessageActions on _AssistantChatScreenState {
       MessageDelivery.uncertain =>
         'Resultado incierto; reenvío bloqueado hasta revisar',
     };
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 6),
-        Text(
-          label,
-          key: Key('delivery-state-$id'),
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-        Wrap(
-          spacing: 4,
-          children: [
-            TextButton(
-              key: Key('edit-message-$id'),
-              onPressed: busy || state == MessageDelivery.sending
-                  ? null
-                  : () => editDurableMessage(message),
-              child: const Text('Editar'),
+    final muted = Theme.of(context).colorScheme.onSurfaceVariant;
+    Widget action(Key key, IconData icon, String tooltip, VoidCallback? onTap) =>
+        IconButton(
+          key: key,
+          icon: Icon(icon),
+          tooltip: tooltip,
+          onPressed: onTap,
+          iconSize: 16,
+          visualDensity: VisualDensity.compact,
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints.tightFor(width: 32, height: 32),
+          color: muted,
+        );
+    return Padding(
+      padding: const EdgeInsets.only(top: 2),
+      child: Wrap(
+        crossAxisAlignment: WrapCrossAlignment.center,
+        spacing: 2,
+        children: [
+          action(
+            Key('edit-message-$id'),
+            Icons.edit_outlined,
+            'Editar',
+            busy || state == MessageDelivery.sending
+                ? null
+                : () => editDurableMessage(message),
+          ),
+          action(
+            Key('history-message-$id'),
+            Icons.history,
+            'Historial',
+            busy ? null : () => showDurableMessageHistory(id),
+          ),
+          action(
+            Key('resend-message-$id'),
+            Icons.refresh,
+            'Reenviar',
+            !busy && aiReady && MessageDeliveryPolicy.canRetry(state)
+                ? () => send(retryMessageId: id)
+                : null,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 6),
+            child: Text(
+              label,
+              key: Key('delivery-state-$id'),
+              style: Theme.of(context)
+                  .textTheme
+                  .labelSmall
+                  ?.copyWith(color: muted),
             ),
-            TextButton(
-              key: Key('history-message-$id'),
-              onPressed: busy ? null : () => showDurableMessageHistory(id),
-              child: const Text('Historial'),
-            ),
-            TextButton(
-              key: Key('resend-message-$id'),
-              onPressed: !busy &&
-                      aiReady &&
-                      MessageDeliveryPolicy.canRetry(state)
-                  ? () => send(retryMessageId: id)
-                  : null,
-              child: const Text('Reenviar'),
-            ),
-          ],
-        ),
-      ],
+          ),
+        ],
+      ),
     );
   }
 

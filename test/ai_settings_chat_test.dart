@@ -356,11 +356,11 @@ void main() {
         for (final entry
             in {
               'Roboto':
-                  '.tools/flutter/engine/src/flutter/third_party/txt/third_party/fonts/Roboto-Regular.ttf',
+                  '.tools/flutter-3.47/flutter/bin/cache/artifacts/material_fonts/Roboto-Regular.ttf',
               'Ahem':
-                  '.tools/flutter/engine/src/flutter/third_party/txt/third_party/fonts/Roboto-Regular.ttf',
+                  '.tools/flutter-3.47/flutter/bin/cache/artifacts/material_fonts/Roboto-Regular.ttf',
               'MaterialIcons':
-                  '.tools/flutter/bin/cache/artifacts/material_fonts/MaterialIcons-Regular.otf',
+                  '.tools/flutter-3.47/flutter/bin/cache/artifacts/material_fonts/MaterialIcons-Regular.otf',
             }.entries) {
           final loader = FontLoader(entry.key);
           loader.addFont(
