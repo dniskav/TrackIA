@@ -1,0 +1,588 @@
+{
+  "@@locale": "ar",
+  "appTitle": "TrackIA",
+  "languageSystem": "لغة الجهاز",
+  "languageSpanish": "الإسبانية",
+  "languageEnglish": "الإنجليزية",
+  "languageArabic": "العربية",
+  "languagePreference": "اللغة",
+  "welcomeTitle": "مرحبًا بك",
+  "welcomeHelpTitle": "المساعدة والترحيب",
+  "welcomeStep": "الخطوة {current} من {total}",
+  "@welcomeStep": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "welcomeSlide1Title": "مرحبًا بك",
+  "welcomeSlide1Body": "تحدّث مع مساعد الذكاء الاصطناعي لإعداد نشاط وطرح الأسئلة ومراجعة تقدمك. أنت من يقرر متى تبدأ.",
+  "welcomeSlide2Title": "تحدّث أو اكتب",
+  "welcomeSlide2Body": "تدعم المحادثة النص والإملاء والمرفقات. لاستخدام الذكاء الاصطناعي، اربط مزودًا من القائمة. تظل سجلاتك المحلية متاحة إذا انقطع الاتصال.",
+  "welcomeSlide3Title": "تحكّم في نشاطك",
+  "welcomeSlide3Body": "اختر نشاطًا أو أنشئه. إعداده لا يبدأ المؤقت: اضغط ابدأ عندما تكون مستعدًا، وإيقاف عند نهاية كل فترة.",
+  "welcomeSlide4Title": "احتفظ ببياناتك",
+  "welcomeSlide4Body": "تُحفظ سجلاتك على هذا الجهاز. يمكنك ربط Google Sheets في أي وقت ومراجعة حالة كل إرسال.",
+  "welcomeSlide5Title": "رفاقك",
+  "welcomeSlide5Body": "اختر GymBro أو التركيز أو الهدوء أو اليوميات. يمكنك تعديل التعليمات وإنشاء رفاق آخرين وربط ورقة أو علامة تبويب Google مختلفة لكل واحد.",
+  "welcomeSlide6Title": "الأوضاع والتذكيرات",
+  "welcomeSlide6Body": "لكل رفيق وضع. افتح قائمته (⋮) واضغط «الأوضاع والتذكيرات»: وضع التذكير ينبهك في الوقت الذي تختاره فقط؛ ويضيف وضع اللعبة أهدافًا وسلاسل إنجازات وجوائز. لتعمل تنبيهات الراحة حتى مع تشغيل عدم الإزعاج، انتقل إلى الإعدادات ← التذكيرات.",
+  "welcomeSaveErrorTitle": "تعذر حفظ اختيارك",
+  "welcomeSaveErrorBody": "يمكنك المحاولة مجددًا أو المتابعة. إذا تابعت، قد يظهر دليل الترحيب عند فتح التطبيق مرة أخرى.",
+  "retry": "إعادة المحاولة",
+  "continueWithoutSaving": "المتابعة دون حفظ",
+  "welcomeNeverAgain": "عدم الإظهار مجددًا",
+  "welcomeNeverAgainHelp": "إذا لم تحدد هذا الخيار، فسيظهر الدليل عند فتح التطبيق. يمكنك تغييره من المساعدة.",
+  "skip": "تخطي",
+  "previous": "السابق",
+  "next": "التالي",
+  "start": "ابدأ",
+  "welcomeAutoShow": "إظهار الترحيب عند الفتح",
+  "devicePreferenceSaved": "يُحفظ اختيارك على هذا الجهاز.",
+  "showWelcome": "عرض دليل الترحيب",
+  "savePreferenceError": "تعذر حفظ التفضيل.",
+  "companionsTitle": "رفاقك",
+  "companionsDescription": "اختر من تعمل معه. يحتفظ كل رفيق بمحادثته ويمكنه استخدام ورقة أو علامة تبويب Google مختلفة.",
+  "companionsEmpty": "ليس لديك رفاق بعد. أنشئ رفيقًا للبدء.",
+  "createCompanion": "إنشاء رفيق",
+  "companionOptions": "خيارات {name}",
+  "@companionOptions": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "companionProgress": "تقدم {name}",
+  "@companionProgress": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "companionStreak": "{days, plural, zero{لا توجد سلسلة إنجاز} one{سلسلة الإنجاز: يوم واحد} two{سلسلة الإنجاز: يومان} few{سلسلة الإنجاز: # أيام} many{سلسلة الإنجاز: # يومًا} other{سلسلة الإنجاز: # يوم}}",
+  "@companionStreak": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "remindersPaused": "التذكيرات متوقفة مؤقتًا",
+  "resume": "استئناف",
+  "edit": "تعديل",
+  "modeAndNotices": "الأوضاع والتذكيرات",
+  "delete": "حذف",
+  "cancel": "إلغاء",
+  "save": "حفظ",
+  "companionDeleteTitle": "حذف {name}؟",
+  "@companionDeleteTitle": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "companionDeleteBody": "سيتم حذف محادثته وملفاته واتصاله المحلي بـ Sheets. لن تُحذف ورقة Google أو سجلات النشاط.",
+  "companionDeleteError": "تعذر الحذف: {error}",
+  "@companionDeleteError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "companionSaveError": "تعذر الحفظ: {error}",
+  "@companionSaveError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "companionLoadError": "تعذر تحميل الرفاق. اضغط لإعادة المحاولة.",
+  "createCompanionTitle": "إنشاء رفيق",
+  "editCompanionTitle": "تعديل رفيق",
+  "companionName": "الاسم",
+  "companionPurpose": "ما الغرض منه؟",
+  "companionInstructions": "تعليمات الذكاء الاصطناعي (اختياري)",
+  "companionInstructionsHelp": "تُستخدم عند ربط مزود.",
+  "icon": "الأيقونة",
+  "color": "اللون",
+  "settings": "الإعدادات",
+  "assistant": "المساعد",
+  "artificialIntelligence": "الذكاء الاصطناعي",
+  "yourData": "بياناتك",
+  "accountAndData": "الحساب والبيانات",
+  "localProfile": "الملف المحلي",
+  "exportImport": "تصدير واستيراد",
+  "appSection": "التطبيق",
+  "notices": "التذكيرات",
+  "enabled": "مفعّلة",
+  "disabled": "متوقفة",
+  "appearance": "المظهر",
+  "helpWelcome": "المساعدة والترحيب",
+  "verified": "تم التحقق",
+  "notConnected": "غير متصل",
+  "notVerified": "لم يتم التحقق",
+  "unavailable": "غير متاح",
+  "checking": "جارٍ التحقق…",
+  "automatic": "تلقائي",
+  "light": "فاتح",
+  "dark": "داكن",
+  "companionSettingsTitle": "الأوضاع والتذكيرات · {name}",
+  "@companionSettingsTitle": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "mode": "الوضع",
+  "reminderMode": "تذكير",
+  "reminderModeDetail": "ينبهك فقط في الوقت الذي تختاره.",
+  "gameMode": "لعبة",
+  "gameModeDetail": "أهداف وسلاسل إنجازات وجوائز، إلى جانب التذكيرات.",
+  "goals": "الأهداف",
+  "streaks": "سلاسل الإنجاز",
+  "achievements": "الجوائز",
+  "encouragementMessages": "رسائل التشجيع",
+  "freeDaysPerWeek": "أيام راحة في الأسبوع",
+  "freeDaysHelp": "لا تقطع سلسلة الإنجاز.",
+  "dailyNotice": "تذكير يومي",
+  "remindersPausedDetail": "مرّت 7 أيام مجدولة دون تسجيل نشاط.",
+  "remindAboutActivity": "ذكّرني بهذا النشاط",
+  "monday": "الاثنين",
+  "tuesday": "الثلاثاء",
+  "wednesday": "الأربعاء",
+  "thursday": "الخميس",
+  "friday": "الجمعة",
+  "saturday": "السبت",
+  "sunday": "الأحد",
+  "from": "من",
+  "until": "إلى",
+  "lastCall": "التنبيه الأخير",
+  "lastCallTime": "وقت التنبيه الأخير",
+  "neutral": "محايد",
+  "motivating": "مشجّع",
+  "minimumForDay": "الحد الأدنى لليوم",
+  "quantity": "الكمية",
+  "sessions": "جلسات",
+  "minutes": "دقائق",
+  "preview": "معاينة",
+  "putGoal": "تحديد هدف",
+  "whatToMeasure": "ما الذي تريد قياسه؟",
+  "timeMinutes": "الوقت (بالدقائق)",
+  "sessionCount": "الجلسات",
+  "perDay": "في اليوم",
+  "perWeek": "في الأسبوع",
+  "target": "الهدف",
+  "minimumStreakOptional": "الحد الأدنى للحفاظ على السلسلة (اختياري)",
+  "chooseTime": "اختر الوقت",
+  "goalMustBePositive": "يجب أن يكون الهدف رقمًا أكبر من 0.",
+  "minimumMustBePositive": "يجب أن يكون الحد الأدنى رقمًا أكبر من 0.",
+  "companionSettingsLoadError": "تعذر تحميل الإعدادات.",
+  "companionSettingsSaveError": "تعذر حفظ الإعدادات.",
+  "aiNotConnected": "الذكاء الاصطناعي غير متصل",
+  "chooseProviderAndModel": "اختر مزودًا ونموذجًا.",
+  "connect": "اتصال",
+  "aiNotVerified": "لم يتم التحقق من الذكاء الاصطناعي",
+  "verifyConnectionAssistant": "اختبر الاتصال لتفعيل المساعد.",
+  "verify": "تحقق",
+  "aiUnavailable": "الذكاء الاصطناعي غير متاح",
+  "reviewProviderRetry": "راجع المزود وحاول مجددًا.",
+  "review": "مراجعة",
+  "waitingPhraseOne": "أنا هنا لمساعدتك عندما تكون مستعدًا.",
+  "waitingPhraseTwo": "خذ وقتك، يمكننا المتابعة هنا.",
+  "waitingPhraseThree": "نتابع متى شئت.",
+  "waitingPhraseFour": "يمكنك مواصلة الكتابة عندما يناسبك.",
+  "logoDescription": "شعار TrackIA",
+  "chatArchive": "أرشفة المحادثة",
+  "chatArchives": "المحادثات المؤرشفة",
+  "chatSendToSheets": "الإرسال إلى Google Sheets",
+  "chatAiProvider": "موفر الذكاء الاصطناعي",
+  "chatConfigureAi": "إعداد الذكاء الاصطناعي",
+  "chatVerifyConnection": "التحقق من الاتصال · يستخدم واجهة API الخاصة بك",
+  "chatTraining": "التدريب",
+  "chatLoadSheets": "تحميل Google Sheets",
+  "chatSheetPending": "تفسير الجدول بالذكاء الاصطناعي",
+  "chatWelcomePrompt": "ما الذي تود فعله اليوم؟ أخبرني لنخطط له معًا.",
+  "chatLoadDataPrompt": "حمّل بياناتك باستخدام + متى شئت. يمكن للذكاء الاصطناعي تفسير تنسيقها عند الاتصال.",
+  "chatPrepareActivity": "تحضير",
+  "chatWaitingModel": "بانتظار النموذج…",
+  "chatDeferredArchive": "سيؤرشف المساعد هذه المحادثة عند عودتك إلى النهاية.",
+  "chatGoLatest": "الانتقال إلى أحدث رسالة",
+  "chatListening": "جارٍ الاستماع… راجع النص واضغط إرسال.",
+  "chatAttach": "إرفاق",
+  "chatComposeHint": "اكتب رسالتك أو أمْلِها…",
+  "chatConnectAiHint": "اتصل بالذكاء الاصطناعي للبدء",
+  "chatStopDictation": "إيقاف الإملاء",
+  "chatDictate": "إملاء رسالة",
+  "chatSend": "إرسال",
+  "chatAssistantImageAlt": "صورة",
+  "chatInputDirections": "اتجاه نص الرسالة",
+  "activityStart": "ابدأ",
+  "activityStop": "إيقاف",
+  "activityFinish": "إنهاء",
+  "activityFinishDay": "إنهاء اليوم",
+  "activityChooseAnother": "اختيار نشاط آخر",
+  "activitySubtractCycle": "إنقاص دورة",
+  "activityAddCycle": "إضافة دورة مكتملة",
+  "activityNoticesOff": "التنبيهات متوقفة",
+  "activityEnableNotices": "تفعيل",
+  "activityCycles": "الدورات",
+  "aiUnavailableFocus": "الذكاء الاصطناعي غير متاح · يمكنك التوقف وحفظ الملاحظات محليًا",
+  "activityRestInProgress": "استراحة جارية",
+  "activityRestChangeNoticePrompt": "هل تريد تغيير التنبيه المجدول بالفعل أيضًا؟",
+  "activityKeepNotice": "الاحتفاظ بالتنبيه",
+  "activityChangeNotice": "تغيير التنبيه",
+  "personalityInstructions": "الشخصية والتعليمات",
+  "personalityInstructionsHelp": "صف النبرة وكيف تريد من هذا الرفيق دعمك. يؤثر ذلك على ردوده بالذكاء الاصطناعي فقط.",
+  "personalitySuggestionTone": "استخدم نبرة ودودة وواضحة.",
+  "personalitySuggestionAsk": "اطرح أسئلة موجزة عندما تنقص التفاصيل.",
+  "personalitySuggestionAccuracy": "لا تختلق معلومات أو تقدمًا لم أذكره.",
+  "personalityTooLong": "يجب ألا تتجاوز تعليمات الشخصية 4000 حرف.",
+  "personalityDraftTitle": "مسودة الشخصية",
+  "personalityDraftAccept": "استخدام المسودة",
+  "personalityDraftButton": "ساعدني في صياغتها",
+  "personalityDraftError": "تعذر إنشاء المسودة. تحقق من اتصال الذكاء الاصطناعي وحاول مجددًا.",
+  "activityTargetTitle": "العدد المستهدف للمجموعات",
+  "activityTargetLabel": "المجموعات (اتركه فارغًا للإزالة)",
+  "activityTargetInvalid": "أدخل عددًا مستهدفًا بين 1 و100، أو اتركه فارغًا.",
+  "activityTargetEditTooltip": "تعديل العدد المستهدف للمجموعات",
+  "activityTargetPreservedProgress": "الهدف: {target}. سيبقى تقدمك محفوظًا مع {completed} مجموعات مكتملة.",
+  "@activityTargetPreservedProgress": {
+    "placeholders": {
+      "target": {},
+      "completed": {}
+    }
+  },
+  "activityTargetUpdated": "تم تحديث الهدف.",
+  "activityNoTarget": "بلا هدف",
+  "activityTargetChangedEvent": "غيّرت العدد المستهدف للمجموعات إلى {target}",
+  "@activityTargetChangedEvent": {
+    "placeholders": {
+      "target": {}
+    }
+  },
+  "chatTargetProposalAmbiguous": "لم يتغير الهدف: الاقتراح ملتبس أو لا يخص نشاطًا جاريًا.",
+  "chatTargetConfirmTitle": "تغيير العدد المستهدف للمجموعات",
+  "chatTargetRemovePrompt": "هل تريد إزالة الهدف؟",
+  "chatTargetSetPrompt": "هل تريد تحديد الهدف بـ {target} مجموعات؟",
+  "@chatTargetSetPrompt": {
+    "placeholders": {
+      "target": {}
+    }
+  },
+  "chatTargetSetPromptWithProgress": "هل تريد تحديد الهدف بـ {target} مجموعات؟ لقد أكملت {completed}؛ وسيبقى التقدم محفوظًا بالكامل.",
+  "@chatTargetSetPromptWithProgress": {
+    "placeholders": {
+      "target": {},
+      "completed": {}
+    }
+  },
+  "chatTargetConfirmButton": "تغيير",
+  "chatTargetSavedNoTarget": "تم حفظ الهدف: بلا هدف.",
+  "chatTargetSaved": "تم حفظ الهدف: {target} مجموعات.",
+  "@chatTargetSaved": {
+    "placeholders": {
+      "target": {}
+    }
+  },
+  "chatTargetSavedWithProgress": "تم حفظ الهدف: {target} مجموعات. سيبقى تقدمك محفوظًا مع {completed} مجموعات مكتملة.",
+  "@chatTargetSavedWithProgress": {
+    "placeholders": {
+      "target": {},
+      "completed": {}
+    }
+  },
+  "chatTargetStale": "لم يتغير الهدف. ربما تغير النشاط؛ راجعه وحاول مجددًا.",
+  "sheetsTitle": "جداول بيانات Google الخاصة بك",
+  "sheetsChooseTitle": "اختر جدول بيانات التمرين",
+  "sheetsSearch": "البحث بالاسم",
+  "sheetsSearchTooltip": "بحث",
+  "sheetsConnect": "الاتصال بـ Google",
+  "sheetsReconnect": "تغيير الحساب أو إعادة التفويض",
+  "sheetsNoResults": "لم يتم العثور على جداول. جرّب اسماً آخر أو غيّر الحساب.",
+  "sheetsLoadMore": "تحميل مزيد من الجداول",
+  "dataTitle": "بياناتك",
+  "dataCreateBackup": "إنشاء نسخة احتياطية ومشاركتها",
+  "dataRestoreBackup": "استعادة نسخة احتياطية",
+  "aiProviderTitle": "موفّر الذكاء الاصطناعي",
+  "aiConnectTitle": "اربط مساعدك",
+  "aiProviderLabel": "موفّر",
+  "sheetChooseTab": "اختر علامة التبويب التي تحتوي على تمارينك",
+  "sheetReview": "مراجعة الجدول",
+  "sheetRowsRead": "تمت قراءة {count} صفاً. سيتم تحميل علامة التبويب كاملة؛ تظهر هنا أول 12 صفاً.",
+  "@sheetRowsRead": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "sheetRowsReadPreview": "تمت قراءة {count} صفاً. معاينة:",
+  "@sheetRowsReadPreview": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "sheetLoadPending": "سيُحفظ الجدول على هذا الهاتف بانتظار تفسيره. لا تحتاج إلى الذكاء الاصطناعي لتحميله. بعد الاتصال، يمكنك طلب تفسير بنيته. لا يؤدي التحميل إلى إنشاء تمارين أو إرسال الخلايا إلى الموفّر.",
+  "sheetSendToAi": "عند الضغط على تحميل وتحليل، ستُرسل هذه الخلايا إلى موفّر الذكاء الاصطناعي المُعدّ. تُحفظ الصفوف كما تظهر ولا تتحول إلى تمارين.",
+  "sheetReadOnlyGoogle": "هذه نسخة للقراءة فقط. لجلب التغييرات اللاحقة، استخدم تحديث الجدول في الدردشة.",
+  "sheetReadOnlyFile": "هذه نسخة للقراءة فقط من الملف. لجلب التغييرات، أعد تحميله.",
+  "sheetsConnecting": "جارٍ الاتصال بـ Google…",
+  "sheetsAuthorizeProgress": "اختر حسابك واسمح بالقراءة من Google…",
+  "sheetsSearchProgress": "جارٍ البحث عن جداولك…",
+  "sheetsLoadingTabs": "جارٍ تحميل علامات التبويب في {name}…",
+  "@sheetsLoadingTabs": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "sheetsReadingTab": "جارٍ قراءة {name}…",
+  "@sheetsReadingTab": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "sheetsReadError": "تعذرت قراءة الجدول. حاول مرة أخرى.",
+  "sheetsGoogleError": "تعذر الاتصال بـ Google.",
+  "sheetsRetry": "إعادة تحميل الجداول",
+  "sheetsPartial": "أعاد Google نتائج بحث جزئية. ابحث باسم الجدول.",
+  "sheetsAuthIncomplete": "لم يُكمل Google التفويض. اضغط على الاتصال بـ Google للمحاولة مجدداً؛ لم يتم تحميل جداولك بعد.",
+  "sheetsSearchAccountChanged": "تغير الحساب أثناء البحث. أعد الاتصال للمتابعة.",
+  "sheetsChooseAccountChanged": "تغير الحساب أثناء الاختيار. أعد الاتصال للمتابعة.",
+  "sheetsReadAccountChanged": "تغير الحساب أثناء القراءة. لم يتم تحميل البيانات.",
+  "sheetsNoTabs": "لا توجد علامات تبويب متاحة في هذا الجدول.",
+  "sheetsReadRowsIntro": "صفاً تمت قراءتها. سيتم تحميل علامة التبويب كاملة؛ تظهر هنا أول 12 صفاً.",
+  "syncTitle": "إرسال إلى جداول بيانات Google",
+  "syncIntro": "اربط Google واختر جدولك مرة واحدة. يمكن للدردشة الاطلاع على أحدث البيانات وإرسال النتائج؛ ويمكنك هنا أيضاً مراجعة إرسال يدوي.",
+  "syncNoSessions": "لا توجد جلسات مكتملة لإرسالها. يمكنك اختبار الاتصال دون بدء نشاط.",
+  "syncWorkout": "التمرين",
+  "syncConnectWrite": "الاتصال بـ Google والسماح بالكتابة",
+  "syncDestinationAccount": "حساب الوجهة: {email}",
+  "@syncDestinationAccount": {
+    "placeholders": {
+      "email": {}
+    }
+  },
+  "syncCheckConnection": "التحقق من الاتصال",
+  "syncDisconnect": "قطع الاتصال بهذا الجدول",
+  "syncChangeAccount": "تغيير حساب الوجهة",
+  "syncCreateNew": "إنشاء جدول جديد",
+  "syncNewSheetName": "اسم الجدول الجديد",
+  "syncCreateDrive": "إنشاء جدول في Google Drive",
+  "syncSheet": "جدول Google",
+  "syncTab": "علامة التبويب",
+  "syncInstructions": "تفضيلات الجدول أو ملاحظاته",
+  "syncInstructionsHint": "مثال: استخدم قسم أكتوبر، إجمالي الأوزان",
+  "syncAllowOverwrite": "السماح بتحديث الخلايا التي تحتوي على بيانات",
+  "syncOverwriteHelp": "ستعرض المراجعة القيمة السابقة والجديدة. تُحفظ الصيغ.",
+  "syncAutomatic": "إرسال الجلسات تلقائياً عند الانتهاء",
+  "syncAutomaticChatHelp": "يظل الإرسال عبر الدردشة متاحاً عند إيقاف الإرسال التلقائي مؤقتاً.",
+  "syncAutomaticActivityHelp": "لا تحدد سجلات النشاط المرافق بعد؛ يمكنك طلب الإرسال والتعديلات من الدردشة.",
+  "syncSavePreferences": "حفظ الاتصال والتفضيلات",
+  "syncReviewLoadChat": "مراجعة الجدول وتحميله في الدردشة",
+  "syncDiagnostics": "تشخيص الاتصال",
+  "syncDiagnosticsHelp": "اختبر علامة التبويب المحددة دون بدء نشاط. يستخدم اختبار الكتابة علامة تبويب مؤقتة ولا يغيّر تمارينك.",
+  "syncTestRead": "اختبار القراءة بالذكاء الاصطناعي",
+  "syncTestWrite": "اختبار الكتابة بالذكاء الاصطناعي",
+  "syncPrepare": "إعداد الإرسال ومراجعته",
+  "syncNoSheet": "اختر جدولاً وعلامة تبويب.",
+  "syncNoValidWorkout": "اختر جدولاً وعلامة تبويب وتمريناً مكتملاً.",
+  "syncSessionUnavailable": "لم تعد الجلسة متاحة.",
+  "syncConnectionError": "تعذر استرداد الجدول المحفوظ. يمكنك اختيار جدول آخر.",
+  "syncOperationError": "تعذر إكمال العملية. حاول مرة أخرى.",
+  "syncGoogleUnconfirmed": "لم يؤكد Google تنفيذ العملية.",
+  "syncNameInvalid": "أدخل اسماً لا يتجاوز 80 حرفاً.",
+  "syncLoadChatTitle": "مراجعة الجدول للدردشة",
+  "syncConfirmLoad": "تأكيد وتحميل",
+  "syncReadConfirmed": "تم تأكيد القراءة: استلام {count} صفاً من Google. رد النموذج: {answer}",
+  "@syncReadConfirmed": {
+    "placeholders": {
+      "count": {},
+      "answer": {}
+    }
+  },
+  "syncWriteConfirmed": "تم تأكيد الكتابة: اقترح النموذج «{marker}»، وقبل Google الاختبار وحُذفت علامة التبويب المؤقتة. لم تُرسل أي تمارين.",
+  "@syncWriteConfirmed": {
+    "placeholders": {
+      "marker": {}
+    }
+  },
+  "syncSentConfirmed": "تم إرسال التمرين إلى جداول بيانات Google. تم التحقق من الإيصال؛ لن يؤدي الإرسال مجدداً إلى تكراره.",
+  "syncReturnChat": "العودة إلى الدردشة",
+  "syncDestination": "الوجهة: {name} / {tab}",
+  "@syncDestination": {
+    "placeholders": {
+      "name": {},
+      "tab": {}
+    }
+  },
+  "syncReceiptNote": "سيحفظ Google أيضاً إيصال الإرسال لمنع التكرار.",
+  "syncReviewCount": "{count} خلية. سيتحقق التطبيق من عدم تغييرها منذ هذه المراجعة.",
+  "@syncReviewCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "syncOriginalData": "عرض بيانات التمرين الأصلية",
+  "syncConfirmSend": "تأكيد الإرسال إلى جداول بيانات Google",
+  "syncDiscard": "تجاهل الاقتراح",
+  "sheetNoTabs": "لا توجد علامات تبويب متاحة في هذا الجدول.",
+  "sheetsLoad": "تحميل الجدول",
+  "sheetsLoadAnalyze": "تحميل وتحليل",
+  "rowLabel": "صف",
+  "syncProposedSessionInvalid": "الجلسة المقترحة غير مكتملة أو لا تنتمي إلى هذا الملف الشخصي. اختر جلسة صالحة.",
+  "syncConnectionSaved": "تم حفظ الاتصال. ستقرأ الدردشة الجدول الحالي ويمكنها إرسال النتائج دون طلب التفويض في كل مرة.",
+  "syncIdentityUnconfirmed": "تعذر تأكيد حساب Google المحدد.",
+  "sheetAllRowsWillLoad": "سيتم تحميل جميع صفوف علامة التبويب.",
+  "syncAccountChangedReview": "تغير الحساب أثناء مراجعة علامة التبويب. تم الاحتفاظ بالجدول السابق؛ أعد الاتصال لتحميله.",
+  "syncLoadedIntoChat": "تم تحميل الجدول في الدردشة: {name} / {tab}.",
+  "@syncLoadedIntoChat": {
+    "placeholders": {
+      "name": {},
+      "tab": {}
+    }
+  },
+  "syncConfigureAi": "أعد إعداد الذكاء الاصطناعي أولاً لاختبار وصول النموذج.",
+  "syncModelEmpty": "لم يُرجع النموذج أي رد.",
+  "syncInvalidMarker": "رد النموذج لكنه لم يقدم علامة اختبار صالحة.",
+  "syncWorkoutChanged": "تغير التمرين. أعد إعداد الإرسال لمراجعة البيانات الحالية.",
+  "syncRefreshAfterSendFailed": "تم تأكيد الإرسال. تعذر تحديث نسخة الدردشة؛ أعد تحميل الجدول للاطلاع على بياناته الجديدة.",
+  "syncReceiptSent": "تم تأكيد جداول بيانات Google: أُرسل التمرين «{workout}» ({id}) إلى «{name} / {tab}». يؤكد إيصال Google الإرسال.",
+  "@syncReceiptSent": {
+    "placeholders": {
+      "workout": {},
+      "id": {},
+      "name": {},
+      "tab": {}
+    }
+  },
+  "syncReceiptCreated": "تم تأكيد جداول بيانات Google: أُنشئ الجدول «{name}» وعلامة التبويب «{tab}». لم يتم إرسال التقدم بعد.",
+  "@syncReceiptCreated": {
+    "placeholders": {
+      "name": {},
+      "tab": {}
+    }
+  },
+  "sheetsAssistantIntro": "اربط حسابك واختر الجدول وعلامة التبويب. راجع البيانات قبل مشاركتها مع مساعدك.",
+  "sheetsImportIntro": "يستخدم TrackIA تفويض Google لقراءة جداولك. تُحفظ البيانات على هذا الهاتف عند تأكيد الاستيراد.",
+  "sheetsErrorExpired": "انتهى تفويض Google. أعد الاتصال بحسابك.",
+  "sheetsErrorPermission": "لا يسمح Google بهذه العملية. تحقق من الوصول وأذونات الجدول.",
+  "sheetsErrorAccount": "لا تتطابق القراءة مع الحساب المفوض. أعد الاتصال من ملفك الشخصي.",
+  "sheetsErrorNotFound": "لم يعد هذا الجدول متاحاً لهذا الحساب.",
+  "sheetsErrorRateLimit": "تلقى Google طلبات كثيرة. انتظر قليلاً ثم حاول مرة أخرى.",
+  "sheetsErrorNetwork": "تعذر تأكيد العملية مع Google. تم الاحتفاظ بالتقدم المحلي؛ سيتحقق الإيصال عند إعادة المحاولة.",
+  "sheetsErrorTooLarge": "يتجاوز حجم علامة التبويب 20 ميغابايت. اختر علامة تبويب أصغر.",
+  "sheetsErrorGeneric": "تعذر على Google إكمال العملية. حاول مرة أخرى.",
+  "sheetsErrorBusy": "هناك عملية Google قيد التنفيذ. انتظر حتى تنتهي.",
+  "syncBeforeValue": "السابق: {value}",
+  "@syncBeforeValue": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "syncEmptyCell": "(فارغة)",
+  "syncDisconnected": "تم قطع الاتصال بالجدول. تم الاحتفاظ بالبيانات المحلية وعمليات الإرسال المعلقة.",
+  "aiProviderDescription": "اختر موفّراً سحابياً أو شغّل نموذجاً محلياً على هذا الهاتف. يمكن للنماذج المحلية العمل دون اتصال؛ ويعتمد الأداء على الذاكرة والنموذج المختار.",
+  "aiConfigReadError": "تعذرت قراءة الإعدادات المحفوظة.",
+  "aiModelImportError": "تعذر استيراد ملف GGUF: {error}",
+  "@aiModelImportError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "aiMemoryAvailableNow": "المتاح الآن",
+  "aiMemoryAfterModel": "بعد النموذج وجهاز العرض",
+  "aiMemoryAfterContext": "بعد إضافة سياق النموذج المحدد",
+  "aiMemoryContextEstimate": "سيستهلك سياق {context} نحو {minimum}–{maximum} من ذاكرة RAM.",
+  "@aiMemoryContextEstimate": {
+    "placeholders": {
+      "context": {},
+      "minimum": {},
+      "maximum": {}
+    }
+  },
+  "aiMemoryShortfall": "يتجاوز التقدير الذاكرة المتاحة بمقدار {amount}.",
+  "@aiMemoryShortfall": {
+    "placeholders": {
+      "amount": {}
+    }
+  },
+  "aiMemoryEstimateHelp": "تقدير تقريبي لأوزان النموذج وجهاز العرض؛ يضيف السياق المحدد استهلاكاً للذاكرة وقد يختلف حسب النموذج.",
+  "aiConnectedChooseModel": "تم ربط الحساب. اختر نموذجاً واختبر الاتصال لاستخدام المساعد.",
+  "aiIdentityConnected": "تم ربط الهوية. يمكنك تفويض استخدام خطة ChatGPT بشكل منفصل.",
+  "aiChatGptDisconnected": "تم قطع اتصال جلسة ChatGPT.",
+  "aiChatGptRemoteRevocationUnconfirmed": "تم قطع الاتصال على هذا الهاتف. لم يتم تأكيد الإلغاء عن بُعد؛ افصل TrackIA أيضاً من إعدادات ChatGPT.",
+  "aiOperationError": "تعذر إكمال العملية{details}",
+  "@aiOperationError": {
+    "placeholders": {
+      "details": {}
+    }
+  },
+  "aiOperationDetails": ": {error}",
+  "@aiOperationDetails": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "aiNoModelImported": "لم يتم استيراد نموذج.",
+  "aiSelectImportGguf": "اختيار / استيراد نموذج .gguf",
+  "aiLocalContextTitle": "سياق النموذج المحلي",
+  "aiLocalContextHelp": "يوصي TrackIA بسياق {context} لتعليماته وسجله وبياناته. تغطي التوصية احتياجات التطبيق، لا الحد الأقصى لهذا النموذج. إذا لم يدعم النموذج الحجم المختار فقد يتعطل؛ ويمكنك تقليله.",
+  "@aiLocalContextHelp": {
+    "placeholders": {
+      "context": {}
+    }
+  },
+  "aiContextSelected": "المحدد: {context}",
+  "@aiContextSelected": {
+    "placeholders": {
+      "context": {}
+    }
+  },
+  "aiUseRecommendation": "استخدام القيمة الموصى بها",
+  "aiVisualProjector": "جهاز عرض الصور (اختياري)",
+  "aiProjectorHelp": "أضفه لاستخدام الصور. يحتاج MiniCPM‑V إلى ملف mmproj GGUF المطابق.",
+  "aiNoProjector": "لا يوجد جهاز عرض للصور.",
+  "aiSelectProjector": "اختيار جهاز عرض mmproj",
+  "aiMemoryHelp": "تُعرض الذاكرة المتاحة بشكل منفصل. تعكس توصية 8192 رمزاً احتياجات TrackIA؛ وقد لا يدعمها ملف GGUF ويمكنك اختيار حجم آخر.",
+  "aiRecalculateMemory": "إعادة حساب الذاكرة المتاحة",
+  "aiApiBase": "عنوان URL الأساسي لواجهة API",
+  "aiHttpsExample": "HTTPS، مثال: https://your-provider.com/v1",
+  "aiChatGptPlanHelp": "استخدم خطتك إذا كان حسابك ومساحة العمل مؤهلين. يُحتسب الاستخدام ضمن الحدود المشتركة. لا يمنح ذلك إمكانية الوصول إلى محادثات ChatGPT.",
+  "aiChatGptAccount": "حساب ChatGPT",
+  "aiChatGptConnectedPlan": "متصل · تم تفويض استخدام الخطة",
+  "aiChatGptConnectedIdentity": "متصل · الهوية فقط",
+  "aiChatGptNotConnected": "ChatGPT غير متصل",
+  "aiContinueChatGpt": "المتابعة باستخدام ChatGPT",
+  "aiReviewPlanPermission": "مراجعة إذن استخدام الخطة",
+  "aiAuthorizePlan": "تفويض استخدام خطة ChatGPT الخاصة بي",
+  "aiAddAccount": "إضافة حساب أو مساحة عمل أخرى",
+  "aiViewUsagePermissions": "عرض الاستخدام والأذونات في ChatGPT",
+  "aiDisconnectChatGpt": "قطع اتصال ChatGPT",
+  "aiCancelConnection": "إلغاء الاتصال",
+  "aiApiKey": "مفتاح API",
+  "aiHideKey": "إخفاء المفتاح",
+  "aiShowKey": "إظهار المفتاح",
+  "aiFetchModels": "الحصول على النماذج / تحديثها",
+  "aiLoadingModels": "جارٍ تحميل النماذج…",
+  "aiModelLabel": "النموذج",
+  "aiChooseCatalogModel": "اختر نموذجاً من الفهرس",
+  "aiCurrentModelPreserved": "النموذج الحالي: {model}. سيبقى محفوظاً حتى إن لم يظهر في الفهرس.",
+  "@aiCurrentModelPreserved": {
+    "placeholders": {
+      "model": {}
+    }
+  },
+  "aiHideManualId": "إخفاء المعرّف اليدوي",
+  "aiEnterManualModel": "إدخال النموذج يدوياً",
+  "aiModelIdentifier": "معرّف النموذج",
+  "aiOpenCodeNotice": "Go مخصص لوكلاء البرمجة. تعرّف هذه الوصلة عن نفسها باسم TrackIA؛ تحقق من الموفّر بشأن دعم هذا الاستخدام. لن يتم التبديل تلقائياً إلى Zen أو خدمة أخرى.",
+  "aiApiSettings": "إعدادات API",
+  "aiHttpsBase": "عنوان URL أساسي لـ HTTPS",
+  "aiProtocol": "التنسيق المتوافق مع النموذج",
+  "aiConfigSaved": "تم حفظ الإعدادات.",
+  "aiSaveLocalModel": "حفظ النموذج المحلي",
+  "aiSaveProvider": "حفظ الموفّر",
+  "aiProviderResponded": "ردّ الموفّر:\n{answer}",
+  "@aiProviderResponded": {
+    "placeholders": {
+      "answer": {}
+    }
+  },
+  "aiTestLocalModel": "اختبار النموذج على هذا الهاتف",
+  "aiTestChatGpt": "اختبار الاتصال · يستخدم خطة ChatGPT الخاصة بي",
+  "aiTestApi": "اختبار الاتصال · يستخدم API الخاصة بك",
+  "aiConfigDeleted": "تم حذف الإعدادات والمفتاح.",
+  "aiDeleteConfig": "حذف الإعدادات والمفتاح"
+}

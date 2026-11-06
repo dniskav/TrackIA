@@ -12,6 +12,7 @@ import '../data/progress_repository.dart';
 import '../domain/ai_config.dart';
 import '../domain/workout.dart';
 import 'package:uuid/uuid.dart';
+import '../application/localization.dart';
 import 'ai_per_companion.dart';
 
 class AiSettingsScreen extends StatefulWidget {
@@ -155,8 +156,9 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
       });
       await refreshLocalMemory();
     } catch (error) {
-      if (mounted)
+      if (mounted) {
         setState(() => status = 'No se pudo importar el archivo GGUF: $error');
+      }
     }
   }
 
@@ -416,12 +418,12 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Proveedor de IA')),
+    appBar: AppBar(title: Text(appText(context).aiProviderTitle)),
     body: ListView(
       padding: const EdgeInsets.all(24),
       children: [
-        const Text(
-          'Conecta tu asistente',
+        Text(
+          appText(context).aiConnectTitle,
           style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 12),
@@ -430,9 +432,10 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
         ),
         const SizedBox(height: 20),
         DropdownButtonFormField<AiService>(
-          value: service,
+          key: ValueKey('service-$service'),
+          initialValue: service,
           isExpanded: true,
-          decoration: const InputDecoration(labelText: 'Proveedor'),
+          decoration: InputDecoration(labelText: appText(context).aiProviderLabel),
           items: [
             for (final s in AiService.values)
               DropdownMenuItem(value: s, child: Text(s.label)),
@@ -590,7 +593,7 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
             if (chatGptAccounts.isNotEmpty)
               DropdownButtonFormField<String>(
                 key: ValueKey('chatgpt-account-$chatGptClientId'),
-                value: chatGptClientId,
+                initialValue: chatGptClientId,
                 isExpanded: true,
                 decoration: const InputDecoration(labelText: 'Cuenta ChatGPT'),
                 items: [
@@ -700,7 +703,7 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
               key: ValueKey(
                 'catalog-${models.map((m) => m.id).join('|')}-${config().modelId}',
               ),
-              value: models.any((m) => m.id == config().modelId)
+              initialValue: models.any((m) => m.id == config().modelId)
                   ? config().modelId
                   : null,
               isExpanded: true,
@@ -788,7 +791,8 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
                   ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<AiProtocol>(
-                  value: protocol,
+                  key: ValueKey('protocol-$protocol'),
+                  initialValue: protocol,
                   decoration: const InputDecoration(
                     labelText: 'Formato compatible con el modelo',
                   ),

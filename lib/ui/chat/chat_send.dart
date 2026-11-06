@@ -60,9 +60,10 @@ extension _ChatSend on _AssistantChatScreenState {
         listening) {
       return;
     }
-    final text = input.text.trim().isEmpty
-        ? 'Interpreta el adjunto de esta actividad.'
-        : input.text;
+    final text =
+        input.text.trim().isEmpty
+            ? 'Interpreta el adjunto de esta actividad.'
+            : input.text;
     if (text.length > 8000) {
       update(() => error = 'El registro supera 8000 caracteres.');
       return;
@@ -81,13 +82,15 @@ extension _ChatSend on _AssistantChatScreenState {
       await widget.controller.refresh();
       final local = compactStrengthMetrics(text, a.definition);
       if (media == null && local.isNotEmpty) {
-        final stored = widget.controller.activities
-            .where((item) => item.id == a.id)
-            .firstOrNull;
-        final ended = stored?.intervals
-            .where((item) => item.id == interval)
-            .firstOrNull
-            ?.endedAt;
+        final stored =
+            widget.controller.activities
+                .where((item) => item.id == a.id)
+                .firstOrNull;
+        final ended =
+            stored?.intervals
+                .where((item) => item.id == interval)
+                .firstOrNull
+                ?.endedAt;
         await widget.controller.activityRepository!.recordActivityMessage(
           a.id,
           '${formatWeight(((local['weight_kg'] as num) * 100).round())} kg × ${local['reps']}${local['failure'] == true ? ' · fallo' : ''}${ended == null ? ' · anotado' : ' · fin ${DateFormat('HH:mm:ss').format(ended.toLocal())}'}',
@@ -108,15 +111,16 @@ extension _ChatSend on _AssistantChatScreenState {
           'Registro guardado en el móvil. Configura el proveedor para consultar al asistente.',
         );
       }
-      final activityHistory = a.messages
-          .where((m) => !archivedActivityMessageIds.contains(m.id))
-          .toList()
-          .reversed
-          .take(12)
-          .toList()
-          .reversed
-          .map((m) => AiMessage(m.role, m.text))
-          .toList();
+      final activityHistory =
+          a.messages
+              .where((m) => !archivedActivityMessageIds.contains(m.id))
+              .toList()
+              .reversed
+              .take(12)
+              .toList()
+              .reversed
+              .map((m) => AiMessage(m.role, m.text))
+              .toList();
       final history = [
         ...messages
             .where((m) => m.role != 'event')
@@ -126,6 +130,8 @@ extension _ChatSend on _AssistantChatScreenState {
       if (history.firstOrNull?.role == 'assistant') history.removeAt(0);
       await refreshLiveSheet();
       if (!mounted) return;
+      final expectedTargetActivity =
+          companionFocus?.id == a.id ? companionFocus : null;
       final answer = await replyWithArchives(
         config,
         [...history, AiMessage('user', text, attachment: media)],
@@ -146,9 +152,10 @@ extension _ChatSend on _AssistantChatScreenState {
                 .interpretActivityMessage(
                   messageId,
                   result['metrics'] as Map<String, dynamic>,
-                  fields: (result['fields'] as List? ?? [])
-                      .map((f) => Map<String, Object>.from(f as Map))
-                      .toList(),
+                  fields:
+                      (result['fields'] as List? ?? [])
+                          .map((f) => Map<String, Object>.from(f as Map))
+                          .toList(),
                 );
           }
         } on ValidationException {
@@ -166,7 +173,12 @@ extension _ChatSend on _AssistantChatScreenState {
         intervalId: interval,
       );
       await widget.controller.refresh();
-      if (mounted) await handleCompletedActions(answer);
+      if (mounted) {
+        await handleCompletedActions(
+          answer,
+          expectedTargetActivity: expectedTargetActivity,
+        );
+      }
       recalledArchive = null;
     } on ValidationException catch (e) {
       error = e.message;
@@ -187,17 +199,40 @@ extension _ChatSend on _AssistantChatScreenState {
     }
   }
 
-  Future<void> send({String? retry, bool includeAttachment = true}) async {
-    if (widget.focusMode && companionFocus != null && retry == null) {
+  Future<void> send({
+    String? retry,
+    bool includeAttachment = true,
+    String? retryMessageId,
+  }) async {
+    if (widget.focusMode &&
+        companionFocus != null &&
+        retry == null &&
+        retryMessageId == null) {
       await sendFocus();
+      return;
+    }
+    if (deliveryInitializationFailed) {
+      update(
+        () => error =
+            'La cola durable no está disponible. Conserva el texto y vuelve a abrir el chat.',
+      );
+      return;
+    }
+    if (messageRevisions != null) {
+      await sendDurable(
+        retry: retry,
+        includeAttachment: includeAttachment,
+        retryMessageId: retryMessageId,
+      );
       return;
     }
     if (!aiReady) return;
     final media = includeAttachment ? attachment : null;
     final typed = retry ?? input.text.trim();
-    final text = typed.isEmpty && media != null
-        ? 'Ayúdame a interpretar este adjunto en el contexto del entrenamiento.'
-        : typed;
+    final text =
+        typed.isEmpty && media != null
+            ? 'Ayúdame a interpretar este adjunto en el contexto del entrenamiento.'
+            : typed;
     if (busy || listening || text.isEmpty) return;
     if (text.length > 8000) {
       update(() => error = 'El mensaje supera 8000 caracteres.');
@@ -232,14 +267,16 @@ extension _ChatSend on _AssistantChatScreenState {
           last?.text == outgoing.text &&
           last?.attachment?.mime == media?.mime &&
           listEquals(last?.attachment?.bytes, media?.bytes);
-      final previous = reuse
-          ? messages.take(messages.length - 1).toList()
-          : messages.toList();
-      final history = previous
-          .where((m) => m.role != 'event')
-          .toList()
-          .skip(previous.length > 20 ? previous.length - 20 : 0)
-          .toList();
+      final previous =
+          reuse
+              ? messages.take(messages.length - 1).toList()
+              : messages.toList();
+      final history =
+          previous
+              .where((m) => m.role != 'event')
+              .toList()
+              .skip(previous.length > 20 ? previous.length - 20 : 0)
+              .toList();
       if (!reuse) messages.add(outgoing);
       try {
         await persist();
@@ -256,6 +293,7 @@ extension _ChatSend on _AssistantChatScreenState {
       }
       await refreshLiveSheet();
       if (!mounted) return;
+      final expectedTargetActivity = widget.focusMode ? companionFocus : null;
       final answer = await replyWithArchives(
         config,
         [...history, AiMessage('user', text, attachment: media)],
@@ -264,11 +302,14 @@ extension _ChatSend on _AssistantChatScreenState {
         onText: receiveText,
       );
       if (!mounted) return;
-      if (widget.focusMode && !hasBlock(answer, 'sheet-edit')) {
+      if (widget.focusMode &&
+          !hasBlock(answer, 'sheet-edit') &&
+          !hasBlock(answer, 'activity-target')) {
         proposal = ActivityDefinition.proposal(answer);
       }
       if (widget.focusMode &&
           hasBlock(answer, 'activity') &&
+          !hasBlock(answer, 'activity-target') &&
           proposal == null) {
         error =
             'El modelo envió una propuesta incompleta. Pídele que prepare de nuevo el ejercicio para mostrar Iniciar.';
@@ -285,7 +326,12 @@ extension _ChatSend on _AssistantChatScreenState {
         if (widget.focusMode && proposal != null && !canRecord && aiReady) {
           await acceptProposal();
         }
-        if (mounted) await handleCompletedActions(answer);
+        if (mounted) {
+          await handleCompletedActions(
+            answer,
+            expectedTargetActivity: expectedTargetActivity,
+          );
+        }
         recalledArchive = null;
       } catch (_) {
         error =

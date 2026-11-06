@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+import '../l10n/generated/app_localizations.dart';
+import '../application/locale_settings.dart';
 import '../application/workout_controller.dart';
 import '../domain/workout.dart';
 import 'theme.dart';
@@ -16,6 +17,7 @@ import 'progress_screen.dart';
 import '../application/progress_service.dart';
 import '../application/reminder_scheduler.dart';
 import '../data/companion_store.dart';
+import '../data/ai_settings_store.dart';
 import 'settings.dart';
 import '../domain/companion.dart';
 import 'gym_home.dart';
@@ -29,16 +31,19 @@ class GymApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ListenableBuilder(
     listenable: ThemeSettings.instance,
-    builder: (context, _) => MaterialApp(
-      title: 'TrackIA',
-      debugShowCheckedModeBanner: false,
-      theme: gymLightTheme,
-      darkTheme: gymTheme,
-      themeMode: ThemeSettings.instance.mode,
-      locale: const Locale('es'),
-      supportedLocales: const [Locale('es')],
-      localizationsDelegates: GlobalMaterialLocalizations.delegates,
-      home: GymRoot(controller: controller),
+    builder: (context, _) => ListenableBuilder(
+      listenable: LocaleSettings.instance,
+      builder: (context, _) => MaterialApp(
+        title: 'TrackIA',
+        debugShowCheckedModeBanner: false,
+        theme: gymLightTheme,
+        darkTheme: gymTheme,
+        themeMode: ThemeSettings.instance.mode,
+        locale: LocaleSettings.instance.locale,
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        home: GymRoot(controller: controller),
+      ),
     ),
   );
 }
@@ -107,8 +112,10 @@ class _TrackiaRootState extends State<GymRoot> {
       MaterialPageRoute<void>(
         builder: (_) => CompanionSettingsScreen(
           progress: progress,
+          store: CompanionStore(profileId: widget.controller.profileId),
           companion: companion,
           scheduler: reminders,
+          aiStore: AiSettingsStore(profileId: widget.controller.profileId),
         ),
       ),
     );

@@ -7,6 +7,7 @@ import 'data/profile_store.dart';
 import 'data/trackia_rename.dart';
 import 'data/theme_settings.dart';
 import 'data/welcome_settings_store.dart';
+import 'application/locale_settings.dart';
 import 'package:sqflite/sqflite.dart';
 
 void main() {
@@ -53,6 +54,11 @@ class _BootstrapState extends State<Bootstrap> {
         await WelcomeSettings.instance.load();
       } catch (_) {
         /* A missing preference means the welcome remains available. */
+      }
+      try {
+        await LocaleSettings.instance.load();
+      } catch (_) {
+        // System locale remains the default if preference storage is unavailable.
       }
       await profiles.load();
     }

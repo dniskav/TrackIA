@@ -70,6 +70,29 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  testWidgets('home shows the TrackIA logo with an accessible name', (
+    tester,
+  ) async {
+    await openDashboard(tester);
+    final logo = tester.widget<Image>(
+      find.byKey(const Key('dashboard-trackia-logo')),
+    );
+    expect(
+      (logo.image as AssetImage).assetName,
+      'assets/branding/trackia-logo.png',
+    );
+    expect(
+      find.byKey(const Key('dashboard-trackia-logo-semantics')),
+      findsOneWidget,
+    );
+    expect(find.text('TrackIA'), findsOneWidget);
+    final semantics = tester.getSemantics(
+      find.byKey(const Key('dashboard-trackia-logo-semantics')),
+    );
+    expect(semantics.label, 'Logotipo de TrackIA');
+    expect(semantics.flagsCollection.isImage, isTrue);
+  });
+
   testWidgets('each card shows its companion icon on a tinted circle', (
     tester,
   ) async {
@@ -174,9 +197,8 @@ void main() {
     );
     await tester.tap(find.text('Guardar'));
     await tester.pumpAndSettle();
-    final calma = (await const CompanionStore(
-      profileId: 'local',
-    ).load()).firstWhere((c) => c.id == 'calma');
+    final calma = (await const CompanionStore(profileId: 'local').load())
+        .firstWhere((c) => c.id == 'calma');
     expect((calma.icon, calma.color), ('leaf', 'green'));
   });
 
@@ -190,11 +212,12 @@ void main() {
     );
     AiAvailability availability() => AiAvailability(
       catalog: AiModelCatalog(
-        transport: (_, __) async => {
-          'data': [
-            {'id': 'test-model'},
-          ],
-        },
+        transport:
+            (_, __) async => {
+              'data': [
+                {'id': 'test-model'},
+              ],
+            },
       ),
     );
 

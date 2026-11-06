@@ -188,6 +188,27 @@ void main() {
     expect(calls.length, 1);
   });
 
+  testWidgets(
+    'revoked permission after connecting reports the failure and offers reconnect',
+    (tester) async {
+      reply = (call) {
+        if (call.method == 'authorize') return true;
+        if (call.method == 'list') {
+          throw PlatformException(
+            code: 'GOOGLE_AUTH_REQUIRED',
+            message: 'Google volvió a pedir permiso.',
+          );
+        }
+        throw StateError('Unexpected ${call.method}');
+      };
+      await open(tester);
+      expect(calls.map((call) => call.method), ['authorize', 'list']);
+      expect(find.text('Google volvió a pedir permiso.'), findsOneWidget);
+      expect(find.text('Cambiar cuenta o autorizar de nuevo'), findsOneWidget);
+      expect(find.text('Volver a cargar las hojas'), findsNothing);
+    },
+  );
+
   testWidgets('cancelled tab choice never downloads or imports rows', (
     tester,
   ) async {

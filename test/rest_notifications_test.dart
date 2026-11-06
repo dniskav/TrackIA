@@ -103,7 +103,9 @@ void main() {
       await c.refresh();
       await Future<void>.delayed(const Duration(milliseconds: 10));
       expect(calls.where((v) => v.method == 'schedule').length, scheduled);
-      await c.run(() => repo.setActivityRest(c.focus!.id, 90));
+      await c.run(
+        () => repo.setActivityRest(c.focus!.id, 90, updateActiveRest: true, expectedRestEndsAt: c.focus!.restEndsAt),
+      );
       await Future<void>.delayed(const Duration(milliseconds: 10));
       expect(
         calls.last.arguments['end'],

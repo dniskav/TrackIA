@@ -19,6 +19,7 @@ import 'package:trackia/ui/activity_builder.dart';
 import 'package:trackia/ui/activity_focus.dart';
 import 'package:trackia/ui/theme.dart';
 import 'package:trackia/ui/timer_ring.dart';
+import 'package:trackia/l10n/generated/app_localizations.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -75,9 +76,13 @@ void main() {
     WidgetTester tester, {
     AiClient? client,
     Companion? companion,
+    Locale locale = const Locale('es'),
   }) async {
     await tester.pumpWidget(
       MaterialApp(
+        locale: locale,
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
         theme: gymTheme,
         home: AssistantChatScreen(
           controller: c,
@@ -101,6 +106,23 @@ void main() {
     await tester.pump();
     await tester.pump();
     await tester.pump();
+  }
+
+  Future<void> showActivityControls(
+    WidgetTester tester, {
+    required Locale locale,
+  }) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        locale: locale,
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        home: Scaffold(
+          body: ActivityFocusControls(controller: c, flushInput: () async {}),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
   }
 
   Future<void> waitFor(WidgetTester tester, bool Function() done) async {
@@ -129,6 +151,68 @@ void main() {
       await tester.pump();
     }
   }
+
+  for (final localeCase in [
+    (
+      locale: const Locale('en'),
+      title: 'Rest in progress',
+      prompt:
+          'Do you also want to change the notice that is already scheduled?',
+      keep: 'Keep notice',
+      change: 'Change notice',
+    ),
+    (
+      locale: const Locale('ar'),
+      title: 'استراحة جارية',
+      prompt: 'هل تريد تغيير التنبيه المجدول بالفعل أيضًا؟',
+      keep: 'الاحتفاظ بالتنبيه',
+      change: 'تغيير التنبيه',
+    ),
+  ]) {
+    testWidgets(
+      '${localeCase.locale.languageCode} rest notice prompt is localized',
+      (tester) async {
+        final activityId = c.focus!.id;
+        await tester.runAsync(() async {
+          await repo.startInterval(activityId);
+          now = now.add(const Duration(seconds: 30));
+          await repo.stopInterval(activityId);
+          await c.refresh();
+        });
+        expect(c.focus!.restEndsAt!.isAfter(now), isTrue);
+        await showActivityControls(tester, locale: localeCase.locale);
+        await tester.ensureVisible(find.byKey(const Key('activity-rest')));
+        await tester.tap(find.byKey(const Key('activity-rest')));
+        await tester.pumpAndSettle();
+        expect(find.byType(ActivityRestDialog), findsOneWidget);
+        await tester.enterText(find.byType(TextField).last, '90');
+        await tester.tap(find.byType(FilledButton).last);
+        await tester.pumpAndSettle();
+        expect(find.text(localeCase.title), findsOneWidget);
+        expect(find.text(localeCase.prompt), findsOneWidget);
+        expect(find.text(localeCase.keep), findsOneWidget);
+        expect(find.text(localeCase.change), findsOneWidget);
+        await tester.tap(find.text(localeCase.keep));
+        await waitFor(tester, () => c.focus!.definition.restSeconds == 90);
+        await disposeScreen(tester);
+      },
+    );
+  }
+
+  testWidgets('Arabic chat localizes composer and retains RTL app direction', (
+    tester,
+  ) async {
+    await show(tester, locale: const Locale('ar'));
+    expect(find.byTooltip('إرسال'), findsOneWidget);
+    expect(find.text('اكتب رسالتك أو أمْلِها…'), findsOneWidget);
+    expect(
+      Directionality.of(
+        tester.element(find.byKey(const Key('assistant-input'))),
+      ),
+      TextDirection.rtl,
+    );
+    await disposeScreen(tester);
+  });
 
   testWidgets(
     'one primary control saves result locally and rest never gates restart',
@@ -559,44 +643,45 @@ void main() {
     await disposeScreen(tester);
   });
 
-  testWidgets('idle bar offers a new activity and the prepared panel shows Iniciar', (
-    tester,
-  ) async {
-    await tester.runAsync(() async {
-      await repo.finishActivity(c.focus!.id, now);
-      now = now.add(const Duration(seconds: 121));
-      await c.refresh();
-    });
-    await show(tester);
-    expect(find.text('Sin actividad'), findsOneWidget);
-    expect(find.text('Registra una cuando quieras'), findsOneWidget);
-    expect(find.text('Finalizar día'), findsOneWidget);
-    expect(find.byKey(const Key('new-activity')), findsOneWidget);
-    expect(find.byKey(const Key('activity-start-stop')), findsNothing);
-    expect(find.text('Esperando actividad'), findsNothing);
-    expect(
-      tester
-          .widget<OutlinedButton>(find.byKey(const Key('new-activity')))
-          .onPressed,
-      isNotNull,
-    );
-    await tester.runAsync(() async {
-      await repo.prepareActivity(ActivityDefinition(name: 'Chest Press'));
-      await c.refresh();
-    });
-    await tester.pumpAndSettle();
-    expect(find.byKey(const Key('new-activity')), findsNothing);
-    expect(find.text('Chest Press'), findsOneWidget);
-    expect(find.text('Iniciar'), findsOneWidget);
-    expect(find.byKey(const Key('finish-activity')), findsOneWidget);
-    expect(
-      tester
-          .widget<FilledButton>(find.byKey(const Key('activity-start-stop')))
-          .onPressed,
-      isNotNull,
-    );
-    await disposeScreen(tester);
-  });
+  testWidgets(
+    'idle bar offers a new activity and the prepared panel shows Iniciar',
+    (tester) async {
+      await tester.runAsync(() async {
+        await repo.finishActivity(c.focus!.id, now);
+        now = now.add(const Duration(seconds: 121));
+        await c.refresh();
+      });
+      await show(tester);
+      expect(find.text('Sin actividad'), findsOneWidget);
+      expect(find.text('Registra una cuando quieras'), findsOneWidget);
+      expect(find.text('Finalizar día'), findsOneWidget);
+      expect(find.byKey(const Key('new-activity')), findsOneWidget);
+      expect(find.byKey(const Key('activity-start-stop')), findsNothing);
+      expect(find.text('Esperando actividad'), findsNothing);
+      expect(
+        tester
+            .widget<OutlinedButton>(find.byKey(const Key('new-activity')))
+            .onPressed,
+        isNotNull,
+      );
+      await tester.runAsync(() async {
+        await repo.prepareActivity(ActivityDefinition(name: 'Chest Press'));
+        await c.refresh();
+      });
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('new-activity')), findsNothing);
+      expect(find.text('Chest Press'), findsOneWidget);
+      expect(find.text('Iniciar'), findsOneWidget);
+      expect(find.byKey(const Key('finish-activity')), findsOneWidget);
+      expect(
+        tester
+            .widget<FilledButton>(find.byKey(const Key('activity-start-stop')))
+            .onPressed,
+        isNotNull,
+      );
+      await disposeScreen(tester);
+    },
+  );
 
   testWidgets('a new activity can be created from the idle bar without AI', (
     tester,
@@ -614,9 +699,11 @@ void main() {
     expect(button.onPressed, isNotNull);
     await tap(tester, const Key('new-activity'));
     // choose() flushes the draft through the real database first.
-    for (var i = 0;
-        i < 100 && find.byType(ActivityChooser).evaluate().isEmpty;
-        i++) {
+    for (
+      var i = 0;
+      i < 100 && find.byType(ActivityChooser).evaluate().isEmpty;
+      i++
+    ) {
       await tester.runAsync(
         () => Future<void>.delayed(const Duration(milliseconds: 20)),
       );
@@ -626,27 +713,31 @@ void main() {
     await disposeScreen(tester);
   });
 
-  testWidgets('Iniciar is teal, Parar is crimson and a running tramo shows the ring', (
-    tester,
-  ) async {
-    await show(tester);
-    Color? fill() =>
-        tester
-            .widget<FilledButton>(find.byKey(const Key('activity-start-stop')))
-            .style!
-            .backgroundColor!
-            .resolve({});
-    expect(fill(), brandTeal);
-    expect(find.byType(TimerRing), findsNothing);
-    now = now.add(const Duration(seconds: 100));
-    await tap(tester, const Key('activity-start-stop'));
-    await waitFor(tester, () => c.focus!.running != null && !c.busy);
-    expect(fill(), brandCrimson);
-    final ring = tester.widget<TimerRing>(find.byType(TimerRing));
-    expect(ring.total, isNull, reason: 'Pec Fly no tiene duración: cronómetro');
-    expect(find.text('Parar'), findsOneWidget);
-    await disposeScreen(tester);
-  });
+  testWidgets(
+    'Iniciar is teal, Parar is crimson and a running tramo shows the ring',
+    (tester) async {
+      await show(tester);
+      Color? fill() => tester
+          .widget<FilledButton>(find.byKey(const Key('activity-start-stop')))
+          .style!
+          .backgroundColor!
+          .resolve({});
+      expect(fill(), brandTeal);
+      expect(find.byType(TimerRing), findsNothing);
+      now = now.add(const Duration(seconds: 100));
+      await tap(tester, const Key('activity-start-stop'));
+      await waitFor(tester, () => c.focus!.running != null && !c.busy);
+      expect(fill(), brandCrimson);
+      final ring = tester.widget<TimerRing>(find.byType(TimerRing));
+      expect(
+        ring.total,
+        isNull,
+        reason: 'Pec Fly no tiene duración: cronómetro',
+      );
+      expect(find.text('Parar'), findsOneWidget);
+      await disposeScreen(tester);
+    },
+  );
 
   testWidgets('a timed tramo counts down inside the ring', (tester) async {
     await tester.runAsync(() async {
@@ -672,6 +763,319 @@ void main() {
     expect(find.text('14:05'), findsOneWidget);
     await disposeScreen(tester);
   });
+
+  testWidgets(
+    'local target editor updates objective without deleting progress',
+    (tester) async {
+      await show(tester);
+      await tap(tester, const Key('edit-activity-target'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).last, '2');
+      await tester.tap(find.text('Guardar'));
+      await waitFor(
+        tester,
+        () => c.focus!.definition.targetSets == 2 && !c.busy,
+      );
+      expect(c.focus!.intervals.where((i) => i.endedAt != null), hasLength(1));
+      await disposeScreen(tester);
+    },
+  );
+
+  for (final localeCase in [
+    (
+      locale: const Locale('en'),
+      title: 'Set target',
+      label: 'Sets (empty to clear)',
+    ),
+    (
+      locale: const Locale('ar'),
+      title: 'العدد المستهدف للمجموعات',
+      label: 'المجموعات (اتركه فارغًا للإزالة)',
+    ),
+  ]) {
+    testWidgets(
+      '${localeCase.locale.languageCode} local target editor is localized',
+      (tester) async {
+        await showActivityControls(tester, locale: localeCase.locale);
+        await tester.tap(find.byKey(const Key('edit-activity-target')));
+        await tester.pumpAndSettle();
+        expect(find.text(localeCase.title), findsOneWidget);
+        expect(find.text(localeCase.label), findsOneWidget);
+        await tester.tap(
+          find.text(
+            localeCase.locale.languageCode == 'en' ? 'Cancel' : 'إلغاء',
+          ),
+        );
+        await tester.pumpAndSettle();
+        await disposeScreen(tester);
+      },
+    );
+  }
+
+  testWidgets('chat target proposal requires confirmation and saves once', (
+    tester,
+  ) async {
+    await show(
+      tester,
+      client: AiClient(
+        transport:
+            (_, __, ___) async => {
+              'choices': [
+                {
+                  'message': {
+                    'content':
+                        'Propongo ajustarlo.\n```trackia-activity-target\n{"targetSets": 3}\n```',
+                  },
+                },
+              ],
+            },
+      ),
+    );
+    await tester.enterText(
+      find.byKey(const Key('assistant-input')),
+      'Cambia a tres series',
+    );
+    await tester.runAsync(() => tester.tap(find.byTooltip('Enviar')));
+    await waitFor(
+      tester,
+      () => find.text('Cambiar objetivo de series').evaluate().isNotEmpty,
+    );
+    expect(c.focus!.definition.targetSets, 4);
+    await tester.tap(find.text('Cambiar'));
+    await waitFor(tester, () => c.focus!.definition.targetSets == 3 && !c.busy);
+    expect(c.focus!.intervals.where((i) => i.endedAt != null), hasLength(1));
+    await disposeScreen(tester);
+  });
+
+  for (final localeCase in [
+    (
+      locale: const Locale('en'),
+      title: 'Change set target',
+      prompt: 'Do you want to set the target to 3 sets?',
+      cancel: 'Cancel',
+      confirm: 'Change',
+    ),
+    (
+      locale: const Locale('ar'),
+      title: 'تغيير العدد المستهدف للمجموعات',
+      prompt: 'هل تريد تحديد الهدف بـ 3 مجموعات؟',
+      cancel: 'إلغاء',
+      confirm: 'تغيير',
+    ),
+  ]) {
+    testWidgets(
+      '${localeCase.locale.languageCode} chat target confirmation is localized',
+      (tester) async {
+        await show(
+          tester,
+          locale: localeCase.locale,
+          client: AiClient(
+            transport:
+                (_, __, ___) async => {
+                  'choices': [
+                    {
+                      'message': {
+                        'content':
+                            '```trackia-activity-target\n{"targetSets":3}\n```',
+                      },
+                    },
+                  ],
+                },
+          ),
+        );
+        await tester.enterText(
+          find.byKey(const Key('assistant-input')),
+          'Change the set target',
+        );
+        await tester.tap(
+          find.byTooltip(
+            localeCase.locale.languageCode == 'en' ? 'Send' : 'إرسال',
+          ),
+        );
+        await waitFor(
+          tester,
+          () => find.text(localeCase.title).evaluate().isNotEmpty,
+        );
+        expect(find.text(localeCase.prompt), findsOneWidget);
+        expect(find.text(localeCase.cancel), findsOneWidget);
+        expect(find.text(localeCase.confirm), findsOneWidget);
+        await tester.tap(find.text(localeCase.cancel));
+        await waitFor(tester, () => !c.busy);
+        expect(c.focus!.definition.targetSets, 4);
+        await disposeScreen(tester);
+      },
+    );
+  }
+
+  testWidgets('stale chat target is rejected after a local edit', (
+    tester,
+  ) async {
+    final reply = Completer<Map<String, dynamic>>();
+    var requested = false;
+    await show(
+      tester,
+      client: AiClient(
+        transport: (_, __, ___) async {
+          requested = true;
+          return reply.future;
+        },
+      ),
+    );
+    await tester.enterText(
+      find.byKey(const Key('assistant-input')),
+      'Cambia a tres series',
+    );
+    await tester.runAsync(() => tester.tap(find.byTooltip('Enviar')));
+    await waitFor(tester, () => requested);
+    await tester.runAsync(() async {
+      await repo.renameActivity(c.focus!.id, 'Otro nombre');
+      await c.refresh();
+      reply.complete({
+        'choices': [
+          {
+            'message': {
+              'content': '```trackia-activity-target\n{"targetSets":3}\n```',
+            },
+          },
+        ],
+      });
+    });
+    await waitFor(
+      tester,
+      () => find.text('Cambiar objetivo de series').evaluate().isNotEmpty,
+    );
+    await tester.tap(find.text('Cambiar'));
+    await waitFor(
+      tester,
+      () =>
+          find
+              .textContaining('No se cambió el objetivo. La actividad')
+              .evaluate()
+              .isNotEmpty,
+    );
+    expect(c.focus!.definition.targetSets, 4);
+    expect(c.focus!.definition.name, 'Otro nombre');
+    await disposeScreen(tester);
+  });
+
+  for (final otherKind in [
+    'goal',
+    'achievement',
+    'reminder-copy',
+    'archive',
+    'recall',
+  ]) {
+    testWidgets('chat rejects target mixed with $otherKind', (tester) async {
+      var calls = 0;
+      await show(
+        tester,
+        client: AiClient(
+          transport: (_, __, ___) async {
+            calls++;
+            return {
+              'choices': [
+                {
+                  'message': {
+                    'content':
+                        '```trackia-activity-target\n{"targetSets":3}\n```\n```trackia-$otherKind\n{}\n```',
+                  },
+                },
+              ],
+            };
+          },
+        ),
+      );
+      await tester.enterText(
+        find.byKey(const Key('assistant-input')),
+        'Cambia a tres series',
+      );
+      await tester.runAsync(() => tester.tap(find.byTooltip('Enviar')));
+      await waitFor(
+        tester,
+        () => !c.busy && calls > 0 && c.focus!.messages.length >= 2,
+      );
+      for (var i = 0; i < 5; i++) {
+        await tester.runAsync(
+          () => Future<void>.delayed(const Duration(milliseconds: 20)),
+        );
+        await tester.pump();
+      }
+      expect(find.text('Cambiar objetivo de series'), findsNothing);
+      expect(c.focus!.definition.targetSets, 4);
+      expect(calls, 1);
+      await disposeScreen(tester);
+    });
+  }
+
+  testWidgets('chat rejects a series target for continuous activity', (
+    tester,
+  ) async {
+    await tester.runAsync(() async {
+      await repo.finishActivity(c.focus!.id, now);
+      await repo.prepareActivity(
+        ActivityDefinition(name: 'Correr', repeated: false),
+      );
+      await c.refresh();
+    });
+    await show(
+      tester,
+      client: AiClient(
+        transport:
+            (_, __, ___) async => {
+              'choices': [
+                {
+                  'message': {
+                    'content':
+                        '```trackia-activity-target\n{"targetSets":3}\n```',
+                  },
+                },
+              ],
+            },
+      ),
+    );
+    await tester.enterText(
+      find.byKey(const Key('assistant-input')),
+      'Cambia a tres series',
+    );
+    await tester.runAsync(() => tester.tap(find.byTooltip('Enviar')));
+    await waitFor(tester, () => !c.busy && c.focus!.messages.length >= 2);
+    expect(find.text('Cambiar objetivo de series'), findsNothing);
+    expect(c.focus!.definition.targetSets, isNull);
+    await disposeScreen(tester);
+  });
+
+  for (final updateNotice in [false, true]) {
+    testWidgets(
+      'rest edit ${updateNotice ? 'updates' : 'preserves'} the active notice after confirmation',
+      (tester) async {
+        final originalEnd = c.focus!.restEndsAt!;
+        await show(tester);
+        await tap(tester, const Key('activity-rest'));
+        await tester.pumpAndSettle();
+        await tester.enterText(find.byType(TextField).last, '180');
+        await tester.tap(find.text('Guardar'));
+        await tester.pumpAndSettle();
+        await waitFor(
+          tester,
+          () => find.text('Descanso en curso').evaluate().isNotEmpty,
+        );
+        await tester.tap(
+          find.text(updateNotice ? 'Cambiar aviso' : 'Conservar aviso'),
+        );
+        await tester.pump();
+        await waitFor(
+          tester,
+          () => c.focus!.definition.restSeconds == 180 && !c.busy,
+        );
+        expect(
+          c.focus!.restEndsAt,
+          originalEnd.add(Duration(seconds: updateNotice ? 60 : 0)),
+        );
+        expect(c.focus!.intervals.single.restSeconds, 120);
+        await disposeScreen(tester);
+      },
+    );
+  }
 
   testWidgets('with notices off the panel offers to turn them on', (
     tester,
@@ -706,9 +1110,11 @@ void main() {
       });
       await show(tester);
       await tap(tester, const Key('new-activity'));
-      for (var i = 0;
-          i < 100 && find.byType(ActivityChooser).evaluate().isEmpty;
-          i++) {
+      for (
+        var i = 0;
+        i < 100 && find.byType(ActivityChooser).evaluate().isEmpty;
+        i++
+      ) {
         await tester.runAsync(
           () => Future<void>.delayed(const Duration(milliseconds: 20)),
         );
@@ -754,40 +1160,52 @@ void main() {
       expect(done(), isTrue);
     }
 
-    testWidgets('the chooser lists your saved activities of this companion first', (
-      tester,
-    ) async {
-      await tester.runAsync(() async {
-        await repo.templates.save(
-          companionId: 'gymbro',
-          definition: ActivityDefinition(name: 'Estiramientos', repeated: false, restSeconds: 0),
-        );
-        await repo.templates.save(
-          companionId: 'calma',
-          definition: ActivityDefinition(
-            name: 'Respirar',
-            repeated: false,
-            restSeconds: 0,
+    testWidgets(
+      'the chooser lists your saved activities of this companion first',
+      (tester) async {
+        await tester.runAsync(() async {
+          await repo.templates.save(
+            companionId: 'gymbro',
+            definition: ActivityDefinition(
+              name: 'Estiramientos',
+              repeated: false,
+              restSeconds: 0,
+            ),
+          );
+          await repo.templates.save(
             companionId: 'calma',
-          ),
-        );
-      });
-      await openChooser(tester);
-      expect(find.text('Tus actividades'), findsOneWidget);
-      expect(find.text('Estiramientos'), findsOneWidget);
-      expect(find.text('Respirar'), findsNothing);
-    });
+            definition: ActivityDefinition(
+              name: 'Respirar',
+              repeated: false,
+              restSeconds: 0,
+              companionId: 'calma',
+            ),
+          );
+        });
+        await openChooser(tester);
+        expect(find.text('Tus actividades'), findsOneWidget);
+        expect(find.text('Estiramientos'), findsOneWidget);
+        expect(find.text('Respirar'), findsNothing);
+      },
+    );
 
     testWidgets('choosing a saved activity prepares it', (tester) async {
       await tester.runAsync(
         () => repo.templates.save(
           companionId: 'gymbro',
-          definition: ActivityDefinition(name: 'Estiramientos', repeated: false, restSeconds: 0),
+          definition: ActivityDefinition(
+            name: 'Estiramientos',
+            repeated: false,
+            restSeconds: 0,
+          ),
         ),
       );
       await openChooser(tester);
       await tester.tap(find.text('Estiramientos'));
-      await waitUntil(tester, () => c.focus?.definition.name == 'Estiramientos');
+      await waitUntil(
+        tester,
+        () => c.focus?.definition.name == 'Estiramientos',
+      );
       expect(c.focus!.intervals, isEmpty);
       await disposeScreen(tester);
     });
@@ -804,35 +1222,43 @@ void main() {
       pressSubmit(tester);
       await waitUntil(tester, () => c.focus?.definition.name == 'Leer');
       expect(c.focus!.definition.companionId, 'gymbro');
-      final saved = (await tester.runAsync(
-        () => repo.templates.list(companionId: 'gymbro'),
-      ))!;
+      final saved =
+          (await tester.runAsync(
+            () => repo.templates.list(companionId: 'gymbro'),
+          ))!;
       expect(saved.map((t) => t.definition.name), ['Leer']);
       expect(saved.single.instant, isFalse);
       await disposeScreen(tester);
     });
 
-    testWidgets('unchecking «Guardar en tus actividades» keeps it out of the list', (
+    testWidgets(
+      'unchecking «Guardar en tus actividades» keeps it out of the list',
+      (tester) async {
+        await openChooser(tester);
+        await tester.tap(find.text('Nueva actividad').last);
+        await tester.pumpAndSettle();
+        await tester.enterText(
+          find.byKey(const Key('builder-name')),
+          'Solo hoy',
+        );
+        await revealBuilder(tester, 'builder-save');
+        toggleSave(tester, false);
+        await tester.pump();
+        await revealBuilder(tester, 'builder-submit');
+        pressSubmit(tester);
+        await waitUntil(tester, () => c.focus?.definition.name == 'Solo hoy');
+        final saved =
+            (await tester.runAsync(
+              () => repo.templates.list(companionId: 'gymbro'),
+            ))!;
+        expect(saved, isEmpty);
+        await disposeScreen(tester);
+      },
+    );
+
+    testWidgets('leaving the builder with Atrás changes nothing', (
       tester,
     ) async {
-      await openChooser(tester);
-      await tester.tap(find.text('Nueva actividad').last);
-      await tester.pumpAndSettle();
-      await tester.enterText(find.byKey(const Key('builder-name')), 'Solo hoy');
-      await revealBuilder(tester, 'builder-save');
-      toggleSave(tester, false);
-      await tester.pump();
-      await revealBuilder(tester, 'builder-submit');
-      pressSubmit(tester);
-      await waitUntil(tester, () => c.focus?.definition.name == 'Solo hoy');
-      final saved = (await tester.runAsync(
-        () => repo.templates.list(companionId: 'gymbro'),
-      ))!;
-      expect(saved, isEmpty);
-      await disposeScreen(tester);
-    });
-
-    testWidgets('leaving the builder with Atrás changes nothing', (tester) async {
       await openChooser(tester);
       await tester.tap(find.text('Nueva actividad').last);
       await tester.pumpAndSettle();
@@ -895,7 +1321,11 @@ void main() {
       await tester.runAsync(() async {
         await repo.finishActivity(c.focus!.id, now);
         await repo.prepareActivity(
-          ActivityDefinition(name: 'Pomodoro', targetSets: 2, companionId: 'enfoque'),
+          ActivityDefinition(
+            name: 'Pomodoro',
+            targetSets: 2,
+            companionId: 'enfoque',
+          ),
         );
         await c.refresh();
       });
@@ -914,7 +1344,13 @@ void main() {
       restSeconds: 0,
       fields: const [
         {'key': 'pages', 'label': 'Páginas', 'unit': 'págs', 'type': 'number'},
-        {'key': 'best', 'label': 'Mejor marca', 'unit': '', 'type': 'number', 'aggregate': 'max'},
+        {
+          'key': 'best',
+          'label': 'Mejor marca',
+          'unit': '',
+          'type': 'number',
+          'aggregate': 'max',
+        },
         {'key': 'book', 'label': 'Libro', 'unit': '', 'type': 'text'},
         {'key': 'goals', 'label': 'Goles', 'unit': '', 'type': 'number'},
       ],
@@ -945,24 +1381,38 @@ void main() {
       await waitFor(tester, () => c.focus!.messages.length >= count && !c.busy);
     }
 
-    testWidgets('only numeric fields that add up get a counter, and only once started', (
+    testWidgets(
+      'only numeric fields that add up get a counter, and only once started',
+      (tester) async {
+        await prepare(tester, start: false);
+        expect(find.byKey(const Key('counter-pages')), findsNothing);
+        await tap(tester, const Key('activity-start-stop'));
+        await waitFor(tester, () => c.focus!.running != null && !c.busy);
+        expect(find.byKey(const Key('counter-pages')), findsOneWidget);
+        expect(find.byKey(const Key('counter-goals')), findsOneWidget);
+        expect(
+          find.byKey(const Key('counter-best')),
+          findsNothing,
+          reason: 'mejor marca no suma',
+        );
+        expect(
+          find.byKey(const Key('counter-book')),
+          findsNothing,
+          reason: 'texto',
+        );
+        await disposeScreen(tester);
+      },
+    );
+
+    testWidgets('18 taps become one message when the tramo stops', (
       tester,
     ) async {
-      await prepare(tester, start: false);
-      expect(find.byKey(const Key('counter-pages')), findsNothing);
-      await tap(tester, const Key('activity-start-stop'));
-      await waitFor(tester, () => c.focus!.running != null && !c.busy);
-      expect(find.byKey(const Key('counter-pages')), findsOneWidget);
-      expect(find.byKey(const Key('counter-goals')), findsOneWidget);
-      expect(find.byKey(const Key('counter-best')), findsNothing, reason: 'mejor marca no suma');
-      expect(find.byKey(const Key('counter-book')), findsNothing, reason: 'texto');
-      await disposeScreen(tester);
-    });
-
-    testWidgets('18 taps become one message when the tramo stops', (tester) async {
       await prepare(tester);
       await press(tester, 'counter-inc-pages', 18);
-      expect(tester.widget<Text>(find.byKey(const Key('counter-pages'))).data, '18');
+      expect(
+        tester.widget<Text>(find.byKey(const Key('counter-pages'))).data,
+        '18',
+      );
       expect(c.focus!.messages, isEmpty, reason: 'aún no se guarda');
       await tap(tester, const Key('activity-start-stop'));
       await waitMessages(tester, 1);
@@ -974,27 +1424,35 @@ void main() {
       await disposeScreen(tester);
     });
 
-    testWidgets('three seconds without taps saves the burst; the next burst is separate', (
-      tester,
-    ) async {
-      await prepare(tester);
-      await press(tester, 'counter-inc-pages', 5);
-      await tester.pump(const Duration(seconds: 3));
-      await waitMessages(tester, 1);
-      expect(c.focus!.messages.single.metrics, {'pages': 5});
-      expect(
-        tester.widget<Text>(find.byKey(const Key('counter-pages'))).data,
-        '5',
-        reason: 'se muestra lo ya guardado más lo pendiente',
-      );
-      await press(tester, 'counter-inc-pages', 3);
-      expect(tester.widget<Text>(find.byKey(const Key('counter-pages'))).data, '8');
-      await tester.pump(const Duration(seconds: 3));
-      await waitMessages(tester, 2);
-      final totals = c.focus!.messages.map((m) => m.metrics['pages']).toList();
-      expect(totals, [5, 3], reason: 'cada mensaje es una cantidad, no un total');
-      await disposeScreen(tester);
-    });
+    testWidgets(
+      'three seconds without taps saves the burst; the next burst is separate',
+      (tester) async {
+        await prepare(tester);
+        await press(tester, 'counter-inc-pages', 5);
+        await tester.pump(const Duration(seconds: 3));
+        await waitMessages(tester, 1);
+        expect(c.focus!.messages.single.metrics, {'pages': 5});
+        expect(
+          tester.widget<Text>(find.byKey(const Key('counter-pages'))).data,
+          '5',
+          reason: 'se muestra lo ya guardado más lo pendiente',
+        );
+        await press(tester, 'counter-inc-pages', 3);
+        expect(
+          tester.widget<Text>(find.byKey(const Key('counter-pages'))).data,
+          '8',
+        );
+        await tester.pump(const Duration(seconds: 3));
+        await waitMessages(tester, 2);
+        final totals =
+            c.focus!.messages.map((m) => m.metrics['pages']).toList();
+        expect(totals, [
+          5,
+          3,
+        ], reason: 'cada mensaje es una cantidad, no un total');
+        await disposeScreen(tester);
+      },
+    );
 
     testWidgets('taps keep postponing the save', (tester) async {
       await prepare(tester);
@@ -1012,17 +1470,24 @@ void main() {
     testWidgets('minus only takes back pending taps', (tester) async {
       await prepare(tester);
       expect(
-        tester.widget<IconButton>(find.byKey(const Key('counter-dec-pages'))).onPressed,
+        tester
+            .widget<IconButton>(find.byKey(const Key('counter-dec-pages')))
+            .onPressed,
         isNull,
       );
       await press(tester, 'counter-inc-pages', 3);
       await press(tester, 'counter-dec-pages');
-      expect(tester.widget<Text>(find.byKey(const Key('counter-pages'))).data, '2');
+      expect(
+        tester.widget<Text>(find.byKey(const Key('counter-pages'))).data,
+        '2',
+      );
       await tester.pump(const Duration(seconds: 3));
       await waitMessages(tester, 1);
       expect(c.focus!.messages.single.metrics, {'pages': 2});
       expect(
-        tester.widget<IconButton>(find.byKey(const Key('counter-dec-pages'))).onPressed,
+        tester
+            .widget<IconButton>(find.byKey(const Key('counter-dec-pages')))
+            .onPressed,
         isNull,
       );
       await disposeScreen(tester);
@@ -1042,7 +1507,9 @@ void main() {
       await disposeScreen(tester);
     });
 
-    testWidgets('counters also work during the rest and without AI', (tester) async {
+    testWidgets('counters also work during the rest and without AI', (
+      tester,
+    ) async {
       FlutterSecureStorage.setMockInitialValues({});
       await prepare(tester);
       await tap(tester, const Key('activity-start-stop'));
@@ -1067,9 +1534,9 @@ void main() {
         );
         await tester.pump(const Duration(milliseconds: 50));
       }
-      final saved = (await tester.runAsync(() => repo.loadActivities()))!
-          .expand((a) => a.messages)
-          .where((m) => m.metrics['pages'] == 6);
+      final saved = (await tester.runAsync(
+        () => repo.loadActivities(),
+      ))!.expand((a) => a.messages).where((m) => m.metrics['pages'] == 6);
       expect(saved, hasLength(1));
       await disposeScreen(tester);
     });

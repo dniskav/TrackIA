@@ -246,9 +246,10 @@ class ActivityDefinition {
         targetSets: value['targetSets'] as int?,
         targetCycles: value['targetCycles'] as int?,
         completedCycles: value['completedCycles'] as int? ?? 0,
-        fields: (value['fields'] as List)
-            .map((f) => Map<String, Object>.from(f as Map))
-            .toList(),
+        fields:
+            (value['fields'] as List)
+                .map((f) => Map<String, Object>.from(f as Map))
+                .toList(),
         instructions: value['instructions'] as String? ?? '',
         origin: value['origin'] as String? ?? 'user',
         companionId: value['companionId'] as String? ?? 'gymbro',
@@ -404,9 +405,8 @@ class ActivityMessage {
     'intervalId': intervalId,
     'recordedAt': recordedAt.toIso8601String(),
     'metrics': metrics,
-    'attachment': mediaName == null
-        ? null
-        : {'name': mediaName, 'mime': mediaMime},
+    'attachment':
+        mediaName == null ? null : {'name': mediaName, 'mime': mediaMime},
   };
 }
 
@@ -450,23 +450,23 @@ class FocusActivity {
           ...intervals[index].toJson(),
           'durationSeconds':
               intervals[index].endedAt != null &&
-                  !intervals[index].endedAt!.isBefore(
-                    intervals[index].startedAt,
-                  )
-              ? intervals[index].endedAt!
-                    .difference(intervals[index].startedAt)
-                    .inSeconds
-              : null,
+                      !intervals[index].endedAt!.isBefore(
+                        intervals[index].startedAt,
+                      )
+                  ? intervals[index].endedAt!
+                      .difference(intervals[index].startedAt)
+                      .inSeconds
+                  : null,
           'actualRestSeconds':
               index + 1 < intervals.length &&
-                  intervals[index].endedAt != null &&
-                  !intervals[index + 1].startedAt.isBefore(
-                    intervals[index].endedAt!,
-                  )
-              ? intervals[index + 1].startedAt
-                    .difference(intervals[index].endedAt!)
-                    .inSeconds
-              : null,
+                      intervals[index].endedAt != null &&
+                      !intervals[index + 1].startedAt.isBefore(
+                        intervals[index].endedAt!,
+                      )
+                  ? intervals[index + 1].startedAt
+                      .difference(intervals[index].endedAt!)
+                      .inSeconds
+                  : null,
         },
     ],
     'messages': messages.map((m) => m.toJson()).toList(),
@@ -563,10 +563,17 @@ abstract interface class ActivityRepository {
     DateTime end, {
     bool acceptConflicts = false,
   });
+  Future<void> setActivityTarget(
+    String activityId,
+    int? targetSets, {
+    required ActivityDefinition expected,
+  });
   Future<void> setActivityRest(
     String activityId,
     int seconds, {
     String source = 'user',
+    bool updateActiveRest = false,
+    DateTime? expectedRestEndsAt,
   });
   Future<void> setActivityTiming(
     String activityId, {

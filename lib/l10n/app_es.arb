@@ -1,0 +1,588 @@
+{
+  "@@locale": "es",
+  "appTitle": "TrackIA",
+  "languageSystem": "Idioma del dispositivo",
+  "languageSpanish": "Español",
+  "languageEnglish": "Inglés",
+  "languageArabic": "Árabe",
+  "languagePreference": "Idioma",
+  "welcomeTitle": "Bienvenida",
+  "welcomeHelpTitle": "Ayuda y bienvenida",
+  "welcomeStep": "Paso {current} de {total}",
+  "@welcomeStep": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "welcomeSlide1Title": "Bienvenido",
+  "welcomeSlide1Body": "Conversa con tu asistente de IA para preparar una actividad, resolver dudas y revisar tu progreso. Tú decides cuándo empezar.",
+  "welcomeSlide2Title": "Habla o escribe",
+  "welcomeSlide2Body": "El chat admite texto, dictado y adjuntos. Para usar la IA, conecta un proveedor desde el menú. Si se corta la conexión, tus registros locales siguen disponibles.",
+  "welcomeSlide3Title": "Controla tu actividad",
+  "welcomeSlide3Body": "Elige o crea una actividad. Prepararla no inicia el reloj: pulsa Iniciar cuando estés listo y Parar al terminar cada tramo.",
+  "welcomeSlide4Title": "Conserva tus datos",
+  "welcomeSlide4Body": "Tus registros se guardan en el móvil. Puedes conectar Google Sheets cuando quieras y revisar el estado de cada envío.",
+  "welcomeSlide5Title": "Tus acompañantes",
+  "welcomeSlide5Body": "Elige GymBro, Enfoque, Calma o Diario. Puedes editar sus instrucciones, crear otros y conectar una hoja o pestaña de Google distinta para cada uno.",
+  "welcomeSlide6Title": "Modo y avisos",
+  "welcomeSlide6Body": "Cada acompañante tiene su modo. Abre su menú (⋮) y pulsa «Modo y avisos»: con Recordatorio solo te avisa a la hora que elijas; con Juego añade metas, rachas y logros. Para que los avisos de descanso suenen aunque tengas No molestar, ve a Ajustes → Avisos.",
+  "welcomeSaveErrorTitle": "No se pudo guardar la elección",
+  "welcomeSaveErrorBody": "Puedes volver a intentarlo o continuar. Si continúas, la bienvenida podría aparecer al abrir la app de nuevo.",
+  "retry": "Reintentar",
+  "continueWithoutSaving": "Continuar sin guardar",
+  "welcomeNeverAgain": "No volver a mostrar",
+  "welcomeNeverAgainHelp": "Si la dejas sin marcar, verás esta guía al abrir la app. Puedes cambiarlo en Ayuda.",
+  "skip": "Omitir",
+  "previous": "Anterior",
+  "next": "Siguiente",
+  "start": "Empezar",
+  "welcomeAutoShow": "Mostrar bienvenida al abrir",
+  "devicePreferenceSaved": "Tu elección se guarda en este dispositivo.",
+  "showWelcome": "Ver bienvenida",
+  "savePreferenceError": "No se pudo guardar la preferencia.",
+  "companionsTitle": "Tus acompañantes",
+  "companionsDescription": "Elige con quién trabajar. Cada uno conserva su conversación y puede usar una hoja o pestaña de Google distinta.",
+  "companionsEmpty": "Aún no tienes acompañantes. Crea uno para empezar.",
+  "createCompanion": "Crear acompañante",
+  "companionOptions": "Opciones de {name}",
+  "@companionOptions": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "companionProgress": "Progreso de {name}",
+  "@companionProgress": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "companionStreak": "{days, plural, one{Racha: 1 día} other{Racha: # días}}",
+  "@companionStreak": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "remindersPaused": "Recordatorios en pausa",
+  "resume": "Reanudar",
+  "edit": "Editar",
+  "modeAndNotices": "Modo y avisos",
+  "delete": "Borrar",
+  "cancel": "Cancelar",
+  "save": "Guardar",
+  "companionDeleteTitle": "¿Borrar {name}?",
+  "@companionDeleteTitle": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "companionDeleteBody": "Se borrarán su chat, archivos y conexión local de Sheets. La hoja de Google y los registros de actividad no se borrarán.",
+  "companionDeleteError": "No se pudo borrar: {error}",
+  "@companionDeleteError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "companionSaveError": "No se pudo guardar: {error}",
+  "@companionSaveError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "companionLoadError": "No se pudieron cargar los acompañantes. Pulsa para reintentar.",
+  "createCompanionTitle": "Crear acompañante",
+  "editCompanionTitle": "Editar acompañante",
+  "companionName": "Nombre",
+  "companionPurpose": "¿Para qué sirve?",
+  "companionInstructions": "Instrucciones para la IA (opcional)",
+  "companionInstructionsHelp": "Se usan cuando conectes un proveedor.",
+  "icon": "Icono",
+  "color": "Color",
+  "settings": "Ajustes",
+  "assistant": "Asistente",
+  "artificialIntelligence": "Inteligencia artificial",
+  "yourData": "Tus datos",
+  "accountAndData": "Cuenta y datos",
+  "localProfile": "Perfil local",
+  "exportImport": "Exportar e importar",
+  "appSection": "App",
+  "notices": "Avisos",
+  "enabled": "Activados",
+  "disabled": "Desactivados",
+  "appearance": "Apariencia",
+  "helpWelcome": "Ayuda y bienvenida",
+  "verified": "Verificada",
+  "notConnected": "Sin conectar",
+  "notVerified": "Sin verificar",
+  "unavailable": "No disponible",
+  "checking": "Comprobando…",
+  "automatic": "Automático",
+  "light": "Claro",
+  "dark": "Oscuro",
+  "companionSettingsTitle": "Modo y avisos · {name}",
+  "@companionSettingsTitle": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "mode": "Modo",
+  "reminderMode": "Recordatorio",
+  "reminderModeDetail": "Solo te avisa a la hora que elijas.",
+  "gameMode": "Juego",
+  "gameModeDetail": "Metas, rachas y logros, además de los avisos.",
+  "goals": "Metas",
+  "streaks": "Rachas",
+  "achievements": "Logros",
+  "encouragementMessages": "Mensajes de ánimo",
+  "freeDaysPerWeek": "Días libres por semana",
+  "freeDaysHelp": "No rompen la racha.",
+  "dailyNotice": "Aviso diario",
+  "remindersPausedDetail": "Pasaron 7 días programados sin registrar nada.",
+  "remindAboutActivity": "Recordarme esta actividad",
+  "monday": "lunes",
+  "tuesday": "martes",
+  "wednesday": "miércoles",
+  "thursday": "jueves",
+  "friday": "viernes",
+  "saturday": "sábado",
+  "sunday": "domingo",
+  "from": "Desde",
+  "until": "Hasta",
+  "lastCall": "Última llamada",
+  "lastCallTime": "Hora de la última llamada",
+  "neutral": "Neutro",
+  "motivating": "Motivador",
+  "minimumForDay": "Mínimo para ese día",
+  "quantity": "Cantidad",
+  "sessions": "sesiones",
+  "minutes": "minutos",
+  "preview": "Así se verá",
+  "putGoal": "Poner una meta",
+  "whatToMeasure": "Qué medir",
+  "timeMinutes": "Tiempo (minutos)",
+  "sessionCount": "Sesiones",
+  "perDay": "al día",
+  "perWeek": "a la semana",
+  "target": "Objetivo",
+  "minimumStreakOptional": "Mínimo para mantener la racha (opcional)",
+  "chooseTime": "Elige la hora",
+  "goalMustBePositive": "El objetivo debe ser un número mayor que 0.",
+  "minimumMustBePositive": "El mínimo debe ser un número mayor que 0.",
+  "companionSettingsLoadError": "No se pudieron cargar los ajustes.",
+  "companionSettingsSaveError": "No se pudieron guardar los ajustes.",
+  "aiNotConnected": "IA sin conectar",
+  "chooseProviderAndModel": "Elige un proveedor y un modelo.",
+  "connect": "Conectar",
+  "aiNotVerified": "IA sin verificar",
+  "verifyConnectionAssistant": "Prueba la conexión para activar el asistente.",
+  "verify": "Verificar",
+  "aiUnavailable": "IA no disponible",
+  "reviewProviderRetry": "Revisa el proveedor y vuelve a probar.",
+  "review": "Revisar",
+  "waitingPhraseOne": "Estoy aquí para ayudarte.",
+  "waitingPhraseTwo": "Tómate un momento; aquí seguimos.",
+  "waitingPhraseThree": "Cuando quieras, continuamos.",
+  "waitingPhraseFour": "Puedes seguir escribiendo cuando te venga bien.",
+  "logoDescription": "Logotipo de TrackIA",
+  "chatArchive": "Archivar chat",
+  "chatArchives": "Chats archivados",
+  "chatSendToSheets": "Enviar a Google Sheets",
+  "chatAiProvider": "Proveedor de IA",
+  "chatConfigureAi": "Configurar IA",
+  "chatVerifyConnection": "Verificar conexión · usa tu API",
+  "chatTraining": "Entrenamiento",
+  "chatLoadSheets": "Cargar Google Sheets",
+  "chatSheetPending": "Interpretar hoja con IA",
+  "chatWelcomePrompt": "¿Qué te gustaría hacer hoy? Cuéntame y lo organizamos juntos.",
+  "chatLoadDataPrompt": "Carga tus datos con + cuando quieras. La IA podrá interpretar su formato cuando esté conectada.",
+  "chatPrepareActivity": "Preparar",
+  "chatWaitingModel": "Esperando al modelo…",
+  "chatDeferredArchive": "El asistente archivará este chat cuando vuelvas al final.",
+  "chatGoLatest": "Ir al último mensaje",
+  "chatListening": "Escuchando… Revisa el texto y pulsa Enviar.",
+  "chatAttach": "Adjuntar",
+  "chatComposeHint": "Escribe o dicta tu mensaje…",
+  "chatConnectAiHint": "Conecta tu IA para empezar",
+  "chatStopDictation": "Terminar dictado",
+  "chatDictate": "Dictar mensaje",
+  "chatSend": "Enviar",
+  "chatAssistantImageAlt": "Imagen",
+  "chatInputDirections": "Dirección del texto del mensaje",
+  "activityStart": "Iniciar",
+  "activityStop": "Parar",
+  "activityFinish": "Terminar",
+  "activityFinishDay": "Finalizar día",
+  "activityChooseAnother": "Elegir otra actividad",
+  "activitySubtractCycle": "Restar ciclo",
+  "activityAddCycle": "Añadir ciclo completado",
+  "activityNoticesOff": "Avisos desactivados",
+  "activityEnableNotices": "Activar",
+  "activityCycles": "Ciclos",
+  "aiUnavailableFocus": "IA no disponible · puedes parar y guardar notas localmente",
+  "activityRestInProgress": "Descanso en curso",
+  "activityRestChangeNoticePrompt": "¿Quieres cambiar también el aviso que ya está programado?",
+  "activityKeepNotice": "Conservar aviso",
+  "activityChangeNotice": "Cambiar aviso",
+  "personalityInstructions": "Personalidad e instrucciones",
+  "personalityInstructionsHelp": "Describe el tono y cómo quieres que te acompañe. Solo afecta a sus respuestas de IA.",
+  "personalitySuggestionTone": "Usa un tono cercano y claro.",
+  "personalitySuggestionAsk": "Haz preguntas breves cuando falten datos.",
+  "personalitySuggestionAccuracy": "No inventes información ni avances que no haya contado.",
+  "personalityTooLong": "La personalidad no puede superar los 4000 caracteres.",
+  "personalityDraftTitle": "Propuesta de personalidad",
+  "personalityDraftAccept": "Usar propuesta",
+  "personalityDraftButton": "Ayúdame a redactarla",
+  "personalityDraftError": "No se pudo generar la propuesta. Revisa la conexión de IA e inténtalo de nuevo.",
+  "activityTargetTitle": "Objetivo de series",
+  "activityTargetLabel": "Series (vacío para quitar)",
+  "activityTargetInvalid": "Indica un objetivo entre 1 y 100, o déjalo vacío.",
+  "activityTargetEditTooltip": "Editar objetivo de series",
+  "activityTargetPreservedProgress": "Objetivo: {target}. Conservas {completed} series completadas.",
+  "@activityTargetPreservedProgress": {
+    "placeholders": {
+      "target": {},
+      "completed": {}
+    }
+  },
+  "activityTargetUpdated": "Objetivo actualizado.",
+  "activityNoTarget": "sin objetivo",
+  "activityTargetChangedEvent": "Cambiaste el objetivo de series a {target}",
+  "@activityTargetChangedEvent": {
+    "placeholders": {
+      "target": {}
+    }
+  },
+  "chatTargetProposalAmbiguous": "No se cambió el objetivo: la propuesta es ambigua o no corresponde a una actividad activa.",
+  "chatTargetConfirmTitle": "Cambiar objetivo de series",
+  "chatTargetRemovePrompt": "¿Quieres quitar el objetivo?",
+  "chatTargetSetPrompt": "¿Quieres fijar el objetivo en {target} series?",
+  "@chatTargetSetPrompt": {
+    "placeholders": {
+      "target": {}
+    }
+  },
+  "chatTargetSetPromptWithProgress": "¿Quieres fijar el objetivo en {target} series? Ya has completado {completed}; se conserva todo el progreso.",
+  "@chatTargetSetPromptWithProgress": {
+    "placeholders": {
+      "target": {},
+      "completed": {}
+    }
+  },
+  "chatTargetConfirmButton": "Cambiar",
+  "chatTargetSavedNoTarget": "Objetivo guardado: sin objetivo.",
+  "chatTargetSaved": "Objetivo guardado: {target} series.",
+  "@chatTargetSaved": {
+    "placeholders": {
+      "target": {}
+    }
+  },
+  "chatTargetSavedWithProgress": "Objetivo guardado: {target} series. Conservas {completed} series completadas.",
+  "@chatTargetSavedWithProgress": {
+    "placeholders": {
+      "target": {},
+      "completed": {}
+    }
+  },
+  "chatTargetStale": "No se cambió el objetivo. La actividad puede haber cambiado; revísala y vuelve a intentarlo.",
+  "sheetsTitle": "Tus hojas de Google Sheets",
+  "sheetsChooseTitle": "Elige tu hoja de entrenamiento",
+  "sheetsSearch": "Buscar por nombre",
+  "sheetsSearchTooltip": "Buscar",
+  "sheetsConnect": "Conectar con Google",
+  "sheetsReconnect": "Cambiar cuenta o autorizar de nuevo",
+  "sheetsNoResults": "No se encontraron hojas. Prueba otro nombre o cambia de cuenta.",
+  "sheetsLoadMore": "Cargar más hojas",
+  "dataTitle": "Tus datos",
+  "dataCreateBackup": "Crear y compartir copia",
+  "dataRestoreBackup": "Restaurar copia",
+  "aiProviderTitle": "Proveedor de IA",
+  "aiConnectTitle": "Conecta tu asistente",
+  "aiProviderLabel": "Proveedor",
+  "sheetChooseTab": "Elige la pestaña con tus entrenamientos",
+  "sheetReview": "Revisar hoja",
+  "sheetRowsRead": "{count} filas leídas. Se cargará la pestaña completa; aquí se muestran las primeras 12 filas.",
+  "@sheetRowsRead": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "sheetRowsReadPreview": "{count} filas leídas. Vista previa:",
+  "@sheetRowsReadPreview": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "sheetLoadPending": "La hoja se guardará en este móvil, pendiente de interpretación. No necesitas IA para cargarla. Cuando esté conectada, podrás pedirle que interprete su estructura. No se crean entrenamientos ni se envían celdas al proveedor al cargar.",
+  "sheetSendToAi": "Al pulsar Cargar y analizar, estas celdas se enviarán al proveedor de IA configurado. Las filas se conservan tal como aparecen, sin convertirlas en entrenamientos.",
+  "sheetReadOnlyGoogle": "Es una copia de lectura: para traer cambios posteriores usa Actualizar hoja en el chat.",
+  "sheetReadOnlyFile": "Es una copia de lectura del archivo. Para traer cambios, vuelve a cargarlo.",
+  "sheetsConnecting": "Conectando con Google…",
+  "sheetsAuthorizeProgress": "Elige tu cuenta y autoriza la lectura en Google…",
+  "sheetsSearchProgress": "Buscando tus hojas…",
+  "sheetsLoadingTabs": "Cargando las pestañas de {name}…",
+  "@sheetsLoadingTabs": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "sheetsReadingTab": "Leyendo {name}…",
+  "@sheetsReadingTab": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "sheetsReadError": "No se pudo leer la hoja. Vuelve a intentarlo.",
+  "sheetsGoogleError": "No se pudo conectar con Google.",
+  "sheetsRetry": "Volver a cargar las hojas",
+  "sheetsPartial": "Google devolvió una búsqueda parcial. Busca la hoja por su nombre.",
+  "sheetsAuthIncomplete": "Google no completó la autorización. Pulsa Conectar con Google para volver a intentarlo; aún no se han cargado tus hojas.",
+  "sheetsSearchAccountChanged": "La cuenta cambió durante la búsqueda. Vuelve a conectar para continuar.",
+  "sheetsChooseAccountChanged": "La cuenta cambió durante la selección. Vuelve a conectar para continuar.",
+  "sheetsReadAccountChanged": "La cuenta cambió durante la lectura. No se cargaron los datos.",
+  "sheetsNoTabs": "Esta hoja no tiene pestañas disponibles.",
+  "sheetsReadRowsIntro": "filas leídas. Se cargará la pestaña completa; aquí se muestran las primeras 12 filas.",
+  "syncTitle": "Enviar a Google Sheets",
+  "syncIntro": "Conecta Google y elige tu hoja una vez. El chat podrá consultarla actualizada y enviar resultados; aquí también puedes revisar un envío manual.",
+  "syncNoSessions": "No hay sesiones finalizadas para enviar. Puedes probar la conexión sin iniciar una actividad.",
+  "syncWorkout": "Entrenamiento",
+  "syncConnectWrite": "Conectar Google y permitir escritura",
+  "syncDestinationAccount": "Cuenta de destino: {email}",
+  "@syncDestinationAccount": {
+    "placeholders": {
+      "email": {}
+    }
+  },
+  "syncCheckConnection": "Comprobar conexión",
+  "syncDisconnect": "Desconectar esta hoja",
+  "syncChangeAccount": "Cambiar cuenta de destino",
+  "syncCreateNew": "Crear hoja nueva",
+  "syncNewSheetName": "Nombre de la nueva hoja",
+  "syncCreateDrive": "Crear hoja en mi Google Drive",
+  "syncSheet": "Hoja de Google",
+  "syncTab": "Pestaña",
+  "syncInstructions": "Preferencias o aclaraciones sobre la hoja",
+  "syncInstructionsHint": "Ej.: usa el bloque de octubre, cargas totales",
+  "syncAllowOverwrite": "Permitir actualizar celdas con datos",
+  "syncOverwriteHelp": "La revisión mostrará el valor anterior y el nuevo. Las fórmulas se conservan.",
+  "syncAutomatic": "Enviar sesiones automáticamente al finalizar",
+  "syncAutomaticChatHelp": "Los envíos del chat siguen disponibles aunque pauses los automáticos.",
+  "syncAutomaticActivityHelp": "Por ahora los registros de actividad no identifican su acompañante; puedes pedir envíos y ediciones desde el chat.",
+  "syncSavePreferences": "Guardar conexión y preferencias",
+  "syncReviewLoadChat": "Revisar y cargar hoja en el chat",
+  "syncDiagnostics": "Diagnóstico de la conexión",
+  "syncDiagnosticsHelp": "Prueba la pestaña elegida sin iniciar una actividad. La escritura usa una pestaña temporal y no modifica tus entrenamientos.",
+  "syncTestRead": "Probar lectura con IA",
+  "syncTestWrite": "Probar escritura con IA",
+  "syncPrepare": "Preparar y revisar envío",
+  "syncNoSheet": "Elige una hoja y una pestaña.",
+  "syncNoValidWorkout": "Elige una hoja, una pestaña y un entrenamiento finalizado.",
+  "syncSessionUnavailable": "La sesión ya no está disponible.",
+  "syncConnectionError": "No se pudo recuperar la hoja guardada. Puedes elegir otra.",
+  "syncOperationError": "No se pudo completar la operación. Inténtalo de nuevo.",
+  "syncGoogleUnconfirmed": "Google no confirmó la operación.",
+  "syncNameInvalid": "Escribe un nombre de hasta 80 caracteres.",
+  "syncLoadChatTitle": "Revisar hoja para el chat",
+  "syncConfirmLoad": "Confirmar y cargar",
+  "syncReadConfirmed": "Lectura confirmada: {count} filas recibidas de Google. Respuesta del modelo: {answer}",
+  "@syncReadConfirmed": {
+    "placeholders": {
+      "count": {},
+      "answer": {}
+    }
+  },
+  "syncWriteConfirmed": "Escritura confirmada: el modelo propuso «{marker}», Google aceptó la prueba y la pestaña temporal se eliminó. No se enviaron entrenamientos.",
+  "@syncWriteConfirmed": {
+    "placeholders": {
+      "marker": {}
+    }
+  },
+  "syncSentConfirmed": "Entrenamiento enviado a Google Sheets. Recibo comprobado; volver a enviarlo no lo duplica.",
+  "syncReturnChat": "Volver al chat",
+  "syncDestination": "Destino: {name} / {tab}",
+  "@syncDestination": {
+    "placeholders": {
+      "name": {},
+      "tab": {}
+    }
+  },
+  "syncReceiptNote": "Google guardará también un recibo del envío para evitar duplicados.",
+  "syncReviewCount": "{count} celdas. Se comprobará que no hayan cambiado desde esta revisión.",
+  "@syncReviewCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "syncOriginalData": "Ver datos originales del entrenamiento",
+  "syncConfirmSend": "Confirmar y enviar a Google Sheets",
+  "syncDiscard": "Descartar propuesta",
+  "sheetNoTabs": "Esta hoja no tiene pestañas disponibles.",
+  "sheetsLoad": "Cargar hoja",
+  "sheetsLoadAnalyze": "Cargar y analizar",
+  "rowLabel": "Fila",
+  "syncProposedSessionInvalid": "La sesión propuesta no está finalizada o no pertenece a este perfil. Elige una sesión válida.",
+  "syncConnectionSaved": "Conexión guardada. El chat leerá la hoja actual y podrá enviar los resultados sin pedir autorización en cada uso.",
+  "syncIdentityUnconfirmed": "No se pudo confirmar la cuenta de Google seleccionada.",
+  "sheetAllRowsWillLoad": "Se cargarán todas las filas de la pestaña.",
+  "syncAccountChangedReview": "La cuenta cambió mientras revisabas la pestaña. La hoja anterior se conserva; vuelve a conectar para cargarla.",
+  "syncLoadedIntoChat": "Hoja cargada en el chat: {name} / {tab}.",
+  "@syncLoadedIntoChat": {
+    "placeholders": {
+      "name": {},
+      "tab": {}
+    }
+  },
+  "syncConfigureAi": "Configura primero la IA para probar el acceso desde el modelo.",
+  "syncModelEmpty": "El modelo no devolvió una respuesta.",
+  "syncInvalidMarker": "El modelo respondió, pero no dio un marcador válido para la prueba.",
+  "syncWorkoutChanged": "El entrenamiento cambió. Prepara de nuevo el envío para revisar los datos actuales.",
+  "syncRefreshAfterSendFailed": "Envío confirmado. No se pudo refrescar la copia del chat; vuelve a cargar la hoja para consultar sus nuevos datos.",
+  "syncReceiptSent": "Google Sheets confirmado: entrenamiento «{workout}» ({id}) enviado a «{name} / {tab}». El recibo de Google confirma el envío.",
+  "@syncReceiptSent": {
+    "placeholders": {
+      "workout": {},
+      "id": {},
+      "name": {},
+      "tab": {}
+    }
+  },
+  "syncReceiptCreated": "Google Sheets confirmado: hoja «{name}» creada, pestaña «{tab}». El progreso aún no se ha enviado.",
+  "@syncReceiptCreated": {
+    "placeholders": {
+      "name": {},
+      "tab": {}
+    }
+  },
+  "sheetsAssistantIntro": "Conecta tu cuenta, elige la hoja y su pestaña. Revisa los datos antes de compartirlos con tu asistente.",
+  "sheetsImportIntro": "TrackIA usa la autorización de Google para leer tus hojas. Los datos se guardan en este móvil cuando confirmas la importación.",
+  "sheetsErrorExpired": "La autorización de Google ha caducado. Vuelve a conectar tu cuenta.",
+  "sheetsErrorPermission": "Google no permite esta operación. Comprueba el acceso y los permisos de la hoja.",
+  "sheetsErrorAccount": "La lectura no corresponde a la cuenta autorizada. Vuelve a conectar desde tu perfil.",
+  "sheetsErrorNotFound": "La hoja ya no está disponible para esta cuenta.",
+  "sheetsErrorRateLimit": "Google ha recibido demasiadas solicitudes. Espera un momento y vuelve a intentarlo.",
+  "sheetsErrorNetwork": "No se pudo confirmar la operación con Google. El progreso local se conserva; al reintentar se comprobará el recibo.",
+  "sheetsErrorTooLarge": "La pestaña supera 20 MB. Elige una pestaña más pequeña.",
+  "sheetsErrorGeneric": "Google no pudo completar la operación. Vuelve a intentarlo.",
+  "sheetsErrorBusy": "Ya hay una operación con Google en curso. Espera a que termine.",
+  "syncBeforeValue": "Antes: {value}",
+  "@syncBeforeValue": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "syncEmptyCell": "(vacía)",
+  "syncDisconnected": "Hoja desconectada. Los datos locales y los envíos pendientes se conservan.",
+  "aiProviderDescription": "Elige un proveedor en la nube o ejecuta un modelo local en este móvil. Los modelos locales pueden funcionar sin conexión; el rendimiento depende de la memoria y del modelo elegido.",
+  "aiConfigReadError": "No se pudo leer la configuración guardada.",
+  "aiModelImportError": "No se pudo importar el archivo GGUF: {error}",
+  "@aiModelImportError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "aiMemoryAvailableNow": "Disponible ahora",
+  "aiMemoryAfterModel": "Después de modelo y proyector",
+  "aiMemoryAfterContext": "Después + contexto seleccionado",
+  "aiMemoryContextEstimate": "El contexto de {context} añadiría aproximadamente {minimum}–{maximum} de RAM.",
+  "@aiMemoryContextEstimate": {
+    "placeholders": {
+      "context": {},
+      "minimum": {},
+      "maximum": {}
+    }
+  },
+  "aiMemoryShortfall": "La estimación supera lo disponible por {amount}.",
+  "@aiMemoryShortfall": {
+    "placeholders": {
+      "amount": {}
+    }
+  },
+  "aiMemoryEstimateHelp": "Estimación orientativa de pesos y proyector; el contexto elegido añade consumo y puede variar según el modelo.",
+  "aiConnectedChooseModel": "Cuenta conectada. Elige un modelo y prueba la conexión para usar el asistente.",
+  "aiIdentityConnected": "Identidad conectada. Puedes autorizar por separado el uso de tu plan ChatGPT.",
+  "aiChatGptDisconnected": "Sesión ChatGPT desconectada.",
+  "aiChatGptRemoteRevocationUnconfirmed": "Sesión desconectada en este móvil. No se confirmó la revocación remota; desconecta TrackIA también en los ajustes de ChatGPT.",
+  "aiOperationError": "No se pudo completar la operación{details}",
+  "@aiOperationError": {
+    "placeholders": {
+      "details": {}
+    }
+  },
+  "aiOperationDetails": ": {error}",
+  "@aiOperationDetails": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "aiNoModelImported": "No hay modelo importado.",
+  "aiSelectImportGguf": "Seleccionar / importar modelo .gguf",
+  "aiLocalContextTitle": "Contexto del modelo local",
+  "aiLocalContextHelp": "TrackIA recomienda {context} para sus instrucciones, historial y datos. La recomendación cubre las necesidades de la app, no el límite de este GGUF. Si el modelo no soporta el tamaño elegido, puede fallar; tú decides si bajarlo.",
+  "@aiLocalContextHelp": {
+    "placeholders": {
+      "context": {}
+    }
+  },
+  "aiContextSelected": "Seleccionado: {context}",
+  "@aiContextSelected": {
+    "placeholders": {
+      "context": {}
+    }
+  },
+  "aiUseRecommendation": "Usar recomendación",
+  "aiVisualProjector": "Proyector visual (opcional)",
+  "aiProjectorHelp": "Añádelo para usar imágenes. MiniCPM‑V necesita el archivo mmproj GGUF correspondiente.",
+  "aiNoProjector": "Sin proyector visual.",
+  "aiSelectProjector": "Seleccionar proyector mmproj",
+  "aiMemoryHelp": "La memoria disponible se informa aparte. La recomendación de 8192 tokens responde a lo que TrackIA necesita; el GGUF puede no soportarlo y tú puedes elegir otro tamaño.",
+  "aiRecalculateMemory": "Volver a calcular memoria disponible",
+  "aiApiBase": "URL base de la API",
+  "aiHttpsExample": "HTTPS, por ejemplo https://tu-proveedor.com/v1",
+  "aiChatGptPlanHelp": "Usa tu plan si tu cuenta y espacio son elegibles. El uso consume sus límites compartidos. No da acceso a tus conversaciones de ChatGPT.",
+  "aiChatGptAccount": "Cuenta ChatGPT",
+  "aiChatGptConnectedPlan": "Conectada · permiso de uso del plan concedido",
+  "aiChatGptConnectedIdentity": "Conectada · solo identidad",
+  "aiChatGptNotConnected": "ChatGPT sin conectar",
+  "aiContinueChatGpt": "Continuar con ChatGPT",
+  "aiReviewPlanPermission": "Revisar permiso de uso del plan",
+  "aiAuthorizePlan": "Autorizar uso de mi plan ChatGPT",
+  "aiAddAccount": "Añadir otra cuenta o espacio",
+  "aiViewUsagePermissions": "Ver uso y permisos en ChatGPT",
+  "aiDisconnectChatGpt": "Desconectar ChatGPT",
+  "aiCancelConnection": "Cancelar conexión",
+  "aiApiKey": "Clave API",
+  "aiHideKey": "Ocultar clave",
+  "aiShowKey": "Mostrar clave",
+  "aiFetchModels": "Obtener / actualizar modelos",
+  "aiLoadingModels": "Consultando modelos…",
+  "aiModelLabel": "Modelo",
+  "aiChooseCatalogModel": "Elige un modelo del catálogo",
+  "aiCurrentModelPreserved": "Modelo actual: {model}. Se conserva aunque no aparezca en el catálogo.",
+  "@aiCurrentModelPreserved": {
+    "placeholders": {
+      "model": {}
+    }
+  },
+  "aiHideManualId": "Ocultar identificador manual",
+  "aiEnterManualModel": "Introducir modelo manualmente",
+  "aiModelIdentifier": "Identificador del modelo",
+  "aiOpenCodeNotice": "Go está orientado a agentes de programación. Esta conexión se identifica como TrackIA; comprueba con tu proveedor si admite este uso. No se cambia automáticamente a Zen ni a otro servicio.",
+  "aiApiSettings": "Configuración de la API",
+  "aiHttpsBase": "URL base HTTPS",
+  "aiProtocol": "Formato compatible con el modelo",
+  "aiConfigSaved": "Configuración guardada.",
+  "aiSaveLocalModel": "Guardar modelo local",
+  "aiSaveProvider": "Guardar proveedor",
+  "aiProviderResponded": "El proveedor respondió:\n{answer}",
+  "@aiProviderResponded": {
+    "placeholders": {
+      "answer": {}
+    }
+  },
+  "aiTestLocalModel": "Probar modelo en este móvil",
+  "aiTestChatGpt": "Probar conexión · usa mi plan ChatGPT",
+  "aiTestApi": "Probar conexión · usa tu API",
+  "aiConfigDeleted": "Configuración y clave eliminadas.",
+  "aiDeleteConfig": "Eliminar configuración y clave"
+}

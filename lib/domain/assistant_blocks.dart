@@ -34,9 +34,10 @@ T? _reject<T>(String kind, String reason) {
 
 /// The JSON object of the single `trackia-<kind>` block of [answer].
 Map<String, dynamic>? _single(String answer, String kind) {
-  final blocks = RegExp(
-    '```trackia-$kind\\s*\\n([\\s\\S]*?)```',
-  ).allMatches(answer).toList();
+  final blocks =
+      RegExp(
+        '```trackia-$kind\\s*\\n([\\s\\S]*?)```',
+      ).allMatches(answer).toList();
   if (blocks.isEmpty) return null;
   if (blocks.length != 1) return _reject(kind, 'más de un bloque');
   try {
@@ -71,6 +72,23 @@ bool _keys(
 
 bool _text(Object? v, int min, int max) =>
     v is String && v.trim().length >= min && v.trim().length <= max;
+
+/// A single explicit target; null means remove the target.
+class ActivityTargetProposal {
+  const ActivityTargetProposal(this.targetSets);
+  final int? targetSets;
+}
+
+ActivityTargetProposal? parseActivityTargetBlock(String answer) {
+  const kind = 'activity-target';
+  final json = _single(answer, kind);
+  if (json == null || !_keys(kind, json, {'targetSets'}, {})) return null;
+  final value = json['targetSets'];
+  if (value != null && (value is! int || value < 1 || value > 100)) {
+    return _reject(kind, 'objetivo fuera de rango');
+  }
+  return ActivityTargetProposal(value as int?);
+}
 
 // --- trackia-goal --------------------------------------------------------
 

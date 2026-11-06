@@ -5,6 +5,11 @@ import '../domain/assistant_blocks.dart';
 import '../application/progress_engine.dart'
     show GeneratedAchievement, ruleHash;
 import '../data/chat_store.dart';
+import '../data/feature_scope.dart';
+import '../data/message_revision_repository.dart';
+import '../application/message_delivery.dart';
+import '../domain/message_revision.dart';
+import '../application/message_delivery_policy.dart';
 import '../application/progress_service.dart';
 import 'activity_summary.dart';
 import 'dart:convert';
@@ -20,6 +25,7 @@ import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import '../application/assistant_context.dart';
+import '../application/localization.dart';
 import '../application/workout_controller.dart';
 import '../application/ai_availability.dart';
 import '../application/rest_notifications.dart';
@@ -57,6 +63,8 @@ part 'chat/chat_attachments.dart';
 
 part 'chat/chat_game.dart';
 part 'chat/chat_sheet.dart';
+part 'chat/chat_delivery.dart';
+part 'chat/message_actions.dart';
 
 /// Mensaje de confirmación tras guardar tiempos propuestos por la IA. Lo no
 /// propuesto se toma de la definición actual de la actividad.
@@ -71,9 +79,8 @@ String savedTimingsMessage(
       proposal['activitySeconds'] ?? definition.activitySeconds;
   final restSeconds = proposal['restSeconds'] ?? definition.restSeconds;
   final targetCycles = proposal['targetCycles'] ?? definition.targetCycles;
-  final duration = activitySeconds == null
-      ? 'sin límite'
-      : clock(activitySeconds);
+  final duration =
+      activitySeconds == null ? 'sin límite' : clock(activitySeconds);
   final cycles = targetCycles == null ? '' : ', $targetCycles ciclos';
   return 'Tiempos guardados en la actividad: $duration por tramo, '
       '${clock(restSeconds)} de descanso$cycles. '
@@ -95,6 +102,7 @@ class AssistantChatScreen extends StatefulWidget {
     this.progressService,
     this.onProgress,
     this.chatStore,
+    this.messageRevisionRepository,
     this.onRemindersChanged,
   });
   final WorkoutController controller;
@@ -123,6 +131,10 @@ class AssistantChatScreen extends StatefulWidget {
   /// Where this chat and its archives are kept (SQLite and files, FR-040). The
   /// app passes it; without it the chat uses the old secure-storage keys.
   final ChatStore? chatStore;
+
+  /// Optional test/embedding override. The normal app derives the repository
+  /// from [chatStore], keeping both stores on the same SQLite v7 connection.
+  final MessageRevisionRepository? messageRevisionRepository;
 
   /// Told after reminder texts change, so the phone gets a fresh snapshot.
   final VoidCallback? onRemindersChanged;
@@ -165,6 +177,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
       debugPrint('AI override not read: ${error.runtimeType}');
     }
   }
+
   late final archiveStore = ChatArchiveStore(
     profileId: profileId,
     companionId: companionId,
@@ -186,6 +199,22 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
   String activityTranscriptRevision = '';
   final messages = <AiMessage>[];
   String sessionId = const Uuid().v4();
+
+  // SQLite v7 owns delivery. These maps only connect transcript bubbles to
+  // stable IDs; they are not a second editable queue.
+  MessageRevisionRepository? messageRevisions;
+  MessageDeliveryService? messageDelivery;
+  bool deliveryInitializationFailed = false;
+  final outgoingMessageIds = <AiMessage, String>{};
+  final outgoingRevisionIds = <AiMessage, String>{};
+  final outgoingRevisionTexts = <AiMessage, String>{};
+  final durableTranscriptIds = <String>{};
+  final responseLinks = <AiMessage, ({String messageId, String revisionId})>{};
+  final deliveryStates = <String, MessageDelivery>{};
+  bool get hasDeliveryBacklog => deliveryStates.values.any(
+    (state) => state != MessageDelivery.answered,
+  );
+
   bool busy = true;
   String? error;
   String? pending;
@@ -229,15 +258,16 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
   }
 
   bool get canRecord => widget.focusMode && companionFocus != null;
-  FocusActivity? get recoverablePreparation => companionActivities
-      .where(
-        (a) =>
-            !a.active &&
-            a.intervals.isEmpty &&
-            a.finishIssues.contains('not_started') &&
-            a.workoutId == widget.controller.active?.id,
-      )
-      .firstOrNull;
+  FocusActivity? get recoverablePreparation =>
+      companionActivities
+          .where(
+            (a) =>
+                !a.active &&
+                a.intervals.isEmpty &&
+                a.finishIssues.contains('not_started') &&
+                a.workoutId == widget.controller.active?.id,
+          )
+          .firstOrNull;
   List<AiMessage> get transcript {
     if (!widget.focusMode) return messages;
     return [
@@ -392,8 +422,9 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
       draftTail.catchError((_) {
         if (mounted) {
           setState(
-            () => error =
-                'No se pudo guardar el borrador. Conserva el texto y vuelve a intentarlo.',
+            () =>
+                error =
+                    'No se pudo guardar el borrador. Conserva el texto y vuelve a intentarlo.',
           );
         }
       }),
@@ -411,9 +442,10 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
     final a = companionFocus;
     if (a == null) return Future.value();
     final media = attachment;
-    final text = input.text.trim().isEmpty && media != null
-        ? 'Interpreta el adjunto de esta actividad.'
-        : input.text;
+    final text =
+        input.text.trim().isEmpty && media != null
+            ? 'Interpreta el adjunto de esta actividad.'
+            : input.text;
     if (text.trim().isEmpty) return Future.value();
     final revision = inputRevision, token = '${a.id}:$inputRevision';
     final interval = a.intervals.lastOrNull?.id;
@@ -426,13 +458,14 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
             a.id,
             media == null ? text : '$text\n[Adjunto: ${media.name}]',
             intervalId: interval,
-            media: media == null
-                ? null
-                : ActivityMedia(
-                    name: media.name,
-                    mime: media.mime,
-                    bytes: media.bytes,
-                  ),
+            media:
+                media == null
+                    ? null
+                    : ActivityMedia(
+                      name: media.name,
+                      mime: media.mime,
+                      bytes: media.bytes,
+                    ),
           );
       capturedInputs.add(token);
       if (capturedInputs.length > 100) {
@@ -502,6 +535,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
   }
 
   Future<void> load() async {
+    await initializeMessageDelivery();
     try {
       final json = await archiveStore.active();
       if (!mounted) return;
@@ -518,26 +552,14 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
             json['deferredArchive'] as Map,
           );
         }
-        messages.addAll(
-          (json['messages'] as List).map(
-            (m) => AiMessage.fromStorage(Map<String, dynamic>.from(m as Map)),
-          ),
-        );
-        pending = json['pending'] as String?;
-        if (pending == null &&
-            json['composerDraft'] is Map &&
-            companionFocus == null) {
-          final draft = AiMessage.fromStorage(
-            Map<String, dynamic>.from(json['composerDraft'] as Map),
-          );
-          input.text = draft.text;
-          attachment = draft.attachment;
+        for (final raw in json['messages'] as List) {
+          restoreTranscriptMessage(Map<String, dynamic>.from(raw as Map));
         }
-        if (pending != null && companionFocus == null) {
-          input.text = pending!;
-          attachment = messages.lastOrNull?.attachment;
-          error =
-              'Tu mensaje quedó guardado sin respuesta. Puedes volver a enviarlo.';
+        pending = json['pending'] as String?;
+        if (messageRevisions != null) {
+          await restoreDurableDelivery(json);
+        } else {
+          restoreLegacyPending(json);
         }
       }
     } catch (_) {
@@ -573,16 +595,17 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
 
   Map<String, dynamic> chatState({bool includeDraft = false}) => {
     'sessionId': sessionId,
-    'messages': messages.map((m) => m.forStorage()).toList(),
+    'messages': messages.map(messageStorage).toList(),
     'pending': pending,
     'archives': archives,
     'archivedActivityMessageIds': archivedActivityMessageIds.toList(),
     'carryForward': carryForward,
     'deferredArchive': deferredArchive,
     'sheetQuestionWorkoutId': sheetQuestionWorkoutId,
-    'composerDraft': includeDraft
-        ? AiMessage('user', input.text, attachment: attachment).forStorage()
-        : null,
+    'composerDraft':
+        includeDraft
+            ? AiMessage('user', input.text, attachment: attachment).forStorage()
+            : null,
   };
 
   bool get canArchive =>
@@ -590,6 +613,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
           listening ||
           voiceStarting ||
           pending != null ||
+          hasDeliveryBacklog ||
           transcript.isEmpty);
 
   bool get canCloseDay =>
@@ -649,10 +673,11 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
   }
 
   void ignoreGameCard(GameProposalData card) => setState(
-    () => gameCards = [
-      for (final c in gameCards)
-        if (c != card) c,
-    ],
+    () =>
+        gameCards = [
+          for (final c in gameCards)
+            if (c != card) c,
+        ],
   );
 
   List<String> get recentEvents => [
@@ -724,485 +749,518 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
   @override
   Widget build(BuildContext context) => ListenableBuilder(
     listenable: widget.controller,
-    builder: (context, _) => Scaffold(
-      appBar: AppBar(
-        title: widget.focusMode
-            ? companionTitle(context)
-            : Text(widget.companion?.name ?? 'TrackIA'),
-        actions: widget.focusMode
-            ? [chatMenu()]
-            : [
-                IconButton(
-                  tooltip: 'Enviar a Google Sheets',
-                  onPressed: busy ? null : () => openSheetSync(),
-                  icon: const Icon(Icons.cloud_upload_outlined),
-                ),
-                IconButton(
-                  key: const Key('archive-chat'),
-                  tooltip: 'Archivar chat',
-                  onPressed: canArchive ? () => archiveChat() : null,
-                  icon: const Icon(Icons.archive_outlined),
-                ),
-                IconButton(
-                  tooltip: 'Chats archivados',
-                  onPressed: busy ? null : openArchives,
-                  icon: const Icon(Icons.inventory_2_outlined),
-                ),
-                if (widget.onData != null)
-                  IconButton(
-                    tooltip: 'Tus datos',
-                    onPressed: () async {
-                      await widget.onData!();
-                      if (mounted) await reloadSheet();
-                    },
-                    icon: const Icon(Icons.folder_open_outlined),
-                  ),
-                IconButton(
-                  tooltip: 'Proveedor de IA',
-                  onPressed: busy ? null : settings,
-                  icon: const Icon(Icons.settings_outlined),
-                ),
-              ],
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            if (!aiReady &&
-                canRecord &&
-                MediaQuery.viewInsetsOf(context).bottom == 0)
-              const Padding(
-                padding: EdgeInsets.only(top: 4),
-                child: Text(
-                  'IA no disponible · puedes parar y guardar notas localmente',
-                ),
-              ),
-            if (!aiReady && !canRecord)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 12, 24, 8),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(availability.message),
-                    if (availability.status == AiAvailabilityStatus.checking)
-                      const LinearProgressIndicator()
-                    else
-                      Wrap(
-                        spacing: 8,
-                        children: [
-                          FilledButton(
-                            onPressed: settings,
-                            child: const Text('Configurar IA'),
-                          ),
-                          if (availability.status !=
-                              AiAvailabilityStatus.unconfigured)
-                            TextButton(
-                              onPressed: () => availability.check(verify: true),
-                              child: const Text(
-                                'Verificar conexión · usa tu API',
-                              ),
-                            ),
-                        ],
+    builder:
+        (context, _) => Scaffold(
+          appBar: AppBar(
+            title:
+                widget.focusMode
+                    ? companionTitle(context)
+                    : Text(widget.companion?.name ?? 'TrackIA'),
+            actions:
+                widget.focusMode
+                    ? [chatMenu()]
+                    : [
+                      IconButton(
+                        tooltip: appText(context).chatSendToSheets,
+                        onPressed: busy ? null : () => openSheetSync(),
+                        icon: const Icon(Icons.cloud_upload_outlined),
                       ),
-                  ],
-                ),
-              ),
-            if (!widget.focusMode)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: widget.focusMode
-                      ? ActivityFocusControls(
-                          controller: widget.controller,
-                          companionId: companionId,
-                          flushInput: flushFocusInput,
-                          compact: MediaQuery.viewInsetsOf(context).bottom > 0,
-                          aiReady: aiReady,
-                          hideStart: chatInUse,
-                          noticesOff: noticesOff,
-                          onEnableNotices: enableNotices,
-                          onInstantRecorded: instantRecorded,
-                          onActivityEdited: activityEdited,
-                          onActivityFinished: activityFinished,
-                        )
-                      : SessionControl(
-                          controller: widget.controller,
-                          enabled: aiReady && !busy && !voiceStarting,
-                          beforeAction: () async {
-                            if (speech.isListening) await speech.stop();
-                            if (mounted) {
-                              setState(() => listening = false);
-                            }
+                      IconButton(
+                        key: const Key('archive-chat'),
+                        tooltip: appText(context).chatArchive,
+                        onPressed: canArchive ? () => archiveChat() : null,
+                        icon: const Icon(Icons.archive_outlined),
+                      ),
+                      IconButton(
+                        tooltip: appText(context).chatArchives,
+                        onPressed: busy ? null : openArchives,
+                        icon: const Icon(Icons.inventory_2_outlined),
+                      ),
+                      if (widget.onData != null)
+                        IconButton(
+                          tooltip: 'Tus datos',
+                          onPressed: () async {
+                            await widget.onData!();
+                            if (mounted) await reloadSheet();
                           },
-                          sheetLabel: sheetContext == null
-                              ? null
-                              : '${sheetContext!.name} / ${sheetContext!.title}',
+                          icon: const Icon(Icons.folder_open_outlined),
                         ),
-                ),
-              ),
-            if (!widget.focusMode &&
-                widget.onTraining != null &&
-                (!widget.focusMode || widget.controller.focus == null) &&
-                (!widget.focusMode ||
-                    MediaQuery.viewInsetsOf(context).bottom == 0))
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                child: ListenableBuilder(
-                  listenable: widget.controller,
-                  builder: (context, _) => OutlinedButton.icon(
-                    key: const Key('open-training'),
-                    onPressed: !aiReady
-                        ? null
-                        : () async {
-                            if (speech.isListening) {
-                              await speech.stop();
-                            }
-                            if (mounted) {
-                              setState(() => listening = false);
-                              widget.onTraining!();
-                            }
-                          },
-                    icon: const Icon(Icons.fitness_center),
-                    label: Text(
-                      widget.controller.active == null
-                          ? 'Entrenamiento'
-                          : 'Entrenamiento · ${widget.controller.active!.name}',
-                    ),
+                      IconButton(
+                        tooltip: appText(context).chatAiProvider,
+                        onPressed: busy ? null : settings,
+                        icon: const Icon(Icons.settings_outlined),
+                      ),
+                    ],
+          ),
+          body: SafeArea(
+            child: Column(
+              children: [
+                if (!aiReady &&
+                    canRecord &&
+                    MediaQuery.viewInsetsOf(context).bottom == 0)
+                  Padding(
+                    padding: EdgeInsets.only(top: 4),
+                    child: Text(appText(context).aiUnavailableFocus),
                   ),
-                ),
-              ),
-            if (!widget.focusMode &&
-                (!widget.focusMode || widget.controller.focus == null) &&
-                (!widget.focusMode ||
-                    MediaQuery.viewInsetsOf(context).bottom == 0) &&
-                (defaultTargetPlatform == TargetPlatform.android ||
-                    sheetContext != null))
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: TextButton.icon(
-                  key: const Key('assistant-sheet'),
-                  onPressed: busy || voiceStarting ? null : manageSheet,
-                  icon: const Icon(Icons.table_chart_outlined),
-                  label: Text(
-                    sheetContext == null
-                        ? 'Cargar Google Sheets'
-                        : 'Hoja · ${sheetContext!.title}',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-              ),
-            Expanded(
-              child: NotificationListener<ScrollMetricsNotification>(
-                onNotification: (notification) {
-                  if (notification.depth == 0 && followingLatest) {
-                    scheduleScrollToLatest();
-                  }
-                  return false;
-                },
-                child: NotificationListener<ScrollNotification>(
-                  onNotification: (notification) {
-                    if (notification.depth != 0) return false;
-                    if (notification is ScrollStartNotification &&
-                        notification.dragDetails != null) {
-                      userDragging = true;
-                      if (followingLatest) {
-                        setState(() => followingLatest = false);
-                      }
-                    } else if (notification is ScrollEndNotification &&
-                        userDragging) {
-                      userDragging = false;
-                      final next = notification.metrics.extentAfter <= 24;
-                      if (next != followingLatest) {
-                        setState(() => followingLatest = next);
-                      }
-                      if (next) unawaited(resumeDeferredArchive());
-                    }
-                    return false;
-                  },
-                  child: NotificationListener<UserScrollNotification>(
-                    onNotification: (notification) {
-                      if (notification.depth == 0 && !userDragging) {
-                        final next =
-                            notification.direction == ScrollDirection.idle &&
-                            notification.metrics.extentAfter <= 24;
-                        if (next != followingLatest) {
-                          setState(() => followingLatest = next);
-                        }
-                      }
-                      return false;
-                    },
-                    child: ListView(
-                      key: const Key('assistant-transcript'),
-                      controller: scroll,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                if (!aiReady && !canRecord)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(24, 12, 24, 8),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        if (sheetContext?.interpretationPending == true &&
-                            !canRecord)
-                          Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Column(
-                              children: [
-                                Text(
-                                  '«${sheetContext!.name}» cargada · pendiente de interpretación. Los datos originales se conservan.',
-                                ),
-                                if (aiReady)
-                                  TextButton(
-                                    onPressed: busy ? null : analyzeSheet,
-                                    child: const Text(
-                                      'Interpretar hoja con IA',
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        if (transcript.isEmpty && companionFocus == null)
-                          Padding(
-                            padding: EdgeInsets.all(16),
-                            child: Text(
-                              aiReady
-                                  ? '¿Qué te gustaría hacer hoy? Cuéntame y lo organizamos juntos.'
-                                  : 'Carga tus datos con + cuando quieras. La IA podrá interpretar su formato cuando esté conectada.',
-                            ),
-                          ),
-                        for (final message in transcript)
-                          if (message.role == 'event')
-                            Padding(
-                              key: const Key('event-line'),
-                              padding: const EdgeInsets.symmetric(vertical: 4),
-                              child: Center(
-                                child: Text(
-                                  message.text,
-                                  style: Theme.of(context).textTheme.bodySmall,
-                                ),
+                        Text(availability.message),
+                        if (availability.status ==
+                            AiAvailabilityStatus.checking)
+                          const LinearProgressIndicator()
+                        else
+                          Wrap(
+                            spacing: 8,
+                            children: [
+                              FilledButton(
+                                onPressed: settings,
+                                child: Text(appText(context).chatConfigureAi),
                               ),
-                            )
-                          else
-                            Align(
-                              alignment: message.role == 'user'
-                                  ? Alignment.centerRight
-                                  : Alignment.centerLeft,
-                              child: Card(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(14),
-                                  child: ChatMessageBody(
-                                    text: message.text,
-                                    assistant: message.role == 'assistant',
+                              if (availability.status !=
+                                  AiAvailabilityStatus.unconfigured)
+                                TextButton(
+                                  onPressed:
+                                      () => availability.check(verify: true),
+                                  child: Text(
+                                    appText(context).chatVerifyConnection,
                                   ),
                                 ),
-                              ),
-                            ),
-                        if (proposal != null &&
-                            aiReady &&
-                            companionFocus == null)
-                          Card(
-                            child: Padding(
-                              padding: const EdgeInsets.all(12),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    proposal!.name,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    '${proposal!.repeated ? 'Series / tramos' : 'Actividad continua'} · ${proposal!.restSeconds}s de descanso',
-                                  ),
-                                  if (proposal!.fields.isNotEmpty)
-                                    Text(
-                                      proposal!.fields
-                                          .map((f) => f['label'])
-                                          .join(' · '),
-                                    ),
-                                  FilledButton(
-                                    key: const Key('accept-activity-proposal'),
-                                    onPressed: widget.controller.busy
-                                        ? null
-                                        : acceptProposal,
-                                    child: const Text('Preparar'),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        if (lockedProposals != null &&
-                            lockedProposals!.isNotEmpty)
-                          ProposalCard(
-                            proposals: lockedProposals!,
-                            onApply: applyLockedProposal,
-                            onIgnore: ignoreLockedProposal,
-                          ),
-                        for (final card in gameCards)
-                          GameProposalCard(
-                            data: card,
-                            busy: gameBusy,
-                            onAdd: () => addGameCard(card),
-                            onIgnore: () => ignoreGameCard(card),
-                          ),
-                        if (gameSuggestionDue && !suggestionHidden)
-                          GameSuggestionCard(
-                            onActivate: activateGameMode,
-                            onLater: () =>
-                                setState(() => suggestionHidden = true),
-                            onNever: neverSuggestGame,
-                          ),
-                        if (busy && partialReply.isNotEmpty)
-                          Card(
-                            child: Padding(
-                              padding: const EdgeInsets.all(14),
-                              child: ChatMessageBody(
-                                text: partialReply,
-                                assistant: true,
-                              ),
-                            ),
-                          ),
-                        if (busy) ...[
-                          const LinearProgressIndicator(),
-                          if (partialReply.isEmpty)
-                            const Padding(
-                              padding: EdgeInsets.all(8),
-                              child: Text('Esperando al modelo…'),
-                            ),
-                        ],
-                        if (error != null)
-                          Padding(
-                            padding: const EdgeInsets.all(12),
-                            child: Text(error!),
+                            ],
                           ),
                       ],
                     ),
                   ),
-                ),
-              ),
-            ),
-            if (deferredArchive != null && !followingLatest)
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                child: Text(
-                  'El asistente archivará este chat cuando vuelvas al final.',
-                ),
-              ),
-            if (!followingLatest)
-              Align(
-                alignment: Alignment.centerRight,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 16),
-                  child: IconButton.filledTonal(
-                    key: const Key('chat-latest'),
-                    tooltip: 'Ir al último mensaje',
-                    onPressed: returnToLatest,
-                    icon: const Icon(Icons.arrow_downward),
+                if (!widget.focusMode)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child:
+                          widget.focusMode
+                              ? ActivityFocusControls(
+                                controller: widget.controller,
+                                companionId: companionId,
+                                flushInput: flushFocusInput,
+                                compact:
+                                    MediaQuery.viewInsetsOf(context).bottom > 0,
+                                aiReady: aiReady,
+                                hideStart: chatInUse,
+                                noticesOff: noticesOff,
+                                onEnableNotices: enableNotices,
+                                onInstantRecorded: instantRecorded,
+                                onActivityEdited: activityEdited,
+                                onActivityFinished: activityFinished,
+                              )
+                              : SessionControl(
+                                controller: widget.controller,
+                                enabled: aiReady && !busy && !voiceStarting,
+                                beforeAction: () async {
+                                  if (speech.isListening) await speech.stop();
+                                  if (mounted) {
+                                    setState(() => listening = false);
+                                  }
+                                },
+                                sheetLabel:
+                                    sheetContext == null
+                                        ? null
+                                        : '${sheetContext!.name} / ${sheetContext!.title}',
+                              ),
+                    ),
                   ),
-                ),
-              ),
-            if (listening &&
-                (!widget.focusMode ||
-                    MediaQuery.viewInsetsOf(context).bottom == 0))
-              const Padding(
-                padding: EdgeInsets.only(top: 8),
-                child: Text('Escuchando… Revisa el texto y pulsa Enviar.'),
-              ),
-            if (attachment != null)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-                child: InputChip(
-                  label: Text(
-                    attachment!.name,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  avatar: Icon(
-                    attachment!.isImage
-                        ? Icons.image_outlined
-                        : Icons.audio_file_outlined,
-                  ),
-                  onDeleted: busy
-                      ? null
-                      : () => setState(() => attachment = null),
-                ),
-              ),
-            Padding(
-              key: const Key('assistant-composer'),
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                children: [
-                  IconButton(
-                    key: const Key('assistant-attach'),
-                    tooltip: 'Adjuntar',
-                    onPressed: busy || listening ? null : pickAttachment,
-                    icon: const Icon(Icons.add_circle_outline),
-                  ),
-                  Expanded(
-                    child: TextField(
-                      key: const Key('assistant-input'),
-                      controller: input,
-                      focusNode: composerFocus,
-                      onTapOutside: (_) => composerFocus.unfocus(),
-                      enabled:
-                          (!busy ||
-                              (widget.focusMode && companionFocus != null)) &&
-                          (aiReady || canRecord),
-                      readOnly: listening || voiceStarting,
-                      minLines: 1,
-                      maxLines: widget.focusMode
-                          ? (MediaQuery.viewInsetsOf(context).bottom > 0
-                                ? 1
-                                : 2)
-                          : 4,
-                      decoration: InputDecoration(
-                        hintText: aiReady || canRecord
-                            ? 'Escribe o dicta tu mensaje…'
-                            : 'Conecta tu IA para empezar',
-                        suffixIcon: IconButton(
-                          key: const Key('assistant-talk'),
-                          tooltip: listening
-                              ? 'Terminar dictado'
-                              : 'Dictar mensaje',
-                          onPressed:
-                              (!aiReady && !canRecord) ||
-                                  voiceStarting ||
-                                  (busy && !canRecord)
-                              ? null
-                              : talk,
-                          icon: Icon(
-                            listening
-                                ? Icons.stop_circle_outlined
-                                : Icons.mic_none,
+                if (!widget.focusMode &&
+                    widget.onTraining != null &&
+                    (!widget.focusMode || widget.controller.focus == null) &&
+                    (!widget.focusMode ||
+                        MediaQuery.viewInsetsOf(context).bottom == 0))
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                    child: ListenableBuilder(
+                      listenable: widget.controller,
+                      builder:
+                          (context, _) => OutlinedButton.icon(
+                            key: const Key('open-training'),
+                            onPressed:
+                                !aiReady
+                                    ? null
+                                    : () async {
+                                      if (speech.isListening) {
+                                        await speech.stop();
+                                      }
+                                      if (mounted) {
+                                        setState(() => listening = false);
+                                        widget.onTraining!();
+                                      }
+                                    },
+                            icon: const Icon(Icons.fitness_center),
+                            label: Text(
+                              widget.controller.active == null
+                                  ? appText(context).chatTraining
+                                  : '${appText(context).chatTraining} · ${widget.controller.active!.name}',
+                            ),
                           ),
+                    ),
+                  ),
+                if (!widget.focusMode &&
+                    (!widget.focusMode || widget.controller.focus == null) &&
+                    (!widget.focusMode ||
+                        MediaQuery.viewInsetsOf(context).bottom == 0) &&
+                    (defaultTargetPlatform == TargetPlatform.android ||
+                        sheetContext != null))
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: TextButton.icon(
+                      key: const Key('assistant-sheet'),
+                      onPressed: busy || voiceStarting ? null : manageSheet,
+                      icon: const Icon(Icons.table_chart_outlined),
+                      label: Text(
+                        sheetContext == null
+                            ? appText(context).chatLoadSheets
+                            : 'Hoja · ${sheetContext!.title}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                Expanded(
+                  child: NotificationListener<ScrollMetricsNotification>(
+                    onNotification: (notification) {
+                      if (notification.depth == 0 && followingLatest) {
+                        scheduleScrollToLatest();
+                      }
+                      return false;
+                    },
+                    child: NotificationListener<ScrollNotification>(
+                      onNotification: (notification) {
+                        if (notification.depth != 0) return false;
+                        if (notification is ScrollStartNotification &&
+                            notification.dragDetails != null) {
+                          userDragging = true;
+                          if (followingLatest) {
+                            setState(() => followingLatest = false);
+                          }
+                        } else if (notification is ScrollEndNotification &&
+                            userDragging) {
+                          userDragging = false;
+                          final next = notification.metrics.extentAfter <= 24;
+                          if (next != followingLatest) {
+                            setState(() => followingLatest = next);
+                          }
+                          if (next) unawaited(resumeDeferredArchive());
+                        }
+                        return false;
+                      },
+                      child: NotificationListener<UserScrollNotification>(
+                        onNotification: (notification) {
+                          if (notification.depth == 0 && !userDragging) {
+                            final next =
+                                notification.direction ==
+                                    ScrollDirection.idle &&
+                                notification.metrics.extentAfter <= 24;
+                            if (next != followingLatest) {
+                              setState(() => followingLatest = next);
+                            }
+                          }
+                          return false;
+                        },
+                        child: ListView(
+                          key: const Key('assistant-transcript'),
+                          controller: scroll,
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          children: [
+                            if (sheetContext?.interpretationPending == true &&
+                                !canRecord)
+                              Padding(
+                                padding: const EdgeInsets.all(12),
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      '«${sheetContext!.name}» cargada · pendiente de interpretación. Los datos originales se conservan.',
+                                    ),
+                                    if (aiReady)
+                                      TextButton(
+                                        onPressed: busy ? null : analyzeSheet,
+                                        child: Text(
+                                          appText(context).chatSheetPending,
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            if (transcript.isEmpty && companionFocus == null)
+                              Padding(
+                                padding: EdgeInsets.all(16),
+                                child: Text(
+                                  aiReady
+                                      ? appText(context).chatWelcomePrompt
+                                      : appText(context).chatLoadDataPrompt,
+                                ),
+                              ),
+                            for (final message in transcript)
+                              if (message.role == 'event')
+                                Padding(
+                                  key: const Key('event-line'),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 4,
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      message.text,
+                                      style:
+                                          Theme.of(context).textTheme.bodySmall,
+                                    ),
+                                  ),
+                                )
+                              else
+                                Align(
+                                  alignment:
+                                      message.role == 'user'
+                                          ? Alignment.centerRight
+                                          : Alignment.centerLeft,
+                                  child: Card(
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(14),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          ChatMessageBody(
+                                            text: message.text,
+                                            assistant:
+                                                message.role == 'assistant',
+                                          ),
+                                          messageDeliveryDetails(message),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            if (proposal != null &&
+                                aiReady &&
+                                companionFocus == null)
+                              Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        proposal!.name,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        '${proposal!.repeated ? 'Series / tramos' : 'Actividad continua'} · ${proposal!.restSeconds}s de descanso',
+                                      ),
+                                      if (proposal!.fields.isNotEmpty)
+                                        Text(
+                                          proposal!.fields
+                                              .map((f) => f['label'])
+                                              .join(' · '),
+                                        ),
+                                      FilledButton(
+                                        key: const Key(
+                                          'accept-activity-proposal',
+                                        ),
+                                        onPressed:
+                                            widget.controller.busy
+                                                ? null
+                                                : acceptProposal,
+                                        child: Text(
+                                          appText(context).chatPrepareActivity,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            if (lockedProposals != null &&
+                                lockedProposals!.isNotEmpty)
+                              ProposalCard(
+                                proposals: lockedProposals!,
+                                onApply: applyLockedProposal,
+                                onIgnore: ignoreLockedProposal,
+                              ),
+                            for (final card in gameCards)
+                              GameProposalCard(
+                                data: card,
+                                busy: gameBusy,
+                                onAdd: () => addGameCard(card),
+                                onIgnore: () => ignoreGameCard(card),
+                              ),
+                            if (gameSuggestionDue && !suggestionHidden)
+                              GameSuggestionCard(
+                                onActivate: activateGameMode,
+                                onLater:
+                                    () =>
+                                        setState(() => suggestionHidden = true),
+                                onNever: neverSuggestGame,
+                              ),
+                            if (busy && partialReply.isNotEmpty)
+                              Card(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(14),
+                                  child: ChatMessageBody(
+                                    text: partialReply,
+                                    assistant: true,
+                                  ),
+                                ),
+                              ),
+                            if (busy) ...[
+                              const LinearProgressIndicator(),
+                              if (partialReply.isEmpty)
+                                Padding(
+                                  padding: EdgeInsets.all(8),
+                                  child: Text(
+                                    appText(context).chatWaitingModel,
+                                  ),
+                                ),
+                            ],
+                            if (error != null)
+                              Padding(
+                                padding: const EdgeInsets.all(12),
+                                child: Text(error!),
+                              ),
+                          ],
                         ),
                       ),
                     ),
                   ),
-                  IconButton(
-                    tooltip: 'Enviar',
-                    onPressed: busy || listening || (!aiReady && !canRecord)
-                        ? null
-                        : () => send(),
-                    icon: const Icon(Icons.send),
+                ),
+                if (deferredArchive != null && !followingLatest)
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    child: Text(appText(context).chatDeferredArchive),
                   ),
-                ],
-              ),
+                if (!followingLatest)
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 16),
+                      child: IconButton.filledTonal(
+                        key: const Key('chat-latest'),
+                        tooltip: appText(context).chatGoLatest,
+                        onPressed: returnToLatest,
+                        icon: const Icon(Icons.arrow_downward),
+                      ),
+                    ),
+                  ),
+                if (listening &&
+                    (!widget.focusMode ||
+                        MediaQuery.viewInsetsOf(context).bottom == 0))
+                  Padding(
+                    padding: EdgeInsets.only(top: 8),
+                    child: Text(appText(context).chatListening),
+                  ),
+                if (attachment != null)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                    child: InputChip(
+                      label: Text(
+                        attachment!.name,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      avatar: Icon(
+                        attachment!.isImage
+                            ? Icons.image_outlined
+                            : Icons.audio_file_outlined,
+                      ),
+                      onDeleted:
+                          busy ? null : () => setState(() => attachment = null),
+                    ),
+                  ),
+                Padding(
+                  key: const Key('assistant-composer'),
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        key: const Key('assistant-attach'),
+                        tooltip: appText(context).chatAttach,
+                        onPressed: busy || listening ? null : pickAttachment,
+                        icon: const Icon(Icons.add_circle_outline),
+                      ),
+                      Expanded(
+                        child: TextField(
+                          key: const Key('assistant-input'),
+                          controller: input,
+                          focusNode: composerFocus,
+                          onTapOutside: (_) => composerFocus.unfocus(),
+                          enabled:
+                              (!busy ||
+                                  (widget.focusMode &&
+                                      companionFocus != null)) &&
+                              (aiReady || canRecord),
+                          readOnly: listening || voiceStarting,
+                          minLines: 1,
+                          maxLines:
+                              widget.focusMode
+                                  ? (MediaQuery.viewInsetsOf(context).bottom > 0
+                                      ? 1
+                                      : 2)
+                                  : 4,
+                          decoration: InputDecoration(
+                            hintText:
+                                aiReady || canRecord
+                                    ? appText(context).chatComposeHint
+                                    : appText(context).chatConnectAiHint,
+                            suffixIcon: IconButton(
+                              key: const Key('assistant-talk'),
+                              tooltip:
+                                  listening
+                                      ? appText(context).chatStopDictation
+                                      : appText(context).chatDictate,
+                              onPressed:
+                                  (!aiReady && !canRecord) ||
+                                          voiceStarting ||
+                                          (busy && !canRecord)
+                                      ? null
+                                      : talk,
+                              icon: Icon(
+                                listening
+                                    ? Icons.stop_circle_outlined
+                                    : Icons.mic_none,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: appText(context).chatSend,
+                        onPressed:
+                            busy || listening || (!aiReady && !canRecord)
+                                ? null
+                                : () => send(),
+                        icon: const Icon(Icons.send),
+                      ),
+                    ],
+                  ),
+                ),
+                if (widget.focusMode)
+                  ActivityFocusControls(
+                    controller: widget.controller,
+                    companionId: companionId,
+                    flushInput: flushFocusInput,
+                    aiReady: aiReady,
+                    hideStart: chatInUse,
+                    noticesOff: noticesOff,
+                    onEnableNotices: enableNotices,
+                    onInstantRecorded: instantRecorded,
+                    onActivityEdited: activityEdited,
+                    onActivityFinished: activityFinished,
+                    compact: MediaQuery.viewInsetsOf(context).bottom > 0,
+                  ),
+                if (notifications.error != null)
+                  Text(notifications.error!, maxLines: 2),
+              ],
             ),
-            if (widget.focusMode)
-              ActivityFocusControls(
-                controller: widget.controller,
-                companionId: companionId,
-                flushInput: flushFocusInput,
-                aiReady: aiReady,
-                hideStart: chatInUse,
-                noticesOff: noticesOff,
-                onEnableNotices: enableNotices,
-                onInstantRecorded: instantRecorded,
-                onActivityEdited: activityEdited,
-                onActivityFinished: activityFinished,
-                compact: MediaQuery.viewInsetsOf(context).bottom > 0,
-              ),
-            if (notifications.error != null)
-              Text(notifications.error!, maxLines: 2),
-          ],
+          ),
         ),
-      ),
-    ),
   );
 }

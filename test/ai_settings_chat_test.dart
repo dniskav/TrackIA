@@ -12,8 +12,10 @@ import 'helpers/real_io.dart';
 import 'package:trackia/data/ai_client.dart';
 import 'package:trackia/data/ai_model_catalog.dart';
 import 'package:trackia/application/ai_availability.dart';
+import 'package:trackia/application/locale_settings.dart';
 import 'package:trackia/data/ai_settings_store.dart';
 import 'package:trackia/data/sheet_context_store.dart';
+import 'package:trackia/domain/sheet_context.dart';
 import 'package:trackia/data/profile_store.dart';
 import 'package:trackia/domain/user_profile.dart';
 import 'package:trackia/domain/ai_config.dart';
@@ -67,11 +69,12 @@ void main() {
           focusMode: true,
           availability: AiAvailability(
             catalog: AiModelCatalog(
-              transport: (_, __) async => {
-                'data': [
-                  {'id': 'test-model'},
-                ],
-              },
+              transport:
+                  (_, __) async => {
+                    'data': [
+                      {'id': 'test-model'},
+                    ],
+                  },
             ),
           ),
         ),
@@ -122,13 +125,14 @@ void main() {
       await tester.pumpWidget(
         app(
           AiClient(
-            transport: (_, __, ___) async => {
-              'choices': [
-                {
-                  'message': {'content': 'Recibido'},
+            transport:
+                (_, __, ___) async => {
+                  'choices': [
+                    {
+                      'message': {'content': 'Recibido'},
+                    },
+                  ],
                 },
-              ],
-            },
           ),
         ),
       );
@@ -192,18 +196,25 @@ void main() {
             (call) async => switch (call.method) {
               'connectIdentity' => profile.toJson(),
               'authorize' => true,
+              'authorizeWrite' => true,
+              'disconnect' => null,
               'list' => {
                 'files': [
                   {'id': 'sheet-1', 'name': 'Progreso gym final'},
+                  {'id': 'chat-next', 'name': 'Carga de regreso'},
                 ],
               },
-              'tabs' => ['Registro2026'],
+              'tabs' =>
+                call.arguments['id'] == 'chat-next'
+                    ? ['Registro2026', 'Notas']
+                    : ['Registro2026'],
+              'syncSnapshot' => {'rows': rows},
               'read' =>
                 failRefresh
                     ? throw PlatformException(
-                        code: 'GOOGLE_NETWORK',
-                        message: 'Sin conexión con Google.',
-                      )
+                      code: 'GOOGLE_NETWORK',
+                      message: 'Sin conexión con Google.',
+                    )
                     : rows,
               _ => throw StateError('Unexpected ${call.method}'),
             },
@@ -240,11 +251,12 @@ void main() {
           availability: AiAvailability(
             store: aiStore,
             catalog: AiModelCatalog(
-              transport: (_, __) async => {
-                'data': [
-                  {'id': 'test-model'},
-                ],
-              },
+              transport:
+                  (_, __) async => {
+                    'data': [
+                      {'id': 'test-model'},
+                    ],
+                  },
             ),
           ),
         ),
@@ -317,6 +329,22 @@ void main() {
         payloads.last['messages'][0]['content'],
         contains('"googleSheet":null'),
       );
+
+      // SheetSyncScreen writes this store after the user confirms its review.
+      // The chat stays mounted while that route returns, so the notifier must
+      // refresh its in-memory context instead of keeping the removed sheet.
+      await sheetStore.save(
+        SheetContext(
+          id: 'chat-next',
+          name: 'Carga de regreso',
+          title: 'Registro2026',
+          loadedAt: DateTime.now(),
+          rows: rows,
+        ),
+      );
+      await realIo(tester, 10);
+      expect(find.text('Hoja · Registro2026'), findsOneWidget);
+      expect((await sheetStore.load())!.id, 'chat-next');
     },
   );
 
@@ -325,14 +353,15 @@ void main() {
   ) async {
     if (const bool.fromEnvironment('GYMIA_CAPTURE')) {
       await tester.runAsync(() async {
-        for (final entry in {
-          'Roboto':
-              '.tools/flutter/engine/src/flutter/third_party/txt/third_party/fonts/Roboto-Regular.ttf',
-          'Ahem':
-              '.tools/flutter/engine/src/flutter/third_party/txt/third_party/fonts/Roboto-Regular.ttf',
-          'MaterialIcons':
-              '.tools/flutter/bin/cache/artifacts/material_fonts/MaterialIcons-Regular.otf',
-        }.entries) {
+        for (final entry
+            in {
+              'Roboto':
+                  '.tools/flutter/engine/src/flutter/third_party/txt/third_party/fonts/Roboto-Regular.ttf',
+              'Ahem':
+                  '.tools/flutter/engine/src/flutter/third_party/txt/third_party/fonts/Roboto-Regular.ttf',
+              'MaterialIcons':
+                  '.tools/flutter/bin/cache/artifacts/material_fonts/MaterialIcons-Regular.otf',
+            }.entries) {
           final loader = FontLoader(entry.key);
           loader.addFont(
             File(entry.value).readAsBytes().then(ByteData.sublistView),
@@ -349,10 +378,7 @@ void main() {
     });
     const capture = Key('home-capture');
     await tester.pumpWidget(
-      RepaintBoundary(
-        key: capture,
-        child: GymApp(controller: controller),
-      ),
+      RepaintBoundary(key: capture, child: GymApp(controller: controller)),
     );
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('companion-gymbro')));
@@ -399,11 +425,12 @@ void main() {
           controller: controller,
           availability: AiAvailability(
             catalog: AiModelCatalog(
-              transport: (_, __) async => {
-                'data': [
-                  {'id': 'test-model'},
-                ],
-              },
+              transport:
+                  (_, __) async => {
+                    'data': [
+                      {'id': 'test-model'},
+                    ],
+                  },
             ),
           ),
         ),
@@ -426,6 +453,11 @@ void main() {
   testWidgets(
     'fresh home disables assistant and training but keeps data access',
     (tester) async {
+      // This assertion is written for the Spanish fixture strings. In a test
+      // environment the platform locale may be English, so pin the app's
+      // explicit preference and restore the device default afterward.
+      await LocaleSettings.instance.select('es');
+      addTearDown(() => LocaleSettings.instance.select('system'));
       await tester.pumpWidget(GymApp(controller: controller));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('companion-gymbro')));
@@ -522,11 +554,12 @@ void main() {
               client: client,
               availability: AiAvailability(
                 catalog: AiModelCatalog(
-                  transport: (_, __) async => {
-                    'data': [
-                      {'id': 'test-model'},
-                    ],
-                  },
+                  transport:
+                      (_, __) async => {
+                        'data': [
+                          {'id': 'test-model'},
+                        ],
+                      },
                 ),
               ),
             ),
@@ -585,11 +618,12 @@ void main() {
             client: client,
             availability: AiAvailability(
               catalog: AiModelCatalog(
-                transport: (_, __) async => {
-                  'data': [
-                    {'id': 'test-model'},
-                  ],
-                },
+                transport:
+                    (_, __) async => {
+                      'data': [
+                        {'id': 'test-model'},
+                      ],
+                    },
               ),
             ),
           ),
@@ -654,11 +688,12 @@ void main() {
           client: client,
           availability: AiAvailability(
             catalog: AiModelCatalog(
-              transport: (_, __) async => {
-                'data': [
-                  {'id': 'test-model'},
-                ],
-              },
+              transport:
+                  (_, __) async => {
+                    'data': [
+                      {'id': 'test-model'},
+                    ],
+                  },
             ),
           ),
         ),
@@ -673,12 +708,13 @@ void main() {
     }
     expect(find.text('GIMNASIO_SECRETO'), findsNothing);
     expect(find.text('Otro acompañante activo'), findsOneWidget);
-    final sendButton = find
-        .ancestor(
-          of: find.byTooltip('Enviar'),
-          matching: find.byType(IconButton),
-        )
-        .first;
+    final sendButton =
+        find
+            .ancestor(
+              of: find.byTooltip('Enviar'),
+              matching: find.byType(IconButton),
+            )
+            .first;
     for (var i = 0; i < 20; i++) {
       await tester.runAsync(
         () => Future<void>.delayed(const Duration(milliseconds: 50)),
@@ -718,11 +754,12 @@ void main() {
           client: client,
           availability: AiAvailability(
             catalog: AiModelCatalog(
-              transport: (_, __) async => {
-                'data': [
-                  {'id': 'test-model'},
-                ],
-              },
+              transport:
+                  (_, __) async => {
+                    'data': [
+                      {'id': 'test-model'},
+                    ],
+                  },
             ),
           ),
         ),

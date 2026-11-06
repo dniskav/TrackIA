@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -51,6 +52,30 @@ class ChatStore {
     validTrackiaId(profileId);
   }
 
+  // Serializes snapshot, writes and collection within this Dart isolate.
+  // It does not coordinate another process or isolate accessing the directory.
+  static final Map<String, Future<void>> _mediaLocks = {};
+
+  static Future<T> withMediaLock<T>(
+    Directory directory,
+    Future<T> Function() action,
+  ) async {
+    final key = p.normalize(p.absolute(directory.path));
+    final previous = _mediaLocks[key] ?? Future<void>.value();
+    final finished = Completer<void>();
+    _mediaLocks[key] = finished.future;
+    await previous;
+    try {
+      return await action();
+    } finally {
+      if (identical(_mediaLocks[key], finished.future)) _mediaLocks.remove(key);
+      finished.complete();
+    }
+  }
+
+  Future<T> _withMediaLock<T>(Future<T> Function() action) async =>
+      withMediaLock(await mediaDirectory(), action);
+
   static final _safeId = RegExp(r'^[A-Za-z0-9_-]{1,128}$');
   static final _mediaRef = RegExp(r'"media":"([0-9a-f]{64})"');
 
@@ -83,9 +108,10 @@ class ChatStore {
   /// Where attachments live: `trackia_media` next to the database, so they
   /// are private to the app and move together with it. (research D12 named the
   /// application support folder; this needs no plugin and works the same.)
-  Future<Directory> mediaDirectory() async => _mediaDirectory ??= Directory(
-    p.join(p.dirname(_db.path), 'trackia_media'),
-  );
+  Future<Directory> mediaDirectory() async =>
+      _mediaDirectory ??= Directory(
+        p.join(p.dirname(_db.path), 'trackia_media'),
+      );
 
   static String hashOf(List<int> bytes) => sha256.convert(bytes).toString();
 
@@ -246,8 +272,10 @@ class ChatStore {
     final id = _id(companionId);
     final files = <String, Uint8List>{};
     final payload = jsonEncode(_externalize(state, files));
-    await _writeMedia(files);
-    await _db.transaction((tx) => _upsertActive(tx, id, payload));
+    await _withMediaLock(() async {
+      await _writeMedia(files);
+      await _db.transaction((tx) => _upsertActive(tx, id, payload));
+    });
   }
 
   /// Archive and active chat in one transaction: both change or neither does.
@@ -262,17 +290,19 @@ class ChatStore {
     final files = <String, Uint8List>{};
     final archivePayload = jsonEncode(_externalize(archive, files));
     final activePayload = jsonEncode(_externalize(active, files));
-    await _writeMedia(files);
-    await _db.transaction((tx) async {
-      await tx.insert('trackia_chat_archives', {
-        'id': row,
-        'profile_id': profileId,
-        'companion_id': id,
-        'payload': archivePayload,
-        'created_at': _now().millisecondsSinceEpoch,
+    await _withMediaLock(() async {
+      await _writeMedia(files);
+      await _db.transaction((tx) async {
+        await tx.insert('trackia_chat_archives', {
+          'id': row,
+          'profile_id': profileId,
+          'companion_id': id,
+          'payload': archivePayload,
+          'created_at': _now().millisecondsSinceEpoch,
+        });
+        debugStep?.call('archive');
+        await _upsertActive(tx, id, activePayload);
       });
-      debugStep?.call('archive');
-      await _upsertActive(tx, id, activePayload);
     });
   }
 
@@ -318,7 +348,7 @@ class ChatStore {
   Future<ChatMigrationResult> migrate(
     FlutterSecureStorage storage,
     String companionId,
-  ) async {
+  ) => _withMediaLock(() async {
     final id = _id(companionId);
     final chatKey = _chatKey(id);
     try {
@@ -433,7 +463,7 @@ class ChatStore {
     } catch (error) {
       return ChatMigrationResult(ok: false, error: '$error');
     }
-  }
+  });
 
   /// Phase 2: delete the old keys of verified copies. It does nothing in the
   /// launch that made the copy, so a bad copy is found before anything is lost.
@@ -457,9 +487,10 @@ class ChatStore {
         await _db.update(
           table,
           {'legacy_key': null},
-          where: table == 'trackia_chats'
-              ? 'profile_id = ? AND companion_id = ?'
-              : 'id = ?',
+          where:
+              table == 'trackia_chats'
+                  ? 'profile_id = ? AND companion_id = ?'
+                  : 'id = ?',
           whereArgs: table == 'trackia_chats' ? [profileId, id] : [row['id']],
         );
         deleted++;
@@ -483,7 +514,7 @@ class ChatStore {
 
   /// Deletes attachment files that no stored chat or archive refers to (of any
   /// profile). Returns how many were deleted.
-  Future<int> gcMedia() async {
+  Future<int> gcMedia() => _withMediaLock(() async {
     final dir = await mediaDirectory();
     if (!await dir.exists()) return 0;
     final referenced = <String>{};
@@ -504,5 +535,5 @@ class ChatStore {
       }
     }
     return deleted;
-  }
+  });
 }

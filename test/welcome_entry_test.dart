@@ -4,6 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:trackia/application/workout_controller.dart';
+import 'package:trackia/application/locale_settings.dart';
 import 'package:trackia/data/sqlite_workout_repository.dart';
 import 'package:trackia/data/welcome_settings_store.dart';
 import 'package:trackia/domain/activity.dart';
@@ -18,20 +19,19 @@ void main() {
     tester,
   ) async {
     FlutterSecureStorage.setMockInitialValues({});
+    await LocaleSettings.instance.select('es');
     final preference = WelcomeSettings.instance;
     preference.offeredThisLaunch = false;
     await preference.load();
-    final dir =
-        (await tester.runAsync(
-          () => Directory.systemTemp.createTemp('gymia-welcome-entry-'),
-        ))!;
-    final repo =
-        (await tester.runAsync(
-          () => SqliteWorkoutRepository.open(
-            factory: databaseFactoryFfi,
-            path: '${dir.path}/test.sqlite',
-          ),
-        ))!;
+    final dir = (await tester.runAsync(
+      () => Directory.systemTemp.createTemp('gymia-welcome-entry-'),
+    ))!;
+    final repo = (await tester.runAsync(
+      () => SqliteWorkoutRepository.open(
+        factory: databaseFactoryFfi,
+        path: '${dir.path}/test.sqlite',
+      ),
+    ))!;
     final controller = WorkoutController(repo);
     await tester.runAsync(controller.refresh);
     await tester.pumpWidget(GymApp(controller: controller));
@@ -46,7 +46,9 @@ void main() {
     // skipping once is enough to stop it from coming back.
     expect(
       tester
-          .widget<CheckboxListTile>(find.byKey(const Key('welcome-never-again')))
+          .widget<CheckboxListTile>(
+            find.byKey(const Key('welcome-never-again')),
+          )
           .value,
       isTrue,
     );
@@ -63,24 +65,22 @@ void main() {
     tester,
   ) async {
     FlutterSecureStorage.setMockInitialValues({});
+    await LocaleSettings.instance.select('es');
     final preference = WelcomeSettings.instance;
     preference.offeredThisLaunch = false;
     await preference.load();
-    final dir =
-        (await tester.runAsync(
-          () => Directory.systemTemp.createTemp('gymia-welcome-active-'),
-        ))!;
-    final repo =
-        (await tester.runAsync(
-          () => SqliteWorkoutRepository.open(
-            factory: databaseFactoryFfi,
-            path: '${dir.path}/test.sqlite',
-          ),
-        ))!;
-    final id =
-        (await tester.runAsync(
-          () => repo.prepareActivity(ActivityDefinition(name: 'Lectura')),
-        ))!;
+    final dir = (await tester.runAsync(
+      () => Directory.systemTemp.createTemp('gymia-welcome-active-'),
+    ))!;
+    final repo = (await tester.runAsync(
+      () => SqliteWorkoutRepository.open(
+        factory: databaseFactoryFfi,
+        path: '${dir.path}/test.sqlite',
+      ),
+    ))!;
+    final id = (await tester.runAsync(
+      () => repo.prepareActivity(ActivityDefinition(name: 'Lectura')),
+    ))!;
     final controller = WorkoutController(repo);
     await tester.runAsync(controller.refresh);
     await tester.pumpWidget(GymApp(controller: controller));

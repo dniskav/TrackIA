@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../application/ai_availability.dart';
 import '../application/rest_notifications.dart';
 import '../application/workout_controller.dart';
+import '../application/locale_settings.dart';
+import '../application/localization.dart';
+import '../l10n/generated/app_localizations.dart';
 import '../data/ai_settings_store.dart';
 import '../data/profile_store.dart';
 import '../data/theme_settings.dart';
@@ -40,6 +43,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       widget.notifications ?? RestNotificationController(widget.controller);
   final theme = ThemeSettings.instance;
   final profiles = ProfileStore.instance;
+  final localeSettings = LocaleSettings.instance;
 
   @override
   void initState() {
@@ -68,27 +72,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String get aiState => switch (availability.status) {
     AiAvailabilityStatus.ready => availability.message.replaceFirst(
       'IA verificada',
-      'Verificada',
+      appText(context).verified,
     ),
-    AiAvailabilityStatus.unconfigured => 'Sin conectar',
-    AiAvailabilityStatus.unverified => 'Sin verificar',
-    AiAvailabilityStatus.unavailable => 'No disponible',
-    AiAvailabilityStatus.checking => 'Comprobando…',
+    AiAvailabilityStatus.unconfigured => appText(context).notConnected,
+    AiAvailabilityStatus.unverified => appText(context).notVerified,
+    AiAvailabilityStatus.unavailable => appText(context).unavailable,
+    AiAvailabilityStatus.checking => appText(context).checking,
   };
 
-  String get appearanceState => switch (theme.mode) {
-    ThemeMode.system => 'Automático',
-    ThemeMode.light => 'Claro',
-    ThemeMode.dark => 'Oscuro',
+  String appearanceState(AppLocalizations l) => switch (theme.mode) {
+    ThemeMode.system => l.automatic,
+    ThemeMode.light => l.light,
+    ThemeMode.dark => l.dark,
   };
 
   Widget section(BuildContext context, String title) => Padding(
     padding: const EdgeInsets.fromLTRB(16, 20, 16, 4),
     child: Text(
       title,
-      style: Theme.of(
-        context,
-      ).textTheme.labelLarge?.copyWith(color: Theme.of(context).colorScheme.primary),
+      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+        color: Theme.of(context).colorScheme.primary,
+      ),
     ),
   );
 
@@ -109,69 +113,102 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Ajustes')),
+    appBar: AppBar(title: Text(appText(context).settings)),
     body: ListenableBuilder(
       listenable: Listenable.merge([
         availability,
         notifications,
         theme,
         profiles,
+        localeSettings,
       ]),
-      builder:
-          (context, _) => ListView(
-            padding: const EdgeInsets.only(bottom: 32),
-            children: [
-              section(context, 'Asistente'),
-              row(
-                key: const Key('settings-ai'),
-                icon: Icons.auto_awesome_outlined,
-                title: 'Inteligencia artificial',
-                subtitle: aiState,
-                screen: AiSettingsScreen(
-                  profileId: widget.controller.profileId,
-                  progress: widget.controller.progress,
-                ),
-              ),
-              section(context, 'Tus datos'),
-              row(
-                key: const Key('settings-account'),
-                icon: Icons.account_circle_outlined,
-                title: 'Cuenta y datos',
-                subtitle: profiles.active?.email ?? 'Perfil local',
-                screen: const AccountsScreen(),
-              ),
-              row(
-                key: const Key('settings-transfer'),
-                icon: Icons.folder_open_outlined,
-                title: 'Exportar e importar',
-                screen: DataTransferScreen(controller: widget.controller),
-              ),
-              section(context, 'App'),
-              if (notifications.supported)
-                row(
-                  key: const Key('settings-notices'),
-                  icon: Icons.notifications_active_outlined,
-                  title: 'Avisos',
-                  subtitle: notifications.enabled ? 'Activados' : 'Desactivados',
-                  screen: NotificationSettingsScreen(
-                    notifications: notifications,
-                  ),
-                ),
-              row(
-                key: const Key('settings-appearance'),
-                icon: Icons.palette_outlined,
-                title: 'Apariencia',
-                subtitle: appearanceState,
-                screen: const AppearanceScreen(),
-              ),
-              row(
-                key: const Key('settings-help'),
-                icon: Icons.help_outline_rounded,
-                title: 'Ayuda y bienvenida',
-                screen: const WelcomeHelpScreen(),
-              ),
-            ],
+      builder: (context, _) => ListView(
+        padding: const EdgeInsets.only(bottom: 32),
+        children: [
+          section(context, appText(context).assistant),
+          row(
+            key: const Key('settings-ai'),
+            icon: Icons.auto_awesome_outlined,
+            title: appText(context).artificialIntelligence,
+            subtitle: aiState,
+            screen: AiSettingsScreen(
+              profileId: widget.controller.profileId,
+              progress: widget.controller.progress,
+            ),
           ),
+          section(context, appText(context).yourData),
+          row(
+            key: const Key('settings-account'),
+            icon: Icons.account_circle_outlined,
+            title: appText(context).accountAndData,
+            subtitle: profiles.active?.email ?? appText(context).localProfile,
+            screen: const AccountsScreen(),
+          ),
+          row(
+            key: const Key('settings-transfer'),
+            icon: Icons.folder_open_outlined,
+            title: appText(context).exportImport,
+            screen: DataTransferScreen(controller: widget.controller),
+          ),
+          section(context, appText(context).appSection),
+          if (notifications.supported)
+            row(
+              key: const Key('settings-notices'),
+              icon: Icons.notifications_active_outlined,
+              title: appText(context).notices,
+              subtitle: notifications.enabled
+                  ? appText(context).enabled
+                  : appText(context).disabled,
+              screen: NotificationSettingsScreen(notifications: notifications),
+            ),
+          row(
+            key: const Key('settings-appearance'),
+            icon: Icons.palette_outlined,
+            title: appText(context).appearance,
+            subtitle: appearanceState(appText(context)),
+            screen: const AppearanceScreen(),
+          ),
+          row(
+            key: const Key('settings-help'),
+            icon: Icons.help_outline_rounded,
+            title: appText(context).helpWelcome,
+            screen: const WelcomeHelpScreen(),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: DropdownButtonFormField<String>(
+              key: const Key('settings-language'),
+              initialValue: localeSettings.preference,
+              decoration: InputDecoration(
+                labelText: appText(context).languagePreference,
+              ),
+              items: [
+                DropdownMenuItem(
+                  value: 'system',
+                  child: Text(appText(context).languageSystem),
+                ),
+                DropdownMenuItem(
+                  value: 'es',
+                  child: Text(appText(context).languageSpanish),
+                ),
+                DropdownMenuItem(
+                  value: 'en',
+                  child: Text(appText(context).languageEnglish),
+                ),
+                DropdownMenuItem(
+                  value: 'ar',
+                  child: Text(appText(context).languageArabic),
+                ),
+              ],
+              onChanged: localeSettings.busy
+                  ? null
+                  : (value) {
+                      if (value != null) localeSettings.select(value);
+                    },
+            ),
+          ),
+        ],
+      ),
     ),
   );
 }

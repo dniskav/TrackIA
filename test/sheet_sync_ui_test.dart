@@ -80,11 +80,14 @@ void main() {
               return {
                 'files': [
                   {'id': 'file', 'name': 'Progreso'},
+                  {'id': 'other-file', 'name': 'Otra hoja'},
                 ],
                 'nextPageToken': '',
               };
             case 'tabs':
-              return ['Entrenamientos'];
+              return call.arguments['id'] == 'other-file'
+                  ? ['Registro nuevo', 'Notas alternativo']
+                  : ['Entrenamientos'];
             case 'syncStatus':
               return {'synced': sent};
             case 'syncSnapshot':
@@ -319,4 +322,53 @@ void main() {
       false,
     );
   });
+
+  testWidgets('disconnect completing after screen disposal does not use context', (
+    tester,
+  ) async {
+    await mount(tester);
+    await tap(tester, 'sync-connect');
+    expect(find.text('Desconectar esta hoja'), findsOneWidget);
+
+    await tester.tap(find.text('Desconectar esta hoja'));
+    await tester.pumpWidget(const MaterialApp(home: SizedBox.shrink()));
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+    'connect screen selects a tab and loads it into chat only after confirmation',
+    (tester) async {
+      await mount(tester);
+      await tap(tester, 'sync-connect');
+
+      await tester.tap(find.byKey(const ValueKey('sync-file-file')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Otra hoja').last);
+      await tester.pumpAndSettle();
+      expect(calls.last.method, 'tabs');
+      expect(calls.last.arguments['id'], 'other-file');
+
+      await tester.tap(find.byKey(const ValueKey('sync-tab-other-file-null')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Registro nuevo').last);
+      await tester.pumpAndSettle();
+
+      await tap(tester, 'sync-load-for-chat');
+      expect(find.text('Revisar hoja para el chat'), findsOneWidget);
+      expect(find.textContaining('Otra hoja · Registro nuevo'), findsOneWidget);
+      await tester.tap(find.text('Cancelar'));
+      await tester.pumpAndSettle();
+      expect((await const SheetContextStore().load())?.id, 'file');
+
+      await tap(tester, 'sync-load-for-chat');
+      await tester.tap(find.byKey(const Key('sync-load-chat-confirm')));
+      await tester.pumpAndSettle();
+      final loaded = await const SheetContextStore().load();
+      expect(loaded?.id, 'other-file');
+      expect(loaded?.title, 'Registro nuevo');
+      expect(calls.any((call) => call.method == 'syncSnapshot'), isTrue);
+    },
+  );
 }

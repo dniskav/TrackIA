@@ -300,7 +300,7 @@ class _CompanionBuilderScreenState extends State<CompanionBuilderScreen> {
           key: const Key('builder-prompt'),
           controller: prompt,
           maxLines: 4,
-          maxLength: 2000,
+          maxLength: 4000,
           decoration: const InputDecoration(
             labelText: 'Instrucciones para la IA (opcional)',
             helperText: 'Se usan cuando conectes un proveedor.',

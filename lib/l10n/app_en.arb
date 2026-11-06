@@ -1,0 +1,588 @@
+{
+  "@@locale": "en",
+  "appTitle": "TrackIA",
+  "languageSystem": "Device language",
+  "languageSpanish": "Spanish",
+  "languageEnglish": "English",
+  "languageArabic": "Arabic",
+  "languagePreference": "Language",
+  "welcomeTitle": "Welcome",
+  "welcomeHelpTitle": "Help and welcome",
+  "welcomeStep": "Step {current} of {total}",
+  "@welcomeStep": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "welcomeSlide1Title": "Welcome",
+  "welcomeSlide1Body": "Talk with your AI assistant to plan an activity, ask questions, and review your progress. You decide when to start.",
+  "welcomeSlide2Title": "Speak or type",
+  "welcomeSlide2Body": "Chat supports text, dictation, and attachments. To use AI, connect a provider from the menu. Your local records stay available if the connection drops.",
+  "welcomeSlide3Title": "Manage your activity",
+  "welcomeSlide3Body": "Choose or create an activity. Preparing it does not start the timer: tap Start when ready and Stop at the end of each segment.",
+  "welcomeSlide4Title": "Keep your data",
+  "welcomeSlide4Body": "Your records are stored on this device. You can connect Google Sheets at any time and review each send status.",
+  "welcomeSlide5Title": "Your companions",
+  "welcomeSlide5Body": "Choose GymBro, Focus, Calm, or Journal. Edit their instructions, create more, and connect a different Google sheet or tab for each one.",
+  "welcomeSlide6Title": "Modes and reminders",
+  "welcomeSlide6Body": "Each companion has a mode. Open its menu (⋮) and tap “Modes and reminders”: Reminder only alerts you at your chosen time; Game adds goals, streaks, and achievements. For rest alerts even when Do Not Disturb is on, go to Settings → Reminders.",
+  "welcomeSaveErrorTitle": "Could not save your choice",
+  "welcomeSaveErrorBody": "You can try again or continue. If you continue, the welcome guide may appear the next time you open the app.",
+  "retry": "Retry",
+  "continueWithoutSaving": "Continue without saving",
+  "welcomeNeverAgain": "Don't show again",
+  "welcomeNeverAgainHelp": "If unchecked, this guide appears when you open the app. You can change this in Help.",
+  "skip": "Skip",
+  "previous": "Previous",
+  "next": "Next",
+  "start": "Start",
+  "welcomeAutoShow": "Show welcome on open",
+  "devicePreferenceSaved": "Your choice is saved on this device.",
+  "showWelcome": "View welcome guide",
+  "savePreferenceError": "Could not save the preference.",
+  "companionsTitle": "Your companions",
+  "companionsDescription": "Choose who to work with. Each companion keeps its own conversation and can use a different Google sheet or tab.",
+  "companionsEmpty": "You don't have any companions yet. Create one to get started.",
+  "createCompanion": "Create companion",
+  "companionOptions": "Options for {name}",
+  "@companionOptions": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "companionProgress": "Progress for {name}",
+  "@companionProgress": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "companionStreak": "{days, plural, one{Streak: 1 day} other{Streak: # days}}",
+  "@companionStreak": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "remindersPaused": "Reminders paused",
+  "resume": "Resume",
+  "edit": "Edit",
+  "modeAndNotices": "Modes and reminders",
+  "delete": "Delete",
+  "cancel": "Cancel",
+  "save": "Save",
+  "companionDeleteTitle": "Delete {name}?",
+  "@companionDeleteTitle": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "companionDeleteBody": "Its chat, files, and local Sheets connection will be deleted. The Google sheet and activity records will not be deleted.",
+  "companionDeleteError": "Could not delete: {error}",
+  "@companionDeleteError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "companionSaveError": "Could not save: {error}",
+  "@companionSaveError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "companionLoadError": "Couldn't load companions. Tap to retry.",
+  "createCompanionTitle": "Create companion",
+  "editCompanionTitle": "Edit companion",
+  "companionName": "Name",
+  "companionPurpose": "What is it for?",
+  "companionInstructions": "Instructions for AI (optional)",
+  "companionInstructionsHelp": "Used when you connect a provider.",
+  "icon": "Icon",
+  "color": "Color",
+  "settings": "Settings",
+  "assistant": "Assistant",
+  "artificialIntelligence": "Artificial intelligence",
+  "yourData": "Your data",
+  "accountAndData": "Account and data",
+  "localProfile": "Local profile",
+  "exportImport": "Export and import",
+  "appSection": "App",
+  "notices": "Reminders",
+  "enabled": "On",
+  "disabled": "Off",
+  "appearance": "Appearance",
+  "helpWelcome": "Help and welcome",
+  "verified": "Verified",
+  "notConnected": "Not connected",
+  "notVerified": "Not verified",
+  "unavailable": "Unavailable",
+  "checking": "Checking…",
+  "automatic": "Automatic",
+  "light": "Light",
+  "dark": "Dark",
+  "companionSettingsTitle": "Modes and reminders · {name}",
+  "@companionSettingsTitle": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "mode": "Mode",
+  "reminderMode": "Reminder",
+  "reminderModeDetail": "Only alerts you at the time you choose.",
+  "gameMode": "Game",
+  "gameModeDetail": "Goals, streaks, and achievements, along with reminders.",
+  "goals": "Goals",
+  "streaks": "Streaks",
+  "achievements": "Achievements",
+  "encouragementMessages": "Encouragement messages",
+  "freeDaysPerWeek": "Free days per week",
+  "freeDaysHelp": "They don't break a streak.",
+  "dailyNotice": "Daily reminder",
+  "remindersPausedDetail": "Seven scheduled days passed without recording activity.",
+  "remindAboutActivity": "Remind me about this activity",
+  "monday": "Monday",
+  "tuesday": "Tuesday",
+  "wednesday": "Wednesday",
+  "thursday": "Thursday",
+  "friday": "Friday",
+  "saturday": "Saturday",
+  "sunday": "Sunday",
+  "from": "From",
+  "until": "Until",
+  "lastCall": "Last call",
+  "lastCallTime": "Last call time",
+  "neutral": "Neutral",
+  "motivating": "Encouraging",
+  "minimumForDay": "Minimum for the day",
+  "quantity": "Amount",
+  "sessions": "sessions",
+  "minutes": "minutes",
+  "preview": "Preview",
+  "putGoal": "Set a goal",
+  "whatToMeasure": "What to measure",
+  "timeMinutes": "Time (minutes)",
+  "sessionCount": "Sessions",
+  "perDay": "per day",
+  "perWeek": "per week",
+  "target": "Target",
+  "minimumStreakOptional": "Minimum to keep a streak (optional)",
+  "chooseTime": "Choose a time",
+  "goalMustBePositive": "The goal must be a number greater than 0.",
+  "minimumMustBePositive": "The minimum must be a number greater than 0.",
+  "companionSettingsLoadError": "Couldn't load settings.",
+  "companionSettingsSaveError": "Couldn't save settings.",
+  "aiNotConnected": "AI not connected",
+  "chooseProviderAndModel": "Choose a provider and model.",
+  "connect": "Connect",
+  "aiNotVerified": "AI not verified",
+  "verifyConnectionAssistant": "Test the connection to activate the assistant.",
+  "verify": "Verify",
+  "aiUnavailable": "AI unavailable",
+  "reviewProviderRetry": "Review the provider and try again.",
+  "review": "Review",
+  "waitingPhraseOne": "I’m here when you’re ready.",
+  "waitingPhraseTwo": "Take your time; we can continue here.",
+  "waitingPhraseThree": "Whenever you’re ready, we’ll continue.",
+  "waitingPhraseFour": "You can keep writing whenever it suits you.",
+  "logoDescription": "TrackIA logo",
+  "chatArchive": "Archive chat",
+  "chatArchives": "Archived chats",
+  "chatSendToSheets": "Send to Google Sheets",
+  "chatAiProvider": "AI provider",
+  "chatConfigureAi": "Set up AI",
+  "chatVerifyConnection": "Verify connection · uses your API",
+  "chatTraining": "Training",
+  "chatLoadSheets": "Load Google Sheets",
+  "chatSheetPending": "Interpret sheet with AI",
+  "chatWelcomePrompt": "What would you like to do today? Tell me and we’ll plan it together.",
+  "chatLoadDataPrompt": "Load your data with + whenever you like. AI can interpret its format once connected.",
+  "chatPrepareActivity": "Prepare",
+  "chatWaitingModel": "Waiting for the model…",
+  "chatDeferredArchive": "The assistant will archive this chat when you return to the end.",
+  "chatGoLatest": "Go to latest message",
+  "chatListening": "Listening… Review the text and tap Send.",
+  "chatAttach": "Attach",
+  "chatComposeHint": "Type or dictate your message…",
+  "chatConnectAiHint": "Connect AI to get started",
+  "chatStopDictation": "Stop dictation",
+  "chatDictate": "Dictate message",
+  "chatSend": "Send",
+  "chatAssistantImageAlt": "Image",
+  "chatInputDirections": "Message text direction",
+  "activityStart": "Start",
+  "activityStop": "Stop",
+  "activityFinish": "Finish",
+  "activityFinishDay": "Finish day",
+  "activityChooseAnother": "Choose another activity",
+  "activitySubtractCycle": "Subtract cycle",
+  "activityAddCycle": "Add completed cycle",
+  "activityNoticesOff": "Notices are off",
+  "activityEnableNotices": "Enable",
+  "activityCycles": "Cycles",
+  "aiUnavailableFocus": "AI unavailable · you can stop and save notes locally",
+  "activityRestInProgress": "Rest in progress",
+  "activityRestChangeNoticePrompt": "Do you also want to change the notice that is already scheduled?",
+  "activityKeepNotice": "Keep notice",
+  "activityChangeNotice": "Change notice",
+  "personalityInstructions": "Personality and instructions",
+  "personalityInstructionsHelp": "Describe the tone and how you want this companion to support you. This only affects its AI responses.",
+  "personalitySuggestionTone": "Use a warm, clear tone.",
+  "personalitySuggestionAsk": "Ask brief questions when details are missing.",
+  "personalitySuggestionAccuracy": "Do not invent information or progress I have not shared.",
+  "personalityTooLong": "Personality instructions cannot exceed 4,000 characters.",
+  "personalityDraftTitle": "Personality draft",
+  "personalityDraftAccept": "Use draft",
+  "personalityDraftButton": "Help me write it",
+  "personalityDraftError": "Could not generate a draft. Check the AI connection and try again.",
+  "activityTargetTitle": "Set target",
+  "activityTargetLabel": "Sets (empty to clear)",
+  "activityTargetInvalid": "Enter a target from 1 to 100, or leave it empty.",
+  "activityTargetEditTooltip": "Edit set target",
+  "activityTargetPreservedProgress": "Target: {target}. You keep all {completed} completed sets.",
+  "@activityTargetPreservedProgress": {
+    "placeholders": {
+      "target": {},
+      "completed": {}
+    }
+  },
+  "activityTargetUpdated": "Target updated.",
+  "activityNoTarget": "no target",
+  "activityTargetChangedEvent": "You changed the set target to {target}",
+  "@activityTargetChangedEvent": {
+    "placeholders": {
+      "target": {}
+    }
+  },
+  "chatTargetProposalAmbiguous": "The target was not changed: the proposal is ambiguous or does not match an active activity.",
+  "chatTargetConfirmTitle": "Change set target",
+  "chatTargetRemovePrompt": "Do you want to remove the target?",
+  "chatTargetSetPrompt": "Do you want to set the target to {target} sets?",
+  "@chatTargetSetPrompt": {
+    "placeholders": {
+      "target": {}
+    }
+  },
+  "chatTargetSetPromptWithProgress": "Do you want to set the target to {target} sets? You have completed {completed}; all progress will be kept.",
+  "@chatTargetSetPromptWithProgress": {
+    "placeholders": {
+      "target": {},
+      "completed": {}
+    }
+  },
+  "chatTargetConfirmButton": "Change",
+  "chatTargetSavedNoTarget": "Target saved: no target.",
+  "chatTargetSaved": "Target saved: {target} sets.",
+  "@chatTargetSaved": {
+    "placeholders": {
+      "target": {}
+    }
+  },
+  "chatTargetSavedWithProgress": "Target saved: {target} sets. You keep all {completed} completed sets.",
+  "@chatTargetSavedWithProgress": {
+    "placeholders": {
+      "target": {},
+      "completed": {}
+    }
+  },
+  "chatTargetStale": "The target was not changed. The activity may have changed; review it and try again.",
+  "sheetsTitle": "Your Google Sheets",
+  "sheetsChooseTitle": "Choose your workout sheet",
+  "sheetsSearch": "Search by name",
+  "sheetsSearchTooltip": "Search",
+  "sheetsConnect": "Connect to Google",
+  "sheetsReconnect": "Change account or authorize again",
+  "sheetsNoResults": "No sheets found. Try another name or switch accounts.",
+  "sheetsLoadMore": "Load more sheets",
+  "dataTitle": "Your data",
+  "dataCreateBackup": "Create and share backup",
+  "dataRestoreBackup": "Restore backup",
+  "aiProviderTitle": "AI provider",
+  "aiConnectTitle": "Connect your assistant",
+  "aiProviderLabel": "Provider",
+  "sheetChooseTab": "Choose the tab with your workouts",
+  "sheetReview": "Review sheet",
+  "sheetRowsRead": "{count} rows read. The full tab will be loaded; the first 12 rows are shown here.",
+  "@sheetRowsRead": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "sheetRowsReadPreview": "{count} rows read. Preview:",
+  "@sheetRowsReadPreview": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "sheetLoadPending": "The sheet will be saved on this device, pending interpretation. AI is not needed to load it. Once connected, you can ask it to interpret the layout. Loading does not create workouts or send cells to the provider.",
+  "sheetSendToAi": "When you tap Load and analyze, these cells will be sent to the configured AI provider. Rows are kept as shown and are not converted into workouts.",
+  "sheetReadOnlyGoogle": "This is a read-only copy. To get later changes, use Refresh sheet in chat.",
+  "sheetReadOnlyFile": "This is a read-only copy of the file. Load it again to get changes.",
+  "sheetsConnecting": "Connecting to Google…",
+  "sheetsAuthorizeProgress": "Choose your account and authorize Google read access…",
+  "sheetsSearchProgress": "Searching for your sheets…",
+  "sheetsLoadingTabs": "Loading tabs in {name}…",
+  "@sheetsLoadingTabs": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "sheetsReadingTab": "Reading {name}…",
+  "@sheetsReadingTab": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "sheetsReadError": "Could not read the sheet. Try again.",
+  "sheetsGoogleError": "Could not connect to Google.",
+  "sheetsRetry": "Reload sheets",
+  "sheetsPartial": "Google returned partial search results. Search by sheet name.",
+  "sheetsAuthIncomplete": "Google did not complete authorization. Tap Connect to Google to try again; your sheets have not been loaded.",
+  "sheetsSearchAccountChanged": "The account changed during the search. Reconnect to continue.",
+  "sheetsChooseAccountChanged": "The account changed while selecting. Reconnect to continue.",
+  "sheetsReadAccountChanged": "The account changed while reading. No data was loaded.",
+  "sheetsNoTabs": "This sheet has no available tabs.",
+  "sheetsReadRowsIntro": "rows read. The full tab will be loaded; the first 12 rows are shown here.",
+  "syncTitle": "Send to Google Sheets",
+  "syncIntro": "Connect Google and choose your sheet once. Chat can check the latest data and send results; you can also review a manual send here.",
+  "syncNoSessions": "There are no completed sessions to send. You can test the connection without starting an activity.",
+  "syncWorkout": "Workout",
+  "syncConnectWrite": "Connect Google and allow writing",
+  "syncDestinationAccount": "Destination account: {email}",
+  "@syncDestinationAccount": {
+    "placeholders": {
+      "email": {}
+    }
+  },
+  "syncCheckConnection": "Check connection",
+  "syncDisconnect": "Disconnect this sheet",
+  "syncChangeAccount": "Change destination account",
+  "syncCreateNew": "Create a new sheet",
+  "syncNewSheetName": "New sheet name",
+  "syncCreateDrive": "Create sheet in my Google Drive",
+  "syncSheet": "Google sheet",
+  "syncTab": "Tab",
+  "syncInstructions": "Sheet preferences or notes",
+  "syncInstructionsHint": "E.g. use the October block, total loads",
+  "syncAllowOverwrite": "Allow updating cells that contain data",
+  "syncOverwriteHelp": "The review shows the old and new values. Formulas are preserved.",
+  "syncAutomatic": "Automatically send sessions when finished",
+  "syncAutomaticChatHelp": "Chat sends remain available when automatic sending is paused.",
+  "syncAutomaticActivityHelp": "Activity records do not identify their companion yet; you can request sends and edits from chat.",
+  "syncSavePreferences": "Save connection and preferences",
+  "syncReviewLoadChat": "Review and load sheet in chat",
+  "syncDiagnostics": "Connection diagnostics",
+  "syncDiagnosticsHelp": "Test the selected tab without starting an activity. The write test uses a temporary tab and does not change your workouts.",
+  "syncTestRead": "Test reading with AI",
+  "syncTestWrite": "Test writing with AI",
+  "syncPrepare": "Prepare and review send",
+  "syncNoSheet": "Choose a sheet and a tab.",
+  "syncNoValidWorkout": "Choose a sheet, a tab, and a completed workout.",
+  "syncSessionUnavailable": "The session is no longer available.",
+  "syncConnectionError": "Could not retrieve the saved sheet. You can choose another.",
+  "syncOperationError": "Could not complete the operation. Try again.",
+  "syncGoogleUnconfirmed": "Google did not confirm the operation.",
+  "syncNameInvalid": "Enter a name up to 80 characters long.",
+  "syncLoadChatTitle": "Review sheet for chat",
+  "syncConfirmLoad": "Confirm and load",
+  "syncReadConfirmed": "Read confirmed: {count} rows received from Google. Model response: {answer}",
+  "@syncReadConfirmed": {
+    "placeholders": {
+      "count": {},
+      "answer": {}
+    }
+  },
+  "syncWriteConfirmed": "Write confirmed: the model suggested “{marker}”, Google accepted the test, and the temporary tab was deleted. No workouts were sent.",
+  "@syncWriteConfirmed": {
+    "placeholders": {
+      "marker": {}
+    }
+  },
+  "syncSentConfirmed": "Workout sent to Google Sheets. Receipt verified; sending again will not duplicate it.",
+  "syncReturnChat": "Return to chat",
+  "syncDestination": "Destination: {name} / {tab}",
+  "@syncDestination": {
+    "placeholders": {
+      "name": {},
+      "tab": {}
+    }
+  },
+  "syncReceiptNote": "Google will also save a receipt of the send to prevent duplicates.",
+  "syncReviewCount": "{count} cells. The app will check they have not changed since this review.",
+  "@syncReviewCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "syncOriginalData": "View original workout data",
+  "syncConfirmSend": "Confirm and send to Google Sheets",
+  "syncDiscard": "Discard proposal",
+  "sheetNoTabs": "This sheet has no available tabs.",
+  "sheetsLoad": "Load sheet",
+  "sheetsLoadAnalyze": "Load and analyze",
+  "rowLabel": "Row",
+  "syncProposedSessionInvalid": "The proposed session is not finished or does not belong to this profile. Choose a valid session.",
+  "syncConnectionSaved": "Connection saved. Chat will read the current sheet and can send results without asking for authorization each time.",
+  "syncIdentityUnconfirmed": "Could not confirm the selected Google account.",
+  "sheetAllRowsWillLoad": "All rows in the tab will be loaded.",
+  "syncAccountChangedReview": "The account changed while you reviewed the tab. The previous sheet is preserved; reconnect to load it.",
+  "syncLoadedIntoChat": "Sheet loaded in chat: {name} / {tab}.",
+  "@syncLoadedIntoChat": {
+    "placeholders": {
+      "name": {},
+      "tab": {}
+    }
+  },
+  "syncConfigureAi": "Set up AI first to test model access.",
+  "syncModelEmpty": "The model returned no response.",
+  "syncInvalidMarker": "The model responded but did not provide a valid test marker.",
+  "syncWorkoutChanged": "The workout changed. Prepare the send again to review the current data.",
+  "syncRefreshAfterSendFailed": "Send confirmed. The chat copy could not be refreshed; reload the sheet to see its latest data.",
+  "syncReceiptSent": "Google Sheets confirmed: workout “{workout}” ({id}) sent to “{name} / {tab}”. Google receipt confirms the send.",
+  "@syncReceiptSent": {
+    "placeholders": {
+      "workout": {},
+      "id": {},
+      "name": {},
+      "tab": {}
+    }
+  },
+  "syncReceiptCreated": "Google Sheets confirmed: sheet “{name}” created, tab “{tab}”. Progress has not been sent yet.",
+  "@syncReceiptCreated": {
+    "placeholders": {
+      "name": {},
+      "tab": {}
+    }
+  },
+  "sheetsAssistantIntro": "Connect your account, choose the sheet and tab, and review the data before sharing it with your assistant.",
+  "sheetsImportIntro": "TrackIA uses Google authorization to read your sheets. Data is saved on this device when you confirm the import.",
+  "sheetsErrorExpired": "Google authorization expired. Reconnect your account.",
+  "sheetsErrorPermission": "Google does not allow this operation. Check access and sheet permissions.",
+  "sheetsErrorAccount": "The read does not match the authorized account. Reconnect from your profile.",
+  "sheetsErrorNotFound": "The sheet is no longer available to this account.",
+  "sheetsErrorRateLimit": "Google received too many requests. Wait a moment and try again.",
+  "sheetsErrorNetwork": "Could not confirm the operation with Google. Local progress is preserved; retrying will check the receipt.",
+  "sheetsErrorTooLarge": "The tab is over 20 MB. Choose a smaller tab.",
+  "sheetsErrorGeneric": "Google could not complete the operation. Try again.",
+  "sheetsErrorBusy": "A Google operation is already in progress. Wait for it to finish.",
+  "syncBeforeValue": "Before: {value}",
+  "@syncBeforeValue": {
+    "placeholders": {
+      "value": {}
+    }
+  },
+  "syncEmptyCell": "(empty)",
+  "syncDisconnected": "Sheet disconnected. Local data and pending sends are preserved.",
+  "aiProviderDescription": "Choose a cloud provider or run a model locally on this device. Local models can work offline; performance depends on available memory and the model.",
+  "aiConfigReadError": "Could not read the saved configuration.",
+  "aiModelImportError": "Could not import the GGUF file: {error}",
+  "@aiModelImportError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "aiMemoryAvailableNow": "Available now",
+  "aiMemoryAfterModel": "After model and projector",
+  "aiMemoryAfterContext": "After + selected context",
+  "aiMemoryContextEstimate": "The {context} context would use approximately {minimum}–{maximum} of RAM.",
+  "@aiMemoryContextEstimate": {
+    "placeholders": {
+      "context": {},
+      "minimum": {},
+      "maximum": {}
+    }
+  },
+  "aiMemoryShortfall": "The estimate exceeds available memory by {amount}.",
+  "@aiMemoryShortfall": {
+    "placeholders": {
+      "amount": {}
+    }
+  },
+  "aiMemoryEstimateHelp": "Approximate estimate for model weights and projector; the selected context adds memory use, which varies by model.",
+  "aiConnectedChooseModel": "Account connected. Choose a model and test the connection to use the assistant.",
+  "aiIdentityConnected": "Identity connected. You can separately authorize use of your ChatGPT plan.",
+  "aiChatGptDisconnected": "ChatGPT session disconnected.",
+  "aiChatGptRemoteRevocationUnconfirmed": "Signed out on this device. Remote revocation was not confirmed; also disconnect TrackIA in ChatGPT settings.",
+  "aiOperationError": "Could not complete the operation{details}",
+  "@aiOperationError": {
+    "placeholders": {
+      "details": {}
+    }
+  },
+  "aiOperationDetails": ": {error}",
+  "@aiOperationDetails": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "aiNoModelImported": "No model imported.",
+  "aiSelectImportGguf": "Select / import .gguf model",
+  "aiLocalContextTitle": "Local model context",
+  "aiLocalContextHelp": "TrackIA recommends {context} for its instructions, history, and data. This recommendation covers the app’s needs, not this GGUF’s limit. If the model does not support the selected size, it may fail; you can lower it.",
+  "@aiLocalContextHelp": {
+    "placeholders": {
+      "context": {}
+    }
+  },
+  "aiContextSelected": "Selected: {context}",
+  "@aiContextSelected": {
+    "placeholders": {
+      "context": {}
+    }
+  },
+  "aiUseRecommendation": "Use recommendation",
+  "aiVisualProjector": "Vision projector (optional)",
+  "aiProjectorHelp": "Add this to use images. MiniCPM‑V requires the matching mmproj GGUF file.",
+  "aiNoProjector": "No vision projector.",
+  "aiSelectProjector": "Select mmproj projector",
+  "aiMemoryHelp": "Available memory is shown separately. The 8192-token recommendation reflects TrackIA’s needs; the GGUF may not support it, and you can choose another size.",
+  "aiRecalculateMemory": "Recalculate available memory",
+  "aiApiBase": "API base URL",
+  "aiHttpsExample": "HTTPS, for example https://your-provider.com/v1",
+  "aiChatGptPlanHelp": "Use your plan if your account and workspace are eligible. Usage counts toward shared limits. This does not provide access to your ChatGPT conversations.",
+  "aiChatGptAccount": "ChatGPT account",
+  "aiChatGptConnectedPlan": "Connected · plan usage authorized",
+  "aiChatGptConnectedIdentity": "Connected · identity only",
+  "aiChatGptNotConnected": "ChatGPT not connected",
+  "aiContinueChatGpt": "Continue with ChatGPT",
+  "aiReviewPlanPermission": "Review plan usage permission",
+  "aiAuthorizePlan": "Authorize use of my ChatGPT plan",
+  "aiAddAccount": "Add another account or workspace",
+  "aiViewUsagePermissions": "View usage and permissions in ChatGPT",
+  "aiDisconnectChatGpt": "Disconnect ChatGPT",
+  "aiCancelConnection": "Cancel connection",
+  "aiApiKey": "API key",
+  "aiHideKey": "Hide key",
+  "aiShowKey": "Show key",
+  "aiFetchModels": "Get / refresh models",
+  "aiLoadingModels": "Loading models…",
+  "aiModelLabel": "Model",
+  "aiChooseCatalogModel": "Choose a model from the catalog",
+  "aiCurrentModelPreserved": "Current model: {model}. It is kept even if it does not appear in the catalog.",
+  "@aiCurrentModelPreserved": {
+    "placeholders": {
+      "model": {}
+    }
+  },
+  "aiHideManualId": "Hide manual identifier",
+  "aiEnterManualModel": "Enter model manually",
+  "aiModelIdentifier": "Model identifier",
+  "aiOpenCodeNotice": "Go is intended for coding agents. This connection identifies itself as TrackIA; check with your provider that this use is supported. It will not switch automatically to Zen or another service.",
+  "aiApiSettings": "API settings",
+  "aiHttpsBase": "HTTPS base URL",
+  "aiProtocol": "Model-compatible format",
+  "aiConfigSaved": "Configuration saved.",
+  "aiSaveLocalModel": "Save local model",
+  "aiSaveProvider": "Save provider",
+  "aiProviderResponded": "Provider response:\n{answer}",
+  "@aiProviderResponded": {
+    "placeholders": {
+      "answer": {}
+    }
+  },
+  "aiTestLocalModel": "Test model on this device",
+  "aiTestChatGpt": "Test connection · uses my ChatGPT plan",
+  "aiTestApi": "Test connection · uses your API",
+  "aiConfigDeleted": "Configuration and key deleted.",
+  "aiDeleteConfig": "Delete configuration and key"
+}

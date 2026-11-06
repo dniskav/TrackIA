@@ -25,6 +25,7 @@ import 'helpers/real_io.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   sqfliteFfiInit();
+  databaseFactory = databaseFactoryFfi;
   const storage = FlutterSecureStorage();
   late Directory dir;
   late SqliteWorkoutRepository repo;

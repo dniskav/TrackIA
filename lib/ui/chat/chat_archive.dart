@@ -18,6 +18,7 @@ extension _ChatArchive on _AssistantChatScreenState {
       onText: onText,
     );
     if (!mounted) return answer;
+    if (hasBlock(answer, 'activity-target')) return answer;
     final request = chatDirective(answer, 'recall');
     if (request == null) return answer;
     final data = await archiveStore.excerpt(
@@ -40,20 +41,22 @@ extension _ChatArchive on _AssistantChatScreenState {
     final directive = chatDirective(answer, 'archive');
     if (directive == null && hasBlock(answer, 'archive') && mounted) {
       update(
-        () => error =
-            'El modelo pidió archivar con datos incompletos. El chat sigue abierto.',
+        () =>
+            error =
+                'El modelo pidió archivar con datos incompletos. El chat sigue abierto.',
       );
     }
-    if (directive != null && mounted && pending == null) {
+    if (directive != null && mounted && pending == null && !hasDeliveryBacklog) {
       if (followingLatest) {
         await archiveChat(directive: directive);
       } else {
         update(
-          () => deferredArchive = {
-            'directive': directive,
-            'sessionId': sessionId,
-            'messageCount': transcript.length,
-          },
+          () =>
+              deferredArchive = {
+                'directive': directive,
+                'sessionId': sessionId,
+                'messageCount': transcript.length,
+              },
         );
         await persist();
       }
@@ -68,7 +71,8 @@ extension _ChatArchive on _AssistantChatScreenState {
         !followingLatest ||
         listening ||
         voiceStarting ||
-        pending != null) {
+        pending != null ||
+        hasDeliveryBacklog) {
       return;
     }
     if (saved['sessionId'] != sessionId ||
@@ -93,6 +97,7 @@ extension _ChatArchive on _AssistantChatScreenState {
         listening ||
         voiceStarting ||
         pending != null ||
+        hasDeliveryBacklog ||
         (!automatic && (busy || widget.controller.busy)) ||
         transcript.isEmpty) {
       return;
@@ -131,7 +136,7 @@ extension _ChatArchive on _AssistantChatScreenState {
       ];
       final next = await archiveStore.archive(
         state: chatState(includeDraft: true),
-        transcript: snapshot.map((m) => m.forStorage()).toList(),
+        transcript: snapshot.map(messageStorage).toList(),
         activityMessageIds: ids,
         title: title,
         summary: summary,
@@ -142,6 +147,7 @@ extension _ChatArchive on _AssistantChatScreenState {
       update(() {
         sessionId = next['sessionId'] as String;
         messages.clear();
+        clearDeliveryMetadata();
         archives = ChatArchiveStore.index(next);
         archivedActivityMessageIds
           ..clear()
@@ -170,8 +176,9 @@ extension _ChatArchive on _AssistantChatScreenState {
     } catch (_) {
       if (mounted) {
         update(
-          () => error =
-              'No se pudo archivar. La conversación y los entrenamientos se conservan.',
+          () =>
+              error =
+                  'No se pudo archivar. La conversación y los entrenamientos se conservan.',
         );
       }
     } finally {
@@ -179,7 +186,79 @@ extension _ChatArchive on _AssistantChatScreenState {
     }
   }
 
-  Future<void> handleCompletedActions(String answer) async {
+  Future<void> handleCompletedActions(
+    String answer, {
+    FocusActivity? expectedTargetActivity,
+  }) async {
+    if (hasBlock(answer, 'activity-target')) {
+      final proposed = parseActivityTargetBlock(answer);
+      if (proposed == null ||
+          expectedTargetActivity == null ||
+          !expectedTargetActivity.definition.repeated ||
+          RegExp(r'```(?:trackia|gymia)-([a-z][a-z-]*)')
+              .allMatches(answer)
+              .any((match) => match.group(1) != 'activity-target')) {
+        await saveSheetReply(appText(context).chatTargetProposalAmbiguous);
+        return;
+      }
+      final target = proposed.targetSets;
+      final completed =
+          expectedTargetActivity.intervals
+              .where((i) => i.endedAt != null)
+              .length;
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder:
+            (dialog) => AlertDialog(
+              title: Text(appText(context).chatTargetConfirmTitle),
+              content: Text(
+                target == null
+                    ? appText(context).chatTargetRemovePrompt
+                    : completed > target
+                    ? appText(
+                      context,
+                    ).chatTargetSetPromptWithProgress(target, completed)
+                    : appText(context).chatTargetSetPrompt(target),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialog, false),
+                  child: Text(appText(context).cancel),
+                ),
+                FilledButton(
+                  onPressed: () => Navigator.pop(dialog, true),
+                  child: Text(appText(context).chatTargetConfirmButton),
+                ),
+              ],
+            ),
+      );
+      if (confirmed != true || !mounted) return;
+      final done = await widget.controller.run(
+        () => widget.controller.activityRepository!.setActivityTarget(
+          expectedTargetActivity.id,
+          target,
+          expected: expectedTargetActivity.definition,
+        ),
+      );
+      if (!mounted) return;
+      final current = widget.controller.focus;
+      final actualCompleted =
+          current?.id == expectedTargetActivity.id
+              ? current!.intervals.where((i) => i.endedAt != null).length
+              : completed;
+      await saveSheetReply(
+        done
+            ? target == null
+                ? appText(context).chatTargetSavedNoTarget
+                : actualCompleted > target
+                ? appText(
+                  context,
+                ).chatTargetSavedWithProgress(target, actualCompleted)
+                : appText(context).chatTargetSaved(target)
+            : appText(context).chatTargetStale,
+      );
+      return;
+    }
     await handleGameBlocks(answer);
     if (hasBlock(answer, 'timing')) {
       final timing = activityTimingProposal(answer);
@@ -209,9 +288,8 @@ extension _ChatArchive on _AssistantChatScreenState {
           source: 'assistant',
         ),
       );
-      final locked = timing.keys
-          .where(activity.definition.userSet.contains)
-          .toSet();
+      final locked =
+          timing.keys.where(activity.definition.userSet.contains).toSet();
       if (locked.isEmpty) {
         final applied = await applyTiming(timing.cast<String, int?>());
         await saveSheetReply(
@@ -225,19 +303,22 @@ extension _ChatArchive on _AssistantChatScreenState {
         for (final e in timing.entries)
           if (!locked.contains(e.key)) e.key: e.value,
       };
-      final appliedFree = freeApply.isEmpty
-          ? true
-          : await applyTiming(freeApply.cast<String, int?>());
+      final appliedFree =
+          freeApply.isEmpty
+              ? true
+              : await applyTiming(freeApply.cast<String, int?>());
       if (mounted) {
         update(
-          () => lockedProposals = [
-            for (final name in locked)
-              LockedProposal(name, switch (name) {
-                'restSeconds' => activity.definition.restSeconds,
-                'activitySeconds' => activity.definition.activitySeconds ?? 0,
-                _ => activity.definition.targetCycles ?? 0,
-              }, timing[name]!),
-          ],
+          () =>
+              lockedProposals = [
+                for (final name in locked)
+                  LockedProposal(name, switch (name) {
+                    'restSeconds' => activity.definition.restSeconds,
+                    'activitySeconds' =>
+                      activity.definition.activitySeconds ?? 0,
+                    _ => activity.definition.targetCycles ?? 0,
+                  }, timing[name]!),
+              ],
         );
       }
       final covered = [
@@ -290,8 +371,9 @@ extension _ChatArchive on _AssistantChatScreenState {
     } else if (hasBlock(answer, 'sync')) {
       if (mounted) {
         update(
-          () => error =
-              'La propuesta de envío no es válida. Usa Enviar a Google Sheets en el menú.',
+          () =>
+              error =
+                  'La propuesta de envío no es válida. Usa Enviar a Google Sheets en el menú.',
         );
       }
     } else {
@@ -303,8 +385,8 @@ extension _ChatArchive on _AssistantChatScreenState {
     final id = await Navigator.push<String>(
       context,
       MaterialPageRoute(
-        builder: (_) =>
-            ArchivedChatsScreen(store: archiveStore, entries: archives),
+        builder:
+            (_) => ArchivedChatsScreen(store: archiveStore, entries: archives),
       ),
     );
     if (id == null || !mounted) return;

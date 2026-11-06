@@ -39,6 +39,33 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets(
+    'Arabic user message keeps its text and uses local RTL direction',
+    (tester) async {
+      const original = 'تمرّنت اليوم ٣٠ دقيقة.';
+      await tester.pumpWidget(
+        const MaterialApp(
+          locale: Locale('en'),
+          home: Scaffold(
+            body: ChatMessageBody(assistant: false, text: original),
+          ),
+        ),
+      );
+      final message = tester.widget<SelectableText>(
+        find.byType(SelectableText),
+      );
+      expect(message.data, original);
+    expect(
+      Directionality.of(tester.element(find.byType(SelectableText))),
+      TextDirection.rtl,
+    );
+      expect(
+        Directionality.of(tester.element(find.byType(Scaffold))),
+        TextDirection.ltr,
+      );
+    },
+  );
+
   testWidgets('model image markup does not read files or download images', (
     tester,
   ) async {

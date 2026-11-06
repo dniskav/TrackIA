@@ -12,15 +12,15 @@ RegExp blockPattern(String kind) => RegExp(
 );
 
 /// Whether the text opens a block of [kind], finished or not.
-bool hasBlock(String text, String kind) =>
-    text.contains('```$blockPrefix-$kind') ||
-    text.contains('```$_legacyBlockPrefix-$kind');
+bool hasBlock(String text, String kind) => RegExp(
+  '```(?:$blockPrefix|$_legacyBlockPrefix)-${RegExp.escape(kind)}(?=[\\s`]|\$)',
+).hasMatch(text);
 
 /// Blocks the user never sees as text. Every old `gymia-*` block, and the
 /// `trackia-*` ones that are commands to the app (the game and companion
 /// blocks are shown by their own cards).
 final hiddenBlockPattern = RegExp(
   '```(?:$_legacyBlockPrefix-|$blockPrefix-'
-  '(?:activity|result|archive|recall|sync|sheet-plan|sheet-edit|timing))'
+  '(?:activity|activity-target|result|archive|recall|sync|sheet-plan|sheet-edit|timing))'
   r'[\s\S]*?(?:```|$)',
 );

@@ -3,6 +3,7 @@ import '../data/ai_client.dart';
 import '../data/activity_template_repository.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../application/localization.dart';
 import '../application/ai_availability.dart';
 import '../data/ai_settings_store.dart';
 import '../data/companion_store.dart';
@@ -104,15 +105,16 @@ class _CompanionDashboardState extends State<CompanionDashboard>
     if (progress == null) return edit();
     final made = await Navigator.of(context).push<Companion>(
       MaterialPageRoute(
-        builder: (_) => CompanionCreatorScreen(
-          store: store,
-          progress: progress,
-          templates: widget.templates,
-          availability: availability,
-          aiStore: AiSettingsStore(profileId: widget.profileId),
-          client: widget.aiClient,
-          onOpenAiSettings: connectAi,
-        ),
+        builder:
+            (_) => CompanionCreatorScreen(
+              store: store,
+              progress: progress,
+              templates: widget.templates,
+              availability: availability,
+              aiStore: AiSettingsStore(profileId: widget.profileId),
+              client: widget.aiClient,
+              onOpenAiSettings: connectAi,
+            ),
       ),
     );
     if (made == null) return;
@@ -135,22 +137,19 @@ class _CompanionDashboardState extends State<CompanionDashboard>
   /// opening a companion first.
   Widget aiCard(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final l = appText(context);
     final (title, body, action) = switch (availability.status) {
       AiAvailabilityStatus.unconfigured => (
-        'IA sin conectar',
-        'Elige un proveedor y un modelo.',
-        'Conectar',
+        l.aiNotConnected,
+        l.chooseProviderAndModel,
+        l.connect,
       ),
       AiAvailabilityStatus.unverified => (
-        'IA sin verificar',
-        'Prueba la conexión para activar el asistente.',
-        'Verificar',
+        l.aiNotVerified,
+        l.verifyConnectionAssistant,
+        l.verify,
       ),
-      _ => (
-        'IA no disponible',
-        'Revisa el proveedor y vuelve a probar.',
-        'Revisar',
-      ),
+      _ => (l.aiUnavailable, l.reviewProviderRetry, l.review),
     };
     return Container(
       key: const Key('ai-not-connected'),
@@ -241,6 +240,7 @@ class _CompanionDashboardState extends State<CompanionDashboard>
 
   /// Ring of the goal and the streak line of a companion in game mode.
   Widget gameLine(Companion companion, ProgressState state) {
+    final l = appText(context);
     final goal = state.goalProgress;
     final days = state.streak.current;
     return Padding(
@@ -260,14 +260,14 @@ class _CompanionDashboardState extends State<CompanionDashboard>
           const SizedBox(width: 4),
           Flexible(
             child: Text(
-              days == 1 ? 'Racha: 1 día' : 'Racha: $days días',
+              l.companionStreak(days),
               key: Key('streak-${companion.id}'),
             ),
           ),
           if (widget.onProgress != null)
             IconButton(
               key: Key('progress-${companion.id}'),
-              tooltip: 'Progreso de ${companion.name}',
+              tooltip: l.companionProgress(companion.name),
               icon: const Icon(Icons.emoji_events_outlined),
               onPressed: () => widget.onProgress!(companion),
             ),
@@ -293,9 +293,9 @@ class _CompanionDashboardState extends State<CompanionDashboard>
       await refresh();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('No se pudo guardar: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(appText(context).companionSaveError(e))),
+        );
       }
     }
   }
@@ -303,22 +303,21 @@ class _CompanionDashboardState extends State<CompanionDashboard>
   Future<void> remove(Companion companion) async {
     final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('¿Borrar ${companion.name}?'),
-        content: const Text(
-          'Se borrarán su chat, archivos y conexión local de Sheets. La hoja de Google y los registros de actividad no se borrarán.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
+      builder:
+          (context) => AlertDialog(
+            title: Text(appText(context).companionDeleteTitle(companion.name)),
+            content: Text(appText(context).companionDeleteBody),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text(appText(context).cancel),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text(appText(context).delete),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Borrar'),
-          ),
-        ],
-      ),
     );
     if (confirmed != true) return;
     try {
@@ -328,9 +327,9 @@ class _CompanionDashboardState extends State<CompanionDashboard>
       await refresh();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('No se pudo borrar: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(appText(context).companionDeleteError(e))),
+        );
       }
     }
   }
@@ -338,12 +337,33 @@ class _CompanionDashboardState extends State<CompanionDashboard>
   @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
-      title: const Text('TrackIA'),
+      title: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Semantics(
+            key: const Key('dashboard-trackia-logo-semantics'),
+            container: true,
+            image: true,
+            label: appText(context).logoDescription,
+            child: ExcludeSemantics(
+              child: Image.asset(
+                'assets/branding/trackia-logo.png',
+                key: const Key('dashboard-trackia-logo'),
+                width: 32,
+                height: 32,
+                fit: BoxFit.contain,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(appText(context).appTitle),
+        ],
+      ),
       actions: [
         if (widget.onSettings != null)
           IconButton(
             key: const Key('dashboard-settings'),
-            tooltip: 'Ajustes',
+            tooltip: appText(context).settings,
             onPressed: widget.onSettings,
             icon: const Icon(Icons.settings_outlined),
           ),
@@ -353,110 +373,120 @@ class _CompanionDashboardState extends State<CompanionDashboard>
       key: const Key('companion-create'),
       onPressed: create,
       icon: const Icon(Icons.add),
-      label: const Text('Crear acompañante'),
+      label: Text(appText(context).createCompanion),
     ),
-    body: loading
-        ? const Center(child: CircularProgressIndicator())
-        : error != null
-        ? Center(
-            child: TextButton(onPressed: refresh, child: Text(error!)),
-          )
-        : ListView(
-            padding: const EdgeInsets.fromLTRB(16, 20, 16, 104),
-            children: [
-              Text(
-                'Tus acompañantes',
-                style: Theme.of(context).textTheme.headlineMedium,
+    body:
+        loading
+            ? const Center(child: CircularProgressIndicator())
+            : error != null
+            ? Center(
+              child: TextButton(
+                onPressed: refresh,
+                child: Text(appText(context).companionLoadError),
               ),
-              const SizedBox(height: 6),
-              const Text(
-                'Elige con quién trabajar. Cada uno conserva su conversación y puede usar una hoja o pestaña de Google distinta.',
-              ),
-              const SizedBox(height: 20),
-              ListenableBuilder(
-                listenable: availability,
-                builder: (context, _) => switch (availability.status) {
-                  AiAvailabilityStatus.ready ||
-                  AiAvailabilityStatus.checking => const SizedBox.shrink(),
-                  _ => aiCard(context),
-                },
-              ),
-              if (companions.isEmpty)
-                const Card(
-                  child: Padding(
-                    padding: EdgeInsets.all(24),
-                    child: Text(
-                      'Aún no tienes acompañantes. Crea uno para empezar.',
+            )
+            : ListView(
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 104),
+              children: [
+                Text(
+                  appText(context).companionsTitle,
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+                const SizedBox(height: 6),
+                Text(appText(context).companionsDescription),
+                const SizedBox(height: 20),
+                ListenableBuilder(
+                  listenable: availability,
+                  builder:
+                      (context, _) => switch (availability.status) {
+                        AiAvailabilityStatus.ready ||
+                        AiAvailabilityStatus
+                            .checking => const SizedBox.shrink(),
+                        _ => aiCard(context),
+                      },
+                ),
+                if (companions.isEmpty)
+                  Card(
+                    child: Padding(
+                      padding: EdgeInsets.all(24),
+                      child: Text(appText(context).companionsEmpty),
                     ),
                   ),
-                ),
-              for (final companion in companions)
-                Card(
-                  key: Key('companion-${companion.id}'),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 6),
-                    child: ListTile(
-                      leading: CompanionAvatar(companion: companion),
-                      title: Text(companion.name),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(companion.description),
-                          if (gameStates[companion.id] case final state?)
-                            gameLine(companion, state),
-                          if (pausedIds.contains(companion.id))
-                            Row(
-                              key: Key('paused-${companion.id}'),
-                              children: [
-                                const Icon(
-                                  Icons.pause_circle_outline,
-                                  size: 16,
+                for (final companion in companions)
+                  Card(
+                    key: Key('companion-${companion.id}'),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      child: ListTile(
+                        leading: CompanionAvatar(companion: companion),
+                        title: Text(companion.name),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(companion.description),
+                            if (gameStates[companion.id] case final state?)
+                              gameLine(companion, state),
+                            if (pausedIds.contains(companion.id))
+                              Row(
+                                key: Key('paused-${companion.id}'),
+                                children: [
+                                  const Icon(
+                                    Icons.pause_circle_outline,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Flexible(
+                                    child: Text(
+                                      appText(context).remindersPaused,
+                                    ),
+                                  ),
+                                  TextButton(
+                                    key: Key('resume-${companion.id}'),
+                                    onPressed: () => resume(companion),
+                                    child: Text(appText(context).resume),
+                                  ),
+                                ],
+                              ),
+                          ],
+                        ),
+                        onTap: () => widget.onOpen(companion),
+                        trailing: PopupMenuButton<String>(
+                          tooltip: appText(
+                            context,
+                          ).companionOptions(companion.name),
+                          onSelected:
+                              (choice) => switch (choice) {
+                                'edit' => edit(companion),
+                                'settings' => widget.onCompanionSettings?.call(
+                                  companion,
                                 ),
-                                const SizedBox(width: 4),
-                                const Flexible(
-                                  child: Text('Recordatorios en pausa'),
+                                _ => remove(companion),
+                              },
+                          itemBuilder:
+                              (_) => [
+                                PopupMenuItem(
+                                  value: 'edit',
+                                  child: Text(appText(context).edit),
                                 ),
-                                TextButton(
-                                  key: Key('resume-${companion.id}'),
-                                  onPressed: () => resume(companion),
-                                  child: const Text('Reanudar'),
+                                if (widget.onCompanionSettings != null)
+                                  PopupMenuItem(
+                                    key: Key('menu-companion-settings'),
+                                    value: 'settings',
+                                    child: Text(
+                                      appText(context).modeAndNotices,
+                                    ),
+                                  ),
+                                PopupMenuItem(
+                                  value: 'delete',
+                                  child: Text(appText(context).delete),
                                 ),
                               ],
-                            ),
-                        ],
-                      ),
-                      onTap: () => widget.onOpen(companion),
-                      trailing: PopupMenuButton<String>(
-                        tooltip: 'Opciones de ${companion.name}',
-                        onSelected: (choice) => switch (choice) {
-                          'edit' => edit(companion),
-                          'settings' => widget.onCompanionSettings?.call(
-                            companion,
-                          ),
-                          _ => remove(companion),
-                        },
-                        itemBuilder: (_) => [
-                          const PopupMenuItem(
-                            value: 'edit',
-                            child: Text('Editar'),
-                          ),
-                          if (widget.onCompanionSettings != null)
-                            const PopupMenuItem(
-                              key: Key('menu-companion-settings'),
-                              value: 'settings',
-                              child: Text('Modo y avisos'),
-                            ),
-                          const PopupMenuItem(
-                            value: 'delete',
-                            child: Text('Borrar'),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-            ],
-          ),
+              ],
+            ),
   );
 }
 
@@ -490,18 +520,20 @@ class _CompanionEditorState extends State<_CompanionEditor> {
   void save() {
     try {
       final original = widget.original;
-      final value = original == null
-          ? Companion.custom(
-              name: name.text,
-              prompt: prompt.text,
-            ).copyWith(description: description.text, icon: icon, color: color)
-          : original.copyWith(
-              name: name.text,
-              description: description.text,
-              prompt: prompt.text,
-              icon: icon,
-              color: color,
-            );
+      final value =
+          original == null
+              ? Companion.custom(name: name.text, prompt: prompt.text).copyWith(
+                description: description.text,
+                icon: icon,
+                color: color,
+              )
+              : original.copyWith(
+                name: name.text,
+                description: description.text,
+                prompt: prompt.text,
+                icon: icon,
+                color: color,
+              );
       Navigator.pop(context, value);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('$e')));
@@ -509,108 +541,112 @@ class _CompanionEditorState extends State<_CompanionEditor> {
   }
 
   @override
-  Widget build(BuildContext context) => AlertDialog(
-    title: Text(
-      widget.original == null ? 'Crear acompañante' : 'Editar acompañante',
-    ),
-    content: SizedBox(
-      width: 520,
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: name,
-              maxLength: 80,
-              decoration: const InputDecoration(labelText: 'Nombre'),
-            ),
-            TextField(
-              controller: description,
-              maxLength: 120,
-              decoration: const InputDecoration(labelText: '¿Para qué sirve?'),
-            ),
-            TextField(
-              controller: prompt,
-              maxLines: 8,
-              maxLength: 8000,
-              decoration: const InputDecoration(
-                labelText: 'Instrucciones para la IA (opcional)',
-                helperText: 'Se usan cuando conectes un proveedor.',
+  Widget build(BuildContext context) {
+    final l = appText(context);
+    return AlertDialog(
+      title: Text(
+        widget.original == null ? l.createCompanionTitle : l.editCompanionTitle,
+      ),
+      content: SizedBox(
+        width: 520,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: name,
+                maxLength: 80,
+                decoration: InputDecoration(labelText: l.companionName),
               ),
-            ),
-            const SizedBox(height: 16),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Icono',
-                style: Theme.of(context).textTheme.labelLarge,
+              TextField(
+                controller: description,
+                maxLength: 120,
+                decoration: InputDecoration(labelText: l.companionPurpose),
               ),
-            ),
-            Wrap(
-              spacing: 4,
-              runSpacing: 4,
-              children: [
-                for (final entry in companionIcons.entries)
-                  IconButton(
-                    key: Key('icon-${entry.key}'),
-                    tooltip: entry.key,
-                    isSelected: icon == entry.key,
-                    onPressed: () => setState(() => icon = entry.key),
-                    icon: Icon(entry.value),
-                    selectedIcon: Icon(
-                      entry.value,
-                      color: companionColor(context, color),
-                    ),
-                    style: IconButton.styleFrom(
-                      side: icon == entry.key
-                          ? BorderSide(
-                              color: companionColor(context, color),
-                              width: 2,
-                            )
-                          : null,
-                    ),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Color',
-                style: Theme.of(context).textTheme.labelLarge,
+              TextField(
+                controller: prompt,
+                maxLines: 8,
+                maxLength: 8000,
+                decoration: InputDecoration(
+                  labelText: l.companionInstructions,
+                  helperText: l.companionInstructionsHelp,
+                ),
               ),
-            ),
-            Wrap(
-              spacing: 4,
-              runSpacing: 4,
-              children: [
-                for (final id in Companion.colorIds)
-                  IconButton(
-                    key: Key('color-$id'),
-                    tooltip: id,
-                    isSelected: color == id,
-                    onPressed: () => setState(() => color = id),
-                    icon: Icon(
-                      Icons.circle,
-                      color: companionColor(context, id),
+              const SizedBox(height: 16),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  l.icon,
+                  style: Theme.of(context).textTheme.labelLarge,
+                ),
+              ),
+              Wrap(
+                spacing: 4,
+                runSpacing: 4,
+                children: [
+                  for (final entry in companionIcons.entries)
+                    IconButton(
+                      key: Key('icon-${entry.key}'),
+                      tooltip: entry.key,
+                      isSelected: icon == entry.key,
+                      onPressed: () => setState(() => icon = entry.key),
+                      icon: Icon(entry.value),
+                      selectedIcon: Icon(
+                        entry.value,
+                        color: companionColor(context, color),
+                      ),
+                      style: IconButton.styleFrom(
+                        side:
+                            icon == entry.key
+                                ? BorderSide(
+                                  color: companionColor(context, color),
+                                  width: 2,
+                                )
+                                : null,
+                      ),
                     ),
-                    selectedIcon: Icon(
-                      Icons.check_circle,
-                      color: companionColor(context, id),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  l.color,
+                  style: Theme.of(context).textTheme.labelLarge,
+                ),
+              ),
+              Wrap(
+                spacing: 4,
+                runSpacing: 4,
+                children: [
+                  for (final id in Companion.colorIds)
+                    IconButton(
+                      key: Key('color-$id'),
+                      tooltip: id,
+                      isSelected: color == id,
+                      onPressed: () => setState(() => color = id),
+                      icon: Icon(
+                        Icons.circle,
+                        color: companionColor(context, id),
+                      ),
+                      selectedIcon: Icon(
+                        Icons.check_circle,
+                        color: companionColor(context, id),
+                      ),
                     ),
-                  ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-    actions: [
-      TextButton(
-        onPressed: () => Navigator.pop(context),
-        child: const Text('Cancelar'),
-      ),
-      FilledButton(onPressed: save, child: const Text('Guardar')),
-    ],
-  );
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l.cancel),
+        ),
+        FilledButton(onPressed: save, child: Text(l.save)),
+      ],
+    );
+  }
 }

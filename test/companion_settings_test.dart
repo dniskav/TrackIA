@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:trackia/application/reminder_scheduler.dart';
 import 'package:trackia/data/progress_repository.dart';
+import 'package:trackia/data/ai_client.dart';
+import 'package:trackia/data/ai_settings_store.dart';
+import 'package:trackia/domain/ai_config.dart';
+import 'package:trackia/data/companion_store.dart';
 import 'package:trackia/data/sqlite_workout_repository.dart';
 import 'package:trackia/domain/activity.dart';
 import 'package:trackia/domain/companion.dart';
@@ -10,6 +14,7 @@ import 'package:trackia/domain/progress.dart';
 import 'package:trackia/ui/companion_settings.dart';
 import 'package:trackia/ui/theme.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -28,6 +33,7 @@ void main() {
   );
 
   setUp(() async {
+    FlutterSecureStorage.setMockInitialValues({});
     syncCalls = 0;
     dir = await Directory.systemTemp.createTemp('trackia-settings-ui-');
     repo = await SqliteWorkoutRepository.open(
@@ -63,7 +69,7 @@ void main() {
     }
   }
 
-  Future<void> open(WidgetTester tester) async {
+  Future<void> open(WidgetTester tester, {AiClient? client, AiSettingsStore? aiStore}) async {
     popped = null;
     // Tall enough that the whole list is built, so every key is findable.
     tester.view.physicalSize = const Size(800, 3200);
@@ -81,9 +87,12 @@ void main() {
                   MaterialPageRoute(
                     builder: (_) => CompanionSettingsScreen(
                       progress: progress,
+                      store: const CompanionStore(profileId: 'local'),
                       companion: lectura,
                       scheduler: scheduler,
                       clock: () => now,
+                      aiClient: client,
+                      aiStore: aiStore,
                     ),
                   ),
                 );
@@ -96,6 +105,18 @@ void main() {
     );
     await tester.tap(find.byKey(const Key('open')));
     await settle(tester);
+  }
+
+  Future<AiSettingsStore> connectedStore() async {
+    const store = AiSettingsStore(profileId: 'local');
+    await store.save(const AiConfig(
+      service: AiService.custom,
+      baseUrl: 'https://provider.invalid/v1',
+      model: 'synthetic',
+      protocol: AiProtocol.chatCompletions,
+      apiKey: 'synthetic-key',
+    ));
+    return store;
   }
 
   Future<void> tapKey(WidgetTester tester, String key) async {
@@ -126,6 +147,44 @@ void main() {
     expect(find.byKey(const Key('free-days')), findsOneWidget);
     await tapKey(tester, 'mode-reminder');
     expect(find.byKey(const Key('game-goals')), findsNothing);
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('accepting a synthetic personality draft replaces the editor', (tester) async {
+    final aiStore = await connectedStore();
+    await open(tester, aiStore: aiStore, client: _DraftClient('Nueva propuesta'));
+    await tapKey(tester, 'personality-ai-draft');
+    await settle(tester);
+    expect(find.text('Nueva propuesta'), findsOneWidget);
+    await tester.tap(find.text('Usar propuesta'));
+    await tester.pumpAndSettle();
+    expect(tester.widget<TextField>(find.byKey(const Key('companion-personality'))).controller!.text, 'Nueva propuesta');
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('cancelling a synthetic personality draft preserves user text', (tester) async {
+    final aiStore = await connectedStore();
+    await open(tester, aiStore: aiStore, client: _DraftClient('Nueva propuesta'));
+    final editor = find.byKey(const Key('companion-personality'));
+    await tester.enterText(editor, 'Texto propio');
+    await tapKey(tester, 'personality-ai-draft');
+    await settle(tester);
+    await tester.tap(find.text('Cancelar'));
+    await tester.pumpAndSettle();
+    expect(tester.widget<TextField>(editor).controller!.text, 'Texto propio');
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('provider failure is clear and preserves personality text', (tester) async {
+    final aiStore = await connectedStore();
+    await open(tester, aiStore: aiStore, client: _DraftClient.failure());
+    final editor = find.byKey(const Key('companion-personality'));
+    await tester.enterText(editor, 'Texto propio');
+    await tapKey(tester, 'personality-ai-draft');
+    await settle(tester);
+    expect(find.byKey(const Key('settings-error')), findsOneWidget);
+    expect(tester.widget<Text>(find.byKey(const Key('settings-error'))).data, contains('No se pudo generar'));
+    expect(tester.widget<TextField>(editor).controller!.text, 'Texto propio');
     await tester.pumpWidget(const SizedBox());
   });
 
@@ -450,4 +509,20 @@ void main() {
       await tester.pumpWidget(const SizedBox());
     });
   });
+}
+
+class _DraftClient extends AiClient {
+  _DraftClient(this.answer) : super();
+  _DraftClient.failure() : answer = null, super();
+  final String? answer;
+
+  @override
+  Future<String> reply(AiConfig config, List<AiMessage> messages, {
+    required String system,
+    required String sessionId,
+    void Function(String text)? onText,
+  }) async {
+    if (answer == null) throw StateError('synthetic provider failure');
+    return answer!;
+  }
 }

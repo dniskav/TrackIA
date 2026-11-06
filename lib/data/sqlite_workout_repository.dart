@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:crypto/crypto.dart';
+import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
 import 'package:uuid/uuid.dart';
 import '../domain/workout.dart';
@@ -332,10 +334,27 @@ class SqliteWorkoutRepository
           'local',
           factory: f,
         );
+    // The v7 recovery copy runs outside of sqflite's upgrade transaction:
+    // SQLite cannot ATTACH inside one. A plain open peeks the stored version
+    // without triggering callbacks; a missing or in-memory database skips it.
+    // If the copy fails, opening aborts and the database stays unchanged.
+    if (dbPath != inMemoryDatabasePath && await f.databaseExists(dbPath)) {
+      final probe = await f.openDatabase(dbPath);
+      try {
+        final stored = await probe.getVersion();
+        if (stored > 0 && stored < 7) {
+          await createTrackiaV7Backup(probe, dbPath);
+        }
+      } finally {
+        try {
+          await probe.close();
+        } catch (_) {}
+      }
+    }
     final db = await f.openDatabase(
       dbPath,
       options: OpenDatabaseOptions(
-        version: 6,
+        version: 7,
         onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON'),
         onCreate: (db, version) async {
           await db.execute('''CREATE TABLE workouts (
@@ -362,6 +381,7 @@ class SqliteWorkoutRepository
           await _migrateV4(db);
           await _createTrackiaV5(db);
           await _createTrackiaV6(db);
+          await _createTrackiaV7(db);
         },
         onUpgrade: (db, old, next) async {
           if (old < 2) await _migrateV2(db);
@@ -376,6 +396,9 @@ class SqliteWorkoutRepository
               await _backupBeforeTrackiaV5(db, dbPath, 'pre-trackia-v6.json');
             }
             await _createTrackiaV6(db);
+          }
+          if (old < 7) {
+            await _createTrackiaV7(db);
           }
         },
       ),

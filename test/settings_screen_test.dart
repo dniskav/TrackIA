@@ -5,6 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:trackia/application/ai_availability.dart';
 import 'package:trackia/application/rest_notifications.dart';
+import 'package:trackia/application/locale_settings.dart';
 import 'package:trackia/application/workout_controller.dart';
 import 'package:trackia/data/ai_model_catalog.dart';
 import 'package:trackia/data/ai_settings_store.dart';
@@ -76,12 +77,11 @@ void main() {
 
   AiAvailability availability() => AiAvailability(
     catalog: AiModelCatalog(
-      transport:
-          (_, __) async => {
-            'data': [
-              {'id': 'test-model'},
-            ],
-          },
+      transport: (_, __) async => {
+        'data': [
+          {'id': 'test-model'},
+        ],
+      },
     ),
   );
 
@@ -113,6 +113,25 @@ void main() {
     expect(y('App'), lessThan(y('Avisos')));
     expect(y('Avisos'), lessThan(y('Apariencia')));
     expect(y('Apariencia'), lessThan(y('Ayuda y bienvenida')));
+  });
+
+  testWidgets('language selector persists an accessible Arabic choice', (
+    tester,
+  ) async {
+    await open(tester);
+    final field = tester.widget<DropdownButtonFormField<String>>(
+      find.byKey(const Key('settings-language')),
+    );
+    expect(field.decoration.labelText, 'Idioma');
+    await tester.drag(find.byType(ListView), const Offset(0, -420));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('settings-language')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Árabe').last);
+    await tester.pumpAndSettle();
+    expect(LocaleSettings.instance.preference, 'ar');
+    expect(LocaleSettings.instance.locale?.languageCode, 'ar');
+    await LocaleSettings.instance.select('system');
   });
 
   testWidgets('each row opens its screen', (tester) async {

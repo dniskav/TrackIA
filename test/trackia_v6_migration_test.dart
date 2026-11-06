@@ -52,7 +52,7 @@ void main() {
       await repo.close();
 
       final after = await databaseFactoryFfi.openDatabase(path);
-      expect(await after.getVersion(), 6);
+      expect(await after.getVersion(), 7);
       await after.close();
       expect(await _tables(path), containsAll(trackiaV6Tables));
 
@@ -88,8 +88,8 @@ void main() {
     }
   });
 
-  test('a new database is created directly at v6 with every table', () async {
-    final dir = await Directory.systemTemp.createTemp('trackia-v6-new-');
+  test('a new database is created directly at v7 with every table', () async {
+    final dir = await Directory.systemTemp.createTemp('trackia-v7-new-');
     final path = '${dir.path}/fresh.sqlite';
     try {
       final repo = await SqliteWorkoutRepository.open(
@@ -98,7 +98,7 @@ void main() {
       );
       await repo.close();
       final db = await databaseFactoryFfi.openDatabase(path);
-      expect(await db.getVersion(), 6);
+      expect(await db.getVersion(), 7);
       await db.close();
       expect(await _tables(path), containsAll(trackiaV6Tables));
     } finally {

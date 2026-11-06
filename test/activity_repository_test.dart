@@ -251,7 +251,7 @@ void main() {
       await repo.setActivityRest(id, 180);
       expect(
         (await repo.loadActivities()).single.restEndsAt,
-        stopped.add(const Duration(seconds: 180)),
+        stopped.add(const Duration(seconds: 120)),
       );
       final message = await repo.recordActivityMessage(id, '60k 13r f');
       await repo.interpretActivityMessage(message, {'weight_kg': 99});
@@ -317,7 +317,7 @@ void main() {
         (a) => a.id == first,
       );
       expect(previous.restEndsAt, isNull);
-      expect(previous.intervals.single.restSeconds, 150);
+      expect(previous.intervals.single.restSeconds, 120);
     },
   );
   test(
@@ -478,7 +478,7 @@ void main() {
         targetCycles: 4,
       );
       activity = (await repo.loadActivities()).singleWhere((a) => a.id == id);
-      expect(activity.restEndsAt, now.add(const Duration(minutes: 10)));
+      expect(activity.restEndsAt, now.add(const Duration(minutes: 5)));
     },
   );
 

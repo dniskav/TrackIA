@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../application/workout_controller.dart';
+import '../application/localization.dart';
 import '../domain/transfer.dart';
 import '../domain/workout.dart';
 import '../domain/sheet_context.dart';
@@ -31,7 +32,7 @@ class _GoogleSheetsImportScreenState extends State<GoogleSheetsImportScreen> {
   String? nextPage;
   String? error;
   String query = '';
-  String progress = 'Conectando con Google…';
+  String progress = '';
   bool busy = true;
   bool authorized = false;
   bool reconnect = false;
@@ -52,10 +53,10 @@ class _GoogleSheetsImportScreenState extends State<GoogleSheetsImportScreen> {
     if (!mounted) return;
     setState(() {
       error = switch (e) {
-        PlatformException p => p.message ?? 'No se pudo conectar con Google.',
+        PlatformException p => googleSheetsError(context, p.code, p.message),
         ValidationException v => v.message,
         FormatException f => f.message,
-        _ => 'No se pudo leer la hoja. Vuelve a intentarlo.',
+        _ => appText(context).sheetsReadError,
       };
       reconnect = e is PlatformException && e.code == 'GOOGLE_AUTH_REQUIRED';
     });
@@ -69,13 +70,19 @@ class _GoogleSheetsImportScreenState extends State<GoogleSheetsImportScreen> {
       files = [];
       nextPage = null;
       error = null;
-      progress = 'Elige tu cuenta y autoriza la lectura en Google…';
+      progress = appText(context).sheetsAuthorizeProgress;
     });
     try {
       if (chooseAccount) {
         await Navigator.of(
           context,
         ).push(MaterialPageRoute<void>(builder: (_) => const AccountsScreen()));
+        if (mounted &&
+            widget.controller.profileId != 'local' &&
+            ProfileStore.instance.activeId == widget.controller.profileId) {
+          // Resume onboarding after selecting a different saved Google profile.
+          await connect();
+        }
         return;
       }
       final bool? granted;
@@ -90,11 +97,7 @@ class _GoogleSheetsImportScreenState extends State<GoogleSheetsImportScreen> {
       }
       if (!mounted) return;
       if (granted != true) {
-        setState(
-          () =>
-              error =
-                  'Google no completó la autorización. Pulsa Conectar con Google para volver a intentarlo; aún no se han cargado tus hojas.',
-        );
+        setState(() => error = appText(context).sheetsAuthIncomplete);
         return;
       }
       setState(() => authorized = true);
@@ -110,7 +113,7 @@ class _GoogleSheetsImportScreenState extends State<GoogleSheetsImportScreen> {
     setState(() {
       busy = true;
       error = null;
-      progress = 'Buscando tus hojas…';
+      progress = appText(context).sheetsSearchProgress;
       if (!more) {
         query = search.text.trim();
         files = [];
@@ -125,6 +128,10 @@ class _GoogleSheetsImportScreenState extends State<GoogleSheetsImportScreen> {
         if (more) 'pageToken': nextPage,
       });
       if (!mounted || response == null) return;
+      if (widget.controller.profileId != 'local' &&
+          ProfileStore.instance.activeId != widget.controller.profileId) {
+        throw FormatException(appText(context).sheetsSearchAccountChanged);
+      }
       final found =
           (response['files'] as List)
               .map(
@@ -139,8 +146,7 @@ class _GoogleSheetsImportScreenState extends State<GoogleSheetsImportScreen> {
         final page = response['nextPageToken'] as String?;
         nextPage = page == null || page.isEmpty ? null : page;
         if (response['incompleteSearch'] == true) {
-          error =
-              'Google devolvió una búsqueda parcial. Busca la hoja por su nombre.';
+          error = appText(context).sheetsPartial;
         }
       });
     } catch (e) {
@@ -155,7 +161,7 @@ class _GoogleSheetsImportScreenState extends State<GoogleSheetsImportScreen> {
     setState(() {
       busy = true;
       error = null;
-      progress = 'Cargando las pestañas de ${file['name']}…';
+      progress = appText(context).sheetsLoadingTabs(file['name']!);
     });
     try {
       final tabs = await channel.invokeListMethod<String>('tabs', {
@@ -164,17 +170,19 @@ class _GoogleSheetsImportScreenState extends State<GoogleSheetsImportScreen> {
           'expectedSubject': ProfileStore.instance.active?.subject,
       });
       if (!mounted) return;
+      if (widget.controller.profileId != 'local' &&
+          ProfileStore.instance.activeId != widget.controller.profileId) {
+        throw FormatException(appText(context).sheetsChooseAccountChanged);
+      }
       if (tabs == null || tabs.isEmpty) {
-        throw const ValidationException(
-          'Esta hoja no tiene pestañas disponibles.',
-        );
+        throw ValidationException(appText(context).sheetNoTabs);
       }
       setState(() => progress = '');
       final title = await showDialog<String>(
         context: context,
         builder:
             (context) => SimpleDialog(
-              title: const Text('Elige la pestaña con tus entrenamientos'),
+              title: Text(appText(context).sheetChooseTab),
               children: [
                 for (final tab in tabs)
                   SimpleDialogOption(
@@ -185,7 +193,7 @@ class _GoogleSheetsImportScreenState extends State<GoogleSheetsImportScreen> {
             ),
       );
       if (title == null || !mounted) return;
-      setState(() => progress = 'Leyendo $title…');
+      setState(() => progress = appText(context).sheetsReadingTab(title));
       final rows = await channel.invokeListMethod<dynamic>('read', {
         'id': file['id'],
         if (widget.controller.profileId != 'local')
@@ -193,6 +201,10 @@ class _GoogleSheetsImportScreenState extends State<GoogleSheetsImportScreen> {
         'title': title,
       });
       if (!mounted) return;
+      if (widget.controller.profileId != 'local' &&
+          ProfileStore.instance.activeId != widget.controller.profileId) {
+        throw FormatException(appText(context).sheetsReadAccountChanged);
+      }
       final cells = <List<String>>[
         for (final row in rows ?? [])
           [for (final cell in row as List) cell.toString()],
@@ -236,19 +248,19 @@ class _GoogleSheetsImportScreenState extends State<GoogleSheetsImportScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Tus hojas de Google Sheets')),
+    appBar: AppBar(title: Text(appText(context).sheetsTitle)),
     body: ListView(
       padding: const EdgeInsets.all(24),
       children: [
-        const Text(
-          'Elige tu hoja de entrenamiento',
+        Text(
+          appText(context).sheetsChooseTitle,
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 12),
         Text(
           widget.forAssistant
-              ? 'Conecta tu cuenta, elige la hoja y su pestaña. Revisa los datos antes de compartirlos con tu asistente.'
-              : 'TrackIA usa la autorización de Google para leer tus hojas. Los datos se guardan en este móvil cuando confirmas la importación.',
+              ? appText(context).sheetsAssistantIntro
+              : appText(context).sheetsImportIntro,
         ),
         const SizedBox(height: 16),
         if (authorized) ...[
@@ -256,9 +268,9 @@ class _GoogleSheetsImportScreenState extends State<GoogleSheetsImportScreen> {
             controller: search,
             enabled: !busy,
             decoration: InputDecoration(
-              labelText: 'Buscar por nombre',
+              labelText: appText(context).sheetsSearch,
               suffixIcon: IconButton(
-                tooltip: 'Buscar',
+                tooltip: appText(context).sheetsSearchTooltip,
                 onPressed: busy ? null : () => loadFiles(),
                 icon: const Icon(Icons.search),
               ),
@@ -277,13 +289,11 @@ class _GoogleSheetsImportScreenState extends State<GoogleSheetsImportScreen> {
               ),
             ),
           if (!busy && error == null && files.isEmpty)
-            const Text(
-              'No se encontraron hojas. Prueba otro nombre o cambia de cuenta.',
-            ),
+            Text(appText(context).sheetsNoResults),
           if (nextPage != null)
             TextButton(
               onPressed: busy ? null : () => loadFiles(more: true),
-              child: const Text('Cargar más hojas'),
+              child: Text(appText(context).sheetsLoadMore),
             ),
         ],
         if (busy && progress.isNotEmpty) ...[
@@ -301,7 +311,7 @@ class _GoogleSheetsImportScreenState extends State<GoogleSheetsImportScreen> {
           if (authorized && !reconnect)
             TextButton(
               onPressed: busy ? null : () => loadFiles(),
-              child: const Text('Volver a cargar las hojas'),
+              child: Text(appText(context).sheetsRetry),
             ),
         ],
         const SizedBox(height: 16),
@@ -310,8 +320,8 @@ class _GoogleSheetsImportScreenState extends State<GoogleSheetsImportScreen> {
           icon: const Icon(Icons.account_circle_outlined),
           label: Text(
             authorized
-                ? 'Cambiar cuenta o autorizar de nuevo'
-                : 'Conectar con Google',
+                ? appText(context).sheetsReconnect
+                : appText(context).sheetsConnect,
           ),
         ),
       ],
@@ -330,7 +340,7 @@ class SheetContextPreviewScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Revisar hoja')),
+    appBar: AppBar(title: Text(appText(context).sheetReview)),
     body: ListView(
       padding: const EdgeInsets.all(24),
       children: [
@@ -339,20 +349,18 @@ class SheetContextPreviewScreen extends StatelessWidget {
           style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 12),
-        Text(
-          '${sheet.rows.length} filas leídas. Se cargará la pestaña completa; aquí se muestran las primeras 12 filas.',
-        ),
+        Text(appText(context).sheetRowsRead(sheet.rows.length)),
         const SizedBox(height: 12),
         Text(
           loadOnly
-              ? 'La hoja se guardará en este móvil, pendiente de interpretación. No necesitas IA para cargarla. Cuando esté conectada, podrás pedirle que interprete su estructura. No se crean entrenamientos ni se envían celdas al proveedor al cargar.'
-              : 'Al pulsar Cargar y analizar, estas celdas se enviarán al proveedor de IA configurado. Las filas se conservan tal como aparecen, sin convertirlas en entrenamientos.',
+              ? appText(context).sheetLoadPending
+              : appText(context).sheetSendToAi,
         ),
         const SizedBox(height: 12),
         Text(
           sheet.source == 'google'
-              ? 'Es una copia de lectura: para traer cambios posteriores usa Actualizar hoja en el chat.'
-              : 'Es una copia de lectura del archivo. Para traer cambios, vuelve a cargarlo.',
+              ? appText(context).sheetReadOnlyGoogle
+              : appText(context).sheetReadOnlyFile,
         ),
         const SizedBox(height: 20),
         for (var i = 0; i < sheet.rows.length && i < 12; i++)
@@ -360,7 +368,7 @@ class SheetContextPreviewScreen extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(12),
               child: SelectableText(
-                'Fila ${i + 1}: ${sheet.rows[i].join(' | ')}',
+                '${appText(context).rowLabel} ${i + 1}: ${sheet.rows[i].join(' | ')}',
               ),
             ),
           ),
@@ -368,7 +376,11 @@ class SheetContextPreviewScreen extends StatelessWidget {
         FilledButton.icon(
           onPressed: () => Navigator.pop(context, true),
           icon: const Icon(Icons.auto_awesome_outlined),
-          label: Text(loadOnly ? 'Cargar hoja' : 'Cargar y analizar'),
+          label: Text(
+            loadOnly
+                ? appText(context).sheetsLoad
+                : appText(context).sheetsLoadAnalyze,
+          ),
         ),
       ],
     ),

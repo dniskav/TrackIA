@@ -9,6 +9,7 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import '../application/workout_controller.dart';
+import '../application/localization.dart';
 import '../domain/transfer.dart';
 import '../domain/transfer_repository.dart';
 import '../domain/workout.dart';
@@ -309,7 +310,7 @@ class _DataTransferScreenState extends State<DataTransferScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Tus datos')),
+    appBar: AppBar(title: Text(appText(context).dataTitle)),
     body: ListView(
       padding: const EdgeInsets.all(24),
       children: [
@@ -346,13 +347,13 @@ class _DataTransferScreenState extends State<DataTransferScreen> {
                 FilledButton.icon(
                   onPressed: working ? null : exportBackup,
                   icon: const Icon(Icons.ios_share_rounded),
-                  label: const Text('Crear y compartir copia'),
+                  label: Text(appText(context).dataCreateBackup),
                 ),
                 const SizedBox(height: 8),
                 OutlinedButton.icon(
                   onPressed: working ? null : restoreBackup,
                   icon: const Icon(Icons.restore_rounded),
-                  label: const Text('Restaurar copia'),
+                  label: Text(appText(context).dataRestoreBackup),
                 ),
               ],
             ),
@@ -509,7 +510,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
   }) => Padding(
     padding: const EdgeInsets.only(bottom: 12),
     child: DropdownButtonFormField<int>(
-      value: value,
+      initialValue: value,
       decoration: InputDecoration(labelText: label),
       isExpanded: true,
       items: [

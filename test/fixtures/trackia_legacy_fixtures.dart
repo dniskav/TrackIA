@@ -84,6 +84,12 @@ class TrackiaLegacyFixture {
           'trackia_observations',
           'trackia_chat_archives',
           'trackia_chats',
+          // Feature 005 tables did not exist on real v4 or v5 databases;
+          // drop them so the simulated legacy schema matches reality.
+          'trackia_message_effects',
+          'trackia_companion_memories',
+          'message_revision_versions',
+          'message_revision_messages',
         ]) {
           await db.execute('DROP TABLE IF EXISTS $table');
         }
