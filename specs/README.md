@@ -32,3 +32,5 @@ son evidencia de runtime. Un requisito futuro o una prueba planificada no equiva
 una capacidad entregada. Las integraciones y casos de gimnasio se conservan.
 
 La estructura y las skills oficiales se inicializaron con [Spec Kit 1.2.2](../.specify/UPSTREAM.md).
+
+- [005 · Conversación fiable, memoria y apoyo adaptable](005-conversacion-memoria/spec.md): especificación, [plan](005-conversacion-memoria/plan.md) y [tareas](005-conversacion-memoria/tasks.md) propuestos el 2026-11-05; no implementados. Incluye plan iOS, no una versión iOS validada.
