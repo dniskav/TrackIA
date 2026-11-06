@@ -346,12 +346,26 @@ class _CompanionDashboardState extends State<CompanionDashboard>
             image: true,
             label: appText(context).logoDescription,
             child: ExcludeSemantics(
-              child: Image.asset(
-                'assets/branding/trackia-logo.png',
-                key: const Key('dashboard-trackia-logo'),
-                width: 32,
-                height: 32,
-                fit: BoxFit.contain,
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                clipBehavior: Clip.antiAlias,
+                alignment: Alignment.center,
+                child: OverflowBox(
+                  maxWidth: 44,
+                  maxHeight: 44,
+                  child: Image.asset(
+                    'assets/branding/trackia-logo.png',
+                    key: const Key('dashboard-trackia-logo'),
+                    width: 44,
+                    height: 44,
+                    fit: BoxFit.contain,
+                  ),
+                ),
               ),
             ),
           ),

@@ -360,7 +360,9 @@ class _CompanionSettingsScreenState extends State<CompanionSettingsScreen> {
     final selected = settings.mode == mode;
     return Card(
       key: Key('mode-$mode'),
-      color: selected ? Theme.of(context).colorScheme.primaryContainer : null,
+      color: selected
+          ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.14)
+          : null,
       child: Semantics(
         selected: selected,
         button: true,

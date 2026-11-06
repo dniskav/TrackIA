@@ -107,6 +107,10 @@ ThemeData _theme(Brightness brightness) {
       fillColor: dark ? _darkBackground : const Color(0xFFE9F3F4),
       border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
     ),
+    floatingActionButtonTheme: const FloatingActionButtonThemeData(
+      backgroundColor: brandTeal,
+      foregroundColor: Colors.white,
+    ),
     filledButtonTheme: _filled(),
     outlinedButtonTheme: _outlined(scheme),
   );
