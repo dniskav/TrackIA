@@ -211,6 +211,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
   final durableTranscriptIds = <String>{};
   final responseLinks = <AiMessage, ({String messageId, String revisionId})>{};
   final deliveryStates = <String, MessageDelivery>{};
+  final expandedMessageIds = <String>{};
   bool get hasDeliveryBacklog => deliveryStates.values.any(
     (state) => state != MessageDelivery.answered,
   );
@@ -1015,30 +1016,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
                                   ),
                                 )
                               else
-                                Align(
-                                  alignment:
-                                      message.role == 'user'
-                                          ? Alignment.centerRight
-                                          : Alignment.centerLeft,
-                                  child: Card(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(14),
-                                      child: Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        children: [
-                                          ChatMessageBody(
-                                            text: message.text,
-                                            assistant:
-                                                message.role == 'assistant',
-                                          ),
-                                          messageDeliveryDetails(message),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
+                                messageBubble(message),
                             if (proposal != null &&
                                 aiReady &&
                                 companionFocus == null)

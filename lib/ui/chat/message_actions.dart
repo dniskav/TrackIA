@@ -2,6 +2,68 @@ part of '../assistant_chat.dart';
 
 /// Accessible, ID-based actions for durable user messages.
 extension _MessageActions on _AssistantChatScreenState {
+  /// Burbuja de chat estilo mensajería: el usuario a la derecha con el color
+  /// de acento y el asistente a la izquierda en tono neutro.
+  Widget messageBubble(AiMessage message) {
+    final isUser = message.role == 'user';
+    final scheme = Theme.of(context).colorScheme;
+    final id = outgoingMessageIds[message];
+    final VoidCallback? toggle =
+        isUser && id != null ? () => toggleMessageActions(id) : null;
+    const big = Radius.circular(18);
+    const small = Radius.circular(4);
+    return Align(
+      alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.sizeOf(context).width * 0.84,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 3),
+          child: Material(
+            key: Key(isUser ? 'bubble-user' : 'bubble-assistant'),
+            color: isUser ? scheme.primaryContainer : scheme.surfaceContainerHigh,
+            borderRadius: BorderRadius.only(
+              topLeft: big,
+              topRight: big,
+              bottomLeft: isUser ? big : small,
+              bottomRight: isUser ? small : big,
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              key: id == null ? null : Key('message-tap-$id'),
+              onTap: toggle,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                child: DefaultTextStyle.merge(
+                  style: TextStyle(
+                    color: isUser ? scheme.onPrimaryContainer : scheme.onSurface,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ChatMessageBody(
+                        text: message.text,
+                        assistant: message.role == 'assistant',
+                        onTap: toggle,
+                      ),
+                      messageDeliveryDetails(message),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void toggleMessageActions(String id) => update(() {
+    if (!expandedMessageIds.remove(id)) expandedMessageIds.add(id);
+  });
+
   Widget messageDeliveryDetails(AiMessage message) {
     final id = outgoingMessageIds[message];
     if (id == null || message.role != 'user') {
@@ -16,19 +78,35 @@ extension _MessageActions on _AssistantChatScreenState {
       MessageDelivery.uncertain =>
         'Resultado incierto; reenvío bloqueado hasta revisar',
     };
-    final muted = Theme.of(context).colorScheme.onSurfaceVariant;
-    Widget action(Key key, IconData icon, String tooltip, VoidCallback? onTap) =>
-        IconButton(
-          key: key,
-          icon: Icon(icon),
-          tooltip: tooltip,
-          onPressed: onTap,
-          iconSize: 16,
-          visualDensity: VisualDensity.compact,
-          padding: EdgeInsets.zero,
-          constraints: const BoxConstraints.tightFor(width: 32, height: 32),
-          color: muted,
-        );
+    // Los detalles solo existen en mensajes del usuario (burbuja de acento).
+    final muted = Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.7);
+    final stateText = Text(
+      label,
+      key: Key('delivery-state-$id'),
+      style: Theme.of(context).textTheme.labelSmall?.copyWith(color: muted),
+    );
+    if (!expandedMessageIds.contains(id)) {
+      // Los iconos se muestran al tocar el mensaje. Un problema de entrega
+      // (pendiente, fallido, incierto) sí queda visible para no ocultarlo.
+      if (state == MessageDelivery.answered) return const SizedBox.shrink();
+      return Padding(padding: const EdgeInsets.only(top: 6), child: stateText);
+    }
+    Widget action(
+      Key key,
+      IconData icon,
+      String tooltip,
+      VoidCallback? onTap,
+    ) => IconButton(
+      key: key,
+      icon: Icon(icon),
+      tooltip: tooltip,
+      onPressed: onTap,
+      iconSize: 16,
+      visualDensity: VisualDensity.compact,
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints.tightFor(width: 32, height: 32),
+      color: muted,
+    );
     return Padding(
       padding: const EdgeInsets.only(top: 2),
       child: Wrap(
@@ -57,17 +135,7 @@ extension _MessageActions on _AssistantChatScreenState {
                 ? () => send(retryMessageId: id)
                 : null,
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 6),
-            child: Text(
-              label,
-              key: Key('delivery-state-$id'),
-              style: Theme.of(context)
-                  .textTheme
-                  .labelSmall
-                  ?.copyWith(color: muted),
-            ),
-          ),
+          Padding(padding: const EdgeInsets.only(left: 6), child: stateText),
         ],
       ),
     );
@@ -148,13 +216,18 @@ extension _MessageActions on _AssistantChatScreenState {
       replaceOutgoingFromItem(message, updated);
       syncPendingFromDelivery();
       await persist();
-      update(() => error = 'Edición guardada. Usa Reenviar para enviar esta versión.');
+      update(
+        () =>
+            error = 'Edición guardada. Usa Reenviar para enviar esta versión.',
+      );
     } on ValidationException catch (e) {
       update(() => error = e.message);
     } on ArgumentError {
       update(() => error = 'Escribe un mensaje de 1 a 8000 caracteres.');
     } catch (_) {
-      update(() => error = 'No se pudo guardar la edición; el original se conserva.');
+      update(
+        () => error = 'No se pudo guardar la edición; el original se conserva.',
+      );
     }
   }
 

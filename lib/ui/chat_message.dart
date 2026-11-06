@@ -8,9 +8,13 @@ class ChatMessageBody extends StatelessWidget {
     super.key,
     required this.text,
     required this.assistant,
+    this.onTap,
   });
   final String text;
   final bool assistant;
+
+  /// Toque sobre el texto (SelectableText lo absorbe y no llega al padre).
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +25,7 @@ class ChatMessageBody extends StatelessWidget {
     if (!assistant) {
       return Directionality(
         textDirection: textDirection,
-        child: SelectableText(text),
+        child: SelectableText(text, onTap: onTap),
       );
     }
     final visible = text.replaceAll(hiddenBlockPattern, '').trim();
