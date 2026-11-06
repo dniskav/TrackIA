@@ -19,17 +19,17 @@ Colores muestreados de `assets/branding/trackia-icon-master.png` (anillo `#027D9
 
 | Rol | Hex | Contraste medido |
 |---|---|---|
-| `background` (scaffold, AppBar) | `#0A1A20` | — |
-| `surface` (tarjetas, paneles) | `#12303A` | — |
-| `onSurface` / texto principal | `#E6EEF0` | 15,11 sobre fondo; 11,83 sobre superficie |
-| `onSurfaceVariant` / secundario | `#9DB8BE` | 8,49 sobre fondo; 6,65 sobre superficie |
-| `primary` | `#35B5CB` | 7,30 sobre fondo; 5,71 sobre superficie |
-| `onPrimary` | `#0A1A20` | sobre `#35B5CB`: 7,30 |
-| `outlineVariant` (bordes decorativos) | `#1F4A55` | decorativo |
-| `error` | `#FF8FA3` | 6,43 sobre superficie |
-| `inputFill` | `#0A1A20` | — |
-| Pista del anillo | `#1E5A68` | decorativo |
-| Texto «en curso» | `#FF8A4D` | 5,96 sobre superficie |
+| `background` (scaffold, AppBar) | `#08110C` | — |
+| `surface` (tarjetas, paneles) | `#13211A` | — |
+| `onSurface` / texto principal | `#EEF4F0` | 17,19 sobre fondo; 14,95 sobre superficie |
+| `onSurfaceVariant` / secundario | `#A9BDB3` | 9,69 sobre fondo; 8,43 sobre superficie |
+| `primary` | `#35B5CB` | 7,87 sobre fondo; 6,84 sobre superficie |
+| `onPrimary` | `#08110C` | sobre `#35B5CB`: 7,87 |
+| `outlineVariant` (bordes decorativos) | `#2C4436` | decorativo |
+| `error` | `#FF8FA3` | 7,71 sobre superficie |
+| `inputFill` | `#08110C` | — |
+| Pista del anillo | `#1E4F52` | decorativo |
+| Texto «en curso» | `#FF8A4D` | 7,14 sobre superficie |
 
 ## Tema claro (`gymLightTheme`)
 
@@ -53,7 +53,7 @@ Colores muestreados de `assets/branding/trackia-icon-master.png` (anillo `#027D9
 |---|---|---|---|---|
 | Iniciar (`FilledButton`, acción de empezar) | `#027D92` en ambos temas | `#FFFFFF`, `FontWeight.w700` | 4,83 | Icono `Icons.play_arrow` |
 | Parar (acción de detener un tramo) | `#DC0148` en ambos temas | `#FFFFFF`, `FontWeight.w700` | 5,07 | Icono `Icons.stop` |
-| Secundario (Terminar, Dictar, Editar…) | transparente | `primary` del tema | 5,71 oscuro / 4,83 claro | Borde 1,5 px del color `primary` (no `outlineVariant`) |
+| Secundario (Terminar, Dictar, Editar…) | transparente | `primary` del tema | 6,84 oscuro / 4,83 claro | Borde 1,5 px del color `primary` (no `outlineVariant`) |
 | Destructivo (Borrar, Eliminar configuración) | transparente | `error` del tema | ≥ 6,4 | Separado del primario por al menos 24 px |
 
 Prohibido: texto negro sobre naranja; texto blanco sobre `#FE6101` (3,03). Altura mínima 54 px para
@@ -94,14 +94,24 @@ rápidos (si hay campos `number`); botón principal; fila de secundarios.
 
 Se usan para el icono y su fondo circular (el mismo color al 20 % de opacidad sobre la superficie).
 
-| ID | Oscuro | Contraste sobre `#12303A` | Claro | Contraste sobre `#FFFFFF` |
+| ID | Oscuro | Contraste sobre `#13211A` | Claro | Contraste sobre `#FFFFFF` |
 |---|---|---|---|---|
-| `teal` | `#35B5CB` | 5,71 | `#027D92` | 4,83 |
-| `orange` | `#FF8A4D` | 5,96 | `#C2410C` | 5,18 |
-| `green` | `#7FD6A4` | 7,99 | `#2E7D4F` | 5,05 |
-| `amber` | `#F2C46D` | 8,54 | `#8A5A00` | 5,93 |
-| `crimson` | `#FF6B8E` | 5,13 | `#B0003A` | 7,22 |
-| `violet` | `#B4A2F0` | 6,20 | `#5B44B3` | 7,19 |
+| `teal` | `#35B5CB` | 6,84 | `#027D92` | 4,83 |
+| `orange` | `#FF8A4D` | 7,14 | `#C2410C` | 5,18 |
+| `green` | `#7FD6A4` | 9,57 | `#2E7D4F` | 5,05 |
+| `amber` | `#F2C46D` | 10,23 | `#8A5A00` | 5,93 |
+| `crimson` | `#FF6B8E` | 6,15 | `#B0003A` | 7,22 |
+| `violet` | `#B4A2F0` | 7,43 | `#5B44B3` | 7,19 |
+
+## Burbujas de chat
+
+| Burbuja | Relleno | Texto | Contraste |
+|---|---|---|---|
+| Usuario (ambos temas) | `#027D92` (`brandTeal`) | `#FFFFFF`; detalles de entrega blancos al 80 % | 4,83 |
+| Asistente, oscuro | color oscuro del acompañante al 22 % sobre `#13211A`; borde del color al 45 % | `onSurface` `#EEF4F0` | teal 9,92; orange 10,12; green 8,91; amber 8,83; crimson 10,72; violet 9,81 (mín. 4,5) |
+| Asistente, claro | color claro del acompañante al 14 % sobre `#FFFFFF`; borde del color al 45 % | `onSurface` `#0A1A20` | todos ≥ 13,6 |
+
+Sin acompañante se usa `orange` (GymBro).
 
 ## Iconos de logro (IDs → `Icons`)
 

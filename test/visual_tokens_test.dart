@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:trackia/ui/companion_style.dart';
 import 'package:trackia/ui/theme.dart';
 
 double _channel(int v) {
@@ -35,15 +36,15 @@ void main() {
   test('dark theme uses the contract values', () {
     final s = gymTheme.colorScheme;
     expect(gymTheme.brightness, Brightness.dark);
-    expect(gymTheme.scaffoldBackgroundColor, const Color(0xFF0A1A20));
-    expect(s.surface, const Color(0xFF12303A));
-    expect(s.onSurface, const Color(0xFFE6EEF0));
-    expect(s.onSurfaceVariant, const Color(0xFF9DB8BE));
+    expect(gymTheme.scaffoldBackgroundColor, const Color(0xFF08110C));
+    expect(s.surface, const Color(0xFF13211A));
+    expect(s.onSurface, const Color(0xFFEEF4F0));
+    expect(s.onSurfaceVariant, const Color(0xFFA9BDB3));
     expect(s.primary, const Color(0xFF35B5CB));
-    expect(s.onPrimary, const Color(0xFF0A1A20));
-    expect(s.outlineVariant, const Color(0xFF1F4A55));
+    expect(s.onPrimary, const Color(0xFF08110C));
+    expect(s.outlineVariant, const Color(0xFF2C4436));
     expect(s.error, const Color(0xFFFF8FA3));
-    expect(gymTheme.inputDecorationTheme.fillColor, const Color(0xFF0A1A20));
+    expect(gymTheme.inputDecorationTheme.fillColor, const Color(0xFF08110C));
   });
 
   test('light theme uses the contract values', () {
@@ -119,6 +120,23 @@ void main() {
         greaterThanOrEqualTo(4.5),
         reason: '${entry.key} claro',
       );
+    }
+  });
+
+  test('chat bubbles keep text contrast >= 4.5 in both themes', () {
+    expect(contrast(userBubbleTextColor, userBubbleColor), greaterThanOrEqualTo(4.5));
+    for (final theme in [gymTheme, gymLightTheme]) {
+      final scheme = theme.colorScheme;
+      final dark = theme.brightness == Brightness.dark;
+      for (final entry in trackiaCompanionColors.entries) {
+        final color = dark ? entry.value.dark : entry.value.light;
+        final fill = assistantBubbleColors(color, scheme).fill;
+        expect(
+          contrast(scheme.onSurface, fill),
+          greaterThanOrEqualTo(4.5),
+          reason: 'asistente ${entry.key} ${theme.brightness.name}',
+        );
+      }
     }
   });
 

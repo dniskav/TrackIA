@@ -33,11 +33,11 @@ const trackiaCompanionColors = <String, ({Color dark, Color light})>{
 /// Unfilled part of the timer ring; decorative, so no text contrast applies.
 Color ringTrackColor(Brightness brightness) =>
     brightness == Brightness.dark
-        ? const Color(0xFF1E5A68)
+        ? const Color(0xFF1E4F52)
         : const Color(0xFFBFDCE2);
 
-const _darkBackground = Color(0xFF0A1A20);
-const _darkSurface = Color(0xFF12303A);
+const _darkBackground = Color(0xFF08110C);
+const _darkSurface = Color(0xFF13211A);
 const _lightBackground = Color(0xFFF6FAFA);
 
 ColorScheme _scheme(Brightness brightness) {
@@ -53,9 +53,9 @@ ColorScheme _scheme(Brightness brightness) {
     secondary: dark ? brandOrangeTextDark : brandOrangeTextLight,
     onSecondary: dark ? _darkBackground : Colors.white,
     surface: surface,
-    onSurface: dark ? const Color(0xFFE6EEF0) : _darkBackground,
-    onSurfaceVariant: dark ? const Color(0xFF9DB8BE) : const Color(0xFF4B6670),
-    outlineVariant: dark ? const Color(0xFF1F4A55) : const Color(0xFFBCD3D8),
+    onSurface: dark ? const Color(0xFFEEF4F0) : const Color(0xFF0A1A20),
+    onSurfaceVariant: dark ? const Color(0xFFA9BDB3) : const Color(0xFF4B6670),
+    outlineVariant: dark ? const Color(0xFF2C4436) : const Color(0xFFBCD3D8),
     error: dark ? const Color(0xFFFF8FA3) : const Color(0xFFB0003A),
     onError: dark ? _darkBackground : Colors.white,
     surfaceContainerLowest: background,

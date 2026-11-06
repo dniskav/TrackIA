@@ -30,6 +30,26 @@ Color companionColor(BuildContext context, String id) {
       : pair.light;
 }
 
+/// Burbuja del asistente: color del acompañante mezclado sobre la superficie
+/// (22 % en oscuro, 14 % en claro) y borde fino del mismo color.
+({Color fill, Color border}) assistantBubbleColors(
+  Color companion,
+  ColorScheme scheme,
+) {
+  final dark = scheme.brightness == Brightness.dark;
+  return (
+    fill: Color.alphaBlend(
+      companion.withValues(alpha: dark ? 0.22 : 0.14),
+      scheme.surface,
+    ),
+    border: companion.withValues(alpha: 0.45),
+  );
+}
+
+/// Burbuja del usuario: teal de marca con texto blanco en ambos temas (4,83).
+const userBubbleColor = brandTeal;
+const userBubbleTextColor = Colors.white;
+
 /// The companion's icon on a circle tinted with its color at 20 %.
 class CompanionAvatar extends StatelessWidget {
   const CompanionAvatar({super.key, required this.companion, this.radius = 20});

@@ -8,6 +8,10 @@ extension _MessageActions on _AssistantChatScreenState {
     final isUser = message.role == 'user';
     final scheme = Theme.of(context).colorScheme;
     final id = outgoingMessageIds[message];
+    final bubble = assistantBubbleColors(
+      companionColor(context, widget.companion?.color ?? 'orange'),
+      scheme,
+    );
     final VoidCallback? toggle =
         isUser && id != null ? () => toggleMessageActions(id) : null;
     const big = Radius.circular(18);
@@ -22,12 +26,17 @@ extension _MessageActions on _AssistantChatScreenState {
           padding: const EdgeInsets.symmetric(vertical: 3),
           child: Material(
             key: Key(isUser ? 'bubble-user' : 'bubble-assistant'),
-            color: isUser ? scheme.primaryContainer : scheme.surfaceContainerHigh,
-            borderRadius: BorderRadius.only(
-              topLeft: big,
-              topRight: big,
-              bottomLeft: isUser ? big : small,
-              bottomRight: isUser ? small : big,
+            color: isUser ? userBubbleColor : bubble.fill,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                topLeft: big,
+                topRight: big,
+                bottomLeft: isUser ? big : small,
+                bottomRight: isUser ? small : big,
+              ),
+              side: isUser
+                  ? BorderSide.none
+                  : BorderSide(color: bubble.border, width: 1),
             ),
             clipBehavior: Clip.antiAlias,
             child: InkWell(
@@ -37,7 +46,7 @@ extension _MessageActions on _AssistantChatScreenState {
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 child: DefaultTextStyle.merge(
                   style: TextStyle(
-                    color: isUser ? scheme.onPrimaryContainer : scheme.onSurface,
+                    color: isUser ? userBubbleTextColor : scheme.onSurface,
                   ),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -79,7 +88,7 @@ extension _MessageActions on _AssistantChatScreenState {
         'Resultado incierto; reenvío bloqueado hasta revisar',
     };
     // Los detalles solo existen en mensajes del usuario (burbuja de acento).
-    final muted = Theme.of(context).colorScheme.onPrimaryContainer.withValues(alpha: 0.7);
+    final muted = userBubbleTextColor.withValues(alpha: 0.8);
     final stateText = Text(
       label,
       key: Key('delivery-state-$id'),
