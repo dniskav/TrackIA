@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../l10n/generated/app_localizations.dart';
+import '../application/localization.dart';
 import '../application/locale_settings.dart';
 import '../application/workout_controller.dart';
 import '../domain/workout.dart';
@@ -193,12 +194,12 @@ class _TrackiaRootState extends State<GymRoot> {
         );
         if (file == null) break;
         final bytes = file['bytes'];
+        if (!mounted) break;
         if (bytes is! Uint8List) {
-          throw const ValidationException(
-            'No se pudo leer la copia compartida.',
+          throw ValidationException(
+            appText(context).restScreenSharedCopyUnreadable,
           );
         }
-        if (!mounted) break;
         await openImportDocument(
           context,
           widget.controller,
@@ -213,7 +214,9 @@ class _TrackiaRootState extends State<GymRoot> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(e.message ?? 'No se pudo abrir la copia compartida.'),
+            content: Text(
+              e.message ?? appText(context).restScreenSharedCopyOpenError,
+            ),
           ),
         );
       }

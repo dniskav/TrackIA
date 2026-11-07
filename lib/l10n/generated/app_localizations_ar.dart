@@ -3965,4 +3965,20 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get packageScanUseFile => 'الاستيراد من ملف أو نص';
+
+  @override
+  String get restScreenSharedCopyUnreadable => 'تعذّرت قراءة النسخة المشتركة.';
+
+  @override
+  String get restScreenSharedCopyOpenError => 'تعذّر فتح النسخة المشتركة.';
+
+  @override
+  String restScreenCompanionsLoadDetail(Object error) {
+    return 'تعذّر تحميل المرافقين: $error';
+  }
+
+  @override
+  String restScreenTimerLabel(Object label) {
+    return 'الوقت: $label';
+  }
 }

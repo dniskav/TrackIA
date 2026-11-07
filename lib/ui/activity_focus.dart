@@ -432,7 +432,11 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
     );
     if (name == null || focus?.id != a.id) return;
     final done = await c.run(
-      () => c.activityRepository!.renameActivity(a.id, name),
+      () => c.activityRepository!.renameActivity(
+        a.id,
+        name,
+        expectedRevision: a.revision,
+      ),
     );
     if (done) {
       widget.onActivityEdited?.call('Renombraste la actividad a «$name»');
@@ -483,6 +487,7 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
           value,
           updateActiveRest: updateActiveRest,
           expectedRestEndsAt: updateActiveRest ? a.restEndsAt : null,
+          expectedRevision: a.revision,
         ),
       );
       if (done) {

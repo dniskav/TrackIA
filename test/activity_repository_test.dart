@@ -667,6 +667,26 @@ void main() {
       },
     );
 
+    test('rename and rest honour expectedRevision inside the transaction', () async {
+      final id = await repo.prepareActivity(ActivityDefinition(name: 'Leer'));
+      final rev = (await repo.loadActivities()).single.revision;
+      await repo.renameActivity(id, 'Libros', expectedRevision: rev);
+      await expectLater(
+        repo.renameActivity(id, 'Novelas', expectedRevision: rev),
+        throwsA(isA<ValidationException>()),
+      );
+      await expectLater(
+        repo.setActivityRest(id, 99, expectedRevision: rev),
+        throwsA(isA<ValidationException>()),
+      );
+      final a = (await repo.loadActivities()).single;
+      expect(a.definition.name, 'Libros');
+      expect(a.definition.restSeconds, isNot(99));
+      expect(a.revision, rev + 1);
+      await repo.setActivityRest(id, 99, expectedRevision: rev + 1);
+      expect((await repo.loadActivities()).single.definition.restSeconds, 99);
+    });
+
     test('renaming twice still keeps the original key', () async {
       final id = await repo.prepareActivity(ActivityDefinition(name: 'Leer'));
       await repo.renameActivity(id, 'Libros');

@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../application/localization.dart';
 import 'theme.dart';
 
 /// The activity clock drawn like the app icon: a ring with the four clock
@@ -40,7 +41,7 @@ class TimerRing extends StatelessWidget {
     final remaining = total == null ? elapsed : total! - elapsed;
     final label = format(remaining);
     return Semantics(
-      label: 'Tiempo: $label',
+      label: appText(context).restScreenTimerLabel(label),
       excludeSemantics: true,
       child: SizedBox(
         width: size,

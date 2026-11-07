@@ -4047,4 +4047,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get packageScanUseFile => 'Import from file or text';
+
+  @override
+  String get restScreenSharedCopyUnreadable =>
+      'The shared copy could not be read.';
+
+  @override
+  String get restScreenSharedCopyOpenError =>
+      'The shared copy could not be opened.';
+
+  @override
+  String restScreenCompanionsLoadDetail(Object error) {
+    return 'Companions could not be loaded: $error';
+  }
+
+  @override
+  String restScreenTimerLabel(Object label) {
+    return 'Time: $label';
+  }
 }

@@ -579,6 +579,7 @@ abstract interface class ActivityRepository {
     String source = 'user',
     bool updateActiveRest = false,
     DateTime? expectedRestEndsAt,
+    int? expectedRevision,
   });
   Future<void> setActivityTiming(
     String activityId, {
@@ -593,6 +594,7 @@ abstract interface class ActivityRepository {
     String activityId,
     String name, {
     String source = 'user',
+    int? expectedRevision,
   });
   Future<void> changeCompletedCycles(String activityId, int delta);
   Future<void> replaceActivityPreparation(

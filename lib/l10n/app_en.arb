@@ -2113,5 +2113,19 @@
   "packageScanTorch": "Flashlight",
   "packageScanPermissionDenied": "Camera permission was not granted. You can import the companion from a file or by pasting the text.",
   "packageScanCameraError": "The camera could not be used. You can import the companion from a file or by pasting the text.",
-  "packageScanUseFile": "Import from file or text"
+  "packageScanUseFile": "Import from file or text",
+  "restScreenSharedCopyUnreadable": "The shared copy could not be read.",
+  "restScreenSharedCopyOpenError": "The shared copy could not be opened.",
+  "restScreenCompanionsLoadDetail": "Companions could not be loaded: {error}",
+  "@restScreenCompanionsLoadDetail": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "restScreenTimerLabel": "Time: {label}",
+  "@restScreenTimerLabel": {
+    "placeholders": {
+      "label": {}
+    }
+  }
 }

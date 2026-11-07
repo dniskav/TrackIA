@@ -75,13 +75,24 @@ mixin _SqliteActivities implements ActivityRepository {
         await _writeDefinition(tx, activityId, jsonEncode(definition));
       });
 
+  void _checkExpectedRevision(Map<String, Object?> row, int? expectedRevision) {
+    // The monotonic revision also catches an A -> B -> A round trip.
+    if (expectedRevision != null && row['revision'] != expectedRevision) {
+      throw const ValidationException(
+        'La actividad cambió desde que se propuso; vuelve a pedirlo.',
+      );
+    }
+  }
+
   @override
   Future<void> renameActivity(
     String activityId,
     String name, {
     String source = 'user',
+    int? expectedRevision,
   }) => _db.transaction((tx) async {
     final row = await _activeActivity(tx, activityId);
+    _checkExpectedRevision(row, expectedRevision);
     final definition = Map<String, dynamic>.from(
       jsonDecode(row['definition'] as String) as Map,
     );
@@ -702,6 +713,7 @@ mixin _SqliteActivities implements ActivityRepository {
     String source = 'user',
     bool updateActiveRest = false,
     DateTime? expectedRestEndsAt,
+    int? expectedRevision,
   }) => _db.transaction((tx) async {
     final rows = await tx.query(
       'activities',
@@ -714,6 +726,7 @@ mixin _SqliteActivities implements ActivityRepository {
       throw const ValidationException('Este descanso ya no está activo.');
     }
     final a = rows.single;
+    _checkExpectedRevision(a, expectedRevision);
     if (updateActiveRest &&
         (expectedRestEndsAt == null ||
             a['rest_ends_at'] != expectedRestEndsAt.millisecondsSinceEpoch)) {

@@ -2113,5 +2113,19 @@
   "packageScanTorch": "Linterna",
   "packageScanPermissionDenied": "No hay permiso para usar la cámara. Puedes importar el acompañante desde un archivo o pegando el texto.",
   "packageScanCameraError": "No se pudo usar la cámara. Puedes importar el acompañante desde un archivo o pegando el texto.",
-  "packageScanUseFile": "Importar desde archivo o texto"
+  "packageScanUseFile": "Importar desde archivo o texto",
+  "restScreenSharedCopyUnreadable": "No se pudo leer la copia compartida.",
+  "restScreenSharedCopyOpenError": "No se pudo abrir la copia compartida.",
+  "restScreenCompanionsLoadDetail": "No se pudieron cargar los acompañantes: {error}",
+  "@restScreenCompanionsLoadDetail": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "restScreenTimerLabel": "Tiempo: {label}",
+  "@restScreenTimerLabel": {
+    "placeholders": {
+      "label": {}
+    }
+  }
 }

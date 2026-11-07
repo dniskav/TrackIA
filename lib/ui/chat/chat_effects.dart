@@ -66,7 +66,11 @@ extension _ChatEffects on _AssistantChatScreenState {
       if (!fresh) {
         await messageEffects!.settle(key, status, summary: summary);
       }
-    } catch (_) {}
+    } catch (error) {
+      // El registro de efectos no debe romper el chat, pero un fallo aquí
+      // dejaría al asistente sin saber qué se aplicó: queda en el log.
+      debugPrint('No se pudo registrar el efecto: ${error.runtimeType}');
+    }
   }
 
   /// Anota que el asistente propuso algo que necesita la decisión del usuario.
@@ -95,7 +99,11 @@ extension _ChatEffects on _AssistantChatScreenState {
     if (key == null) return;
     try {
       await messageEffects!.settle(key, status);
-    } catch (_) {}
+    } catch (error) {
+      // El registro de efectos no debe romper el chat, pero un fallo aquí
+      // dejaría al asistente sin saber qué se aplicó: queda en el log.
+      debugPrint('No se pudo registrar el efecto: ${error.runtimeType}');
+    }
   }
 
   /// Ejecuta una escritura local con el controlador y distingue «no se aplicó»
@@ -175,6 +183,10 @@ extension _ChatEffects on _AssistantChatScreenState {
         at: widget.controller.now(),
       );
       if (!done) await recordEffect(kind, discriminator, summary, targetId: targetId);
-    } catch (_) {}
+    } catch (error) {
+      // El registro de efectos no debe romper el chat, pero un fallo aquí
+      // dejaría al asistente sin saber qué se aplicó: queda en el log.
+      debugPrint('No se pudo registrar el efecto: ${error.runtimeType}');
+    }
   }
 }

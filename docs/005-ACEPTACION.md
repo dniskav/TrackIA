@@ -29,6 +29,9 @@
 | Fechas por idioma, fuente grande, lector de pantalla, RTL en todo el árbol | T042–T045 parciales | Verificación manual; resultado se anota, no se da por aprobado |
 | Revisión humana del árabe | Sin validar | Tipo G (persona revisora) |
 | Edición de cualquier mensaje | Decisión de producto: solo el **último** mensaje del usuario | Los mensajes anteriores no ofrecen Editar |
+| Escaneo con cámara física y linterna | No probado; la cámara virtual del emulador muestra negro | Solo tipo C (persona, dispositivo real) |
+| Abrir un `.trackia` desde otra app | El manifiesto de Android no lo asocia (T059 abierta) | Importar desde «Importar acompañante» |
+| Compartir/importar en iOS | Sin validar; el texto de `NSCameraUsageDescription` habla de fotos | Fuera de este recorrido |
 
 ## Preparación previa (antes de cualquier instalación)
 
@@ -184,10 +187,32 @@ Nota: nombre y descanso no usan control de versión (T017); si dos cambios se ha
 | R4 | Dejar que el aviso se dispare (Android). | Aviso llega con el texto del idioma | T | `[ ]` |
 | R5 | Revisión de veracidad de las frases. | Persona revisora anota | G (revisión humana) | `sin ejecutar` |
 
+## US8 — Compartir, importar y escanear (T)
+
+**Objetivo**: compartir un acompañante como QR o archivo, importarlo en otro perfil y escanearlo, sin datos prohibidos y sin aplicar nada sin confirmación.
+**Detalle**: `docs/005-COMPARTIR.md`. Las columnas **E**, **T** y **C** son evidencias separadas: **E** emulador (automática o manual en el emulador), **T** teléfono Android real, **C** cámara física leyendo un QR real. La última columna marca si el paso **requiere a la persona**. Usar solo acompañantes sintéticos.
+
+| # | Paso | Resultado esperado | E | T | C | Requiere a la persona |
+|---|---|---|---|---|---|---|
+| 8.1 | Ajustes de un acompañante propio → «Compartir acompañante» → leer el aviso. | Se listan qué viaja y qué no; ninguna clave, chat ni memoria. E: `test/companion_share_test.dart`. | `[ ]` | `[ ]` | — | Sí (T) |
+| 8.2 | Compartir el archivo `.trackia` con la hoja del sistema (p. ej. guardar en archivos). | El archivo se entrega siempre. E: `test/companion_share_test.dart`, `integration_test/companion_package_android_test.dart`. | `[ ]` | `[ ]` | — | Sí (T) |
+| 8.3 | Acompañante corto: aparece QR. Con instrucciones que dejen el texto por encima de 2000 caracteres: solo archivo y aviso. | QR solo si cabe. E: `test/companion_share_test.dart`. | `[ ]` | `[ ]` | — | Sí (T) |
+| 8.4 | Escanear el QR mostrado en la pantalla de otro teléfono. | Se abre la vista previa con el contenido del paquete. E: `integration_test/companion_qr_decode_android_test.dart` (QR generado en el emulador; pasó el 2026-11-07, `docs/005-QA.md`). | `[ ]` | `[ ]` | `[ ]` | Sí (T y C) |
+| 8.5 | Pulsar «Escanear acompañante» con el permiso de cámara denegado. | Aparece «No hay permiso para usar la cámara…» y el botón «Importar desde archivo o texto». E: `test/companion_scan_test.dart` (lector simulado). | `[ ]` | `[ ]` | — | Sí (T) |
+| 8.6 | Importar el `.trackia` en un perfil limpio: revisar la vista previa, editar el nombre y guardar; repetir y cancelar. | Aviso de contenido externo, modo «solo recordatorio», identidad nueva, origen importado. Cancelar no crea nada. E: `integration_test/companion_package_android_test.dart`. | `[ ]` | `[ ]` | — | Sí (T) |
+| 8.7 | Abrir un paquete con el `checksum` alterado, o con versión futura (`trackia-companion/2`). | Rechazado con mensaje; no hay vista previa ni acompañante. E: `integration_test/companion_package_android_test.dart` (tres paquetes hostiles) y `test/companion_package_test.dart`. | `[ ]` | `[ ]` | — | Sí (T) |
+| 8.8 | Paquete con un bloque `trackia-activity` en las instrucciones. | El bloque se retira y el aviso dice cuántos. E: `test/companion_package_import_test.dart`. | `[ ]` | `[ ]` | — | Sí (T) |
+| 8.9 | Con un acompañante importado, pedir al asistente que edite una hoja de prueba. | Diálogo con hoja, pestaña y cada celda; «Cancelar» no escribe. E: `test/imported_companion_confirmation_test.dart`. Hoja real: requiere cuenta de prueba (G). | `[ ]` | `[ ]` | — | Sí (T); G solo con autorización |
+| 8.10 | Con un acompañante importado, provocar una propuesta automática de actividad. | Diálogo con nombre, descanso y duración; «Cancelar» no crea la actividad. Requiere IA real (G). E: `test/imported_companion_confirmation_test.dart` (sin IA). | `[ ]` | sin ejecutar (G) | — | Sí (G) |
+| 8.11 | «Confiar en este acompañante» → confirmar. | Pasa a propio; sus acciones ya no piden diálogo. E: `test/imported_companion_confirmation_test.dart`. | `[ ]` | `[ ]` | — | Sí (T) |
+| 8.12 | Leer con la cámara real el QR de un acompañante, con luz normal y con poca luz; probar la linterna. | El QR se lee con la cámara real y la linterna enciende y apaga. El emulador no lo prueba. | — | — | `[ ]` | Sí (C) |
+| 8.13 | Pantallas de compartir e importar en árabe. | RTL correcto, sin textos en español ni claves sin traducir. Una persona revisora anota la calidad del texto. | — | `[ ]` | — | Sí (T y revisión humana) |
+
 ## Orden sugerido y cierre
 
 1. P1–P4, luego M1–M7 (migración) con permiso.
 2. US1, US2 y recordatorios (solo T).
+2b. US8 (8.1–8.13), después de US1–US7 y con la misma preparación de emulador y teléfono.
 3. US4 y US5 en modo local (T).
 4. US6 con cambio de idioma.
 5. G (Google, IA, iOS, revisión humana) solo con autorización explícita.

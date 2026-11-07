@@ -28,6 +28,7 @@ centro de la experiencia; el guardado local permite continuidad si falla la cone
 
 ## Funciones
 - Tablero con GymBro, Enfoque, Calma y Diario; crear, editar o borrar acompañantes, con prompt, chat y destino de Sheets por acompañante. Los entrenamientos anteriores y sus envíos automáticos permanecen en GymBro. Los registros visibles, el contexto de IA y la exportación se filtran por acompañante. [Acompañantes](docs/0.3.29-COMPANIONS.md) y [aislamiento](docs/0.3.30-COMPANION-ISOLATION.md).
+- Compartir un acompañante como archivo `.trackia` y, si cabe, como QR; importarlo en otro perfil con vista previa editable y sin claves, chats ni memoria. [Formato, límites y confianza](docs/005-COMPARTIR.md).
 - Bienvenida con cinco pantallas que se deslizan, indicadores de progreso y opción «No volver a mostrar».
 - Probar lectura y escritura de Google Sheets con IA desde la conexión guardada, sin una actividad en marcha. La escritura usa una pestaña temporal que se elimina en la misma operación; no altera registros existentes.
 - Probar una notificación inmediata desde el menú sin esperar a que termine un descanso.

@@ -6991,6 +6991,30 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Importar desde archivo o texto'**
   String get packageScanUseFile;
+
+  /// No description provided for @restScreenSharedCopyUnreadable.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo leer la copia compartida.'**
+  String get restScreenSharedCopyUnreadable;
+
+  /// No description provided for @restScreenSharedCopyOpenError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo abrir la copia compartida.'**
+  String get restScreenSharedCopyOpenError;
+
+  /// No description provided for @restScreenCompanionsLoadDetail.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudieron cargar los acompañantes: {error}'**
+  String restScreenCompanionsLoadDetail(Object error);
+
+  /// No description provided for @restScreenTimerLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Tiempo: {label}'**
+  String restScreenTimerLabel(Object label);
 }
 
 class _AppLocalizationsDelegate

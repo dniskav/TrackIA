@@ -2113,5 +2113,19 @@
   "packageScanTorch": "المصباح",
   "packageScanPermissionDenied": "لم يتم منح إذن الكاميرا. يمكنك استيراد المرافق من ملف أو بلصق النص.",
   "packageScanCameraError": "تعذّر استخدام الكاميرا. يمكنك استيراد المرافق من ملف أو بلصق النص.",
-  "packageScanUseFile": "الاستيراد من ملف أو نص"
+  "packageScanUseFile": "الاستيراد من ملف أو نص",
+  "restScreenSharedCopyUnreadable": "تعذّرت قراءة النسخة المشتركة.",
+  "restScreenSharedCopyOpenError": "تعذّر فتح النسخة المشتركة.",
+  "restScreenCompanionsLoadDetail": "تعذّر تحميل المرافقين: {error}",
+  "@restScreenCompanionsLoadDetail": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "restScreenTimerLabel": "الوقت: {label}",
+  "@restScreenTimerLabel": {
+    "placeholders": {
+      "label": {}
+    }
+  }
 }

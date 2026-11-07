@@ -261,6 +261,59 @@ void main() {
       expect((await currentActivity(id)).revision, 4);
     });
 
+    test('nombre y descanso con expectedRevision correcta o sin ella', () async {
+      final id = await makeThreeSetActivity();
+      final rev = (await currentActivity(id)).revision;
+      await repo.renameActivity(id, 'Press A', expectedRevision: rev);
+      var a = await currentActivity(id);
+      expect((a.definition.name, a.revision), ('Press A', rev + 1));
+      await repo.setActivityRest(id, 45, expectedRevision: rev + 1);
+      a = await currentActivity(id);
+      expect((a.definition.restSeconds, a.revision), (45, rev + 2));
+      await repo.renameActivity(id, 'Press B');
+      await repo.setActivityRest(id, 50);
+      a = await currentActivity(id);
+      expect((a.definition.name, a.definition.restSeconds), ('Press B', 50));
+    });
+
+    test('nombre y descanso con revisión obsoleta se rechazan', () async {
+      final id = await makeThreeSetActivity();
+      final seen = await currentActivity(id);
+      await repo.setActivityTarget(id, 4, expected: seen.definition);
+      final name = seen.definition.name;
+      final rest = seen.definition.restSeconds;
+      final stale = isA<ValidationException>().having(
+        (e) => e.message,
+        'message',
+        staleTargetText,
+      );
+      await expectLater(
+        repo.renameActivity(id, 'Otro', expectedRevision: seen.revision),
+        throwsA(stale),
+      );
+      await expectLater(
+        repo.setActivityRest(id, 999, expectedRevision: seen.revision),
+        throwsA(stale),
+      );
+      final after = await currentActivity(id);
+      expect((after.definition.name, after.definition.restSeconds), (name, rest));
+      expect(after.revision, seen.revision + 1);
+    });
+
+    test('ABA del nombre: A -> B -> A se rechaza con la revisión original', () async {
+      final id = await makeThreeSetActivity();
+      final seen = await currentActivity(id);
+      final a = seen.definition.name;
+      await repo.renameActivity(id, 'Nombre B');
+      await repo.renameActivity(id, a);
+      expect((await currentActivity(id)).definition.name, a);
+      await expectLater(
+        repo.renameActivity(id, 'Nombre C', expectedRevision: seen.revision),
+        throwsA(isA<ValidationException>()),
+      );
+      expect((await currentActivity(id)).definition.name, a);
+    });
+
     test('ABA: 10 -> 60 -> 10 con propuesta de la revisión 1 se rechaza', () async {
       final id = await makeThreeSetActivity();
       final seen = await currentActivity(id);

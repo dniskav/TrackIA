@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' show Bidi;
+import '../application/localization.dart';
 import '../domain/block_names.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 
@@ -70,7 +71,8 @@ class ChatMessageBody extends StatelessWidget {
         ),
         // Generated Markdown does not authorize file reads or image downloads.
         // User attachments use the picker.
-        imageBuilder: (_, __, alt) => Text(alt ?? 'Imagen'),
+        imageBuilder: (_, __, alt) =>
+            Text(alt ?? appText(context).chatAssistantImageAlt),
       ),
     );
   }

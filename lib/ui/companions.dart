@@ -245,7 +245,7 @@ class _CompanionDashboardState extends State<CompanionDashboard>
       if (mounted) {
         setState(() {
           loading = false;
-          error = 'No se pudieron cargar los acompañantes: $e';
+          error = appText(context).restScreenCompanionsLoadDetail('$e');
         });
       }
     }
