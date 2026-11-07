@@ -29,6 +29,8 @@ dependencies:
   llama_cpp_dart:
     path: packages/llama_cpp_dart
   package_info_plus: ^9.0.1
+  qr_flutter: ^4.1.0
+  mobile_scanner: ^7.5.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
