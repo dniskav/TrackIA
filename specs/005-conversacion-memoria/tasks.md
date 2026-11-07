@@ -130,7 +130,7 @@
 - [ ] T044 [US6] Localizar Sheets, IA, transferencia, errores y avisos en `lib/ui/google_sheets_import.dart`, `lib/ui/ai_settings.dart`, `lib/ui/data_transfer.dart`, `lib/application/` y recursos nativos `android/app/src/main/res/`; no traducir datos del usuario.
   - Estado 2026-11-07: parcial avanzado: Sheets, IA, transferencia y avisos migrados; recursos nativos Android (72 cadenas en `values`, `values-en`, `values-ar`) y frases de recordatorio por idioma. Queda: `SheetsWriter.kt` (errores `GOOGLE_SYNC`) sin Context, textos de validación de `reminder.dart` y recorrer el árbol completo en árabe.
 - [ ] T045 [US6] Completar inventario T040 y agregar prueba de claves faltantes y recorridos es/en/ar en `test/localization_test.dart`; cubrir plurales, fechas, fuente grande, lector de pantalla, RTL y reinicio.
-  - Estado 2026-11-07: parcial: `test/localization_test.dart` (9) valida claves, parámetros y llaves de es/en/ar y el recorrido de 6 claves. Faltan pruebas de fechas por idioma, RTL, fuente grande, lector de pantalla y reinicio.
+  - Estado 2026-11-07: parcial: `test/localization_test.dart` (9) valida claves, parámetros y llaves de es/en/ar; `test/localization_ui_test.dart` (15) demuestra RTL en árabe, fuente al 200 % sin overflow en es/en/ar, fechas por idioma y la etiqueta semántica de versión, solo en bienvenida y ayuda. Faltan esas pruebas en chat, actividad, acompañantes y memoria, el lector de pantalla completo y el cambio de idioma en caliente.
 - [x] T046 [US6] Añadir logo existente en `lib/ui/companions.dart` con alternativa semántica y frases de espera localizadas y variadas en `lib/ui/chat/`; probar presentación en `test/locale_settings_test.dart`.
   - Evidencia: logo con descripción accesible y cuatro frases es/en/ar; `companion_dashboard_test.dart`, `locale_settings_test.dart` y `ai_settings_chat_test.dart` → 25 pruebas aprobadas.
 - [x] T047 [US6] Solicitar respuestas del modelo en el idioma elegido en `lib/application/assistant_context.dart` sin traducir ni alterar originales; probar contexto en `test/assistant_context_test.dart`.
@@ -154,6 +154,7 @@
 - [x] T052 Verificar matriz FR-001–FR-015 y SC-001–SC-006 contra tareas y evidencia en `docs/005-QA.md`; corregir huecos y actualizar `specs/README.md` y `README.md` con estado real.
   - Evidencia 2026-11-07 (trabajo autónomo): `docs/005-MATRIZ.md` verifica FR-001…FR-015 y SC-001…SC-006 contra tareas y archivos de evidencia existentes: 3 cubiertos, 14 parciales y 4 sin validar con servicio real; huecos priorizados al final. FR-001 queda parcial por decisión del dueño (solo se edita el último mensaje).
 - [ ] T053 Preparar recorridos de aceptación con datos sintéticos y evidencia diferenciada de Google real, teléfono y iOS en `docs/005-QA.md`; solicitar disponibilidad solo cuando sea necesaria, sin publicar ni instalar automáticamente.
+  - Estado 2026-11-07: preparado, sin ejecutar: `docs/005-ACEPTACION.md` (195 líneas) con recorridos paso a paso, datos sintéticos y evidencia separada en emulador, teléfono real y Google/IA/iOS. Queda abierta hasta que una persona ejecute los recorridos de teléfono y autorice los de servicios reales.
 
 ## Dependencias y estrategia
 
@@ -164,6 +165,6 @@ T001–T005 → US1 y US2; US3 puede ejecutarse tras T001–T002; US4/US5 tras T
 Casillas [x] tras contrastar con el código y ejecutar sus pruebas (ver evidencia en cada tarea y `docs/005-QA.md`).
 
 - Hechas (46): T001–T029, T031–T038, T040, T041, T046–T052. Con reservas: T021, T022 y T034 solo con transporte/cliente simulado; T026 sin conexión al chat; T027 y T031 con transporte falso y sin Drive real; T037 con persistencia (T036) pero sin avisos por acuerdo; T013/T014 solo con mensajes durables; T052 deja 14 requisitos en parcial.
-- Abiertas (7): T030 (adaptador real de Drive y OAuth: bloqueo externo), T039 (prueba de integración de acuerdos con avisos), T042–T044 (localización: parcial avanzado, ver sus notas), T045 (parcial: faltan fechas, RTL, fuente grande, lector de pantalla y reinicio) y T053 (recorridos de aceptación con datos sintéticos).
+- Abiertas (7): T030 (adaptador real de Drive y OAuth: bloqueo externo), T039 (prueba de integración de acuerdos con avisos), T042–T044 (localización: parcial avanzado, ver sus notas), T045 (parcial: RTL, fuente grande y fechas probados solo en bienvenida y ayuda) y T053 (recorridos preparados en `docs/005-ACEPTACION.md`, sin ejecutar).
 - Validación real aún no hecha: Google OAuth/Drive, IA real, Android antiguo e interrupción de proceso (T004), iOS, revisión humana del árabe y aplicar la migración v8 a la base real del teléfono.
 - Antes de instalar en el teléfono real: conservar el APK actual (mismo número de versión permite volver atrás) y comprobar que se genera la copia `.pre-trackia-v8.sqlite`.
