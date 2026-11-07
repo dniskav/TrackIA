@@ -10,6 +10,7 @@ import '../data/ai_settings_store.dart';
 import '../data/companion_store.dart';
 import '../data/progress_repository.dart';
 import '../domain/assistant_blocks.dart';
+import '../domain/block_names.dart' show fenceOpen;
 import '../domain/companion.dart';
 import '../domain/reminder.dart';
 import '../domain/workout.dart';
@@ -594,7 +595,7 @@ class _CompanionAssistedScreenState extends State<CompanionAssistedScreen> {
   }
 
   static String visible(String answer) => answer
-      .replaceAll(RegExp(r'```(?:trackia|gymia)-[a-z-]+[\s\S]*?```'), '')
+      .replaceAll(RegExp('$fenceOpen(?:trackia|gymia)-[a-z-]+[\\s\\S]*?```'), '')
       .replaceAll(RegExp(r'\n{3,}'), '\n\n')
       .trim();
 

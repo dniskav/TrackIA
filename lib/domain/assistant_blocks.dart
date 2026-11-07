@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart' show debugPrint;
 
 import 'activity.dart';
+import 'block_names.dart';
 import 'companion.dart';
 import 'progress.dart';
 import 'reminder.dart';
@@ -25,7 +26,7 @@ String get blockRejectedText => _blockProblem;
 
 /// Whether [answer] tries to use a `trackia-<kind>` block at all, valid or not.
 bool mentionsBlock(String answer, String kind) =>
-    answer.contains('```trackia-$kind');
+    RegExp('$fenceOpen${RegExp.escape('trackia-$kind')}').hasMatch(answer);
 
 T? _reject<T>(String kind, String reason) {
   debugPrint('trackia-$kind rechazado: $reason');
@@ -36,7 +37,7 @@ T? _reject<T>(String kind, String reason) {
 Map<String, dynamic>? _single(String answer, String kind) {
   final blocks =
       RegExp(
-        '```trackia-$kind\\s*\\n([\\s\\S]*?)```',
+        '${fenceOpen}trackia-$kind\\s*\\n([\\s\\S]*?)```',
       ).allMatches(answer).toList();
   if (blocks.isEmpty) return null;
   if (blocks.length != 1) return _reject(kind, 'más de un bloque');
@@ -144,7 +145,7 @@ TargetProposalCheck checkActivityTargetProposal(
   required ActivityDefinition? current,
 }) {
   final proposal = parseActivityTargetBlock(answer);
-  final otherBlock = RegExp(r'```(?:trackia|gymia)-([a-z][a-z-]*)')
+  final otherBlock = RegExp('$fenceOpen(?:trackia|gymia)-([a-z][a-z-]*)')
       .allMatches(answer)
       .any((match) => match.group(1) != 'activity-target');
   if (proposal == null ||

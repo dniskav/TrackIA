@@ -8,21 +8,25 @@ import 'dart:convert';
 const blockPrefix = 'trackia';
 const _legacyBlockPrefix = 'gymia';
 
+/// Apertura de un bloque: tres acentos graves y, a veces, un espacio antes del
+/// nombre (los modelos escriben «``` trackia-sheet-plan»), que también cuenta.
+const fenceOpen = r'```[ \t]*';
+
 /// A block of [kind] with its JSON body in group 1, under either prefix.
 RegExp blockPattern(String kind) => RegExp(
-  '```(?:$blockPrefix|$_legacyBlockPrefix)-$kind\\s*\\n([\\s\\S]*?)```',
+  '$fenceOpen(?:$blockPrefix|$_legacyBlockPrefix)-$kind\\s*\\n([\\s\\S]*?)```',
 );
 
 /// Whether the text opens a block of [kind], finished or not.
 bool hasBlock(String text, String kind) => RegExp(
-  '```(?:$blockPrefix|$_legacyBlockPrefix)-${RegExp.escape(kind)}(?=[\\s`]|\$)',
+  '$fenceOpen(?:$blockPrefix|$_legacyBlockPrefix)-${RegExp.escape(kind)}(?=[\\s`]|\$)',
 ).hasMatch(text);
 
 /// Blocks the user never sees as text. Every old `gymia-*` block, and the
 /// `trackia-*` ones that are commands to the app (the game and companion
 /// blocks are shown by their own cards).
 final hiddenBlockPattern = RegExp(
-  '```(?:$_legacyBlockPrefix-|$blockPrefix-'
+  '$fenceOpen(?:$_legacyBlockPrefix-|$blockPrefix-'
   '(?:activity|activity-target|result|archive|recall|sync|sheet-plan|sheet-edit|timing))'
   r'[\s\S]*?(?:```|$)',
 );
@@ -31,7 +35,9 @@ final hiddenBlockPattern = RegExp(
 /// veces escribe como JSON suelto en lugar de usar el bloque `trackia-sheet-plan`.
 const _strayPlanKeys = {'summary', 'resumen', 'writes', 'layout'};
 
-final _fencedJson = RegExp(r'```[A-Za-z0-9_-]*[ \t]*\n(\s*\{[\s\S]*?\})\s*```');
+final _fencedJson = RegExp(
+  r'```[ \t]*[A-Za-z0-9_-]*[ \t]*\n(\s*\{[\s\S]*?\})\s*```',
+);
 
 /// Quita del texto visible los bloques de código con un JSON de plan que la app
 /// no reconoce: no son para el usuario y se veían como texto en crudo.
