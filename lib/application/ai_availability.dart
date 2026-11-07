@@ -4,6 +4,7 @@ import '../data/ai_client.dart';
 import '../data/ai_model_catalog.dart';
 import '../data/ai_settings_store.dart';
 import '../domain/workout.dart';
+import '../l10n/generated/app_localizations.dart';
 
 enum AiAvailabilityStatus {
   checking,
@@ -11,6 +12,21 @@ enum AiAvailabilityStatus {
   unverified,
   ready,
   unavailable,
+}
+
+/// Language-neutral reason behind the current [AiAvailability] state. The UI
+/// turns it into text with [AiAvailability.text] / [AiAvailability.settingsText];
+/// nothing in the application layer depends on Spanish wording.
+enum AiNotice {
+  checking,
+  unconfigured,
+  unverified,
+  verified,
+  catalogFailedWithReason,
+  catalogFailed,
+  validationError,
+  unreachable,
+  requestFailed,
 }
 
 /// Configuration is not evidence of a working model. A real reply verifies
@@ -26,17 +42,52 @@ class AiAvailability extends ChangeNotifier {
   final AiClient client;
   final AiSettingsStore store;
   AiAvailabilityStatus status = AiAvailabilityStatus.checking;
-  String message = 'Comprobando IA…';
+  AiNotice notice = AiNotice.checking;
+
+  /// Model id for [AiNotice.verified]; validation reason for
+  /// [AiNotice.validationError] and [AiNotice.catalogFailedWithReason]
+  /// (already user-facing text produced by the domain layer).
+  String detail = '';
   bool get ready => status == AiAvailabilityStatus.ready;
   int _request = 0;
   bool _disposed = false;
 
-  void _set(int request, AiAvailabilityStatus next, String text) {
+  void _set(
+    int request,
+    AiAvailabilityStatus next,
+    AiNotice reason, [
+    String info = '',
+  ]) {
     if (_disposed || request != _request) return;
     status = next;
-    message = text;
+    notice = reason;
+    detail = info;
     notifyListeners();
   }
+
+  /// Full status sentence, as shown in the chat banner.
+  String text(AppLocalizations l) => switch (notice) {
+    AiNotice.checking => l.aiStatusChecking,
+    AiNotice.unconfigured => l.aiStatusUnconfigured,
+    AiNotice.unverified => l.aiStatusUnverified,
+    AiNotice.verified => l.aiStatusVerified(detail),
+    AiNotice.catalogFailedWithReason => l.aiStatusCatalogReason(detail),
+    AiNotice.catalogFailed => l.aiStatusCatalogFailed,
+    AiNotice.validationError => detail,
+    AiNotice.unreachable => l.aiStatusUnreachable,
+    AiNotice.requestFailed => l.aiStatusRequestFailed,
+  };
+
+  /// Short row subtitle for the settings screen.
+  String settingsText(AppLocalizations l) => switch (status) {
+    AiAvailabilityStatus.ready when notice == AiNotice.verified =>
+      '${l.verified} · $detail',
+    AiAvailabilityStatus.ready => text(l),
+    AiAvailabilityStatus.unconfigured => l.notConnected,
+    AiAvailabilityStatus.unverified => l.notVerified,
+    AiAvailabilityStatus.unavailable => l.unavailable,
+    AiAvailabilityStatus.checking => l.checking,
+  };
 
   Future<void> check({
     bool verify = false,
@@ -45,7 +96,7 @@ class AiAvailability extends ChangeNotifier {
     final request = ++_request;
     final wasReady = ready && !verify;
     if (!wasReady) {
-      _set(request, AiAvailabilityStatus.checking, 'Comprobando IA…');
+      _set(request, AiAvailabilityStatus.checking, AiNotice.checking);
     }
     try {
       final config = await store.load();
@@ -53,7 +104,7 @@ class AiAvailability extends ChangeNotifier {
         _set(
           request,
           AiAvailabilityStatus.unconfigured,
-          'Configura tu proveedor y modelo para usar el asistente. Puedes cargar tus datos antes.',
+          AiNotice.unconfigured,
         );
         return;
       }
@@ -75,7 +126,7 @@ class AiAvailability extends ChangeNotifier {
             _set(
               request,
               AiAvailabilityStatus.unverified,
-              'Verifica la conexión del modelo para habilitar el asistente y las actividades.',
+              AiNotice.unverified,
             );
             return;
           }
@@ -93,17 +144,24 @@ class AiAvailability extends ChangeNotifier {
       _set(
         request,
         AiAvailabilityStatus.ready,
-        'IA verificada · ${config.modelId}',
+        AiNotice.verified,
+        config.modelId,
       );
     } on ValidationException catch (e) {
       if (wasReady) {
         _set(
           request,
           AiAvailabilityStatus.ready,
-          'IA configurada · no se pudo actualizar el catálogo: ${e.message}',
+          AiNotice.catalogFailedWithReason,
+          e.message,
         );
       } else {
-        _set(request, AiAvailabilityStatus.unavailable, e.message);
+        _set(
+          request,
+          AiAvailabilityStatus.unavailable,
+          AiNotice.validationError,
+          e.message,
+        );
       }
     } catch (_) {
       _set(
@@ -111,9 +169,7 @@ class AiAvailability extends ChangeNotifier {
         wasReady
             ? AiAvailabilityStatus.ready
             : AiAvailabilityStatus.unavailable,
-        wasReady
-            ? 'IA configurada · no se pudo actualizar el catálogo. Puedes seguir enviando mensajes.'
-            : 'No se pudo comprobar la conexión con la IA. Reintenta o revisa el proveedor. Tus datos se conservan.',
+        wasReady ? AiNotice.catalogFailed : AiNotice.unreachable,
       );
     }
   }
@@ -122,7 +178,7 @@ class AiAvailability extends ChangeNotifier {
     _set(
       ++_request,
       ready ? AiAvailabilityStatus.ready : AiAvailabilityStatus.unavailable,
-      'La última solicitud falló. Puedes reintentar con el mismo modelo; tus registros se conservan.',
+      AiNotice.requestFailed,
     );
   }
 

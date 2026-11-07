@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../application/localization.dart';
 import '../application/progress_engine.dart' show formatCount;
+import '../l10n/generated/app_localizations.dart';
 import '../domain/progress.dart';
 import 'goal_ring.dart';
 
@@ -15,14 +16,16 @@ IconData achievementIcon(String id) => switch (id) {
   _ => Icons.emoji_events,
 };
 
-String durationText(Duration value) {
+String durationText(Duration value, AppLocalizations l) {
   final minutes = value.inMinutes;
   if (minutes >= 60) {
     final rest = minutes % 60;
-    return rest == 0 ? '${minutes ~/ 60} h' : '${minutes ~/ 60} h $rest min';
+    return rest == 0
+        ? l.durationHours(minutes ~/ 60)
+        : l.durationHoursMinutes(minutes ~/ 60, rest);
   }
-  if (minutes >= 1) return '$minutes min';
-  return '${value.inSeconds} s';
+  if (minutes >= 1) return l.durationMinutes(minutes);
+  return l.durationSeconds(value.inSeconds);
 }
 
 String _number(double value) => value == value.roundToDouble()
@@ -64,7 +67,7 @@ class ActivitySummary extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              '$name · ${durationText(duration)}',
+              '$name · ${durationText(duration, appText(context))}',
               key: const Key('summary-line'),
               style: theme.textTheme.titleMedium,
             ),

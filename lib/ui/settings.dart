@@ -69,16 +69,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     notifications.initialize();
   }
 
-  String get aiState => switch (availability.status) {
-    AiAvailabilityStatus.ready => availability.message.replaceFirst(
-      'IA verificada',
-      appText(context).verified,
-    ),
-    AiAvailabilityStatus.unconfigured => appText(context).notConnected,
-    AiAvailabilityStatus.unverified => appText(context).notVerified,
-    AiAvailabilityStatus.unavailable => appText(context).unavailable,
-    AiAvailabilityStatus.checking => appText(context).checking,
-  };
+  String get aiState => availability.settingsText(appText(context));
 
   String appearanceState(AppLocalizations l) => switch (theme.mode) {
     ThemeMode.system => l.automatic,

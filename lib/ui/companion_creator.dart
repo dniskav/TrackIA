@@ -409,7 +409,7 @@ class _CompanionBuilderScreenState extends State<CompanionBuilderScreen> {
                 goalText(goal!, {
                   for (final f in activity?.fields ?? const [])
                     '${f['key']}': '${f['label']}',
-                }),
+                }, appText(context)),
               ),
             ),
             trailing: IconButton(
@@ -556,7 +556,7 @@ class CompanionPreviewCard extends StatelessWidget {
               appText(context).creatorGoalLabel(
                 draft.goal == null
                     ? appText(context).creatorNoGoal
-                    : goalText(draft.goal!, labels),
+                    : goalText(draft.goal!, labels, appText(context)),
               ),
               key: const Key('preview-goal'),
             ),
@@ -568,7 +568,7 @@ class CompanionPreviewCard extends StatelessWidget {
               appText(context).creatorReminderLabel(
                 draft.reminder == null
                     ? appText(context).creatorNoReminder
-                    : reminderText(draft.reminder!),
+                    : reminderText(draft.reminder!, appText(context)),
               ),
               key: const Key('preview-reminder'),
             ),

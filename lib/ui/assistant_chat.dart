@@ -678,7 +678,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
       tone: 'neutral',
       paused: false,
       streak: state.streak.current,
-      goalText: state.goal == null ? null : goalText(state.goal!, labels),
+      goalText: state.goal == null ? null : goalText(state.goal!, labels, appText(context)),
       lastActivityDate: reminderDay(lastActivity),
       templates: ReminderTemplates.defaults(
         tone: 'neutral',
@@ -835,7 +835,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(availability.message),
+                        Text(availability.text(appText(context))),
                         if (availability.status ==
                             AiAvailabilityStatus.checking)
                           const LinearProgressIndicator()

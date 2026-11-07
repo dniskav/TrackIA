@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:trackia/domain/progress.dart';
+import 'package:trackia/l10n/generated/app_localizations.dart';
 import 'package:trackia/ui/activity_summary.dart';
 import 'package:trackia/ui/theme.dart';
 
@@ -85,10 +86,11 @@ void main() {
   });
 
   test('durations read naturally', () {
-    expect(durationText(const Duration(seconds: 45)), '45 s');
-    expect(durationText(const Duration(minutes: 20)), '20 min');
-    expect(durationText(const Duration(minutes: 60)), '1 h');
-    expect(durationText(const Duration(minutes: 95)), '1 h 35 min');
+    final l = lookupAppLocalizations(const Locale('es'));
+    expect(durationText(const Duration(seconds: 45), l), '45 s');
+    expect(durationText(const Duration(minutes: 20), l), '20 min');
+    expect(durationText(const Duration(minutes: 60), l), '1 h');
+    expect(durationText(const Duration(minutes: 95), l), '1 h 35 min');
   });
 
   test('every icon id has an icon', () {

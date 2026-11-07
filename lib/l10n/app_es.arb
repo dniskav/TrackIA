@@ -2127,5 +2127,150 @@
     "placeholders": {
       "label": {}
     }
+  },
+  "aiStatusChecking": "Comprobando IA…",
+  "aiStatusUnconfigured": "Configura tu proveedor y modelo para usar el asistente. Puedes cargar tus datos antes.",
+  "aiStatusUnverified": "Verifica la conexión del modelo para habilitar el asistente y las actividades.",
+  "aiStatusVerified": "IA verificada · {model}",
+  "@aiStatusVerified": {
+    "placeholders": {
+      "model": {}
+    }
+  },
+  "aiStatusCatalogReason": "IA configurada · no se pudo actualizar el catálogo: {reason}",
+  "@aiStatusCatalogReason": {
+    "placeholders": {
+      "reason": {}
+    }
+  },
+  "aiStatusCatalogFailed": "IA configurada · no se pudo actualizar el catálogo. Puedes seguir enviando mensajes.",
+  "aiStatusUnreachable": "No se pudo comprobar la conexión con la IA. Reintenta o revisa el proveedor. Tus datos se conservan.",
+  "aiStatusRequestFailed": "La última solicitud falló. Puedes reintentar con el mismo modelo; tus registros se conservan.",
+  "ruleUnitMin": "min",
+  "ruleUnitSessions": "sesiones",
+  "ruleSessionOne": "1 sesión",
+  "ruleMetricTime": "Tiempo",
+  "ruleMetricSessions": "Sesiones",
+  "ruleMetricMax": "Máximo de {label}",
+  "@ruleMetricMax": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "ruleMetricAvg": "Promedio de {label}",
+  "@ruleMetricAvg": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "ruleMetricDistinct": "{label} distintos",
+  "@ruleMetricDistinct": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "ruleMetricCountTrue": "Veces: {label}",
+  "@ruleMetricCountTrue": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "rulePerDay": "por día",
+  "rulePerWeek": "por semana",
+  "rulePerSession": "por sesión",
+  "rulePerTotal": "en total",
+  "ruleGoalMinimum": "(mínimo {value})",
+  "@ruleGoalMinimum": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "ruleGoalDaily": "al día",
+  "ruleGoalWeekly": "a la semana",
+  "ruleStreakOne": "Racha de 1 día",
+  "ruleStreakDays": "Racha de {n} días",
+  "@ruleStreakDays": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "ruleAtLeast": "{metric} ≥ {amount} {per}",
+  "@ruleAtLeast": {
+    "placeholders": {
+      "metric": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      },
+      "per": {
+        "type": "String"
+      }
+    }
+  },
+  "ruleDaysAll": "Todos los días",
+  "ruleDaysWeekdays": "De lunes a viernes",
+  "ruleDaysWeekend": "Fines de semana",
+  "ruleDayMon": "lun",
+  "ruleDayTue": "mar",
+  "ruleDayWed": "mié",
+  "ruleDayThu": "jue",
+  "ruleDayFri": "vie",
+  "ruleDaySat": "sáb",
+  "ruleDaySun": "dom",
+  "ruleReminderLastCall": "· última llamada {time}",
+  "@ruleReminderLastCall": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "durationHours": "{h} h",
+  "@durationHours": {
+    "placeholders": {
+      "h": {
+        "type": "int"
+      }
+    }
+  },
+  "durationHoursMinutes": "{h} h {m} min",
+  "@durationHoursMinutes": {
+    "placeholders": {
+      "h": {
+        "type": "int"
+      },
+      "m": {
+        "type": "int"
+      }
+    }
+  },
+  "durationMinutes": "{m} min",
+  "@durationMinutes": {
+    "placeholders": {
+      "m": {
+        "type": "int"
+      }
+    }
+  },
+  "durationSeconds": "{s} s",
+  "@durationSeconds": {
+    "placeholders": {
+      "s": {
+        "type": "int"
+      }
+    }
   }
 }

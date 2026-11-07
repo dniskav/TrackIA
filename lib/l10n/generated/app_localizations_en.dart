@@ -4065,4 +4065,163 @@ class AppLocalizationsEn extends AppLocalizations {
   String restScreenTimerLabel(Object label) {
     return 'Time: $label';
   }
+
+  @override
+  String get aiStatusChecking => 'Checking AI…';
+
+  @override
+  String get aiStatusUnconfigured =>
+      'Set up your provider and model to use the assistant. You can load your data first.';
+
+  @override
+  String get aiStatusUnverified =>
+      'Verify the model connection to enable the assistant and activities.';
+
+  @override
+  String aiStatusVerified(Object model) {
+    return 'AI verified · $model';
+  }
+
+  @override
+  String aiStatusCatalogReason(Object reason) {
+    return 'AI configured · the catalog could not be updated: $reason';
+  }
+
+  @override
+  String get aiStatusCatalogFailed =>
+      'AI configured · the catalog could not be updated. You can keep sending messages.';
+
+  @override
+  String get aiStatusUnreachable =>
+      'Could not check the connection to the AI. Try again or review the provider. Your data is kept.';
+
+  @override
+  String get aiStatusRequestFailed =>
+      'The last request failed. You can retry with the same model; your records are kept.';
+
+  @override
+  String get ruleUnitMin => 'min';
+
+  @override
+  String get ruleUnitSessions => 'sessions';
+
+  @override
+  String get ruleSessionOne => '1 session';
+
+  @override
+  String get ruleMetricTime => 'Time';
+
+  @override
+  String get ruleMetricSessions => 'Sessions';
+
+  @override
+  String ruleMetricMax(String label) {
+    return 'Maximum of $label';
+  }
+
+  @override
+  String ruleMetricAvg(String label) {
+    return 'Average of $label';
+  }
+
+  @override
+  String ruleMetricDistinct(String label) {
+    return 'Distinct $label';
+  }
+
+  @override
+  String ruleMetricCountTrue(String label) {
+    return 'Times: $label';
+  }
+
+  @override
+  String get rulePerDay => 'per day';
+
+  @override
+  String get rulePerWeek => 'per week';
+
+  @override
+  String get rulePerSession => 'per session';
+
+  @override
+  String get rulePerTotal => 'in total';
+
+  @override
+  String ruleGoalMinimum(String value) {
+    return '(minimum $value)';
+  }
+
+  @override
+  String get ruleGoalDaily => 'a day';
+
+  @override
+  String get ruleGoalWeekly => 'a week';
+
+  @override
+  String get ruleStreakOne => '1-day streak';
+
+  @override
+  String ruleStreakDays(int n) {
+    return '$n-day streak';
+  }
+
+  @override
+  String ruleAtLeast(String metric, String amount, String per) {
+    return '$metric ≥ $amount $per';
+  }
+
+  @override
+  String get ruleDaysAll => 'Every day';
+
+  @override
+  String get ruleDaysWeekdays => 'Monday to Friday';
+
+  @override
+  String get ruleDaysWeekend => 'Weekends';
+
+  @override
+  String get ruleDayMon => 'Mon';
+
+  @override
+  String get ruleDayTue => 'Tue';
+
+  @override
+  String get ruleDayWed => 'Wed';
+
+  @override
+  String get ruleDayThu => 'Thu';
+
+  @override
+  String get ruleDayFri => 'Fri';
+
+  @override
+  String get ruleDaySat => 'Sat';
+
+  @override
+  String get ruleDaySun => 'Sun';
+
+  @override
+  String ruleReminderLastCall(String time) {
+    return '· last call $time';
+  }
+
+  @override
+  String durationHours(int h) {
+    return '$h h';
+  }
+
+  @override
+  String durationHoursMinutes(int h, int m) {
+    return '$h h $m min';
+  }
+
+  @override
+  String durationMinutes(int m) {
+    return '$m min';
+  }
+
+  @override
+  String durationSeconds(int s) {
+    return '$s s';
+  }
 }

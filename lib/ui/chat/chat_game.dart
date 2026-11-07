@@ -257,7 +257,7 @@ extension _ChatGame on _AssistantChatScreenState {
         cards.add(
           GameProposalData(
             kind: 'goal',
-            title: l.chatGameGoalTitle(goalText(goal.rule, labels)),
+            title: l.chatGameGoalTitle(goalText(goal.rule, labels, l)),
             lines: const [],
             payload: goal,
           ),
@@ -273,7 +273,7 @@ extension _ChatGame on _AssistantChatScreenState {
           GameProposalData(
             kind: 'achievement',
             title: l.chatGameAchievementTitle(achievement.title),
-            lines: [ruleText(achievement.rule, labels)],
+            lines: [ruleText(achievement.rule, labels, l)],
             payload: achievement,
           ),
         );
@@ -299,6 +299,7 @@ extension _ChatGame on _AssistantChatScreenState {
   }
 
   Future<void> addGameCard(GameProposalData card) async {
+    final l = appText(context);
     final service = widget.progressService;
     if (service == null || gameBusy) return;
     update(() => gameBusy = true);
@@ -314,8 +315,8 @@ extension _ChatGame on _AssistantChatScreenState {
           );
           await recordEffect(
             'goal',
-            goalText(goal.rule, await fieldLabels(service)),
-            'Añadí la meta «${goalText(goal.rule, await fieldLabels(service))}»',
+            goalText(goal.rule, await fieldLabels(service), l),
+            'Añadí la meta «${goalText(goal.rule, await fieldLabels(service), l)}»',
           );
           result = 'Meta añadida. La verás en tu progreso.';
         case 'achievement':

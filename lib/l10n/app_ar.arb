@@ -2127,5 +2127,150 @@
     "placeholders": {
       "label": {}
     }
+  },
+  "aiStatusChecking": "جارٍ التحقق من الذكاء الاصطناعي…",
+  "aiStatusUnconfigured": "اضبط المزوّد والنموذج لاستخدام المساعد. يمكنك تحميل بياناتك قبل ذلك.",
+  "aiStatusUnverified": "تحقق من اتصال النموذج لتفعيل المساعد والأنشطة.",
+  "aiStatusVerified": "تم التحقق من الذكاء الاصطناعي · {model}",
+  "@aiStatusVerified": {
+    "placeholders": {
+      "model": {}
+    }
+  },
+  "aiStatusCatalogReason": "تم إعداد الذكاء الاصطناعي · تعذّر تحديث الكتالوج: {reason}",
+  "@aiStatusCatalogReason": {
+    "placeholders": {
+      "reason": {}
+    }
+  },
+  "aiStatusCatalogFailed": "تم إعداد الذكاء الاصطناعي · تعذّر تحديث الكتالوج. يمكنك متابعة إرسال الرسائل.",
+  "aiStatusUnreachable": "تعذّر التحقق من الاتصال بالذكاء الاصطناعي. أعد المحاولة أو راجع المزوّد. بياناتك محفوظة.",
+  "aiStatusRequestFailed": "فشل الطلب الأخير. يمكنك إعادة المحاولة بالنموذج نفسه؛ سجلاتك محفوظة.",
+  "ruleUnitMin": "د",
+  "ruleUnitSessions": "جلسات",
+  "ruleSessionOne": "جلسة واحدة",
+  "ruleMetricTime": "الوقت",
+  "ruleMetricSessions": "الجلسات",
+  "ruleMetricMax": "الحد الأقصى من {label}",
+  "@ruleMetricMax": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "ruleMetricAvg": "متوسط {label}",
+  "@ruleMetricAvg": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "ruleMetricDistinct": "{label} المختلفة",
+  "@ruleMetricDistinct": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "ruleMetricCountTrue": "عدد المرات: {label}",
+  "@ruleMetricCountTrue": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "rulePerDay": "في اليوم",
+  "rulePerWeek": "في الأسبوع",
+  "rulePerSession": "في الجلسة",
+  "rulePerTotal": "في المجموع",
+  "ruleGoalMinimum": "(الحد الأدنى {value})",
+  "@ruleGoalMinimum": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "ruleGoalDaily": "في اليوم",
+  "ruleGoalWeekly": "في الأسبوع",
+  "ruleStreakOne": "سلسلة من يوم واحد",
+  "ruleStreakDays": "سلسلة من {n} أيام",
+  "@ruleStreakDays": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "ruleAtLeast": "{metric} ≥ {amount} {per}",
+  "@ruleAtLeast": {
+    "placeholders": {
+      "metric": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      },
+      "per": {
+        "type": "String"
+      }
+    }
+  },
+  "ruleDaysAll": "كل يوم",
+  "ruleDaysWeekdays": "من الاثنين إلى الجمعة",
+  "ruleDaysWeekend": "عطلة نهاية الأسبوع",
+  "ruleDayMon": "الاثنين",
+  "ruleDayTue": "الثلاثاء",
+  "ruleDayWed": "الأربعاء",
+  "ruleDayThu": "الخميس",
+  "ruleDayFri": "الجمعة",
+  "ruleDaySat": "السبت",
+  "ruleDaySun": "الأحد",
+  "ruleReminderLastCall": "· آخر تنبيه {time}",
+  "@ruleReminderLastCall": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "durationHours": "{h} س",
+  "@durationHours": {
+    "placeholders": {
+      "h": {
+        "type": "int"
+      }
+    }
+  },
+  "durationHoursMinutes": "{h} س {m} د",
+  "@durationHoursMinutes": {
+    "placeholders": {
+      "h": {
+        "type": "int"
+      },
+      "m": {
+        "type": "int"
+      }
+    }
+  },
+  "durationMinutes": "{m} د",
+  "@durationMinutes": {
+    "placeholders": {
+      "m": {
+        "type": "int"
+      }
+    }
+  },
+  "durationSeconds": "{s} ث",
+  "@durationSeconds": {
+    "placeholders": {
+      "s": {
+        "type": "int"
+      }
+    }
   }
 }

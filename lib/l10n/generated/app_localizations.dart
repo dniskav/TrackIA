@@ -7015,6 +7015,258 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Tiempo: {label}'**
   String restScreenTimerLabel(Object label);
+
+  /// No description provided for @aiStatusChecking.
+  ///
+  /// In es, this message translates to:
+  /// **'Comprobando IA…'**
+  String get aiStatusChecking;
+
+  /// No description provided for @aiStatusUnconfigured.
+  ///
+  /// In es, this message translates to:
+  /// **'Configura tu proveedor y modelo para usar el asistente. Puedes cargar tus datos antes.'**
+  String get aiStatusUnconfigured;
+
+  /// No description provided for @aiStatusUnverified.
+  ///
+  /// In es, this message translates to:
+  /// **'Verifica la conexión del modelo para habilitar el asistente y las actividades.'**
+  String get aiStatusUnverified;
+
+  /// No description provided for @aiStatusVerified.
+  ///
+  /// In es, this message translates to:
+  /// **'IA verificada · {model}'**
+  String aiStatusVerified(Object model);
+
+  /// No description provided for @aiStatusCatalogReason.
+  ///
+  /// In es, this message translates to:
+  /// **'IA configurada · no se pudo actualizar el catálogo: {reason}'**
+  String aiStatusCatalogReason(Object reason);
+
+  /// No description provided for @aiStatusCatalogFailed.
+  ///
+  /// In es, this message translates to:
+  /// **'IA configurada · no se pudo actualizar el catálogo. Puedes seguir enviando mensajes.'**
+  String get aiStatusCatalogFailed;
+
+  /// No description provided for @aiStatusUnreachable.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo comprobar la conexión con la IA. Reintenta o revisa el proveedor. Tus datos se conservan.'**
+  String get aiStatusUnreachable;
+
+  /// No description provided for @aiStatusRequestFailed.
+  ///
+  /// In es, this message translates to:
+  /// **'La última solicitud falló. Puedes reintentar con el mismo modelo; tus registros se conservan.'**
+  String get aiStatusRequestFailed;
+
+  /// No description provided for @ruleUnitMin.
+  ///
+  /// In es, this message translates to:
+  /// **'min'**
+  String get ruleUnitMin;
+
+  /// No description provided for @ruleUnitSessions.
+  ///
+  /// In es, this message translates to:
+  /// **'sesiones'**
+  String get ruleUnitSessions;
+
+  /// No description provided for @ruleSessionOne.
+  ///
+  /// In es, this message translates to:
+  /// **'1 sesión'**
+  String get ruleSessionOne;
+
+  /// No description provided for @ruleMetricTime.
+  ///
+  /// In es, this message translates to:
+  /// **'Tiempo'**
+  String get ruleMetricTime;
+
+  /// No description provided for @ruleMetricSessions.
+  ///
+  /// In es, this message translates to:
+  /// **'Sesiones'**
+  String get ruleMetricSessions;
+
+  /// No description provided for @ruleMetricMax.
+  ///
+  /// In es, this message translates to:
+  /// **'Máximo de {label}'**
+  String ruleMetricMax(String label);
+
+  /// No description provided for @ruleMetricAvg.
+  ///
+  /// In es, this message translates to:
+  /// **'Promedio de {label}'**
+  String ruleMetricAvg(String label);
+
+  /// No description provided for @ruleMetricDistinct.
+  ///
+  /// In es, this message translates to:
+  /// **'{label} distintos'**
+  String ruleMetricDistinct(String label);
+
+  /// No description provided for @ruleMetricCountTrue.
+  ///
+  /// In es, this message translates to:
+  /// **'Veces: {label}'**
+  String ruleMetricCountTrue(String label);
+
+  /// No description provided for @rulePerDay.
+  ///
+  /// In es, this message translates to:
+  /// **'por día'**
+  String get rulePerDay;
+
+  /// No description provided for @rulePerWeek.
+  ///
+  /// In es, this message translates to:
+  /// **'por semana'**
+  String get rulePerWeek;
+
+  /// No description provided for @rulePerSession.
+  ///
+  /// In es, this message translates to:
+  /// **'por sesión'**
+  String get rulePerSession;
+
+  /// No description provided for @rulePerTotal.
+  ///
+  /// In es, this message translates to:
+  /// **'en total'**
+  String get rulePerTotal;
+
+  /// No description provided for @ruleGoalMinimum.
+  ///
+  /// In es, this message translates to:
+  /// **'(mínimo {value})'**
+  String ruleGoalMinimum(String value);
+
+  /// No description provided for @ruleGoalDaily.
+  ///
+  /// In es, this message translates to:
+  /// **'al día'**
+  String get ruleGoalDaily;
+
+  /// No description provided for @ruleGoalWeekly.
+  ///
+  /// In es, this message translates to:
+  /// **'a la semana'**
+  String get ruleGoalWeekly;
+
+  /// No description provided for @ruleStreakOne.
+  ///
+  /// In es, this message translates to:
+  /// **'Racha de 1 día'**
+  String get ruleStreakOne;
+
+  /// No description provided for @ruleStreakDays.
+  ///
+  /// In es, this message translates to:
+  /// **'Racha de {n} días'**
+  String ruleStreakDays(int n);
+
+  /// No description provided for @ruleAtLeast.
+  ///
+  /// In es, this message translates to:
+  /// **'{metric} ≥ {amount} {per}'**
+  String ruleAtLeast(String metric, String amount, String per);
+
+  /// No description provided for @ruleDaysAll.
+  ///
+  /// In es, this message translates to:
+  /// **'Todos los días'**
+  String get ruleDaysAll;
+
+  /// No description provided for @ruleDaysWeekdays.
+  ///
+  /// In es, this message translates to:
+  /// **'De lunes a viernes'**
+  String get ruleDaysWeekdays;
+
+  /// No description provided for @ruleDaysWeekend.
+  ///
+  /// In es, this message translates to:
+  /// **'Fines de semana'**
+  String get ruleDaysWeekend;
+
+  /// No description provided for @ruleDayMon.
+  ///
+  /// In es, this message translates to:
+  /// **'lun'**
+  String get ruleDayMon;
+
+  /// No description provided for @ruleDayTue.
+  ///
+  /// In es, this message translates to:
+  /// **'mar'**
+  String get ruleDayTue;
+
+  /// No description provided for @ruleDayWed.
+  ///
+  /// In es, this message translates to:
+  /// **'mié'**
+  String get ruleDayWed;
+
+  /// No description provided for @ruleDayThu.
+  ///
+  /// In es, this message translates to:
+  /// **'jue'**
+  String get ruleDayThu;
+
+  /// No description provided for @ruleDayFri.
+  ///
+  /// In es, this message translates to:
+  /// **'vie'**
+  String get ruleDayFri;
+
+  /// No description provided for @ruleDaySat.
+  ///
+  /// In es, this message translates to:
+  /// **'sáb'**
+  String get ruleDaySat;
+
+  /// No description provided for @ruleDaySun.
+  ///
+  /// In es, this message translates to:
+  /// **'dom'**
+  String get ruleDaySun;
+
+  /// No description provided for @ruleReminderLastCall.
+  ///
+  /// In es, this message translates to:
+  /// **'· última llamada {time}'**
+  String ruleReminderLastCall(String time);
+
+  /// No description provided for @durationHours.
+  ///
+  /// In es, this message translates to:
+  /// **'{h} h'**
+  String durationHours(int h);
+
+  /// No description provided for @durationHoursMinutes.
+  ///
+  /// In es, this message translates to:
+  /// **'{h} h {m} min'**
+  String durationHoursMinutes(int h, int m);
+
+  /// No description provided for @durationMinutes.
+  ///
+  /// In es, this message translates to:
+  /// **'{m} min'**
+  String durationMinutes(int m);
+
+  /// No description provided for @durationSeconds.
+  ///
+  /// In es, this message translates to:
+  /// **'{s} s'**
+  String durationSeconds(int s);
 }
 
 class _AppLocalizationsDelegate

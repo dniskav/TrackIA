@@ -3981,4 +3981,163 @@ class AppLocalizationsAr extends AppLocalizations {
   String restScreenTimerLabel(Object label) {
     return 'الوقت: $label';
   }
+
+  @override
+  String get aiStatusChecking => 'جارٍ التحقق من الذكاء الاصطناعي…';
+
+  @override
+  String get aiStatusUnconfigured =>
+      'اضبط المزوّد والنموذج لاستخدام المساعد. يمكنك تحميل بياناتك قبل ذلك.';
+
+  @override
+  String get aiStatusUnverified =>
+      'تحقق من اتصال النموذج لتفعيل المساعد والأنشطة.';
+
+  @override
+  String aiStatusVerified(Object model) {
+    return 'تم التحقق من الذكاء الاصطناعي · $model';
+  }
+
+  @override
+  String aiStatusCatalogReason(Object reason) {
+    return 'تم إعداد الذكاء الاصطناعي · تعذّر تحديث الكتالوج: $reason';
+  }
+
+  @override
+  String get aiStatusCatalogFailed =>
+      'تم إعداد الذكاء الاصطناعي · تعذّر تحديث الكتالوج. يمكنك متابعة إرسال الرسائل.';
+
+  @override
+  String get aiStatusUnreachable =>
+      'تعذّر التحقق من الاتصال بالذكاء الاصطناعي. أعد المحاولة أو راجع المزوّد. بياناتك محفوظة.';
+
+  @override
+  String get aiStatusRequestFailed =>
+      'فشل الطلب الأخير. يمكنك إعادة المحاولة بالنموذج نفسه؛ سجلاتك محفوظة.';
+
+  @override
+  String get ruleUnitMin => 'د';
+
+  @override
+  String get ruleUnitSessions => 'جلسات';
+
+  @override
+  String get ruleSessionOne => 'جلسة واحدة';
+
+  @override
+  String get ruleMetricTime => 'الوقت';
+
+  @override
+  String get ruleMetricSessions => 'الجلسات';
+
+  @override
+  String ruleMetricMax(String label) {
+    return 'الحد الأقصى من $label';
+  }
+
+  @override
+  String ruleMetricAvg(String label) {
+    return 'متوسط $label';
+  }
+
+  @override
+  String ruleMetricDistinct(String label) {
+    return '$label المختلفة';
+  }
+
+  @override
+  String ruleMetricCountTrue(String label) {
+    return 'عدد المرات: $label';
+  }
+
+  @override
+  String get rulePerDay => 'في اليوم';
+
+  @override
+  String get rulePerWeek => 'في الأسبوع';
+
+  @override
+  String get rulePerSession => 'في الجلسة';
+
+  @override
+  String get rulePerTotal => 'في المجموع';
+
+  @override
+  String ruleGoalMinimum(String value) {
+    return '(الحد الأدنى $value)';
+  }
+
+  @override
+  String get ruleGoalDaily => 'في اليوم';
+
+  @override
+  String get ruleGoalWeekly => 'في الأسبوع';
+
+  @override
+  String get ruleStreakOne => 'سلسلة من يوم واحد';
+
+  @override
+  String ruleStreakDays(int n) {
+    return 'سلسلة من $n أيام';
+  }
+
+  @override
+  String ruleAtLeast(String metric, String amount, String per) {
+    return '$metric ≥ $amount $per';
+  }
+
+  @override
+  String get ruleDaysAll => 'كل يوم';
+
+  @override
+  String get ruleDaysWeekdays => 'من الاثنين إلى الجمعة';
+
+  @override
+  String get ruleDaysWeekend => 'عطلة نهاية الأسبوع';
+
+  @override
+  String get ruleDayMon => 'الاثنين';
+
+  @override
+  String get ruleDayTue => 'الثلاثاء';
+
+  @override
+  String get ruleDayWed => 'الأربعاء';
+
+  @override
+  String get ruleDayThu => 'الخميس';
+
+  @override
+  String get ruleDayFri => 'الجمعة';
+
+  @override
+  String get ruleDaySat => 'السبت';
+
+  @override
+  String get ruleDaySun => 'الأحد';
+
+  @override
+  String ruleReminderLastCall(String time) {
+    return '· آخر تنبيه $time';
+  }
+
+  @override
+  String durationHours(int h) {
+    return '$h س';
+  }
+
+  @override
+  String durationHoursMinutes(int h, int m) {
+    return '$h س $m د';
+  }
+
+  @override
+  String durationMinutes(int m) {
+    return '$m د';
+  }
+
+  @override
+  String durationSeconds(int s) {
+    return '$s ث';
+  }
 }
