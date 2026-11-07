@@ -248,31 +248,33 @@ extension _ChatDelivery on _AssistantChatScreenState {
     return history;
   }
 
-  /// Tras editar un mensaje ya respondido, la conversación activa se reconstruye
-  /// hasta ese mensaje: la respuesta a la revisión anterior y los mensajes
-  /// posteriores ya contestados se marcan obsoletos (no entran en el contexto
-  /// ni se ven; siguen guardados) y se deja una línea de evento. Los posteriores
-  /// sin resolver se respetan para no perder texto que nunca se envió.
+  /// Respuestas del asistente enlazadas a una revisión anterior del mensaje y
+  /// aún vigentes (no obsoletas).
+  List<AiMessage> staleReplies(MessageDeliveryItem attempt) => [
+    for (final e in responseLinks.entries)
+      if (e.value.messageId == attempt.message.id &&
+          e.value.revisionId != attempt.revision.id &&
+          !obsoleteMessages.contains(e.key))
+        e.key,
+  ];
+
+  /// Último mensaje del usuario de la transcripción activa (sin obsoletos ni
+  /// eventos): es el único que se puede editar.
+  AiMessage? get lastUserMessage => messages
+      .where((m) => m.role == 'user' && !obsoleteMessages.contains(m))
+      .lastOrNull;
+
+  /// Tras editar el último mensaje ya respondido, la respuesta a la revisión
+  /// anterior se marca obsoleta (no entra en el contexto ni se ve; sigue
+  /// guardada) y se deja una línea de evento. Los datos antiguos con mensajes
+  /// posteriores obsoletos siguen restaurándose por su bandera.
   bool continueFromEditedMessage(
     AiMessage edited,
     MessageDeliveryItem attempt,
   ) {
-    final stale = responseLinks.entries.any(
-      (e) =>
-          e.value.messageId == attempt.message.id &&
-          e.value.revisionId != attempt.revision.id &&
-          !obsoleteMessages.contains(e.key),
-    );
-    if (!stale) return false;
-    final start = messages.indexOf(edited);
-    if (start < 0) return false;
-    for (final message in messages.skip(start + 1)) {
-      if (message.role == 'event') continue;
-      final id = outgoingMessageIds[message];
-      final state = id == null ? null : deliveryStates[id];
-      if (state != null && state != MessageDelivery.answered) continue;
-      obsoleteMessages.add(message);
-    }
+    final stale = staleReplies(attempt);
+    if (stale.isEmpty || !messages.contains(edited)) return false;
+    obsoleteMessages.addAll(stale);
     messages.add(
       AiMessage(
         'event',
@@ -281,6 +283,29 @@ extension _ChatDelivery on _AssistantChatScreenState {
       ),
     );
     return true;
+  }
+
+  /// Nota de edición para el modelo, o null si esta versión no sustituye a una
+  /// que el modelo ya contestó. [stale] son las respuestas a versiones previas.
+  Future<String?> editNoteFor(
+    MessageDeliveryItem attempt,
+    List<AiMessage> stale,
+  ) async {
+    if (stale.isEmpty || attempt.revision.revision < 2) return null;
+    final loaded = await messageRevisions?.load(attempt.message.id);
+    if (loaded == null) return null;
+    final reply = stale.last;
+    final previousId = responseLinks[reply]?.revisionId;
+    final previous = loaded.revisions
+        .where((r) => r.id == previousId)
+        .firstOrNull;
+    if (previous == null) return null;
+    return buildEditNote(
+      previous: (number: previous.revision, text: previous.text),
+      current: (number: attempt.revision.revision, text: attempt.revision.text),
+      previousReply: reply.text,
+      effectsSummary: await appliedEffectsSummary(attempt.message.id),
+    );
   }
 
   Future<void> sendDurable({
@@ -452,6 +477,10 @@ extension _ChatDelivery on _AssistantChatScreenState {
           .where((message) => outgoingMessageIds[message] == attempt.message.id)
           .first;
       syncPendingFromDelivery();
+      final staleReplyList = retryMessageId == null
+          ? <AiMessage>[]
+          : staleReplies(attempt);
+      final editNote = await editNoteFor(attempt, staleReplyList);
       if (retryMessageId != null &&
           continueFromEditedMessage(outgoing, attempt)) {
         if (mounted) update(() {});
@@ -462,7 +491,10 @@ extension _ChatDelivery on _AssistantChatScreenState {
       String answer;
       try {
         dispatched = true;
-        final applied = await appliedEffectsSummary(attempt.message.id);
+        // La nota de edición ya incluye el resumen de efectos; en el resto de
+        // reenvíos se añade solo el resumen, como hasta ahora.
+        final applied = editNote ??
+            await appliedEffectsSummary(attempt.message.id);
         answer = await replyWithArchives(
           config,
           [

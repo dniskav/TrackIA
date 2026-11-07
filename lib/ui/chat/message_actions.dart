@@ -1,5 +1,8 @@
 part of '../assistant_chat.dart';
 
+const _onlyLastEditable =
+    'Solo se puede editar el último mensaje. Escribe una corrección como mensaje nuevo.';
+
 /// Accessible, ID-based actions for durable user messages.
 extension _MessageActions on _AssistantChatScreenState {
   /// Burbuja de chat estilo mensajería: el usuario a la derecha con el color
@@ -108,18 +111,31 @@ extension _MessageActions on _AssistantChatScreenState {
       Key key,
       IconData icon,
       String tooltip,
-      VoidCallback? onTap,
-    ) => IconButton(
-      key: key,
-      icon: Icon(icon),
-      tooltip: tooltip,
-      onPressed: onTap,
-      iconSize: 16,
-      visualDensity: VisualDensity.compact,
-      padding: EdgeInsets.zero,
-      constraints: const BoxConstraints.tightFor(width: 32, height: 32),
-      color: muted,
-    );
+      VoidCallback? onTap, {
+      String? whyDisabled,
+    }) {
+      final button = IconButton(
+        key: key,
+        icon: Icon(icon),
+        tooltip: tooltip,
+        onPressed: onTap,
+        iconSize: 16,
+        visualDensity: VisualDensity.compact,
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints.tightFor(width: 32, height: 32),
+        color: muted,
+      );
+      if (whyDisabled == null) return button;
+      // Deshabilitado, pero al tocarlo se muestra el motivo.
+      return GestureDetector(
+        key: Key('${(key as ValueKey<String>).value}-why'),
+        behavior: HitTestBehavior.opaque,
+        onTap: () => update(() => error = whyDisabled),
+        child: button,
+      );
+    }
+
+    final isLast = identical(message, lastUserMessage);
     return Padding(
       padding: const EdgeInsets.only(top: 2),
       child: Wrap(
@@ -129,10 +145,11 @@ extension _MessageActions on _AssistantChatScreenState {
           action(
             Key('edit-message-$id'),
             Icons.edit_outlined,
-            'Editar',
-            busy || state == MessageDelivery.sending
-                ? null
-                : () => editDurableMessage(message),
+            isLast ? 'Editar' : _onlyLastEditable,
+            isLast && !busy && state != MessageDelivery.sending
+                ? () => editDurableMessage(message)
+                : null,
+            whyDisabled: isLast ? null : _onlyLastEditable,
           ),
           action(
             Key('history-message-$id'),
@@ -158,6 +175,10 @@ extension _MessageActions on _AssistantChatScreenState {
     final repository = messageRevisions;
     final id = outgoingMessageIds[message];
     if (repository == null || id == null) return;
+    if (!identical(message, lastUserMessage)) {
+      update(() => error = _onlyLastEditable);
+      return;
+    }
     final item = await repository.loadItem(id);
     if (!mounted) return;
     if (item == null || item.message.chatId != sessionId) return;
@@ -217,10 +238,10 @@ extension _MessageActions on _AssistantChatScreenState {
         update(() => error = null);
         // Decisión de contexto: send(retryMessageId) manda al modelo la
         // revisión vigente (la editada) y, como la respuesta anterior está
-        // enlazada a otra revisión, sendDurable descarta del contexto esa
-        // respuesta y los mensajes posteriores (los marca obsoletos, sin
-        // borrar nada) y deja una línea de evento. La nueva respuesta se
-        // enlaza a la nueva revisión.
+        // enlazada a otra revisión, sendDurable la saca del historial (la
+        // marca obsoleta, sin borrar nada), la incluye dentro de una nota de
+        // edición para el modelo y deja una línea de evento. La nueva
+        // respuesta se enlaza a la nueva revisión.
         await send(retryMessageId: id);
       } else {
         update(

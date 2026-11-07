@@ -10,6 +10,7 @@ import '../data/message_revision_repository.dart';
 import '../data/message_effect_repository.dart';
 import '../domain/message_effect.dart';
 import '../application/message_delivery.dart';
+import '../application/message_edit_note.dart';
 import '../domain/message_revision.dart';
 import '../application/message_delivery_policy.dart';
 import '../application/progress_service.dart';
@@ -1016,11 +1017,14 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
                             for (final message in transcript)
                               if (message.role == 'event')
                                 Padding(
-                                  key: const Key('event-line'),
+                                  // Clave única por evento: varios eventos
+                                  // hermanos con la misma clave rompen el ListView.
+                                  key: ObjectKey(message),
                                   padding: const EdgeInsets.symmetric(
                                     vertical: 4,
                                   ),
                                   child: Center(
+                                    key: const Key('event-line'),
                                     child: Text(
                                       message.text,
                                       style:
