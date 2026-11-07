@@ -216,4 +216,128 @@ void main() {
       isNotNull,
     );
   });
+
+  group('versión esperada de la propuesta de objetivo (T018)', () {
+    String block(String json) => '```trackia-activity-target\n$json\n```';
+
+    Future<ActivityDefinition> currentDefinition(String id) async =>
+        (await repo.loadActivities()).firstWhere((a) => a.id == id).definition;
+
+    /// Lo que hace el chat: validar y, solo si se acepta, guardar.
+    Future<TargetProposalCheck> apply(
+      String id,
+      String answer,
+      ActivityDefinition expected,
+    ) async {
+      final check = checkActivityTargetProposal(
+        answer,
+        current: await currentDefinition(id),
+      );
+      final proposal = check.proposal;
+      if (proposal != null) {
+        await repo.setActivityTarget(
+          id,
+          proposal.targetSets,
+          expected: expected,
+        );
+      }
+      return check;
+    }
+
+    test('la revisión es estable y cambia con la definición', () async {
+      final id = await makeThreeSetActivity();
+      final before = await currentDefinition(id);
+      expect(activityRevision(before), activityRevision(before));
+      expect(activityRevision(before), matches(RegExp(r'^[0-9a-f]{8}$')));
+      await repo.setActivityTarget(id, 4, expected: before);
+      expect(
+        activityRevision(await currentDefinition(id)),
+        isNot(activityRevision(before)),
+      );
+    });
+
+    test('versión correcta se aplica', () async {
+      final id = await makeThreeSetActivity();
+      final before = await currentDefinition(id);
+      final answer = block(
+        '{"targetSets":5,"expectedRevision":"${activityRevision(before)}"}',
+      );
+      expect(parseActivityTargetBlock(answer)?.expectedRevision, isNotNull);
+      final check = await apply(id, answer, before);
+      expect(check.problem, isNull);
+      expect((await currentDefinition(id)).targetSets, 5);
+    });
+
+    test(
+      'versión obsoleta se rechaza con explicación y no cambia nada',
+      () async {
+        final id = await makeThreeSetActivity();
+        final seen = await currentDefinition(id);
+        final answer = block(
+          '{"targetSets":6,"expectedRevision":"${activityRevision(seen)}"}',
+        );
+        // El usuario cambia el objetivo a mano mientras el modelo responde.
+        await repo.setActivityTarget(id, 4, expected: seen);
+        final changed = await currentDefinition(id);
+        final check = await apply(id, answer, changed);
+        expect(check.proposal, isNull);
+        expect(check.problem, TargetProposalProblem.stale);
+        expect(
+          staleTargetText,
+          'La actividad cambió desde que se propuso; vuelve a pedirlo.',
+        );
+        expect((await currentDefinition(id)).targetSets, 4);
+      },
+    );
+
+    test('propuestas ambiguas se rechazan', () async {
+      final id = await makeThreeSetActivity();
+      final current = await currentDefinition(id);
+      final one = block('{"targetSets":5}');
+      final other = block('{"targetSets":6}');
+      final activity =
+          '```trackia-activity\n{"name":"Otra","repeated":true,"restSeconds":60}\n```';
+      for (final answer in [
+        '$one\n$other',
+        '$one\n$activity',
+        block('{"targetSets":"cinco"}'),
+        block('{"targetSets":5,"expectedRevision":"zzz"}'),
+        'Pon 5 series',
+      ]) {
+        final check = await apply(id, answer, current);
+        expect(check.proposal, isNull, reason: answer);
+        expect(check.problem, TargetProposalProblem.ambiguous, reason: answer);
+      }
+      expect(
+        checkActivityTargetProposal(one, current: null).problem,
+        TargetProposalProblem.ambiguous,
+      );
+      expect(
+        checkActivityTargetProposal(
+          one,
+          current: ActivityDefinition(name: 'Correr', repeated: false),
+        ).problem,
+        TargetProposalProblem.ambiguous,
+      );
+      expect((await currentDefinition(id)).targetSets, 3);
+    });
+
+    test('propuesta sin versión sigue funcionando', () async {
+      final id = await makeThreeSetActivity();
+      final before = await currentDefinition(id);
+      expect(
+        parseActivityTargetBlock(block('{"targetSets":4}'))?.expectedRevision,
+        isNull,
+      );
+      final check = await apply(id, block('{"targetSets":4}'), before);
+      expect(check.problem, isNull);
+      expect((await currentDefinition(id)).targetSets, 4);
+      // Sin versión rige la comprobación de definición del repositorio.
+      await expectLater(
+        repo.setActivityTarget(id, 5, expected: before),
+        throwsA(isA<ValidationException>()),
+      );
+      expect((await currentDefinition(id)).targetSets, 4);
+    });
+  });
 }

@@ -12,6 +12,7 @@ import 'package:trackia/application/ai_availability.dart';
 import 'package:trackia/data/ai_settings_store.dart';
 import 'package:trackia/data/sqlite_workout_repository.dart';
 import 'package:trackia/domain/activity.dart';
+import 'package:trackia/domain/assistant_blocks.dart';
 import 'package:trackia/domain/ai_config.dart';
 import 'package:trackia/domain/companion.dart';
 import 'package:trackia/ui/assistant_chat.dart';
@@ -844,6 +845,83 @@ void main() {
     await tester.tap(find.text('Cambiar'));
     await waitFor(tester, () => c.focus!.definition.targetSets == 3 && !c.busy);
     expect(c.focus!.intervals.where((i) => i.endedAt != null), hasLength(1));
+    await disposeScreen(tester);
+  });
+
+  testWidgets('chat target proposal quotes the revision from the context', (
+    tester,
+  ) async {
+    String? sentRevision;
+    await show(
+      tester,
+      client: AiClient(
+        transport: (_, __, body) async {
+          final system = [
+            for (final m in body['messages'] as List)
+              if ((m as Map)['role'] == 'system') m['content'],
+          ].join('\n');
+          sentRevision =
+              RegExp(r'"expectedRevision":"([0-9a-f]{8})"')
+                  .firstMatch(system)
+                  ?.group(1);
+          return {
+            'choices': [
+              {
+                'message': {
+                  'content':
+                      'Propongo ajustarlo.\n```trackia-activity-target\n{"targetSets": 3, "expectedRevision": "$sentRevision"}\n```',
+                },
+              },
+            ],
+          };
+        },
+      ),
+    );
+    await tester.enterText(
+      find.byKey(const Key('assistant-input')),
+      'Cambia a tres series',
+    );
+    await tester.runAsync(() => tester.tap(find.byTooltip('Enviar')));
+    await waitFor(
+      tester,
+      () => find.text('Cambiar objetivo de series').evaluate().isNotEmpty,
+    );
+    expect(sentRevision, activityRevision(c.focus!.definition));
+    await tester.tap(find.text('Cambiar'));
+    await waitFor(tester, () => c.focus!.definition.targetSets == 3 && !c.busy);
+    await disposeScreen(tester);
+  });
+
+  testWidgets('chat target proposal with an obsolete revision is rejected', (
+    tester,
+  ) async {
+    await show(
+      tester,
+      client: AiClient(
+        transport:
+            (_, __, ___) async => {
+              'choices': [
+                {
+                  'message': {
+                    'content':
+                        'Propongo ajustarlo.\n```trackia-activity-target\n{"targetSets": 3, "expectedRevision": "00000000"}\n```',
+                  },
+                },
+              ],
+            },
+      ),
+    );
+    await tester.enterText(
+      find.byKey(const Key('assistant-input')),
+      'Cambia a tres series',
+    );
+    await tester.runAsync(() => tester.tap(find.byTooltip('Enviar')));
+    await waitFor(
+      tester,
+      () => find.text(staleTargetText).evaluate().isNotEmpty,
+    );
+    expect(find.text('Cambiar objetivo de series'), findsNothing);
+    expect(c.focus!.definition.targetSets, 4);
     await disposeScreen(tester);
   });
 

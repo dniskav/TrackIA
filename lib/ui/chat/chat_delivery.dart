@@ -221,15 +221,24 @@ extension _ChatDelivery on _AssistantChatScreenState {
     pending = null;
   }
 
+  bool _unresolved(AiMessage message) {
+    final id = outgoingMessageIds[message];
+    final state = id == null ? null : deliveryStates[id];
+    return state != null && state != MessageDelivery.answered;
+  }
+
   List<AiMessage> durableHistory(AiMessage outgoing, String outgoingId) {
-    final candidates = messages
-        .where(
-          (message) =>
-              message != outgoing &&
-              message.role != 'event' &&
-              !obsoleteMessages.contains(message),
-        )
-        .toList(growable: false);
+    // Reenviar un pendiente respeta el orden de creación: lo que se guardó
+    // después y sigue sin resolver se enviará en su turno, no antes.
+    final outgoingIndex = messages.indexOf(outgoing);
+    final candidates = <AiMessage>[
+      for (var i = 0; i < messages.length; i++)
+        if (messages[i] != outgoing &&
+            messages[i].role != 'event' &&
+            !obsoleteMessages.contains(messages[i]) &&
+            !(outgoingIndex >= 0 && i > outgoingIndex && _unresolved(messages[i])))
+          messages[i],
+    ];
     final recentStart = candidates.length > 20 ? candidates.length - 20 : 0;
     final history = <AiMessage>[];
     for (var index = 0; index < candidates.length; index++) {

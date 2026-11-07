@@ -191,13 +191,20 @@ extension _ChatArchive on _AssistantChatScreenState {
     FocusActivity? expectedTargetActivity,
   }) async {
     if (hasBlock(answer, 'activity-target')) {
-      final proposed = parseActivityTargetBlock(answer);
-      if (proposed == null ||
-          expectedTargetActivity == null ||
-          !expectedTargetActivity.definition.repeated ||
-          RegExp(r'```(?:trackia|gymia)-([a-z][a-z-]*)')
-              .allMatches(answer)
-              .any((match) => match.group(1) != 'activity-target')) {
+      final live =
+          widget.controller.activities
+              .where((item) => item.id == expectedTargetActivity?.id)
+              .firstOrNull;
+      final check = checkActivityTargetProposal(
+        answer,
+        current: (live ?? expectedTargetActivity)?.definition,
+      );
+      if (check.problem == TargetProposalProblem.stale) {
+        await saveSheetReply(staleTargetText);
+        return;
+      }
+      final proposed = check.proposal;
+      if (proposed == null || expectedTargetActivity == null) {
         await saveSheetReply(appText(context).chatTargetProposalAmbiguous);
         return;
       }
