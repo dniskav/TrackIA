@@ -57,7 +57,7 @@
       "name": {}
     }
   },
-  "companionStreak": "{days, plural, one{Streak: 1 day} other{Streak: # days}}",
+  "companionStreak": "Streak (days): {days}",
   "@companionStreak": {
     "placeholders": {
       "days": {
@@ -828,7 +828,7 @@
   "transferImportAction": "Import",
   "transferImportError": "Could not import.",
   "transferImportSheetTitle": "Import sheet",
-  "transferImportedSummary": "{added, plural, one{1 session imported} other{{added} sessions imported}} · {duplicates, plural, one{1 duplicate skipped} other{{duplicates} duplicates skipped}}.",
+  "transferImportedSummary": "Sessions imported: {added} · Duplicates skipped: {duplicates}",
   "@transferImportedSummary": {
     "placeholders": {
       "added": {
@@ -854,7 +854,7 @@
   "transferWeightKg": "Weight (kg)",
   "transferReps": "Reps",
   "transferReviewImport": "Review import",
-  "transferPreviewSummary": "{newCount, plural, one{1 new session} other{{newCount} new sessions}} · {duplicateCount, plural, one{1 duplicate} other{{duplicateCount} duplicates}} · {errorCount, plural, one{1 row with an error} other{{errorCount} rows with errors}}",
+  "transferPreviewSummary": "New sessions: {newCount} · Duplicates: {duplicateCount} · Rows with errors: {errorCount}",
   "@transferPreviewSummary": {
     "placeholders": {
       "newCount": {
@@ -1161,7 +1161,7 @@
   "homeInProgress": "SESSION IN PROGRESS",
   "homeReadyQuestion": "Ready to train?",
   "homeAddExercisesHint": "Add your exercises and log every set.",
-  "homeActivitiesRecords": "{activities, plural, one{1 activity} other{{activities} activities}} · {records, plural, one{1 record} other{{records} records}}",
+  "homeActivitiesRecords": "Activities: {activities} · Records: {records}",
   "@homeActivitiesRecords": {
     "placeholders": {
       "activities": {
@@ -1207,7 +1207,7 @@
   "homeTimeKeptWarning": "Time kept with a warning. You can review it later.",
   "homeTimeKeptWarningShort": "Time kept with a warning.",
   "homeActivities": "activities",
-  "homeIntervalsRepeated": "{count, plural, one{1 set / segment} other{{count} sets / segments}}",
+  "homeIntervalsRepeated": "Sets / segments: {count}",
   "@homeIntervalsRepeated": {
     "placeholders": {
       "count": {
@@ -1215,7 +1215,7 @@
       }
     }
   },
-  "homeIntervals": "{count, plural, one{1 segment} other{{count} segments}}",
+  "homeIntervals": "Segments: {count}",
   "@homeIntervals": {
     "placeholders": {
       "count": {
@@ -1262,7 +1262,7 @@
     }
   },
   "homeDelete": "Delete",
-  "homeTargetProgress": "Target: {target, plural, one{1 set} other{{target} sets}} of {repsMin}–{repsMax} reps · {done}/{target} logged",
+  "homeTargetProgress": "Sets logged: {done} of {target} · {repsMin}–{repsMax} reps",
   "@homeTargetProgress": {
     "placeholders": {
       "target": {
@@ -1461,7 +1461,7 @@
       "name": {}
     }
   },
-  "progressStreakCurrent": "{n, plural, one{Current streak: 1 day} other{Current streak: {n} days}}",
+  "progressStreakCurrent": "Current streak (days): {n}",
   "@progressStreakCurrent": {
     "placeholders": {
       "n": {

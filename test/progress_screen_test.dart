@@ -108,7 +108,7 @@ void main() {
   ) async {
     await open(tester);
     expect(find.text('Progreso · Lectura'), findsOneWidget);
-    expect(find.text('Racha actual: 0 días'), findsOneWidget);
+    expect(find.text('Racha actual (días): 0'), findsOneWidget);
     expect(find.byKey(const Key('goal-card')), findsNothing);
     expect(find.byKey(const Key('achievements-empty')), findsOneWidget);
     expect(find.textContaining('Activa el modo Juego'), findsOneWidget);
@@ -143,7 +143,7 @@ void main() {
       });
       await open(tester);
 
-      expect(find.text('Racha actual: 3 días'), findsOneWidget);
+      expect(find.text('Racha actual (días): 3'), findsOneWidget);
       expect(find.textContaining('Mejor racha: 3'), findsOneWidget);
       expect(
         find.textContaining('Días libres esta semana: 1/1'),

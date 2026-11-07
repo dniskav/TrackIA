@@ -822,10 +822,10 @@ class _GymHomeState extends State<GymHome> {
               padding: const EdgeInsets.only(top: 12),
               child: Text(
                 appText(context).homeTargetProgress(
+                  e.sets.length,
                   e.targetSets!,
                   '${e.repsMin}',
                   '${e.repsMax}',
-                  e.sets.length,
                 ),
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.primary,

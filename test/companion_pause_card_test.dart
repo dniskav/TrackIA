@@ -200,7 +200,7 @@ void main() {
       await show(tester);
       expect(find.byKey(const Key('game-gymbro')), findsOneWidget);
       expect(find.byKey(const Key('ring-gymbro')), findsOneWidget);
-      expect(find.text('Racha: 1 día'), findsOneWidget);
+      expect(find.text('Racha (días): 1'), findsOneWidget);
       // Companions in reminder mode show nothing of it.
       expect(find.byKey(const Key('game-enfoque')), findsNothing);
       expect(find.byKey(const Key('ring-enfoque')), findsNothing);

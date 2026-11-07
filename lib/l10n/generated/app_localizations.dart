@@ -349,7 +349,7 @@ abstract class AppLocalizations {
   /// No description provided for @companionStreak.
   ///
   /// In es, this message translates to:
-  /// **'{days, plural, one{Racha: 1 día} other{Racha: # días}}'**
+  /// **'Racha (días): {days}'**
   String companionStreak(int days);
 
   /// No description provided for @remindersPaused.
@@ -3262,7 +3262,7 @@ abstract class AppLocalizations {
   /// No description provided for @transferImportedSummary.
   ///
   /// In es, this message translates to:
-  /// **'{added, plural, one{1 sesión importada} other{{added} sesiones importadas}} · {duplicates, plural, one{1 duplicada omitida} other{{duplicates} duplicadas omitidas}}.'**
+  /// **'Sesiones importadas: {added} · Duplicadas omitidas: {duplicates}'**
   String transferImportedSummary(int added, int duplicates);
 
   /// No description provided for @transferRowsFound.
@@ -3316,7 +3316,7 @@ abstract class AppLocalizations {
   /// No description provided for @transferPreviewSummary.
   ///
   /// In es, this message translates to:
-  /// **'{newCount, plural, one{1 sesión nueva} other{{newCount} sesiones nuevas}} · {duplicateCount, plural, one{1 duplicada} other{{duplicateCount} duplicadas}} · {errorCount, plural, one{1 fila con error} other{{errorCount} filas con errores}}'**
+  /// **'Sesiones nuevas: {newCount} · Duplicadas: {duplicateCount} · Filas con error: {errorCount}'**
   String transferPreviewSummary(
     int newCount,
     int duplicateCount,
@@ -4380,7 +4380,7 @@ abstract class AppLocalizations {
   /// No description provided for @homeActivitiesRecords.
   ///
   /// In es, this message translates to:
-  /// **'{activities, plural, one{1 actividad} other{{activities} actividades}} · {records, plural, one{1 registro} other{{records} registros}}'**
+  /// **'Actividades: {activities} · Registros: {records}'**
   String homeActivitiesRecords(int activities, int records);
 
   /// No description provided for @homeStartWorkout.
@@ -4506,13 +4506,13 @@ abstract class AppLocalizations {
   /// No description provided for @homeIntervalsRepeated.
   ///
   /// In es, this message translates to:
-  /// **'{count, plural, one{1 serie / tramo} other{{count} series / tramos}}'**
+  /// **'Series / tramos: {count}'**
   String homeIntervalsRepeated(int count);
 
   /// No description provided for @homeIntervals.
   ///
   /// In es, this message translates to:
-  /// **'{count, plural, one{1 tramo} other{{count} tramos}}'**
+  /// **'Tramos: {count}'**
   String homeIntervals(int count);
 
   /// No description provided for @homeNotStarted.
@@ -4614,12 +4614,12 @@ abstract class AppLocalizations {
   /// No description provided for @homeTargetProgress.
   ///
   /// In es, this message translates to:
-  /// **'Objetivo: {target, plural, one{1 serie} other{{target} series}} de {repsMin}–{repsMax} reps · {done}/{target} registradas'**
+  /// **'Series registradas: {done} de {target} · {repsMin}–{repsMax} reps'**
   String homeTargetProgress(
+    int done,
     int target,
     Object repsMin,
     Object repsMax,
-    int done,
   );
 
   /// No description provided for @homeNoPreviousSession.
@@ -5291,7 +5291,7 @@ abstract class AppLocalizations {
   /// No description provided for @progressStreakCurrent.
   ///
   /// In es, this message translates to:
-  /// **'{n, plural, one{Racha actual: 1 día} other{Racha actual: {n} días}}'**
+  /// **'Racha actual (días): {n}'**
   String progressStreakCurrent(int n);
 
   /// No description provided for @progressStreakBest.

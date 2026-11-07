@@ -149,13 +149,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String companionStreak(int days) {
-    String _temp0 = intl.Intl.pluralLogic(
-      days,
-      locale: localeName,
-      other: 'Streak: # days',
-      one: 'Streak: 1 day',
-    );
-    return '$_temp0';
+    return 'Streak (days): $days';
   }
 
   @override
@@ -1819,19 +1813,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String transferImportedSummary(int added, int duplicates) {
-    String _temp0 = intl.Intl.pluralLogic(
-      added,
-      locale: localeName,
-      other: '$added sessions imported',
-      one: '1 session imported',
-    );
-    String _temp1 = intl.Intl.pluralLogic(
-      duplicates,
-      locale: localeName,
-      other: '$duplicates duplicates skipped',
-      one: '1 duplicate skipped',
-    );
-    return '$_temp0 · $_temp1.';
+    return 'Sessions imported: $added · Duplicates skipped: $duplicates';
   }
 
   @override
@@ -1867,25 +1849,7 @@ class AppLocalizationsEn extends AppLocalizations {
     int duplicateCount,
     int errorCount,
   ) {
-    String _temp0 = intl.Intl.pluralLogic(
-      newCount,
-      locale: localeName,
-      other: '$newCount new sessions',
-      one: '1 new session',
-    );
-    String _temp1 = intl.Intl.pluralLogic(
-      duplicateCount,
-      locale: localeName,
-      other: '$duplicateCount duplicates',
-      one: '1 duplicate',
-    );
-    String _temp2 = intl.Intl.pluralLogic(
-      errorCount,
-      locale: localeName,
-      other: '$errorCount rows with errors',
-      one: '1 row with an error',
-    );
-    return '$_temp0 · $_temp1 · $_temp2';
+    return 'New sessions: $newCount · Duplicates: $duplicateCount · Rows with errors: $errorCount';
   }
 
   @override
@@ -2515,19 +2479,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String homeActivitiesRecords(int activities, int records) {
-    String _temp0 = intl.Intl.pluralLogic(
-      activities,
-      locale: localeName,
-      other: '$activities activities',
-      one: '1 activity',
-    );
-    String _temp1 = intl.Intl.pluralLogic(
-      records,
-      locale: localeName,
-      other: '$records records',
-      one: '1 record',
-    );
-    return '$_temp0 · $_temp1';
+    return 'Activities: $activities · Records: $records';
   }
 
   @override
@@ -2601,24 +2553,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String homeIntervalsRepeated(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count sets / segments',
-      one: '1 set / segment',
-    );
-    return '$_temp0';
+    return 'Sets / segments: $count';
   }
 
   @override
   String homeIntervals(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count segments',
-      one: '1 segment',
-    );
-    return '$_temp0';
+    return 'Segments: $count';
   }
 
   @override
@@ -2686,18 +2626,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String homeTargetProgress(
+    int done,
     int target,
     Object repsMin,
     Object repsMax,
-    int done,
   ) {
-    String _temp0 = intl.Intl.pluralLogic(
-      target,
-      locale: localeName,
-      other: '$target sets',
-      one: '1 set',
-    );
-    return 'Target: $_temp0 of $repsMin–$repsMax reps · $done/$target logged';
+    return 'Sets logged: $done of $target · $repsMin–$repsMax reps';
   }
 
   @override
@@ -3085,13 +3019,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String progressStreakCurrent(int n) {
-    String _temp0 = intl.Intl.pluralLogic(
-      n,
-      locale: localeName,
-      other: 'Current streak: $n days',
-      one: 'Current streak: 1 day',
-    );
-    return '$_temp0';
+    return 'Current streak (days): $n';
   }
 
   @override

@@ -57,7 +57,7 @@
       "name": {}
     }
   },
-  "companionStreak": "{days, plural, one{Racha: 1 día} other{Racha: # días}}",
+  "companionStreak": "Racha (días): {days}",
   "@companionStreak": {
     "placeholders": {
       "days": {
@@ -828,7 +828,7 @@
   "transferImportAction": "Importar",
   "transferImportError": "No se pudo importar.",
   "transferImportSheetTitle": "Importar hoja",
-  "transferImportedSummary": "{added, plural, one{1 sesión importada} other{{added} sesiones importadas}} · {duplicates, plural, one{1 duplicada omitida} other{{duplicates} duplicadas omitidas}}.",
+  "transferImportedSummary": "Sesiones importadas: {added} · Duplicadas omitidas: {duplicates}",
   "@transferImportedSummary": {
     "placeholders": {
       "added": {
@@ -854,7 +854,7 @@
   "transferWeightKg": "Peso (kg)",
   "transferReps": "Repeticiones",
   "transferReviewImport": "Revisar importación",
-  "transferPreviewSummary": "{newCount, plural, one{1 sesión nueva} other{{newCount} sesiones nuevas}} · {duplicateCount, plural, one{1 duplicada} other{{duplicateCount} duplicadas}} · {errorCount, plural, one{1 fila con error} other{{errorCount} filas con errores}}",
+  "transferPreviewSummary": "Sesiones nuevas: {newCount} · Duplicadas: {duplicateCount} · Filas con error: {errorCount}",
   "@transferPreviewSummary": {
     "placeholders": {
       "newCount": {
@@ -1161,7 +1161,7 @@
   "homeInProgress": "SESIÓN EN CURSO",
   "homeReadyQuestion": "¿Vamos a entrenar?",
   "homeAddExercisesHint": "Añade tus ejercicios y registra cada serie.",
-  "homeActivitiesRecords": "{activities, plural, one{1 actividad} other{{activities} actividades}} · {records, plural, one{1 registro} other{{records} registros}}",
+  "homeActivitiesRecords": "Actividades: {activities} · Registros: {records}",
   "@homeActivitiesRecords": {
     "placeholders": {
       "activities": {
@@ -1207,7 +1207,7 @@
   "homeTimeKeptWarning": "Horario conservado con aviso. Puedes revisarlo más adelante.",
   "homeTimeKeptWarningShort": "Horario conservado con aviso.",
   "homeActivities": "actividades",
-  "homeIntervalsRepeated": "{count, plural, one{1 serie / tramo} other{{count} series / tramos}}",
+  "homeIntervalsRepeated": "Series / tramos: {count}",
   "@homeIntervalsRepeated": {
     "placeholders": {
       "count": {
@@ -1215,7 +1215,7 @@
       }
     }
   },
-  "homeIntervals": "{count, plural, one{1 tramo} other{{count} tramos}}",
+  "homeIntervals": "Tramos: {count}",
   "@homeIntervals": {
     "placeholders": {
       "count": {
@@ -1262,17 +1262,17 @@
     }
   },
   "homeDelete": "Eliminar",
-  "homeTargetProgress": "Objetivo: {target, plural, one{1 serie} other{{target} series}} de {repsMin}–{repsMax} reps · {done}/{target} registradas",
+  "homeTargetProgress": "Series registradas: {done} de {target} · {repsMin}–{repsMax} reps",
   "@homeTargetProgress": {
     "placeholders": {
+      "done": {
+        "type": "int"
+      },
       "target": {
         "type": "int"
       },
       "repsMin": {},
-      "repsMax": {},
-      "done": {
-        "type": "int"
-      }
+      "repsMax": {}
     }
   },
   "homeNoPreviousSession": "Sin sesión anterior registrada",
@@ -1461,7 +1461,7 @@
       "name": {}
     }
   },
-  "progressStreakCurrent": "{n, plural, one{Racha actual: 1 día} other{Racha actual: {n} días}}",
+  "progressStreakCurrent": "Racha actual (días): {n}",
   "@progressStreakCurrent": {
     "placeholders": {
       "n": {

@@ -148,17 +148,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String companionStreak(int days) {
-    String _temp0 = intl.Intl.pluralLogic(
-      days,
-      locale: localeName,
-      other: 'سلسلة الإنجاز: # يوم',
-      many: 'سلسلة الإنجاز: # يومًا',
-      few: 'سلسلة الإنجاز: # أيام',
-      two: 'سلسلة الإنجاز: يومان',
-      one: 'سلسلة الإنجاز: يوم واحد',
-      zero: 'لا توجد سلسلة إنجاز',
-    );
-    return '$_temp0';
+    return 'السلسلة (أيام): $days';
   }
 
   @override
@@ -1709,17 +1699,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String transferRestoreBody(int workouts, int routines, Object active) {
-    String _temp0 = intl.Intl.pluralLogic(
-      workouts,
-      locale: localeName,
-      other: '$workouts جلسة',
-    );
-    String _temp1 = intl.Intl.pluralLogic(
-      routines,
-      locale: localeName,
-      other: '$routines روتين',
-    );
-    return 'تحتوي على $_temp0 و$_temp1$active. ستستبدل جميع البيانات الموجودة حاليًا على هذا الهاتف. احفظ نسخة حالية أولًا إن أردت الاحتفاظ بها.';
+    return 'يحتوي على الجلسات: $workouts · الروتينات: $routines$active. ستستبدل جميع البيانات الموجودة حاليًا على هذا الهاتف. احفظ نسخة حالية أولًا إن أردت الاحتفاظ بها.';
   }
 
   @override
@@ -1788,12 +1768,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String transferImportSessionsBody(int count, int sets, int errors) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count جلسة',
-    );
-    return 'ستتم إضافة $_temp0 مع $sets مجموعة. الصفوف المتخطاة بسبب أخطاء: $errors.';
+    return 'ستتم إضافة الجلسات: $count مع المجموعات: $sets. الصفوف المتخطاة بسبب أخطاء: $errors.';
   }
 
   @override
@@ -1807,17 +1782,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String transferImportedSummary(int added, int duplicates) {
-    String _temp0 = intl.Intl.pluralLogic(
-      added,
-      locale: localeName,
-      other: 'تمت إضافة $added جلسة',
-    );
-    String _temp1 = intl.Intl.pluralLogic(
-      duplicates,
-      locale: localeName,
-      other: 'تم تخطي $duplicates جلسة مكررة',
-    );
-    return '$_temp0 · $_temp1.';
+    return 'الجلسات المضافة: $added · المكررات المتخطاة: $duplicates';
   }
 
   @override
@@ -1852,22 +1817,7 @@ class AppLocalizationsAr extends AppLocalizations {
     int duplicateCount,
     int errorCount,
   ) {
-    String _temp0 = intl.Intl.pluralLogic(
-      newCount,
-      locale: localeName,
-      other: '$newCount جلسة جديدة',
-    );
-    String _temp1 = intl.Intl.pluralLogic(
-      duplicateCount,
-      locale: localeName,
-      other: '$duplicateCount مكررة',
-    );
-    String _temp2 = intl.Intl.pluralLogic(
-      errorCount,
-      locale: localeName,
-      other: '$errorCount صف به خطأ',
-    );
-    return '$_temp0 · $_temp1 · $_temp2';
+    return 'جلسات جديدة: $newCount · مكررة: $duplicateCount · صفوف بها أخطاء: $errorCount';
   }
 
   @override
@@ -2483,17 +2433,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String homeActivitiesRecords(int activities, int records) {
-    String _temp0 = intl.Intl.pluralLogic(
-      activities,
-      locale: localeName,
-      other: '$activities نشاط',
-    );
-    String _temp1 = intl.Intl.pluralLogic(
-      records,
-      locale: localeName,
-      other: '$records سجل',
-    );
-    return '$_temp0 · $_temp1';
+    return 'الأنشطة: $activities · السجلات: $records';
   }
 
   @override
@@ -2566,22 +2506,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String homeIntervalsRepeated(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count مجموعات / مقاطع',
-    );
-    return '$_temp0';
+    return 'المجموعات / المقاطع: $count';
   }
 
   @override
   String homeIntervals(int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count مقاطع',
-    );
-    return '$_temp0';
+    return 'المقاطع: $count';
   }
 
   @override
@@ -2636,12 +2566,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String homeDeleteExerciseBody(Object name, int count) {
-    String _temp0 = intl.Intl.pluralLogic(
-      count,
-      locale: localeName,
-      other: '$count مجموعة',
-    );
-    return 'سيُحذف $name و$_temp0.';
+    return 'سيُحذف $name وعدد المجموعات: $count.';
   }
 
   @override
@@ -2649,17 +2574,12 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String homeTargetProgress(
+    int done,
     int target,
     Object repsMin,
     Object repsMax,
-    int done,
   ) {
-    String _temp0 = intl.Intl.pluralLogic(
-      target,
-      locale: localeName,
-      other: '$target مجموعة',
-    );
-    return 'الهدف: $_temp0 من $repsMin–$repsMax تكرار · $done/$target مسجّلة';
+    return 'المجموعات المسجّلة: $done من $target · $repsMin–$repsMax تكرار';
   }
 
   @override
@@ -2689,12 +2609,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String homeSetDeleteBody(Object weight, int reps) {
-    String _temp0 = intl.Intl.pluralLogic(
-      reps,
-      locale: localeName,
-      other: '$reps تكرار',
-    );
-    return '$weight كغ × $_temp0.';
+    return '$weight كغ × التكرارات: $reps.';
   }
 
   @override
@@ -3039,13 +2954,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String progressStreakCurrent(int n) {
-    String _temp0 = intl.Intl.pluralLogic(
-      n,
-      locale: localeName,
-      other: 'السلسلة الحالية: $n أيام',
-      one: 'السلسلة الحالية: يوم واحد',
-    );
-    return '$_temp0';
+    return 'السلسلة الحالية (أيام): $n';
   }
 
   @override

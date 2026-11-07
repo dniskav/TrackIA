@@ -57,7 +57,7 @@
       "name": {}
     }
   },
-  "companionStreak": "{days, plural, zero{لا توجد سلسلة إنجاز} one{سلسلة الإنجاز: يوم واحد} two{سلسلة الإنجاز: يومان} few{سلسلة الإنجاز: # أيام} many{سلسلة الإنجاز: # يومًا} other{سلسلة الإنجاز: # يوم}}",
+  "companionStreak": "السلسلة (أيام): {days}",
   "@companionStreak": {
     "placeholders": {
       "days": {
@@ -769,7 +769,7 @@
   "transferShareSubject": "نسخة احتياطية من TrackIA",
   "transferShareText": "احفظ هذا الملف في Drive أو في مكان آمن.",
   "transferRestoreTitle": "هل تريد استعادة هذه النسخة؟",
-  "transferRestoreBody": "تحتوي على {workouts, plural, other{{workouts} جلسة}} و{routines, plural, other{{routines} روتين}}{active}. ستستبدل جميع البيانات الموجودة حاليًا على هذا الهاتف. احفظ نسخة حالية أولًا إن أردت الاحتفاظ بها.",
+  "transferRestoreBody": "يحتوي على الجلسات: {workouts} · الروتينات: {routines}{active}. ستستبدل جميع البيانات الموجودة حاليًا على هذا الهاتف. احفظ نسخة حالية أولًا إن أردت الاحتفاظ بها.",
   "@transferRestoreBody": {
     "placeholders": {
       "workouts": {
@@ -811,7 +811,7 @@
   "transferChooseColumn": "اختر عمودًا",
   "transferCsvReviewError": "تعذّر فحص ملف CSV.",
   "transferImportSessionsTitle": "هل تريد استيراد هذه الجلسات؟",
-  "transferImportSessionsBody": "ستتم إضافة {count, plural, other{{count} جلسة}} مع {sets} مجموعة. الصفوف المتخطاة بسبب أخطاء: {errors}.",
+  "transferImportSessionsBody": "ستتم إضافة الجلسات: {count} مع المجموعات: {sets}. الصفوف المتخطاة بسبب أخطاء: {errors}.",
   "@transferImportSessionsBody": {
     "placeholders": {
       "count": {
@@ -828,7 +828,7 @@
   "transferImportAction": "استيراد",
   "transferImportError": "تعذّر الاستيراد.",
   "transferImportSheetTitle": "استيراد الجدول",
-  "transferImportedSummary": "{added, plural, other{تمت إضافة {added} جلسة}} · {duplicates, plural, other{تم تخطي {duplicates} جلسة مكررة}}.",
+  "transferImportedSummary": "الجلسات المضافة: {added} · المكررات المتخطاة: {duplicates}",
   "@transferImportedSummary": {
     "placeholders": {
       "added": {
@@ -854,7 +854,7 @@
   "transferWeightKg": "الوزن (كجم)",
   "transferReps": "التكرارات",
   "transferReviewImport": "مراجعة الاستيراد",
-  "transferPreviewSummary": "{newCount, plural, other{{newCount} جلسة جديدة}} · {duplicateCount, plural, other{{duplicateCount} مكررة}} · {errorCount, plural, other{{errorCount} صف به خطأ}}",
+  "transferPreviewSummary": "جلسات جديدة: {newCount} · مكررة: {duplicateCount} · صفوف بها أخطاء: {errorCount}",
   "@transferPreviewSummary": {
     "placeholders": {
       "newCount": {
@@ -1161,7 +1161,7 @@
   "homeInProgress": "الجلسة جارية",
   "homeReadyQuestion": "هل نتدرّب؟",
   "homeAddExercisesHint": "أضف تمارينك وسجّل كل مجموعة.",
-  "homeActivitiesRecords": "{activities, plural, other{{activities} نشاط}} · {records, plural, other{{records} سجل}}",
+  "homeActivitiesRecords": "الأنشطة: {activities} · السجلات: {records}",
   "@homeActivitiesRecords": {
     "placeholders": {
       "activities": {
@@ -1207,7 +1207,7 @@
   "homeTimeKeptWarning": "تم حفظ الوقت مع تنبيه. يمكنك مراجعته لاحقًا.",
   "homeTimeKeptWarningShort": "تم حفظ الوقت مع تنبيه.",
   "homeActivities": "أنشطة",
-  "homeIntervalsRepeated": "{count, plural, other{{count} مجموعات / مقاطع}}",
+  "homeIntervalsRepeated": "المجموعات / المقاطع: {count}",
   "@homeIntervalsRepeated": {
     "placeholders": {
       "count": {
@@ -1215,7 +1215,7 @@
       }
     }
   },
-  "homeIntervals": "{count, plural, other{{count} مقاطع}}",
+  "homeIntervals": "المقاطع: {count}",
   "@homeIntervals": {
     "placeholders": {
       "count": {
@@ -1252,7 +1252,7 @@
     }
   },
   "homeDeleteExerciseTitle": "هل تريد حذف التمرين؟",
-  "homeDeleteExerciseBody": "سيُحذف {name} و{count, plural, other{{count} مجموعة}}.",
+  "homeDeleteExerciseBody": "سيُحذف {name} وعدد المجموعات: {count}.",
   "@homeDeleteExerciseBody": {
     "placeholders": {
       "name": {},
@@ -1262,7 +1262,7 @@
     }
   },
   "homeDelete": "حذف",
-  "homeTargetProgress": "الهدف: {target, plural, other{{target} مجموعة}} من {repsMin}–{repsMax} تكرار · {done}/{target} مسجّلة",
+  "homeTargetProgress": "المجموعات المسجّلة: {done} من {target} · {repsMin}–{repsMax} تكرار",
   "@homeTargetProgress": {
     "placeholders": {
       "target": {
@@ -1294,7 +1294,7 @@
       }
     }
   },
-  "homeSetDeleteBody": "{weight} كغ × {reps, plural, other{{reps} تكرار}}.",
+  "homeSetDeleteBody": "{weight} كغ × التكرارات: {reps}.",
   "@homeSetDeleteBody": {
     "placeholders": {
       "weight": {},
@@ -1461,7 +1461,7 @@
       "name": {}
     }
   },
-  "progressStreakCurrent": "{n, plural, one{السلسلة الحالية: يوم واحد} other{السلسلة الحالية: {n} أيام}}",
+  "progressStreakCurrent": "السلسلة الحالية (أيام): {n}",
   "@progressStreakCurrent": {
     "placeholders": {
       "n": {
