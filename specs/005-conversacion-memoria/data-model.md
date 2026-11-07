@@ -14,3 +14,7 @@ Todos los IDs son opacos, estables y no contienen datos personales. Todo dato nu
 
 ## Paquete de acompañante (US8)
 Entrada externa, no confiable y de solo lectura: no se persiste como tal. Al importarlo se convierte en un `Companion` nuevo (identidad propia) a partir de un borrador que la persona revisa y edita. No tiene relación con perfiles, chats, memoria ni cuentas, y no requiere migración de esquema.
+
+- **CompanionPackage** (`trackia-companion/1`): valor inmutable y siempre válido con `name`, `icon`, `color`, `description`, `instructions`, `mode`, hasta 5 `PackageTemplate` (actividad + `instant`) y textos de aviso opcionales. Sin identificador propio ni referencia a perfiles. Límites y campos prohibidos: ver `contracts/contratos.md`.
+- **CompanionImportPreview**: resultado efímero de leer un paquete (no se persiste): `CompanionDraft` editable, `id` libre propuesto, `external = true`, plantillas limpias, textos de aviso, modo declarado y advertencias.
+
