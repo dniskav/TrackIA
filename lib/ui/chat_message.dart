@@ -28,7 +28,8 @@ class ChatMessageBody extends StatelessWidget {
         child: SelectableText(text, onTap: onTap),
       );
     }
-    final visible = text.replaceAll(hiddenBlockPattern, '').trim();
+    final visible =
+        stripStrayPlanJson(text.replaceAll(hiddenBlockPattern, '')).trim();
     final colors = Theme.of(context).colorScheme;
     final textStyle = Theme.of(
       context,

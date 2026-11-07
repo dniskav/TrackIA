@@ -106,7 +106,13 @@ class SheetSyncPlan {
     if (matches.isEmpty &&
         !hasBlock(response, fence) &&
         response.trim().isNotEmpty) {
-      throw SheetClarification(response.trim());
+      final clarification = stripStrayPlanJson(response).trim();
+      if (clarification.isEmpty) {
+        throw const ValidationException(
+          'El modelo no preparó un envío válido. Aclara la zona o el formato de la hoja y vuelve a preparar.',
+        );
+      }
+      throw SheetClarification(clarification);
     }
     if (matches.length != 1) {
       throw const ValidationException(

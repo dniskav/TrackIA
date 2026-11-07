@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 /// The fenced blocks the assistant writes (```trackia-activity …```).
 ///
 /// The app was called GymIA and asked for `gymia-*` blocks. It now asks for
@@ -24,3 +26,21 @@ final hiddenBlockPattern = RegExp(
   '(?:activity|activity-target|result|archive|recall|sync|sheet-plan|sheet-edit|timing))'
   r'[\s\S]*?(?:```|$)',
 );
+
+/// Claves de un plan de Google Sheets (en español o inglés) que un modelo a
+/// veces escribe como JSON suelto en lugar de usar el bloque `trackia-sheet-plan`.
+const _strayPlanKeys = {'summary', 'resumen', 'writes', 'layout'};
+
+final _fencedJson = RegExp(r'```[A-Za-z0-9_-]*[ \t]*\n(\s*\{[\s\S]*?\})\s*```');
+
+/// Quita del texto visible los bloques de código con un JSON de plan que la app
+/// no reconoce: no son para el usuario y se veían como texto en crudo.
+/// Los bloques de código normales (otro contenido) se conservan.
+String stripStrayPlanJson(String text) =>
+    text.replaceAllMapped(_fencedJson, (m) {
+      try {
+        final json = jsonDecode(m[1]!);
+        if (json is Map && json.keys.any(_strayPlanKeys.contains)) return '';
+      } catch (_) {}
+      return m[0]!;
+    });
