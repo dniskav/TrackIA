@@ -153,4 +153,22 @@ void main() {
     expect(loaded.message.currentRevisionId, 'revision-a');
     expect(loaded.revisions, hasLength(1));
   });
+
+  test(
+    'cancelling an edit (nothing appended) keeps the original and its attachment',
+    () async {
+      await repo.create(message(), version('revision-a', 1, 'original'));
+      // El usuario abre el editor y cancela: no se llama a append().
+      final loaded = (await repo.load('message-a'))!;
+      expect(loaded.revisions, hasLength(1));
+      expect(loaded.revisions.single.text, 'original');
+      expect(loaded.message.currentRevisionId, 'revision-a');
+      expect(loaded.message.attachmentRefs, ['media-ref']);
+      // Un reinicio posterior sigue viendo solo la versión original.
+      await db.close();
+      db = await databaseFactoryFfi.openDatabase('${dir.path}/test.sqlite');
+      repo = MessageRevisionRepository(db, scope);
+      expect((await repo.load('message-a'))!.revisions, hasLength(1));
+    },
+  );
 }

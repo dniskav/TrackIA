@@ -22,8 +22,8 @@
 
 **Prueba independiente**: quickstart 1–2. Depende de T003–T005.
 
-- [ ] T006 [US1] Crear `test/message_revision_test.dart` para mensaje hasta 8000 caracteres, IDs estables, revisiones crecientes, original y adjunto conservados, cancelación y migración de chat legado.
-  - Estado 2026-11-07: parcial: `test/message_revision_test.dart` (5 aprobadas) cubre 8000 caracteres, IDs estables, revisiones crecientes, original y adjunto conservados y migración de chat legado; falta una prueba explícita de cancelación de edición.
+- [x] T006 [US1] Crear `test/message_revision_test.dart` para mensaje hasta 8000 caracteres, IDs estables, revisiones crecientes, original y adjunto conservados, cancelación y migración de chat legado.
+  - Evidencia 2026-11-07: `flutter test test/message_revision_test.dart test/message_revision_repository_test.dart` → 9 pruebas aprobadas. `message_revision_test.dart` (5) cubre 8000 caracteres, IDs estables, revisiones crecientes, original y adjunto conservados y migración legada. La cancelación se prueba en `message_revision_repository_test.dart` («cancelling an edit…»: sin `append` el original y su adjunto siguen intactos tras reiniciar) y a nivel de pantalla en `message_edit_widget_test.dart` («Cancelar no cambia nada»).
 - [x] T007 [US1] Implementar modelos de mensaje y revisión en `lib/domain/message_revision.dart` conforme a `data-model.md`, sin eliminar compatibilidad de `AiMessage` existente; ejecutar T006.
   - Evidencia: `./scripts/flutter-local.sh test test/message_revision_test.dart --no-pub` → 5 pruebas aprobadas; falta persistencia y conexión al chat.
 - [x] T008 [US1] Implementar persistencia transaccional de versiones y asociaciones en `lib/data/message_revision_repository.dart`; probar reinicio y aislamiento con `test/message_revision_test.dart`.
@@ -35,7 +35,6 @@
 - [ ] T011 [US1] Integrar cola y contexto ordenado en `lib/ui/chat/chat_send.dart`; no truncar mensajes pendientes y asegurar envío al chat de origen; ejecutar T009 y tests existentes del chat.
   - Estado 2026-11-07: parcial: el chat ya usa `MessageDeliveryService` vía `lib/ui/chat/chat_delivery.dart`, pero no hay prueba que acredite cola ordenada de pendientes, no truncado y envío al chat de origen en `chat_send.dart`.
 - [x] T012 [US1] Crear `test/message_edit_widget_test.dart` y ofrecer Editar, historial y Reenviar accesibles en `lib/ui/assistant_chat.dart` y `lib/ui/chat/`; comprobar cancelación y estados tras reinicio.
-  - Estado 2026-11-07: parcial: existen `lib/ui/chat/message_actions.dart` y `test/message_actions_tap_test.dart`; falta `test/message_edit_widget_test.dart` (cancelación, historial y estados tras reinicio).
   - Actualización 2026-11-07: `test/message_edit_widget_test.dart` (5 pruebas) cubre Guardar, Cancelar, historial y Guardar y enviar. Decisión del dueño: solo se edita el último mensaje del usuario (el lápiz de los demás está deshabilitado con tooltip y motivo al tocar; probado). Al enviar una versión editada el modelo recibe una nota de edición (`lib/application/message_edit_note.dart`, `buildEditNote`; `test/message_edit_note_test.dart`) con versión anterior y nueva, respuesta anterior como «tu respuesta anterior» (fuera del historial), efectos ya aplicados y reglas; un mensaje nuevo no lleva nota. Quedan sin probar los estados tras reinicio.
 - [ ] T013 [US1] Implementar relación mensaje→efecto y corrección transaccional por ID en `lib/data/message_effect_repository.dart`; ante varias relaciones mostrar selección y antes/después; no editar Sheets automáticamente; probar `test/message_effect_test.dart` con 10×10→10×60 y sin duplicados.
   - Estado 2026-11-07: parcial: `lib/data/message_effect_repository.dart` registra efectos por mensaje/revisión (`record` idempotente, `effectsFor`, `effectsForRevision`, `markReverted`, `appliedEffectsSummary`) y el chat los anota (`lib/ui/chat/chat_effects.dart`). Falta la corrección transaccional con antes/después y selección entre varias relaciones (10×10→10×60).
@@ -161,7 +160,7 @@ T001–T005 → US1 y US2; US3 puede ejecutarse tras T001–T002; US4/US5 tras T
 
 Casillas [x] tras contrastar con el código y ejecutar sus pruebas puntuales; ver evidencia en cada tarea.
 
-- Hechas (30): T001–T005, T007–T010, T015, T016, T020–T026, T028, T033–T035, T037, T040, T041, T046–T050. Con reservas: T021, T022 y T034 solo con transporte/cliente simulado; T026 sin conexión al chat; T037 solo lógica sin UI ni persistencia.
-- Parciales (casilla vacía): T006 (falta cancelación), T011, T013, T017, T018, T019, T029 (falta vista previa de importación), T036 (falta repositorio), T042, T043, T044.
+- Hechas (32): T001–T005, T006, T007–T010, T012, T015, T016, T020–T026, T028, T033–T035, T037, T040, T041, T046–T050. Con reservas: T021, T022 y T034 solo con transporte/cliente simulado; T026 sin conexión al chat; T037 solo lógica sin UI ni persistencia.
+- Parciales (casilla vacía): T011, T013, T017, T018, T019, T029 (falta vista previa de importación), T036 (falta repositorio), T042, T043, T044.
 - Pendientes: T014, T027, T030 (sin adaptador Drive real), T031, T032, T038, T039, T045, T051, T052, T053.
 - Validación real aún no hecha: Google OAuth/Drive, IA real, Android antiguo e interrupción de proceso (T004), iOS.
