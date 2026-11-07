@@ -274,6 +274,12 @@ void main() {
         );
         expect(nameField.controller!.text, 'Lectura');
 
+        // En el emulador la pantalla es baja: el botón está más abajo en la lista.
+        await tester.scrollUntilVisible(
+          find.byKey(const Key('import-save')),
+          400,
+          scrollable: find.byType(Scrollable).first,
+        );
         await tester.tap(find.byKey(const Key('import-save')));
         await realIo(tester, 120);
         await tester.pumpAndSettle();
