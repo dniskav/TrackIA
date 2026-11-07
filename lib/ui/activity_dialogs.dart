@@ -361,7 +361,7 @@ class _ActivityEndDialogState extends State<ActivityEndDialog> {
             },
             child: InputDecorator(
               decoration: InputDecoration(labelText: appText(context).activityDialogDate),
-              child: Text(DateFormat('d/M/yyyy').format(end)),
+              child: Text(DateFormat(appText(context).datePatternNumericDate, Localizations.localeOf(context).toString()).format(end)),
             ),
           ),
         ),

@@ -1661,5 +1661,31 @@
     "placeholders": {
       "label": {}
     }
-  }
+  },
+  "datePatternLongWeekday": "EEEE، d MMMM",
+  "datePatternLongDateTime": "d MMMM · HH:mm",
+  "datePatternShortDateTime": "d MMM yyyy · HH:mm",
+  "datePatternShortDate": "d MMM",
+  "datePatternNumericDate": "d/M/yyyy",
+  "datePatternNumericDateTime": "d/M/yyyy HH:mm",
+  "datePatternNumericDateTimeSeconds": "d/M/yyyy HH:mm:ss",
+  "datePatternPaddedDateTime": "dd/MM/yyyy HH:mm",
+  "builderTypeNumber": "رقم",
+  "builderTypeScale": "مقياس",
+  "builderTypeText": "نص",
+  "builderTypeChoice": "خيار",
+  "builderTypeBoolean": "نعم أو لا",
+  "builderAggSum": "جمع",
+  "builderAggMax": "أفضل نتيجة",
+  "builderAggAvg": "المتوسط",
+  "builderAggDistinct": "عدّ المختلفة",
+  "builderAggCountTrue": "عدّ نعم",
+  "builderAggNone": "ملاحظات فقط",
+  "proposalLabelActivitySeconds": "مدة المقطع",
+  "proposalLabelTargetCycles": "الدورات المتوقعة",
+  "proposalLabelUnitCycles": "دورات",
+  "proposalLabelUnitSeconds": "ث",
+  "creatorStaticGreeting": "أخبرني بما تريد أن تواظب عليه وسأساعدك في إنشاء مرافقك.",
+  "creatorStaticDayLetters": "ن,ث,ر,خ,ج,س,ح",
+  "proposalGameSuggestion": "لقد واظبت عدة أيام متتالية. هل تريد تفعيل وضع اللعب لرؤية الأهداف والسلاسل والإنجازات؟"
 }

@@ -22,14 +22,20 @@ class ProposalCard extends StatelessWidget {
   final VoidCallback onApply;
   final VoidCallback onIgnore;
 
-  String _label(String p) => switch (p) {
-    'restSeconds' => 'Descanso',
-    'activitySeconds' => 'Duración por tramo',
-    'targetCycles' => 'Ciclos previstos',
-    _ => p,
-  };
+  String _label(BuildContext context, String p) {
+    final t = appText(context);
+    return switch (p) {
+      'restSeconds' => t.activityRestLabel,
+      'activitySeconds' => t.proposalLabelActivitySeconds,
+      'targetCycles' => t.proposalLabelTargetCycles,
+      _ => p,
+    };
+  }
 
-  String _unit(String p) => p == 'targetCycles' ? 'ciclos' : 's';
+  String _unit(BuildContext context, String p) {
+    final t = appText(context);
+    return p == 'targetCycles' ? t.proposalLabelUnitCycles : t.proposalLabelUnitSeconds;
+  }
 
   @override
   Widget build(BuildContext context) => Card(
@@ -48,9 +54,9 @@ class ProposalCard extends StatelessWidget {
               padding: const EdgeInsets.only(top: 4),
               child: Text(
                 appText(context).proposalChangeLine(
-                  _label(p.property),
+                  _label(context, p.property),
                   p.currentValue,
-                  _unit(p.property),
+                  _unit(context, p.property),
                   p.proposedValue,
                 ),
               ),

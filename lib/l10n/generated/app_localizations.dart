@@ -5707,6 +5707,162 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Añadir {label}'**
   String focusAddField(Object label);
+
+  /// No description provided for @datePatternLongWeekday.
+  ///
+  /// In es, this message translates to:
+  /// **'EEEE, d \'de\' MMMM'**
+  String get datePatternLongWeekday;
+
+  /// No description provided for @datePatternLongDateTime.
+  ///
+  /// In es, this message translates to:
+  /// **'d \'de\' MMMM · HH:mm'**
+  String get datePatternLongDateTime;
+
+  /// No description provided for @datePatternShortDateTime.
+  ///
+  /// In es, this message translates to:
+  /// **'d MMM yyyy · HH:mm'**
+  String get datePatternShortDateTime;
+
+  /// No description provided for @datePatternShortDate.
+  ///
+  /// In es, this message translates to:
+  /// **'d MMM'**
+  String get datePatternShortDate;
+
+  /// No description provided for @datePatternNumericDate.
+  ///
+  /// In es, this message translates to:
+  /// **'d/M/yyyy'**
+  String get datePatternNumericDate;
+
+  /// No description provided for @datePatternNumericDateTime.
+  ///
+  /// In es, this message translates to:
+  /// **'d/M/yyyy HH:mm'**
+  String get datePatternNumericDateTime;
+
+  /// No description provided for @datePatternNumericDateTimeSeconds.
+  ///
+  /// In es, this message translates to:
+  /// **'d/M/yyyy HH:mm:ss'**
+  String get datePatternNumericDateTimeSeconds;
+
+  /// No description provided for @datePatternPaddedDateTime.
+  ///
+  /// In es, this message translates to:
+  /// **'dd/MM/yyyy HH:mm'**
+  String get datePatternPaddedDateTime;
+
+  /// No description provided for @builderTypeNumber.
+  ///
+  /// In es, this message translates to:
+  /// **'Número'**
+  String get builderTypeNumber;
+
+  /// No description provided for @builderTypeScale.
+  ///
+  /// In es, this message translates to:
+  /// **'Escala'**
+  String get builderTypeScale;
+
+  /// No description provided for @builderTypeText.
+  ///
+  /// In es, this message translates to:
+  /// **'Texto'**
+  String get builderTypeText;
+
+  /// No description provided for @builderTypeChoice.
+  ///
+  /// In es, this message translates to:
+  /// **'Opción'**
+  String get builderTypeChoice;
+
+  /// No description provided for @builderTypeBoolean.
+  ///
+  /// In es, this message translates to:
+  /// **'Sí o no'**
+  String get builderTypeBoolean;
+
+  /// No description provided for @builderAggSum.
+  ///
+  /// In es, this message translates to:
+  /// **'Sumar'**
+  String get builderAggSum;
+
+  /// No description provided for @builderAggMax.
+  ///
+  /// In es, this message translates to:
+  /// **'Mejor marca'**
+  String get builderAggMax;
+
+  /// No description provided for @builderAggAvg.
+  ///
+  /// In es, this message translates to:
+  /// **'Promedio'**
+  String get builderAggAvg;
+
+  /// No description provided for @builderAggDistinct.
+  ///
+  /// In es, this message translates to:
+  /// **'Contar distintos'**
+  String get builderAggDistinct;
+
+  /// No description provided for @builderAggCountTrue.
+  ///
+  /// In es, this message translates to:
+  /// **'Contar síes'**
+  String get builderAggCountTrue;
+
+  /// No description provided for @builderAggNone.
+  ///
+  /// In es, this message translates to:
+  /// **'Solo notas'**
+  String get builderAggNone;
+
+  /// No description provided for @proposalLabelActivitySeconds.
+  ///
+  /// In es, this message translates to:
+  /// **'Duración por tramo'**
+  String get proposalLabelActivitySeconds;
+
+  /// No description provided for @proposalLabelTargetCycles.
+  ///
+  /// In es, this message translates to:
+  /// **'Ciclos previstos'**
+  String get proposalLabelTargetCycles;
+
+  /// No description provided for @proposalLabelUnitCycles.
+  ///
+  /// In es, this message translates to:
+  /// **'ciclos'**
+  String get proposalLabelUnitCycles;
+
+  /// No description provided for @proposalLabelUnitSeconds.
+  ///
+  /// In es, this message translates to:
+  /// **'s'**
+  String get proposalLabelUnitSeconds;
+
+  /// No description provided for @creatorStaticGreeting.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuéntame qué quieres seguir y te ayudo a crear tu acompañante.'**
+  String get creatorStaticGreeting;
+
+  /// No description provided for @creatorStaticDayLetters.
+  ///
+  /// In es, this message translates to:
+  /// **'L,M,X,J,V,S,D'**
+  String get creatorStaticDayLetters;
+
+  /// No description provided for @proposalGameSuggestion.
+  ///
+  /// In es, this message translates to:
+  /// **'Llevas varios días seguidos cumpliendo. ¿Quieres activar el modo Juego para ver metas, rachas y logros?'**
+  String get proposalGameSuggestion;
 }
 
 class _AppLocalizationsDelegate

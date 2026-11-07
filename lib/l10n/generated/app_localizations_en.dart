@@ -3341,4 +3341,84 @@ class AppLocalizationsEn extends AppLocalizations {
   String focusAddField(Object label) {
     return 'Add $label';
   }
+
+  @override
+  String get datePatternLongWeekday => 'EEEE, MMMM d';
+
+  @override
+  String get datePatternLongDateTime => 'MMMM d · HH:mm';
+
+  @override
+  String get datePatternShortDateTime => 'MMM d, yyyy · HH:mm';
+
+  @override
+  String get datePatternShortDate => 'MMM d';
+
+  @override
+  String get datePatternNumericDate => 'M/d/yyyy';
+
+  @override
+  String get datePatternNumericDateTime => 'M/d/yyyy HH:mm';
+
+  @override
+  String get datePatternNumericDateTimeSeconds => 'M/d/yyyy HH:mm:ss';
+
+  @override
+  String get datePatternPaddedDateTime => 'MM/dd/yyyy HH:mm';
+
+  @override
+  String get builderTypeNumber => 'Number';
+
+  @override
+  String get builderTypeScale => 'Scale';
+
+  @override
+  String get builderTypeText => 'Text';
+
+  @override
+  String get builderTypeChoice => 'Option';
+
+  @override
+  String get builderTypeBoolean => 'Yes or no';
+
+  @override
+  String get builderAggSum => 'Sum';
+
+  @override
+  String get builderAggMax => 'Personal best';
+
+  @override
+  String get builderAggAvg => 'Average';
+
+  @override
+  String get builderAggDistinct => 'Count distinct';
+
+  @override
+  String get builderAggCountTrue => 'Count yes';
+
+  @override
+  String get builderAggNone => 'Notes only';
+
+  @override
+  String get proposalLabelActivitySeconds => 'Interval duration';
+
+  @override
+  String get proposalLabelTargetCycles => 'Planned cycles';
+
+  @override
+  String get proposalLabelUnitCycles => 'cycles';
+
+  @override
+  String get proposalLabelUnitSeconds => 's';
+
+  @override
+  String get creatorStaticGreeting =>
+      'Tell me what you want to keep up with and I\'ll help you create your companion.';
+
+  @override
+  String get creatorStaticDayLetters => 'M,T,W,T,F,S,S';
+
+  @override
+  String get proposalGameSuggestion =>
+      'You\'ve kept up for several days in a row. Do you want to turn on Game mode to see goals, streaks and achievements?';
 }

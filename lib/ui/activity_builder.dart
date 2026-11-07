@@ -140,21 +140,30 @@ class ActivityBuilder extends StatefulWidget {
 
   final String companionId;
 
-  static const _typeLabels = {
-    'number': 'Número',
-    'scale': 'Escala',
-    'text': 'Texto',
-    'choice': 'Opción',
-    'boolean': 'Sí o no',
-  };
-  static const _aggregateLabels = {
-    'sum': 'Sumar',
-    'max': 'Mejor marca',
-    'avg': 'Promedio',
-    'distinct': 'Contar distintos',
-    'countTrue': 'Contar síes',
-    'none': 'Solo notas',
-  };
+  /// Etiquetas visibles de tipo de campo. La clave (`number`, `scale`…) es lo que se guarda.
+  static Map<String, String> _typeLabels(BuildContext context) {
+    final t = appText(context);
+    return {
+      'number': t.builderTypeNumber,
+      'scale': t.builderTypeScale,
+      'text': t.builderTypeText,
+      'choice': t.builderTypeChoice,
+      'boolean': t.builderTypeBoolean,
+    };
+  }
+
+  /// Etiquetas visibles de agregación. La clave (`sum`, `max`…) es lo que se guarda.
+  static Map<String, String> _aggregateLabels(BuildContext context) {
+    final t = appText(context);
+    return {
+      'sum': t.builderAggSum,
+      'max': t.builderAggMax,
+      'avg': t.builderAggAvg,
+      'distinct': t.builderAggDistinct,
+      'countTrue': t.builderAggCountTrue,
+      'none': t.builderAggNone,
+    };
+  }
   static const _aggregatesByType = {
     'number': ['sum', 'max', 'avg', 'none'],
     'scale': ['avg', 'none'],
@@ -445,8 +454,8 @@ class _ActivityBuilderState extends State<ActivityBuilder> {
                 title: Text(field['label'] as String),
                 subtitle: Text(
                   [
-                    ActivityBuilder._typeLabels[field['type']] ?? '',
-                    ActivityBuilder._aggregateLabels[field['aggregate']] ?? '',
+                    ActivityBuilder._typeLabels(context)[field['type']] ?? '',
+                    ActivityBuilder._aggregateLabels(context)[field['aggregate']] ?? '',
                     if ((field['unit'] as String).isNotEmpty) field['unit'] as String,
                   ].where((t) => t.isNotEmpty).join(' · '),
                 ),
@@ -589,7 +598,7 @@ class _FieldDialogState extends State<_FieldDialog> {
               initialValue: type,
               decoration: InputDecoration(labelText: appText(context).activityBuilderFieldType),
               items: [
-                for (final entry in ActivityBuilder._typeLabels.entries)
+                for (final entry in ActivityBuilder._typeLabels(context).entries)
                   DropdownMenuItem(value: entry.key, child: Text(entry.value)),
               ],
               onChanged: (value) => setState(() {
@@ -645,7 +654,7 @@ class _FieldDialogState extends State<_FieldDialog> {
                   for (final a in ActivityBuilder.aggregatesFor(type))
                     DropdownMenuItem(
                       value: a,
-                      child: Text(ActivityBuilder._aggregateLabels[a]!),
+                      child: Text(ActivityBuilder._aggregateLabels(context)[a]!),
                     ),
                 ],
                 onChanged: (value) => setState(() => aggregate = value ?? aggregate),

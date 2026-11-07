@@ -261,7 +261,7 @@ class _FinishSessionDialogState extends State<_FinishSessionDialog> {
               onTap: confirming ? null : chooseDate,
               child: InputDecorator(
                 decoration: InputDecoration(labelText: appText(context).homeDate),
-                child: Text(DateFormat('d/M/yyyy').format(end)),
+                child: Text(DateFormat(appText(context).datePatternNumericDate, Localizations.localeOf(context).toString()).format(end)),
               ),
             ),
           ),

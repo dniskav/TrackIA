@@ -3295,4 +3295,84 @@ class AppLocalizationsAr extends AppLocalizations {
   String focusAddField(Object label) {
     return 'إضافة $label';
   }
+
+  @override
+  String get datePatternLongWeekday => 'EEEE، d MMMM';
+
+  @override
+  String get datePatternLongDateTime => 'd MMMM · HH:mm';
+
+  @override
+  String get datePatternShortDateTime => 'd MMM yyyy · HH:mm';
+
+  @override
+  String get datePatternShortDate => 'd MMM';
+
+  @override
+  String get datePatternNumericDate => 'd/M/yyyy';
+
+  @override
+  String get datePatternNumericDateTime => 'd/M/yyyy HH:mm';
+
+  @override
+  String get datePatternNumericDateTimeSeconds => 'd/M/yyyy HH:mm:ss';
+
+  @override
+  String get datePatternPaddedDateTime => 'dd/MM/yyyy HH:mm';
+
+  @override
+  String get builderTypeNumber => 'رقم';
+
+  @override
+  String get builderTypeScale => 'مقياس';
+
+  @override
+  String get builderTypeText => 'نص';
+
+  @override
+  String get builderTypeChoice => 'خيار';
+
+  @override
+  String get builderTypeBoolean => 'نعم أو لا';
+
+  @override
+  String get builderAggSum => 'جمع';
+
+  @override
+  String get builderAggMax => 'أفضل نتيجة';
+
+  @override
+  String get builderAggAvg => 'المتوسط';
+
+  @override
+  String get builderAggDistinct => 'عدّ المختلفة';
+
+  @override
+  String get builderAggCountTrue => 'عدّ نعم';
+
+  @override
+  String get builderAggNone => 'ملاحظات فقط';
+
+  @override
+  String get proposalLabelActivitySeconds => 'مدة المقطع';
+
+  @override
+  String get proposalLabelTargetCycles => 'الدورات المتوقعة';
+
+  @override
+  String get proposalLabelUnitCycles => 'دورات';
+
+  @override
+  String get proposalLabelUnitSeconds => 'ث';
+
+  @override
+  String get creatorStaticGreeting =>
+      'أخبرني بما تريد أن تواظب عليه وسأساعدك في إنشاء مرافقك.';
+
+  @override
+  String get creatorStaticDayLetters => 'ن,ث,ر,خ,ج,س,ح';
+
+  @override
+  String get proposalGameSuggestion =>
+      'لقد واظبت عدة أيام متتالية. هل تريد تفعيل وضع اللعب لرؤية الأهداف والسلاسل والإنجازات؟';
 }

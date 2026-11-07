@@ -301,8 +301,8 @@ class _GymHomeState extends State<GymHome> {
       children: [
         Text(
           DateFormat(
-            "EEEE, d 'de' MMMM",
-            'es',
+            appText(context).datePatternLongWeekday,
+            Localizations.localeOf(context).toString(),
           ).format(DateTime.now()).toUpperCase(),
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -525,7 +525,7 @@ class _GymHomeState extends State<GymHome> {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    DateFormat('d MMM yyyy · HH:mm', 'es').format(w.startedAt),
+                    DateFormat(appText(context).datePatternShortDateTime, Localizations.localeOf(context).toString()).format(w.startedAt),
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontSize: 12,
@@ -578,14 +578,14 @@ class _GymHomeState extends State<GymHome> {
       ),
       const SizedBox(height: 10),
       Text(
-        DateFormat("d 'de' MMMM · HH:mm", 'es').format(w.startedAt),
+        DateFormat(appText(context).datePatternLongDateTime, Localizations.localeOf(context).toString()).format(w.startedAt),
         style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
       ),
       if (w.finishedAt != null) ...[
         const SizedBox(height: 8),
         Text(
           appText(context).homeFinishedAt(
-            DateFormat('d/M/yyyy HH:mm:ss').format(w.finishedAt!.toLocal()),
+            DateFormat(appText(context).datePatternNumericDateTimeSeconds, Localizations.localeOf(context).toString()).format(w.finishedAt!.toLocal()),
           ),
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -595,10 +595,10 @@ class _GymHomeState extends State<GymHome> {
           Text(
             w.finishTimeSource == FinishTimeSource.user
                 ? appText(context).homeFinishRecordedByUser(
-                    DateFormat('d/M/yyyy HH:mm:ss').format(w.finishedRecordedAt!.toLocal()),
+                    DateFormat(appText(context).datePatternNumericDateTimeSeconds, Localizations.localeOf(context).toString()).format(w.finishedRecordedAt!.toLocal()),
                   )
                 : appText(context).homeFinishRecorded(
-                    DateFormat('d/M/yyyy HH:mm:ss').format(w.finishedRecordedAt!.toLocal()),
+                    DateFormat(appText(context).datePatternNumericDateTimeSeconds, Localizations.localeOf(context).toString()).format(w.finishedRecordedAt!.toLocal()),
                   ),
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -668,7 +668,7 @@ class _GymHomeState extends State<GymHome> {
                 if (activity.finishedAt != null)
                   Text(
                     appText(context).homeEndedAt(
-                      DateFormat('d/M/yyyy HH:mm').format(activity.finishedAt!.toLocal()),
+                      DateFormat(appText(context).datePatternNumericDateTime, Localizations.localeOf(context).toString()).format(activity.finishedAt!.toLocal()),
                     ),
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -850,7 +850,7 @@ class _GymHomeState extends State<GymHome> {
                       previous == null
                           ? appText(context).homeNoPreviousSession
                           : appText(context).homeLastTime(
-                              DateFormat('d MMM', 'es').format(previous.date),
+                              DateFormat(appText(context).datePatternShortDate, Localizations.localeOf(context).toString()).format(previous.date),
                             ),
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,

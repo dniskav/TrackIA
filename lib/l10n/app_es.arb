@@ -1661,5 +1661,31 @@
     "placeholders": {
       "label": {}
     }
-  }
+  },
+  "datePatternLongWeekday": "EEEE, d 'de' MMMM",
+  "datePatternLongDateTime": "d 'de' MMMM · HH:mm",
+  "datePatternShortDateTime": "d MMM yyyy · HH:mm",
+  "datePatternShortDate": "d MMM",
+  "datePatternNumericDate": "d/M/yyyy",
+  "datePatternNumericDateTime": "d/M/yyyy HH:mm",
+  "datePatternNumericDateTimeSeconds": "d/M/yyyy HH:mm:ss",
+  "datePatternPaddedDateTime": "dd/MM/yyyy HH:mm",
+  "builderTypeNumber": "Número",
+  "builderTypeScale": "Escala",
+  "builderTypeText": "Texto",
+  "builderTypeChoice": "Opción",
+  "builderTypeBoolean": "Sí o no",
+  "builderAggSum": "Sumar",
+  "builderAggMax": "Mejor marca",
+  "builderAggAvg": "Promedio",
+  "builderAggDistinct": "Contar distintos",
+  "builderAggCountTrue": "Contar síes",
+  "builderAggNone": "Solo notas",
+  "proposalLabelActivitySeconds": "Duración por tramo",
+  "proposalLabelTargetCycles": "Ciclos previstos",
+  "proposalLabelUnitCycles": "ciclos",
+  "proposalLabelUnitSeconds": "s",
+  "creatorStaticGreeting": "Cuéntame qué quieres seguir y te ayudo a crear tu acompañante.",
+  "creatorStaticDayLetters": "L,M,X,J,V,S,D",
+  "proposalGameSuggestion": "Llevas varios días seguidos cumpliendo. ¿Quieres activar el modo Juego para ver metas, rachas y logros?"
 }

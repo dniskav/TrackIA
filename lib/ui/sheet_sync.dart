@@ -577,7 +577,7 @@ class _SheetSyncScreenState extends State<SheetSyncScreen> {
                     DropdownMenuItem(
                       value: w.id,
                       child: Text(
-                        '${DateFormat('dd/MM/yyyy HH:mm').format(w.startedAt.toLocal())} · ${w.name}',
+                        '${DateFormat(appText(context).datePatternPaddedDateTime, Localizations.localeOf(context).toString()).format(w.startedAt.toLocal())} · ${w.name}',
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),

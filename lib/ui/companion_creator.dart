@@ -167,18 +167,21 @@ class CompanionBuilderScreen extends StatefulWidget {
   const CompanionBuilderScreen({
     super.key,
     this.initial,
-    this.submitLabel = 'Listo',
+    this.submitLabel,
   });
 
   final CompanionDraft? initial;
-  final String submitLabel;
+  /// Texto del botón final; si es null se usa «Listo» (se resuelve en build).
+  final String? submitLabel;
 
   @override
   State<CompanionBuilderScreen> createState() => _CompanionBuilderScreenState();
 }
 
 class _CompanionBuilderScreenState extends State<CompanionBuilderScreen> {
-  static const _dayLetters = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+  /// Iniciales de los días, de lunes a domingo (la posición define el día).
+  List<String> _dayLetters(BuildContext context) =>
+      appText(context).creatorStaticDayLetters.split(',');
 
   late final name = TextEditingController(text: widget.initial?.name ?? '');
   late final description = TextEditingController(
@@ -430,7 +433,7 @@ class _CompanionBuilderScreenState extends State<CompanionBuilderScreen> {
               for (var i = 0; i < 7; i++)
                 FilterChip(
                   key: Key('builder-day-$i'),
-                  label: Text(_dayLetters[i]),
+                  label: Text(_dayLetters(context)[i]),
                   selected: days >> i & 1 == 1,
                   onSelected: (on) => setState(
                     () => days = on ? days | (1 << i) : days & ~(1 << i),
@@ -479,7 +482,7 @@ class _CompanionBuilderScreenState extends State<CompanionBuilderScreen> {
         FilledButton(
           key: const Key('builder-submit'),
           onPressed: submit,
-          child: Text(widget.submitLabel),
+          child: Text(widget.submitLabel ?? appText(context).homeDone),
         ),
       ],
     ),
@@ -626,8 +629,7 @@ class CompanionAssistedScreen extends StatefulWidget {
 }
 
 class _CompanionAssistedScreenState extends State<CompanionAssistedScreen> {
-  static const greeting =
-      'Cuéntame qué quieres seguir y te ayudo a crear tu acompañante.';
+  String _greeting(BuildContext context) => appText(context).creatorStaticGreeting;
   final input = TextEditingController();
   final messages = <AiMessage>[];
   final sessionId = const Uuid().v4();
@@ -739,10 +741,10 @@ class _CompanionAssistedScreenState extends State<CompanionAssistedScreen> {
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              const Card(
+              Card(
                 child: Padding(
-                  padding: EdgeInsets.all(12),
-                  child: Text(greeting, key: Key('creator-greeting')),
+                  padding: const EdgeInsets.all(12),
+                  child: Text(_greeting(context), key: const Key('creator-greeting')),
                 ),
               ),
               for (final m in messages)

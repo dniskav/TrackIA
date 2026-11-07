@@ -420,7 +420,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
     child: ExpansionTile(
       title: Text(workout.name),
       subtitle: Text(
-        appText(context).transferWorkoutSubtitle(DateFormat('d/M/yyyy HH:mm').format(workout.date), workout.exercises.length, workout.setCount),
+        appText(context).transferWorkoutSubtitle(DateFormat(appText(context).datePatternNumericDateTime, Localizations.localeOf(context).toString()).format(workout.date), workout.exercises.length, workout.setCount),
       ),
       trailing:
           existing.contains(importedFingerprint(workout))

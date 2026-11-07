@@ -78,9 +78,6 @@ class GameSuggestionCard extends StatelessWidget {
     required this.onNever,
   });
 
-  static const text =
-      'Llevas varios días seguidos cumpliendo. ¿Quieres activar el modo Juego para ver metas, rachas y logros?';
-
   final VoidCallback onActivate, onLater, onNever;
 
   @override
@@ -91,7 +88,7 @@ class GameSuggestionCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(text),
+          Text(appText(context).proposalGameSuggestion),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,

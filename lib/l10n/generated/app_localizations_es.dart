@@ -3359,4 +3359,84 @@ class AppLocalizationsEs extends AppLocalizations {
   String focusAddField(Object label) {
     return 'Añadir $label';
   }
+
+  @override
+  String get datePatternLongWeekday => 'EEEE, d \'de\' MMMM';
+
+  @override
+  String get datePatternLongDateTime => 'd \'de\' MMMM · HH:mm';
+
+  @override
+  String get datePatternShortDateTime => 'd MMM yyyy · HH:mm';
+
+  @override
+  String get datePatternShortDate => 'd MMM';
+
+  @override
+  String get datePatternNumericDate => 'd/M/yyyy';
+
+  @override
+  String get datePatternNumericDateTime => 'd/M/yyyy HH:mm';
+
+  @override
+  String get datePatternNumericDateTimeSeconds => 'd/M/yyyy HH:mm:ss';
+
+  @override
+  String get datePatternPaddedDateTime => 'dd/MM/yyyy HH:mm';
+
+  @override
+  String get builderTypeNumber => 'Número';
+
+  @override
+  String get builderTypeScale => 'Escala';
+
+  @override
+  String get builderTypeText => 'Texto';
+
+  @override
+  String get builderTypeChoice => 'Opción';
+
+  @override
+  String get builderTypeBoolean => 'Sí o no';
+
+  @override
+  String get builderAggSum => 'Sumar';
+
+  @override
+  String get builderAggMax => 'Mejor marca';
+
+  @override
+  String get builderAggAvg => 'Promedio';
+
+  @override
+  String get builderAggDistinct => 'Contar distintos';
+
+  @override
+  String get builderAggCountTrue => 'Contar síes';
+
+  @override
+  String get builderAggNone => 'Solo notas';
+
+  @override
+  String get proposalLabelActivitySeconds => 'Duración por tramo';
+
+  @override
+  String get proposalLabelTargetCycles => 'Ciclos previstos';
+
+  @override
+  String get proposalLabelUnitCycles => 'ciclos';
+
+  @override
+  String get proposalLabelUnitSeconds => 's';
+
+  @override
+  String get creatorStaticGreeting =>
+      'Cuéntame qué quieres seguir y te ayudo a crear tu acompañante.';
+
+  @override
+  String get creatorStaticDayLetters => 'L,M,X,J,V,S,D';
+
+  @override
+  String get proposalGameSuggestion =>
+      'Llevas varios días seguidos cumpliendo. ¿Quieres activar el modo Juego para ver metas, rachas y logros?';
 }
