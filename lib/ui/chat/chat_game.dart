@@ -15,11 +15,22 @@ extension _ChatGame on _AssistantChatScreenState {
       }
       return;
     }
+    if (await effectAlreadyApplied('activity', selected.name)) {
+      if (mounted) update(() => proposal = null);
+      return;
+    }
     final ok = await widget.controller.run(() async {
       await widget.controller.activityRepository!.prepareActivity(
         selected.forCompanion(companionId),
       );
     });
+    if (ok) {
+      await recordEffect(
+        'activity',
+        selected.name,
+        'Preparé la actividad «${selected.name}»',
+      );
+    }
     if (mounted) {
       update(() {
         if (ok) {
@@ -53,6 +64,13 @@ extension _ChatGame on _AssistantChatScreenState {
       ),
     );
     final descanso = values['restSeconds'] ?? activity.definition.restSeconds;
+    if (applied) {
+      await recordEffect(
+        'timing',
+        'locked:${values.entries.map((e) => '${e.key}=${e.value}').join(',')}',
+        'Cambié los tiempos de «${activity.definition.name}» tras tu confirmación',
+      );
+    }
     await saveSheetReply(
       applied
           ? 'Aplicado: ${descanso ~/ 60}:${(descanso % 60).toString().padLeft(2, '0')} de descanso.'
@@ -194,6 +212,11 @@ extension _ChatGame on _AssistantChatScreenState {
             goal.rule,
             origin: 'assistant',
           );
+          await recordEffect(
+            'goal',
+            goalText(goal.rule, await fieldLabels(service)),
+            'Añadí la meta «${goalText(goal.rule, await fieldLabels(service))}»',
+          );
           result = 'Meta añadida. La verás en tu progreso.';
         case 'achievement':
           final proposal = card.payload as AchievementProposal;
@@ -206,6 +229,13 @@ extension _ChatGame on _AssistantChatScreenState {
               ruleHash: ruleHash(proposal.rule),
             ),
           ], origin: 'assistant');
+          if (added > 0) {
+            await recordEffect(
+              'achievement',
+              proposal.title,
+              'Añadí el logro «${proposal.title}»',
+            );
+          }
           result = added > 0
               ? 'Logro añadido: ${proposal.title}.'
               : 'Ya tenías un logro con esa regla.';
@@ -228,6 +258,11 @@ extension _ChatGame on _AssistantChatScreenState {
             ),
           );
           widget.onRemindersChanged?.call();
+          await recordEffect(
+            'reminder-copy',
+            '${copy.windowStart.length}-${copy.lastCall.length}-${copy.inactive.length}',
+            'Guardé textos de recordatorio nuevos',
+          );
           result = 'Textos de recordatorio guardados.';
       }
     } catch (_) {

@@ -34,6 +34,9 @@ class MessageRevisionRepository {
   final Database _db;
   final FeatureScope scope;
 
+  /// Shared connection, for repositories on sibling v7 tables.
+  Database get database => _db;
+
   /// Uses the same database path and factory as the active [ChatStore].
   ///
   /// Production paths are resolved with the normal TrackIA naming rules. The

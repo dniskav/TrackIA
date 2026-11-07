@@ -37,9 +37,10 @@
 - [x] T012 [US1] Crear `test/message_edit_widget_test.dart` y ofrecer Editar, historial y Reenviar accesibles en `lib/ui/assistant_chat.dart` y `lib/ui/chat/`; comprobar cancelación y estados tras reinicio.
   - Estado 2026-11-07: parcial: existen `lib/ui/chat/message_actions.dart` y `test/message_actions_tap_test.dart`; falta `test/message_edit_widget_test.dart` (cancelación, historial y estados tras reinicio).
 - [ ] T013 [US1] Implementar relación mensaje→efecto y corrección transaccional por ID en `lib/data/message_effect_repository.dart`; ante varias relaciones mostrar selección y antes/después; no editar Sheets automáticamente; probar `test/message_effect_test.dart` con 10×10→10×60 y sin duplicados.
-  - Estado 2026-11-07: parcial: existe `trackia_message_effects` en v7 pero falta `lib/data/message_effect_repository.dart` y `test/message_effect_test.dart`.
+  - Estado 2026-11-07: parcial: `lib/data/message_effect_repository.dart` registra efectos por mensaje/revisión (`record` idempotente, `effectsFor`, `effectsForRevision`, `markReverted`, `appliedEffectsSummary`) y el chat los anota (`lib/ui/chat/chat_effects.dart`). Falta la corrección transaccional con antes/después y selección entre varias relaciones (10×10→10×60).
+  - Evidencia 2026-11-07: `flutter test --no-pub test/message_effect_test.dart` -> 5 aprobadas (idempotencia y orden, por revisión y ámbito, resumen y marca de corregido, reenvío/edición sin repetir, reinicio con base en archivo); `flutter analyze` sin incidencias y suite completa 829 aprobadas.
 - [ ] T014 [US1] En `lib/application/assistant_context.dart` y `lib/ui/chat/chat_archive.dart` distinguir propuesta de efecto confirmado y evitar afirmaciones de escritura no acreditadas; probar respuesta verbal sin efecto y operación incierta en `test/message_effect_test.dart`.
-  - Estado 2026-11-07: pendiente: sin pruebas ni distinción propuesta/efecto confirmado en `assistant_context.dart`/`chat_archive.dart`.
+  - Estado 2026-11-07: parcial: solo se anota lo ya aplicado (una propuesta sin confirmar no cuenta) y el reenvío añade al contexto del modelo `appliedEffectsSummary`; `chat_archive.dart` no repite objetivo/tiempos/edición ya aplicados. Falta la distinción en `assistant_context.dart` y la prueba de respuesta verbal sin efecto y operación incierta (el resumen sí separa «incierto», cubierto solo por el repositorio).
 
 ## Fase 4 — US2: modificar actividad activa (P1)
 

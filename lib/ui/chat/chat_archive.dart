@@ -233,6 +233,13 @@ extension _ChatArchive on _AssistantChatScreenState {
             ),
       );
       if (confirmed != true || !mounted) return;
+      final targetKey = 'target:${target ?? 'none'}';
+      if (await effectAlreadyApplied('target', targetKey)) {
+        await saveSheetReply(
+          'Ese objetivo ya se había aplicado con este mensaje; no se repitió.',
+        );
+        return;
+      }
       final done = await widget.controller.run(
         () => widget.controller.activityRepository!.setActivityTarget(
           expectedTargetActivity.id,
@@ -240,6 +247,17 @@ extension _ChatArchive on _AssistantChatScreenState {
           expected: expectedTargetActivity.definition,
         ),
       );
+      if (!mounted) return;
+      if (done) {
+        await recordEffect(
+          'target',
+          targetKey,
+          target == null
+              ? 'Quité el objetivo de series de «${expectedTargetActivity.definition.name}»'
+              : 'Fijé el objetivo en $target series en «${expectedTargetActivity.definition.name}»',
+          targetId: expectedTargetActivity.id,
+        );
+      }
       if (!mounted) return;
       final current = widget.controller.focus;
       final actualCompleted =
@@ -290,8 +308,24 @@ extension _ChatArchive on _AssistantChatScreenState {
       );
       final locked =
           timing.keys.where(activity.definition.userSet.contains).toSet();
+      final timingKey =
+          'free:${(timing.entries.toList()..sort((a, b) => a.key.compareTo(b.key))).map((e) => '${e.key}=${e.value}').join(',')}';
+      if (await effectAlreadyApplied('timing', timingKey)) {
+        await saveSheetReply(
+          'Esos tiempos ya se habían aplicado con este mensaje; no se repitieron.',
+        );
+        return;
+      }
       if (locked.isEmpty) {
         final applied = await applyTiming(timing.cast<String, int?>());
+        if (applied) {
+          await recordEffect(
+            'timing',
+            timingKey,
+            'Cambié los tiempos de «${activity.definition.name}» (${timing.entries.map((e) => '${e.key}: ${e.value}').join(', ')})',
+            targetId: activity.id,
+          );
+        }
         await saveSheetReply(
           applied
               ? savedTimingsMessage(activity.definition, timing)
@@ -307,6 +341,14 @@ extension _ChatArchive on _AssistantChatScreenState {
           freeApply.isEmpty
               ? true
               : await applyTiming(freeApply.cast<String, int?>());
+      if (appliedFree && freeApply.isNotEmpty) {
+        await recordEffect(
+          'timing',
+          timingKey,
+          'Cambié los tiempos libres de «${activity.definition.name}» (${freeApply.entries.map((e) => '${e.key}: ${e.value}').join(', ')})',
+          targetId: activity.id,
+        );
+      }
       if (mounted) {
         update(
           () =>

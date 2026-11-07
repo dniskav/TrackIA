@@ -7,6 +7,8 @@ import '../application/progress_engine.dart'
 import '../data/chat_store.dart';
 import '../data/feature_scope.dart';
 import '../data/message_revision_repository.dart';
+import '../data/message_effect_repository.dart';
+import '../domain/message_effect.dart';
 import '../application/message_delivery.dart';
 import '../domain/message_revision.dart';
 import '../application/message_delivery_policy.dart';
@@ -62,6 +64,7 @@ part 'chat/chat_archive.dart';
 part 'chat/chat_attachments.dart';
 
 part 'chat/chat_game.dart';
+part 'chat/chat_effects.dart';
 part 'chat/chat_sheet.dart';
 part 'chat/chat_delivery.dart';
 part 'chat/message_actions.dart';
@@ -203,6 +206,9 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
   // SQLite v7 owns delivery. These maps only connect transcript bubbles to
   // stable IDs; they are not a second editable queue.
   MessageRevisionRepository? messageRevisions;
+  MessageEffectRepository? messageEffects;
+  // Mensaje y revisión cuya respuesta se está aplicando ahora mismo.
+  ({String messageId, String revisionId})? activeEffectOrigin;
   MessageDeliveryService? messageDelivery;
   bool deliveryInitializationFailed = false;
   final outgoingMessageIds = <AiMessage, String>{};

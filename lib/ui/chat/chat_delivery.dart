@@ -16,6 +16,7 @@ extension _ChatDelivery on _AssistantChatScreenState {
       }
       if (messageRevisions != null) {
         messageDelivery = MessageDeliveryService(messageRevisions!);
+        messageEffects = MessageEffectRepository.on(messageRevisions!);
       }
     } catch (_) {
       deliveryInitializationFailed = true;
@@ -461,13 +462,16 @@ extension _ChatDelivery on _AssistantChatScreenState {
       String answer;
       try {
         dispatched = true;
+        final applied = await appliedEffectsSummary(attempt.message.id);
         answer = await replyWithArchives(
           config,
           [
             ...durableHistory(outgoing, attempt.message.id),
             AiMessage('user', attempt.revision.text, attachment: media),
           ],
-          system: contextForAi(),
+          system: applied.isEmpty
+              ? contextForAi()
+              : '${contextForAi()}\n\n$applied',
           sessionId: sessionId,
           onText: receiveText,
         );
@@ -513,6 +517,10 @@ extension _ChatDelivery on _AssistantChatScreenState {
         if (retry == null && retryMessageId == null) input.clear();
         if (includeAttachment && retryMessageId == null) attachment = null;
         if (answerStatus == MessageAnswerStatus.recorded) {
+          activeEffectOrigin = (
+            messageId: attempt.message.id,
+            revisionId: attempt.revision.id,
+          );
           if (widget.focusMode && proposal != null && !canRecord && aiReady) {
             await acceptProposal();
           }
@@ -535,6 +543,7 @@ extension _ChatDelivery on _AssistantChatScreenState {
       error =
           'No se pudo completar la conversación. El mensaje permanece guardado; no se hará un reenvío automático.';
     } finally {
+      activeEffectOrigin = null;
       if (mounted) {
         update(() {
           busy = false;

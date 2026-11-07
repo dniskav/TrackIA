@@ -104,10 +104,22 @@ extension _ChatSheet on _AssistantChatScreenState {
         .where((m) => m.role == 'user')
         .firstOrNull;
     if (latestUser == null) return;
+    final editKey = answer.hashCode.toString();
+    if (await effectAlreadyApplied('sheet-edit', editKey)) {
+      await saveSheetReply(
+        'Esa edición de Google Sheets ya se había aplicado con este mensaje; no se repitió.',
+      );
+      return;
+    }
     try {
       final receipt = await sheets.directEdit(
         answer,
         '$sessionId:${messages.length}:${latestUser.text}',
+      );
+      await recordEffect(
+        'sheet-edit',
+        editKey,
+        'Edité la hoja de Google Sheets',
       );
       if (!mounted) return;
       await saveSheetReply(receipt);
