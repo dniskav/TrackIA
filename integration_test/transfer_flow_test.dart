@@ -40,7 +40,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Revisar importación'));
     await tester.pumpAndSettle();
-    expect(find.textContaining('1 sesión nueva'), findsOneWidget);
+    expect(find.textContaining('Sesiones nuevas: 1'), findsOneWidget);
     // A small phone builds fewer rows: look for it below, then go back up.
     if (find.textContaining('Fila 4').evaluate().isEmpty) {
       await tester.scrollUntilVisible(

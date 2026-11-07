@@ -162,7 +162,7 @@ void main() {
       );
       await tester.pump(const Duration(milliseconds: 50));
     }
-    expect(find.text('Racha actual: 3 días'), findsOneWidget);
+    expect(find.text('Racha actual (días): 3'), findsOneWidget);
     expect(find.byKey(const Key('day-2026-10-26-done')), findsOneWidget);
     expect(find.byKey(const Key('day-2026-10-28-open')), findsOneWidget);
     expect(find.byKey(const Key('goal-text')), findsOneWidget);
