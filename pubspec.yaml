@@ -1,7 +1,7 @@
 name: trackia
 description: Bitácora de entrenamiento local para Android e iOS.
 publish_to: none
-version: 0.3.32+35
+version: 0.3.33+36
 environment:
   sdk: '>=3.10.0 <4.0.0'
   flutter: '>=3.44.0'
@@ -28,6 +28,7 @@ dependencies:
   jose: ^0.3.5+2
   llama_cpp_dart:
     path: packages/llama_cpp_dart
+  package_info_plus: ^9.0.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

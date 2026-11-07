@@ -584,5 +584,11 @@
   "aiTestChatGpt": "Probar conexión · usa mi plan ChatGPT",
   "aiTestApi": "Probar conexión · usa tu API",
   "aiConfigDeleted": "Configuración y clave eliminadas.",
-  "aiDeleteConfig": "Eliminar configuración y clave"
+  "aiDeleteConfig": "Eliminar configuración y clave",
+  "appVersion": "Versión {version}",
+  "@appVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  }
 }

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../application/localization.dart';
 import '../l10n/generated/app_localizations.dart';
 import '../data/welcome_settings_store.dart';
+import '../application/app_version.dart';
+import 'app_version_label.dart';
 import 'trackia_mark.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -9,9 +11,13 @@ class WelcomeScreen extends StatefulWidget {
     super.key,
     this.settings,
     this.preselectNeverAgain = false,
+    this.versionLoader,
   });
 
   final WelcomeSettings? settings;
+
+  /// Para pruebas: cómo se obtiene la versión que se muestra al pie.
+  final AppVersionLoader? versionLoader;
 
   /// The automatic entry starts with «No volver a mostrar» checked, so the
   /// guide appears once unless the user chooses to keep it. The manual entry
@@ -246,6 +252,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 ],
               ),
             ),
+            AppVersionLabel(loader: widget.versionLoader),
           ],
         ),
       ),
@@ -254,8 +261,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 }
 
 class WelcomeHelpScreen extends StatelessWidget {
-  const WelcomeHelpScreen({super.key, this.settings});
+  const WelcomeHelpScreen({super.key, this.settings, this.versionLoader});
   final WelcomeSettings? settings;
+
+  /// Para pruebas: cómo se obtiene la versión que se muestra al pie.
+  final AppVersionLoader? versionLoader;
 
   @override
   Widget build(BuildContext context) {
@@ -291,10 +301,14 @@ class WelcomeHelpScreen extends StatelessWidget {
               title: Text(l.showWelcome),
               onTap: () => Navigator.of(context).push(
                 MaterialPageRoute<void>(
-                  builder: (_) => WelcomeScreen(settings: preference),
+                  builder: (_) => WelcomeScreen(
+                    settings: preference,
+                    versionLoader: versionLoader,
+                  ),
                 ),
               ),
             ),
+            AppVersionLabel(loader: versionLoader),
           ],
         ),
       ),

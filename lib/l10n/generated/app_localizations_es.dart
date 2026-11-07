@@ -1348,4 +1348,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get aiDeleteConfig => 'Eliminar configuración y clave';
+
+  @override
+  String appVersion(Object version) {
+    return 'Versión $version';
+  }
 }

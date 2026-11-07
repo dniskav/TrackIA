@@ -2443,6 +2443,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Eliminar configuración y clave'**
   String get aiDeleteConfig;
+
+  /// No description provided for @appVersion.
+  ///
+  /// In es, this message translates to:
+  /// **'Versión {version}'**
+  String appVersion(Object version);
 }
 
 class _AppLocalizationsDelegate

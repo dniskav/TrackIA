@@ -584,5 +584,11 @@
   "aiTestChatGpt": "اختبار الاتصال · يستخدم خطة ChatGPT الخاصة بي",
   "aiTestApi": "اختبار الاتصال · يستخدم API الخاصة بك",
   "aiConfigDeleted": "تم حذف الإعدادات والمفتاح.",
-  "aiDeleteConfig": "حذف الإعدادات والمفتاح"
+  "aiDeleteConfig": "حذف الإعدادات والمفتاح",
+  "appVersion": "الإصدار {version}",
+  "@appVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  }
 }

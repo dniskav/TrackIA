@@ -1334,4 +1334,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get aiDeleteConfig => 'حذف الإعدادات والمفتاح';
+
+  @override
+  String appVersion(Object version) {
+    return 'الإصدار $version';
+  }
 }

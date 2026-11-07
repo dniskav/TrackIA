@@ -1339,4 +1339,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiDeleteConfig => 'Delete configuration and key';
+
+  @override
+  String appVersion(Object version) {
+    return 'Version $version';
+  }
 }

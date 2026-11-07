@@ -584,5 +584,11 @@
   "aiTestChatGpt": "Test connection · uses my ChatGPT plan",
   "aiTestApi": "Test connection · uses your API",
   "aiConfigDeleted": "Configuration and key deleted.",
-  "aiDeleteConfig": "Delete configuration and key"
+  "aiDeleteConfig": "Delete configuration and key",
+  "appVersion": "Version {version}",
+  "@appVersion": {
+    "placeholders": {
+      "version": {}
+    }
+  }
 }
