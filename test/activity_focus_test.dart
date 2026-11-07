@@ -851,7 +851,7 @@ void main() {
   testWidgets('chat target proposal quotes the revision from the context', (
     tester,
   ) async {
-    String? sentRevision;
+    int? sentRevision;
     await show(
       tester,
       client: AiClient(
@@ -861,15 +861,18 @@ void main() {
               if ((m as Map)['role'] == 'system') m['content'],
           ].join('\n');
           sentRevision =
-              RegExp(r'"expectedRevision":"([0-9a-f]{8})"')
-                  .firstMatch(system)
-                  ?.group(1);
+              int.tryParse(
+                RegExp(r'"expectedRevision":(\d+)')
+                        .firstMatch(system)
+                        ?.group(1) ??
+                    '',
+              );
           return {
             'choices': [
               {
                 'message': {
                   'content':
-                      'Propongo ajustarlo.\n```trackia-activity-target\n{"targetSets": 3, "expectedRevision": "$sentRevision"}\n```',
+                      'Propongo ajustarlo.\n```trackia-activity-target\n{"targetSets": 3, "expectedRevision": $sentRevision}\n```',
                 },
               },
             ],
@@ -886,7 +889,7 @@ void main() {
       tester,
       () => find.text('Cambiar objetivo de series').evaluate().isNotEmpty,
     );
-    expect(sentRevision, activityRevision(c.focus!.definition));
+    expect(sentRevision, c.focus!.revision);
     await tester.tap(find.text('Cambiar'));
     await waitFor(tester, () => c.focus!.definition.targetSets == 3 && !c.busy);
     await disposeScreen(tester);
@@ -904,7 +907,7 @@ void main() {
                 {
                   'message': {
                     'content':
-                        'Propongo ajustarlo.\n```trackia-activity-target\n{"targetSets": 3, "expectedRevision": "00000000"}\n```',
+                        'Propongo ajustarlo.\n```trackia-activity-target\n{"targetSets": 3, "expectedRevision": 999}\n```',
                   },
                 },
               ],

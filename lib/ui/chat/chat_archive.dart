@@ -198,6 +198,7 @@ extension _ChatArchive on _AssistantChatScreenState {
       final check = checkActivityTargetProposal(
         answer,
         current: (live ?? expectedTargetActivity)?.definition,
+        currentRevision: (live ?? expectedTargetActivity)?.revision,
       );
       if (check.problem == TargetProposalProblem.stale) {
         await saveSheetReply(staleTargetText);
@@ -209,6 +210,20 @@ extension _ChatArchive on _AssistantChatScreenState {
         return;
       }
       final target = proposed.targetSets;
+      final targetKey = 'target:${target ?? 'none'}';
+      final targetName = expectedTargetActivity.definition.name;
+      // Propuesta: aún no es un hecho; espera la decisión del usuario.
+      if (!await effectAlreadyApplied('target', targetKey)) {
+        await proposeEffect(
+          'target',
+          targetKey,
+          target == null
+              ? 'Quitar el objetivo de series de «$targetName»'
+              : 'Fijar el objetivo en $target series en «$targetName»',
+          targetId: expectedTargetActivity.id,
+        );
+      }
+      if (!mounted) return;
       final completed =
           expectedTargetActivity.intervals
               .where((i) => i.endedAt != null)
@@ -239,8 +254,10 @@ extension _ChatArchive on _AssistantChatScreenState {
               ],
             ),
       );
+      if (confirmed != true) {
+        await settleEffect('target', targetKey, EffectStatus.failed);
+      }
       if (confirmed != true || !mounted) return;
-      final targetKey = 'target:${target ?? 'none'}';
       if (await effectAlreadyApplied('target', targetKey)) {
         await saveSheetReply(
           'Ese objetivo ya se había aplicado con este mensaje; no se repitió.',
@@ -262,13 +279,22 @@ extension _ChatArchive on _AssistantChatScreenState {
         return;
       }
       final before = expectedTargetActivity.definition.targetSets;
-      final done = await widget.controller.run(
+      final result = await runTracked(
         () => widget.controller.activityRepository!.setActivityTarget(
           expectedTargetActivity.id,
           target,
           expected: expectedTargetActivity.definition,
+          expectedRevision: proposed.expectedRevision,
         ),
       );
+      final done = result.done;
+      if (!done) {
+        await settleEffect(
+          'target',
+          targetKey,
+          result.uncertain ? EffectStatus.uncertain : EffectStatus.failed,
+        );
+      }
       if (!mounted) return;
       if (done) {
         final summary = target == null
@@ -328,19 +354,24 @@ extension _ChatArchive on _AssistantChatScreenState {
       }
       // FR-023: lo fijado a mano no se aplica solo; va a una tarjeta
       // Aplicar/Ignorar. Lo libre se aplica con origen assistant.
-      Future<bool> applyTiming(
-        Map<String, int?> values,
-      ) => widget.controller.run(
-        () => widget.controller.activityRepository!.setActivityTiming(
-          activity.id,
-          activitySeconds:
-              values['activitySeconds'] ?? activity.definition.activitySeconds,
-          restSeconds: values['restSeconds'] ?? activity.definition.restSeconds,
-          targetCycles:
-              values['targetCycles'] ?? activity.definition.targetCycles,
-          source: 'assistant',
-        ),
-      );
+      var timingUncertain = false;
+      Future<bool> applyTiming(Map<String, int?> values) async {
+        final result = await runTracked(
+          () => widget.controller.activityRepository!.setActivityTiming(
+            activity.id,
+            activitySeconds:
+                values['activitySeconds'] ??
+                activity.definition.activitySeconds,
+            restSeconds:
+                values['restSeconds'] ?? activity.definition.restSeconds,
+            targetCycles:
+                values['targetCycles'] ?? activity.definition.targetCycles,
+            source: 'assistant',
+          ),
+        );
+        timingUncertain = result.uncertain;
+        return result.done;
+      }
       final locked =
           timing.keys.where(activity.definition.userSet.contains).toSet();
       final timingKey =
@@ -353,6 +384,15 @@ extension _ChatArchive on _AssistantChatScreenState {
       }
       if (locked.isEmpty) {
         final applied = await applyTiming(timing.cast<String, int?>());
+        if (!applied && timingUncertain) {
+          await recordEffect(
+            'timing',
+            timingKey,
+            'Cambiar los tiempos de «${activity.definition.name}» (${timing.entries.map((e) => '${e.key}: ${e.value}').join(', ')})',
+            targetId: activity.id,
+            status: EffectStatus.uncertain,
+          );
+        }
         if (applied) {
           await recordEffect(
             'timing',
@@ -384,6 +424,13 @@ extension _ChatArchive on _AssistantChatScreenState {
           targetId: activity.id,
         );
       }
+      // Lo fijado por el usuario es una propuesta hasta que pulse Aplicar.
+      await proposeEffect(
+        'timing',
+        lockedTimingKey({for (final n in locked) n: timing[n]!}),
+        'Cambiar los tiempos fijados por ti en «${activity.definition.name}» (${locked.map((n) => '$n: ${timing[n]}').join(', ')})',
+        targetId: activity.id,
+      );
       if (mounted) {
         update(
           () =>

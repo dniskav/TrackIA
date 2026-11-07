@@ -93,6 +93,8 @@ class TrackiaLegacyFixture {
         ]) {
           await db.execute('DROP TABLE IF EXISTS $table');
         }
+        // v8 column; real v4-v7 databases do not have it.
+        await db.execute('ALTER TABLE activities DROP COLUMN revision');
         await db.execute('DROP TABLE IF EXISTS trackia_legacy_activity_scope');
         await db.execute('DROP TABLE IF EXISTS trackia_legacy_workout_scope');
         await db.execute('DROP TABLE IF EXISTS trackia_spaces');

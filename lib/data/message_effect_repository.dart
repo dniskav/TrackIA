@@ -100,16 +100,66 @@ class MessageEffectRepository {
     });
   }
 
-  /// Whether this idempotency key was already applied in this scope.
+  /// Whether this idempotency key was already applied in this scope. A mere
+  /// proposal or a failed attempt did not apply anything; an uncertain one
+  /// might have, so it is not repeated blindly.
   Future<bool> isApplied(String operationKey) async {
     validTrackiaId(operationKey);
     final rows = await _db.query(
       'trackia_message_effects',
       columns: ['status'],
-      where: 'profile_id = ? AND companion_id = ? AND operation_id = ?',
+      where:
+          "profile_id = ? AND companion_id = ? AND operation_id = ? AND status NOT IN ('proposed','failed')",
       whereArgs: [scope.profileId, scope.companionId, operationKey],
     );
     return rows.isNotEmpty;
+  }
+
+  /// Allowed moves of [settle]: target status -> statuses it may come from.
+  static const _settleFrom = {
+    EffectStatus.proposed: ['failed'],
+    EffectStatus.uncertain: ['proposed'],
+    EffectStatus.confirmed: ['proposed', 'uncertain', 'failed'],
+    EffectStatus.failed: ['proposed', 'uncertain'],
+  };
+
+  /// Moves the effect with this idempotency key to [status] (proposal ->
+  /// confirmed/failed/uncertain, uncertain -> confirmed/failed...). Confirmed
+  /// or corrected rows never change. Returns false when there is no row in an
+  /// allowed state. A [summary] replaces the stored sentence.
+  Future<bool> settle(
+    String operationKey,
+    EffectStatus status, {
+    String? summary,
+  }) async {
+    validTrackiaId(operationKey);
+    final from = _settleFrom[status];
+    if (from == null) throw ArgumentError.value(status, 'status');
+    await _ensure();
+    return _db.transaction((tx) async {
+      final changed = await tx.update(
+        'trackia_message_effects',
+        {'status': status.name},
+        where:
+            'profile_id = ? AND companion_id = ? AND operation_id = ? AND status IN (${from.map((_) => '?').join(',')})',
+        whereArgs: [
+          scope.profileId,
+          scope.companionId,
+          operationKey,
+          ...from,
+        ],
+      );
+      if (changed != 1) return false;
+      if (summary != null) {
+        await tx.rawUpdate(
+          '''UPDATE trackia_message_effect_notes SET summary = ? WHERE effect_id =
+          (SELECT id FROM trackia_message_effects WHERE profile_id = ? AND
+          companion_id = ? AND operation_id = ?)''',
+          [summary, scope.profileId, scope.companionId, operationKey],
+        );
+      }
+      return true;
+    });
   }
 
   /// Every effect of every revision of the message, oldest first.
@@ -197,11 +247,18 @@ class MessageEffectRepository {
     return _db.transaction((tx) async {
       final taken = await tx.query(
         'trackia_message_effects',
-        columns: ['id'],
+        columns: ['id', 'status'],
         where: 'profile_id = ? AND companion_id = ? AND operation_id = ?',
         whereArgs: [scope.profileId, scope.companionId, replacement.operationKey],
       );
-      if (taken.isNotEmpty) return false;
+      // Una propuesta o intento previo con la misma clave pasa a ser la
+      // corrección; cualquier otro estado ya es un efecto aplicado.
+      final reuse =
+          taken.isNotEmpty &&
+          const ['proposed', 'uncertain', 'failed'].contains(
+            taken.single['status'],
+          );
+      if (taken.isNotEmpty && !reuse) return false;
       final changed = await tx.update(
         'trackia_message_effects',
         {'status': EffectStatus.superseded.name},
@@ -210,7 +267,23 @@ class MessageEffectRepository {
         whereArgs: [scope.profileId, scope.companionId, effectId],
       );
       if (changed != 1) return false;
-      await _insert(tx, replacement);
+      final newId = reuse ? taken.single['id']! as String : replacement.id;
+      if (reuse) {
+        await tx.update(
+          'trackia_message_effects',
+          {'status': replacement.status.name},
+          where: 'id = ?',
+          whereArgs: [newId],
+        );
+        await tx.update(
+          'trackia_message_effect_notes',
+          {'summary': replacement.summary},
+          where: 'effect_id = ?',
+          whereArgs: [newId],
+        );
+      } else {
+        await _insert(tx, replacement);
+      }
       final when = (at ?? DateTime.now()).toUtc().millisecondsSinceEpoch;
       await tx.insert('trackia_message_effect_notes', {
         'effect_id': effectId,
@@ -223,7 +296,7 @@ class MessageEffectRepository {
       );
       await tx.insert('trackia_message_effect_corrections', {
         'old_effect_id': effectId,
-        'new_effect_id': replacement.id,
+        'new_effect_id': newId,
         'before_value': before,
         'after_value': after,
         'corrected_at': when,

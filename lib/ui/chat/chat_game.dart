@@ -51,8 +51,9 @@ extension _ChatGame on _AssistantChatScreenState {
     final activity = companionFocus;
     if (card == null || activity == null) return;
     final values = {for (final p in card) p.property: p.proposedValue};
+    final lockedKey = lockedTimingKey(values);
     update(() => lockedProposals = null);
-    final applied = await widget.controller.run(
+    final result = await runTracked(
       () => widget.controller.activityRepository!.setActivityTiming(
         activity.id,
         activitySeconds:
@@ -63,11 +64,19 @@ extension _ChatGame on _AssistantChatScreenState {
         source: 'assistant',
       ),
     );
+    final applied = result.done;
+    if (!applied) {
+      await settleEffect(
+        'timing',
+        lockedKey,
+        result.uncertain ? EffectStatus.uncertain : EffectStatus.failed,
+      );
+    }
     final descanso = values['restSeconds'] ?? activity.definition.restSeconds;
     if (applied) {
       await recordEffect(
         'timing',
-        'locked:${values.entries.map((e) => '${e.key}=${e.value}').join(',')}',
+        lockedKey,
         'Cambié los tiempos de «${activity.definition.name}» tras tu confirmación',
       );
     }
@@ -78,7 +87,21 @@ extension _ChatGame on _AssistantChatScreenState {
     );
   }
 
+  /// Clave estable de la propuesta de tiempos fijados por el usuario.
+  String lockedTimingKey(Map<String, int?> values) =>
+      'locked:${values.entries.map((e) => '${e.key}=${e.value}').join(',')}';
+
   void ignoreLockedProposal() {
+    final card = lockedProposals;
+    if (card != null) {
+      unawaited(
+        settleEffect(
+          'timing',
+          lockedTimingKey({for (final p in card) p.property: p.proposedValue}),
+          EffectStatus.failed,
+        ),
+      );
+    }
     update(() => lockedProposals = null);
     saveSheetReply('Propuesta ignorada; lo fijado por ti sigue igual.');
   }

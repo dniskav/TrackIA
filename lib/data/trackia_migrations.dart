@@ -105,6 +105,19 @@ Future<void> _createTrackiaV6(Database db) async {
   }
 }
 
+/// Feature 005 v8: monotonic revision of an activity definition. Additive:
+/// one column with a default; rows and IDs stay untouched, and existing
+/// activities start at revision 1. Every definition update adds 1 to it, so a
+/// proposal made against revision N can never apply after an A -> B -> A round
+/// trip. Idempotent so a retried upgrade does not fail.
+Future<void> _createTrackiaV8(Database db) async {
+  final columns = await db.rawQuery('PRAGMA table_info(activities)');
+  if (columns.any((c) => c['name'] == 'revision')) return;
+  await db.execute(
+    'ALTER TABLE activities ADD COLUMN revision INTEGER NOT NULL DEFAULT 1',
+  );
+}
+
 /// Feature 005 v7 entities. Additive: new tables only; existing rows, columns
 /// and IDs stay untouched. Definitions follow the test-provisional schemas of
 /// the existing repositories and the effect model in data-model.md.
@@ -476,16 +489,20 @@ Future<Directory> _createExperimentalRecoverySnapshot(
 /// timestamped sibling instead of overwriting it. The only crash residues are
 /// staging directories and equal verified media files, which later attempts
 /// clean or overwrite; a backup without complete media fails loudly on load.
-Future<void> createTrackiaV7Backup(Database db, String dbPath) async {
+Future<void> createTrackiaV7Backup(
+  Database db,
+  String dbPath, {
+  String label = 'v7',
+}) async {
   if (dbPath == inMemoryDatabasePath) return;
-  final preferred = File('$dbPath.pre-trackia-v7.sqlite');
+  final preferred = File('$dbPath.pre-trackia-$label.sqlite');
   // Interrupted attempts can leave staging directories with old names or
   // timestamped names: they were never verified and never published, so any
   // of them is crash residue and starting clean is always safe.
   final parent = Directory(p.dirname(dbPath));
   await for (final entry in parent.list()) {
     final name = p.basename(entry.path);
-    if (name.contains('.pre-trackia-v7') && name.endsWith('.snapshot')) {
+    if (name.contains('.pre-trackia-$label.') && name.endsWith('.snapshot')) {
       await entry.delete(recursive: true);
     }
   }
@@ -494,7 +511,7 @@ Future<void> createTrackiaV7Backup(Database db, String dbPath) async {
           ? File('${preferred.path}.${DateTime.now().microsecondsSinceEpoch}')
           : preferred;
   final staging = Directory('${target.path}.snapshot');
-  final mediaTarget = Directory('$dbPath.pre-trackia-v7.media');
+  final mediaTarget = Directory('$dbPath.pre-trackia-$label.media');
   if (await staging.exists()) {
     // Crash residue from an interrupted attempt: its content was never
     // verified and never published, so starting clean is always safe.

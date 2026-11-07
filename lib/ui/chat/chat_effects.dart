@@ -46,7 +46,7 @@ extension _ChatEffects on _AssistantChatScreenState {
     final origin = effectOrigin();
     if (key == null || origin == null) return;
     try {
-      await messageEffects!.record(
+      final fresh = await messageEffects!.record(
         MessageEffect(
           id: const Uuid().v4(),
           profileId: profileId,
@@ -61,7 +61,61 @@ extension _ChatEffects on _AssistantChatScreenState {
           status: status,
         ),
       );
+      // Ya había una fila con esa clave (propuesta, intento incierto o
+      // fallido): pasa al nuevo estado en lugar de duplicarse.
+      if (!fresh) {
+        await messageEffects!.settle(key, status, summary: summary);
+      }
     } catch (_) {}
+  }
+
+  /// Anota que el asistente propuso algo que necesita la decisión del usuario.
+  /// No cuenta como hecho hasta que [recordEffect] lo confirme.
+  Future<void> proposeEffect(
+    String kind,
+    String discriminator,
+    String summary, {
+    String? targetId,
+  }) => recordEffect(
+    kind,
+    discriminator,
+    summary,
+    targetId: targetId,
+    status: EffectStatus.proposed,
+  );
+
+  /// Cierra una propuesta o un intento incierto: [EffectStatus.failed] si el
+  /// usuario la rechazó o no se aplicó, [EffectStatus.uncertain] si no se sabe.
+  Future<void> settleEffect(
+    String kind,
+    String discriminator,
+    EffectStatus status,
+  ) async {
+    final key = effectKey(kind, discriminator);
+    if (key == null) return;
+    try {
+      await messageEffects!.settle(key, status);
+    } catch (_) {}
+  }
+
+  /// Ejecuta una escritura local con el controlador y distingue «no se aplicó»
+  /// de «no se sabe»: un error inesperado tras empezar a escribir, o después de
+  /// escribir (al recargar), deja el resultado incierto.
+  Future<({bool done, bool uncertain})> runTracked(
+    Future<void> Function() write,
+  ) async {
+    var started = false;
+    var rejected = false;
+    final done = await widget.controller.run(() async {
+      started = true;
+      try {
+        await write();
+      } on ValidationException {
+        rejected = true;
+        rethrow;
+      }
+    });
+    return (done: done, uncertain: !done && started && !rejected);
   }
 
   /// Texto para el modelo con lo ya aplicado por la respuesta a [messageId].

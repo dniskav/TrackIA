@@ -220,8 +220,11 @@ void main() {
   group('versión esperada de la propuesta de objetivo (T018)', () {
     String block(String json) => '```trackia-activity-target\n$json\n```';
 
+    Future<FocusActivity> currentActivity(String id) async =>
+        (await repo.loadActivities()).firstWhere((a) => a.id == id);
+
     Future<ActivityDefinition> currentDefinition(String id) async =>
-        (await repo.loadActivities()).firstWhere((a) => a.id == id).definition;
+        (await currentActivity(id)).definition;
 
     /// Lo que hace el chat: validar y, solo si se acepta, guardar.
     Future<TargetProposalCheck> apply(
@@ -232,6 +235,7 @@ void main() {
       final check = checkActivityTargetProposal(
         answer,
         current: await currentDefinition(id),
+        currentRevision: (await currentActivity(id)).revision,
       );
       final proposal = check.proposal;
       if (proposal != null) {
@@ -239,28 +243,62 @@ void main() {
           id,
           proposal.targetSets,
           expected: expected,
+          expectedRevision: proposal.expectedRevision,
         );
       }
       return check;
     }
 
-    test('la revisión es estable y cambia con la definición', () async {
+    test('la revisión es un contador que sube con cada actualización', () async {
       final id = await makeThreeSetActivity();
-      final before = await currentDefinition(id);
-      expect(activityRevision(before), activityRevision(before));
-      expect(activityRevision(before), matches(RegExp(r'^[0-9a-f]{8}$')));
-      await repo.setActivityTarget(id, 4, expected: before);
-      expect(
-        activityRevision(await currentDefinition(id)),
-        isNot(activityRevision(before)),
+      final before = await currentActivity(id);
+      expect(before.revision, 1);
+      await repo.setActivityTarget(id, 4, expected: before.definition);
+      expect((await currentActivity(id)).revision, 2);
+      await repo.setActivityRest(id, 45);
+      expect((await currentActivity(id)).revision, 3);
+      await repo.renameActivity(id, 'Press');
+      expect((await currentActivity(id)).revision, 4);
+    });
+
+    test('ABA: 10 -> 60 -> 10 con propuesta de la revisión 1 se rechaza', () async {
+      final id = await makeThreeSetActivity();
+      final seen = await currentActivity(id);
+      expect(seen.revision, 1);
+      await repo.setActivityTarget(id, 10, expected: seen.definition);
+      final ten = await currentActivity(id);
+      await repo.setActivityTarget(id, 60, expected: ten.definition);
+      final sixty = await currentActivity(id);
+      await repo.setActivityTarget(id, 3, expected: sixty.definition);
+      final back = await currentActivity(id);
+      // La definición es idéntica a la que vio el modelo; la revisión no.
+      expect(back.definition.targetSets, seen.definition.targetSets);
+      expect(back.revision, 4);
+      final answer = block('{"targetSets":8,"expectedRevision":1}');
+      final check = await apply(id, answer, seen.definition);
+      expect(check.problem, TargetProposalProblem.stale);
+      // Y el repositorio también la rechaza dentro de la transacción.
+      await expectLater(
+        repo.setActivityTarget(id, 8,
+            expected: seen.definition, expectedRevision: 1),
+        throwsA(
+          isA<ValidationException>().having(
+            (e) => e.message,
+            'message',
+            staleTargetText,
+          ),
+        ),
       );
+      final after = await currentActivity(id);
+      expect(after.definition.targetSets, 3);
+      expect(after.revision, 4);
     });
 
     test('versión correcta se aplica', () async {
       final id = await makeThreeSetActivity();
       final before = await currentDefinition(id);
       final answer = block(
-        '{"targetSets":5,"expectedRevision":"${activityRevision(before)}"}',
+        '{"targetSets":5,"expectedRevision":${(await currentActivity(id)).revision}}',
       );
       expect(parseActivityTargetBlock(answer)?.expectedRevision, isNotNull);
       final check = await apply(id, answer, before);
@@ -274,7 +312,7 @@ void main() {
         final id = await makeThreeSetActivity();
         final seen = await currentDefinition(id);
         final answer = block(
-          '{"targetSets":6,"expectedRevision":"${activityRevision(seen)}"}',
+          '{"targetSets":6,"expectedRevision":${(await currentActivity(id)).revision}}',
         );
         // El usuario cambia el objetivo a mano mientras el modelo responde.
         await repo.setActivityTarget(id, 4, expected: seen);
@@ -302,6 +340,7 @@ void main() {
         '$one\n$activity',
         block('{"targetSets":"cinco"}'),
         block('{"targetSets":5,"expectedRevision":"zzz"}'),
+        block('{"targetSets":5,"expectedRevision":0}'),
         'Pon 5 series',
       ]) {
         final check = await apply(id, answer, current);

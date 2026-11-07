@@ -344,6 +344,8 @@ class SqliteWorkoutRepository
         final stored = await probe.getVersion();
         if (stored > 0 && stored < 7) {
           await createTrackiaV7Backup(probe, dbPath);
+        } else if (stored == 7) {
+          await createTrackiaV7Backup(probe, dbPath, label: 'v8');
         }
       } finally {
         try {
@@ -354,7 +356,7 @@ class SqliteWorkoutRepository
     final db = await f.openDatabase(
       dbPath,
       options: OpenDatabaseOptions(
-        version: 7,
+        version: 8,
         onConfigure: (db) => db.execute('PRAGMA foreign_keys = ON'),
         onCreate: (db, version) async {
           await db.execute('''CREATE TABLE workouts (
@@ -382,6 +384,7 @@ class SqliteWorkoutRepository
           await _createTrackiaV5(db);
           await _createTrackiaV6(db);
           await _createTrackiaV7(db);
+          await _createTrackiaV8(db);
         },
         onUpgrade: (db, old, next) async {
           if (old < 2) await _migrateV2(db);
@@ -399,6 +402,9 @@ class SqliteWorkoutRepository
           }
           if (old < 7) {
             await _createTrackiaV7(db);
+          }
+          if (old < 8) {
+            await _createTrackiaV8(db);
           }
         },
       ),
@@ -836,7 +842,9 @@ class SqliteWorkoutRepository
     }
     final tables = <String, List<Map<String, Object?>>>{};
     for (final table in _backupTables.keys) {
-      tables[table] = await tx.query(table);
+      // Explicit columns keep the backup format v3 stable (the activity
+      // revision counter is local and restarts at 1 when a copy is restored).
+      tables[table] = await tx.query(table, columns: _backupTables[table]);
     }
     final source = jsonEncode({
       'format': backupFormat,

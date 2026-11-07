@@ -424,8 +424,12 @@ class FocusActivity {
     this.restEndsAt,
     this.finishedRecordedAt,
     this.finishIssues = const [],
+    this.revision = 1,
   });
   final String id, workoutId, draft;
+
+  /// Monotonic counter of definition updates (starts at 1, never decreases).
+  final int revision;
   final String? exerciseId;
   final ActivityDefinition definition;
   final DateTime createdAt;
@@ -567,6 +571,7 @@ abstract interface class ActivityRepository {
     String activityId,
     int? targetSets, {
     required ActivityDefinition expected,
+    int? expectedRevision,
   });
   Future<void> setActivityRest(
     String activityId,

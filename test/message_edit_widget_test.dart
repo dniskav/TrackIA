@@ -14,6 +14,7 @@ import 'package:trackia/data/message_effect_repository.dart';
 import 'package:trackia/data/message_revision_repository.dart';
 import 'package:trackia/data/sqlite_workout_repository.dart';
 import 'package:trackia/domain/message_effect.dart';
+import 'package:trackia/domain/activity.dart';
 import 'package:trackia/domain/ai_config.dart';
 import 'package:trackia/ui/assistant_chat.dart';
 
@@ -425,6 +426,244 @@ void main() {
       find.text('Hoy hice 3 series de press banca con 80 kg'),
       findsOneWidget,
     );
+    await close(tester);
+  });
+
+  // --- T013/T014: el chat registra propuestas, confirmaciones e inciertos ---
+  // El objetivo se propone sobre un mensaje durable ya enviado (reenvío tras
+  // editar con la actividad abierta): el primer envío con foco abierto va por
+  // la ruta de actividad y no tiene mensaje al que enlazar efectos.
+
+  String targetBlock(int sets) =>
+      'Propongo ajustarlo.\n```trackia-activity-target\n{"targetSets": $sets}\n```';
+
+  /// Abre el chat en modo foco, envía [text] (respuesta de texto, sin efecto)
+  /// y solo entonces prepara la actividad: así el mensaje es durable.
+  Future<MessageEffectRepository> openFocus(
+    WidgetTester tester,
+    List<String> replies,
+    String text,
+  ) async {
+    var n = 0;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: AssistantChatScreen(
+          controller: controller,
+          chatStore: repo.chats,
+          focusMode: true,
+          client: AiClient(
+            transport: (_, __, body) async => {
+              'choices': [
+                {
+                  'message': {'content': replies[n++ % replies.length]},
+                },
+              ],
+            },
+          ),
+          availability: AiAvailability(
+            catalog: AiModelCatalog(
+              transport: (_, __) async => {
+                'data': [
+                  {'id': 'test'},
+                ],
+              },
+            ),
+          ),
+        ),
+      ),
+    );
+    await realIo(tester);
+    await say(tester, text);
+    await tester.pump(const Duration(milliseconds: 600));
+    await tester.runAsync(() async {
+      await repo.prepareActivity(
+        ActivityDefinition(
+          name: 'Pec Fly',
+          restSeconds: 120,
+          targetSets: 4,
+          fields: const [
+            {'key': 'reps', 'label': 'Reps', 'unit': ''},
+          ],
+        ),
+      );
+      await controller.refresh();
+    });
+    await realIo(tester, 10);
+    return (await tester.runAsync(() async {
+      final revisions = await MessageRevisionRepository.fromChatStore(
+        repo.chats,
+        FeatureScope(profileId: controller.profileId, companionId: 'gymbro'),
+      );
+      return MessageEffectRepository.on(revisions);
+    }))!;
+  }
+
+  Future<String> messageId(WidgetTester tester) async =>
+      (await tester.runAsync(() async {
+        final revisions = await MessageRevisionRepository.fromChatStore(
+          repo.chats,
+          FeatureScope(profileId: controller.profileId, companionId: 'gymbro'),
+        );
+        return (await revisions.database.rawQuery(
+          'SELECT message_id FROM message_revision_versions',
+        )).first['message_id'] as String;
+      }))!;
+
+  /// Edita y reenvía; deja el diálogo del modelo abierto (no hay `settle`).
+  Future<void> resend(WidgetTester tester, String from, String to) async {
+    await tester.pump(const Duration(milliseconds: 600));
+    await openEditor(tester, from, to);
+    await tester.tap(find.byKey(const Key('save-send-edit-message')));
+    await realIo(tester);
+  }
+
+  Future<void> confirmTarget(WidgetTester tester) async {
+    await tester.tap(find.text('Cambiar'));
+    await realIo(tester);
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('Objetivo propuesto: queda como propuesta y pasa a confirmado', (
+    tester,
+  ) async {
+    final effects = await openFocus(
+      tester,
+      ['Respuesta', targetBlock(3)],
+      'Pon tres series',
+    );
+    final id = await messageId(tester);
+    await tester.pump(const Duration(milliseconds: 600));
+    await openEditor(tester, 'Pon tres series', 'Pon tres series ya');
+    await tester.tap(find.byKey(const Key('save-send-edit-message')));
+    await realIo(tester);
+    expect(find.text('Cambiar objetivo de series'), findsOneWidget);
+    // Con el diálogo abierto es solo una propuesta: no es un hecho.
+    var list = (await tester.runAsync(() => effects.effectsFor(id)))!;
+    expect(list.single.status, EffectStatus.proposed);
+    var text = (await tester.runAsync(() => effects.appliedEffectsSummary(id)))!;
+    expect(text, contains('Propuestas SIN confirmar'));
+    expect(text, isNot(contains('ya aplicados')));
+    await confirmTarget(tester);
+    list = (await tester.runAsync(() => effects.effectsFor(id)))!;
+    expect(list.map((e) => e.status), [EffectStatus.confirmed]);
+    expect(controller.focus!.definition.targetSets, 3);
+    text = (await tester.runAsync(() => effects.appliedEffectsSummary(id)))!;
+    expect(text, contains('ya aplicados'));
+    expect(text, isNot(contains('SIN confirmar')));
+    expect(tester.takeException(), isNull);
+    await close(tester);
+  });
+
+  testWidgets('Objetivo rechazado: la propuesta queda fallida y no cambia nada', (
+    tester,
+  ) async {
+    final effects = await openFocus(
+      tester,
+      ['Respuesta', targetBlock(3)],
+      'Pon tres series',
+    );
+    final id = await messageId(tester);
+    await tester.pump(const Duration(milliseconds: 600));
+    await openEditor(tester, 'Pon tres series', 'Pon tres series ya');
+    await tester.tap(find.byKey(const Key('save-send-edit-message')));
+    await realIo(tester);
+    await tester.tap(find.text('Cancelar'));
+    await realIo(tester);
+    await tester.pumpAndSettle();
+    final list = (await tester.runAsync(() => effects.effectsFor(id)))!;
+    expect(list.single.status, EffectStatus.failed);
+    expect(controller.focus!.definition.targetSets, 4);
+    expect((await tester.runAsync(() => effects.appliedEffectsSummary(id)))!, '');
+    expect(tester.takeException(), isNull);
+    await close(tester);
+  });
+
+  testWidgets('Varias candidatas: pregunta cuál; una sola: corrige con antes/después', (
+    tester,
+  ) async {
+    final effects = await openFocus(
+      tester,
+      ['Respuesta', targetBlock(3), targetBlock(5), targetBlock(6)],
+      'Pon tres series',
+    );
+    final id = await messageId(tester);
+    await resend(tester, 'Pon tres series', 'Pon tres series ya');
+    await confirmTarget(tester);
+    expect(controller.focus!.definition.targetSets, 3);
+    // Reenvío con otro valor propuesto: hay una sola relación, se corrige.
+    await resend(tester, 'Pon tres series ya', 'Pon cinco series');
+    expect(find.text('Cambiar objetivo de series'), findsOneWidget);
+    await confirmTarget(tester);
+    expect(controller.focus!.definition.targetSets, 5);
+    var list = (await tester.runAsync(() => effects.effectsFor(id)))!;
+    expect(list.map((e) => e.status), [
+      EffectStatus.superseded,
+      EffectStatus.confirmed,
+    ]);
+    final text = (await tester.runAsync(() => effects.appliedEffectsSummary(id)))!;
+    expect(text, contains('antes: 3 series; ahora: 5 series'));
+    // Una segunda relación confirmada del mismo objetivo: no elige solo.
+    await tester.runAsync(() async {
+      await effects.record(
+        MessageEffect(
+          id: 'extra-target',
+          profileId: controller.profileId,
+          companionId: 'gymbro',
+          messageId: id,
+          revisionId: list.last.revisionId,
+          kind: 'target',
+          targetId: list.last.targetId,
+          operationKey: 'op-extra-target',
+          summary: 'Fijé el objetivo en 9 series',
+          createdAt: DateTime.utc(2026, 11, 7),
+        ),
+      );
+    });
+    await resend(tester, 'Pon cinco series', 'Pon seis series');
+    await confirmTarget(tester);
+    expect(find.textContaining('dime a cuál te refieres'), findsOneWidget);
+    expect(find.textContaining('Fijé el objetivo en 9 series'), findsWidgets);
+    expect(controller.focus!.definition.targetSets, 5);
+    list = (await tester.runAsync(() => effects.effectsFor(id)))!;
+    expect(
+      list.where((e) => e.status == EffectStatus.confirmed).length,
+      2,
+      reason: 'no se corrigió ninguna ni se duplicó',
+    );
+    expect(tester.takeException(), isNull);
+    await close(tester);
+  });
+
+  testWidgets('Objetivo con error inesperado al guardar: queda incierto y el modelo lo sabe', (
+    tester,
+  ) async {
+    final effects = await openFocus(
+      tester,
+      ['Respuesta', targetBlock(3), 'Vale'],
+      'Pon tres series',
+    );
+    final id = await messageId(tester);
+    await resend(tester, 'Pon tres series', 'Pon tres series ya');
+    expect(find.text('Cambiar objetivo de series'), findsOneWidget);
+    // Un fallo de almacenamiento que no es una validación (disco, bloqueo...).
+    await tester.runAsync(() async {
+      final other = await databaseFactoryFfi.openDatabase(
+        '${dir.path}/test.sqlite',
+        options: OpenDatabaseOptions(singleInstance: false),
+      );
+      await other.execute(
+        "CREATE TRIGGER boom BEFORE UPDATE ON activities BEGIN SELECT RAISE(ABORT, 'boom'); END",
+      );
+      await other.close();
+    });
+    await confirmTarget(tester);
+    expect(controller.focus!.definition.targetSets, 4);
+    final list = (await tester.runAsync(() => effects.effectsFor(id)))!;
+    expect(list.single.status, EffectStatus.uncertain);
+    final text = (await tester.runAsync(() => effects.appliedEffectsSummary(id)))!;
+    expect(text, contains('Con resultado incierto'));
+    expect(text, isNot(contains('ya aplicados')));
+    expect(tester.takeException(), isNull);
     await close(tester);
   });
 }

@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:trackia/data/sqlite_workout_repository.dart';
+import 'package:trackia/domain/activity.dart';
 import 'package:trackia/domain/workout.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -48,7 +49,7 @@ void main() {
         final saved = await File('$path.pre-trackia-v4.json').readAsString();
         expect(jsonDecode(saved), jsonDecode(fixture.backupV3));
         final dbAfter = await databaseFactoryFfi.openDatabase(path);
-        expect(await dbAfter.getVersion(), 7);
+        expect(await dbAfter.getVersion(), 8);
         expect(
           await dbAfter.query(
             'trackia_spaces',
@@ -186,4 +187,96 @@ void main() {
       }
     },
   );
+
+  test('v8 adds the activity revision: backup first, IDs kept, counter grows', () async {
+    final dir = await Directory.systemTemp.createTemp('trackia-v8-');
+    final path = '${dir.path}/v7.sqlite';
+    try {
+      // A real v7 database: current schema without the v8 column.
+      var repo = await SqliteWorkoutRepository.open(
+        factory: databaseFactoryFfi,
+        path: path,
+      );
+      final activityId = await repo.prepareActivity(
+        ActivityDefinition(name: 'Press', targetSets: 3),
+      );
+      final workoutId = (await repo.loadActivities()).single.workoutId;
+      await repo.close();
+      var db = await databaseFactoryFfi.openDatabase(path);
+      await db.execute('ALTER TABLE activities DROP COLUMN revision');
+      await db.setVersion(7);
+      await db.close();
+      expect(File('$path.pre-trackia-v8.sqlite').existsSync(), isFalse);
+
+      repo = await SqliteWorkoutRepository.open(
+        factory: databaseFactoryFfi,
+        path: path,
+      );
+      final migrated = (await repo.loadActivities()).single;
+      expect(migrated.id, activityId);
+      expect(migrated.workoutId, workoutId);
+      expect(migrated.revision, 1);
+      await repo.setActivityTarget(
+        activityId,
+        5,
+        expected: migrated.definition,
+        expectedRevision: 1,
+      );
+      expect((await repo.loadActivities()).single.revision, 2);
+      await repo.close();
+
+      // The backup was taken before the change: v7 schema, original ID.
+      final backup = File('$path.pre-trackia-v8.sqlite');
+      expect(backup.existsSync(), isTrue);
+      final old = await databaseFactoryFfi.openDatabase(backup.path);
+      expect(await old.getVersion(), 7);
+      final cols = await old.rawQuery('PRAGMA table_info(activities)');
+      expect(cols.map((c) => c['name']), isNot(contains('revision')));
+      final rows = await old.query('activities');
+      expect(rows.single['id'], activityId);
+      expect(rows.single['definition'], contains('"targetSets":3'));
+      await old.close();
+
+      db = await databaseFactoryFfi.openDatabase(path);
+      expect(await db.getVersion(), 8);
+      await db.close();
+      // Reopening a v8 database is a no-op: no new backup, revision kept.
+      repo = await SqliteWorkoutRepository.open(
+        factory: databaseFactoryFfi,
+        path: path,
+      );
+      expect((await repo.loadActivities()).single.revision, 2);
+      await repo.close();
+      expect(
+        dir.listSync().where((f) => f.path.contains('pre-trackia-v8.sqlite')),
+        hasLength(1),
+      );
+    } finally {
+      await dir.delete(recursive: true);
+    }
+  });
+
+  test('upgrade from an old v4 base starts every activity at revision 1', () async {
+    final dir = await Directory.systemTemp.createTemp('trackia-v8-old-');
+    final path = '${dir.path}/legacy.sqlite';
+    try {
+      final fixture = await TrackiaLegacyFixture.create(
+        factory: databaseFactoryFfi,
+        path: path,
+      );
+      final repo = await SqliteWorkoutRepository.open(
+        factory: databaseFactoryFfi,
+        path: path,
+      );
+      final activity = (await repo.loadActivities()).single;
+      expect(activity.id, fixture.activityId);
+      expect(activity.revision, 1);
+      await repo.close();
+      // Only the original v4 -> v7 recovery copy exists, not a v8 one.
+      expect(File('$path.pre-trackia-v7.sqlite').existsSync(), isTrue);
+      expect(File('$path.pre-trackia-v8.sqlite').existsSync(), isFalse);
+    } finally {
+      await dir.delete(recursive: true);
+    }
+  });
 }

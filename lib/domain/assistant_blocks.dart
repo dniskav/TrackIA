@@ -76,25 +76,13 @@ bool _text(Object? v, int min, int max) =>
 
 /// A single explicit target; null means remove the target.
 ///
-/// [expectedRevision] is the activity revision the model saw when it proposed
-/// the change (see [activityRevision]); null for proposals that carry none.
+/// [expectedRevision] is the activity revision (monotonic counter stored with
+/// the activity, [FocusActivity.revision]) the model saw when it proposed the
+/// change; null for proposals that carry none.
 class ActivityTargetProposal {
   const ActivityTargetProposal(this.targetSets, {this.expectedRevision});
   final int? targetSets;
-  final String? expectedRevision;
-}
-
-/// Stable signature of an activity definition, sent to the model as the
-/// version its proposal must quote. It is derived from the persisted
-/// definition (FNV-1a over its JSON), not from a counter, so it detects any
-/// change of definition but not an A -> B -> A round trip. A monotonic counter
-/// stored with the activity is pending (T017); this value is its stand-in.
-String activityRevision(ActivityDefinition definition) {
-  var hash = 0x811c9dc5;
-  for (final unit in utf8.encode(jsonEncode(definition.toJson()))) {
-    hash = ((hash ^ unit) * 0x01000193) & 0xffffffff;
-  }
-  return hash.toRadixString(16).padLeft(8, '0');
+  final int? expectedRevision;
 }
 
 ActivityTargetProposal? parseActivityTargetBlock(String answer) {
@@ -110,12 +98,12 @@ ActivityTargetProposal? parseActivityTargetBlock(String answer) {
   }
   final revision = json['expectedRevision'];
   if (json.containsKey('expectedRevision') &&
-      !(revision is String && RegExp(r'^[0-9a-f]{8}$').hasMatch(revision))) {
+      !(revision is int && revision >= 1)) {
     return _reject(kind, 'revisión esperada no válida');
   }
   return ActivityTargetProposal(
     value as int?,
-    expectedRevision: revision as String?,
+    expectedRevision: revision as int?,
   );
 }
 
@@ -137,12 +125,13 @@ class TargetProposalCheck {
 /// Validates the target proposal in [answer] against the [current] definition
 /// of the activity it must apply to. Ambiguous means: not exactly one valid
 /// block, other action blocks next to it, or no repeated activity to apply it
-/// to. Stale means the proposal quotes a revision other than the current one;
+/// to. Stale means the proposal quotes a revision other than [currentRevision];
 /// a proposal without revision is accepted (the repository still compares the
 /// definition when saving).
 TargetProposalCheck checkActivityTargetProposal(
   String answer, {
   required ActivityDefinition? current,
+  int? currentRevision,
 }) {
   final proposal = parseActivityTargetBlock(answer);
   final otherBlock = RegExp('$fenceOpen(?:trackia|gymia)-([a-z][a-z-]*)')
@@ -155,7 +144,7 @@ TargetProposalCheck checkActivityTargetProposal(
     return const TargetProposalCheck.rejected(TargetProposalProblem.ambiguous);
   }
   final quoted = proposal.expectedRevision;
-  if (quoted != null && quoted != activityRevision(current)) {
+  if (quoted != null && quoted != currentRevision) {
     return const TargetProposalCheck.rejected(TargetProposalProblem.stale);
   }
   return TargetProposalCheck.accepted(proposal);

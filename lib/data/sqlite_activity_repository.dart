@@ -31,6 +31,26 @@ Future<void> _migrateV4(Database db) async {
   );
 }
 
+/// Writes a new definition and adds 1 to the activity revision in the same
+/// statement, so the counter only ever grows (no A -> B -> A ambiguity).
+Future<void> _writeDefinition(
+  DatabaseExecutor tx,
+  String activityId,
+  String definitionJson, [
+  Map<String, Object?> extra = const {},
+]) async {
+  final columns = ['definition = ?', 'revision = revision + 1'];
+  final args = <Object?>[definitionJson];
+  extra.forEach((column, value) {
+    columns.add('$column = ?');
+    args.add(value);
+  });
+  await tx.rawUpdate(
+    'UPDATE activities SET ${columns.join(', ')} WHERE id = ?',
+    [...args, activityId],
+  );
+}
+
 mixin _SqliteActivities implements ActivityRepository {
   @override
   Future<void> changeCompletedCycles(String activityId, int delta) =>
@@ -52,12 +72,7 @@ mixin _SqliteActivities implements ActivityRepository {
           );
         }
         definition['completedCycles'] = next;
-        await tx.update(
-          'activities',
-          {'definition': jsonEncode(definition)},
-          where: 'id = ?',
-          whereArgs: [activityId],
-        );
+        await _writeDefinition(tx, activityId, jsonEncode(definition));
       });
 
   @override
@@ -81,12 +96,7 @@ mixin _SqliteActivities implements ActivityRepository {
       userSet.add('name');
       definition['userSet'] = userSet.toList();
     }
-    await tx.update(
-      'activities',
-      {'definition': jsonEncode(definition)},
-      where: 'id = ?',
-      whereArgs: [activityId],
-    );
+    await _writeDefinition(tx, activityId, jsonEncode(definition));
   });
 
   @override
@@ -287,11 +297,10 @@ mixin _SqliteActivities implements ActivityRepository {
       whereArgs: [messageId],
     );
     if (additions.isNotEmpty) {
-      await tx.update(
-        'activities',
-        {'definition': jsonEncode(definition.toJson())},
-        where: 'id = ?',
-        whereArgs: [row['activity_id']],
+      await _writeDefinition(
+        tx,
+        row['activity_id'] as String,
+        jsonEncode(definition.toJson()),
       );
     }
   });
@@ -344,6 +353,7 @@ mixin _SqliteActivities implements ActivityRepository {
                     : (jsonDecode(a['finish_time_issues'] as String) as List)
                         .cast<String>(),
             draft: a['draft'] as String,
+            revision: a['revision'] as int? ?? 1,
             restEndsAt: _date(a['rest_ends_at']),
             intervals:
                 intervals
@@ -653,12 +663,20 @@ mixin _SqliteActivities implements ActivityRepository {
     String activityId,
     int? targetSets, {
     required ActivityDefinition expected,
+    int? expectedRevision,
   }) => _db.transaction((tx) async {
     final row = await _activeActivity(tx, activityId);
     final current = ActivityDefinition.fromJson(
       jsonDecode(row['definition'] as String) as Map<String, dynamic>,
     );
-    if (jsonEncode(current.toJson()) != jsonEncode(expected.toJson())) {
+    if (expectedRevision != null) {
+      // The monotonic revision also catches an A -> B -> A round trip.
+      if (row['revision'] != expectedRevision) {
+        throw const ValidationException(
+          'La actividad cambió desde que se propuso; vuelve a pedirlo.',
+        );
+      }
+    } else if (jsonEncode(current.toJson()) != jsonEncode(expected.toJson())) {
       throw const ValidationException(
         'La actividad cambió. Revisa el objetivo de nuevo.',
       );
@@ -674,12 +692,7 @@ mixin _SqliteActivities implements ActivityRepository {
       'targetSets': targetSets,
       'userSet': locks.toList(),
     });
-    await tx.update(
-      'activities',
-      {'definition': jsonEncode(updated.toJson())},
-      where: 'id = ?',
-      whereArgs: [activityId],
-    );
+    await _writeDefinition(tx, activityId, jsonEncode(updated.toJson()));
   });
 
   @override
@@ -725,15 +738,14 @@ mixin _SqliteActivities implements ActivityRepository {
       limit: 1,
     );
     final lastEnd = intervals.firstOrNull?['ended_at'] as int?;
-    await tx.update(
-      'activities',
+    await _writeDefinition(
+      tx,
+      activityId,
+      jsonEncode(definition.toJson()),
       {
-        'definition': jsonEncode(definition.toJson()),
         if (updateActiveRest && a['rest_ends_at'] != null && lastEnd != null)
           'rest_ends_at': seconds > 0 ? lastEnd + seconds * 1000 : null,
       },
-      where: 'id = ?',
-      whereArgs: [activityId],
     );
   });
 
@@ -766,12 +778,7 @@ mixin _SqliteActivities implements ActivityRepository {
       'targetCycles': targetCycles,
       'userSet': userSet.toList(),
     });
-    await tx.update(
-      'activities',
-      {'definition': jsonEncode(definition.toJson())},
-      where: 'id = ?',
-      whereArgs: [activityId],
-    );
+    await _writeDefinition(tx, activityId, jsonEncode(definition.toJson()));
   });
 
   @override
@@ -788,12 +795,7 @@ mixin _SqliteActivities implements ActivityRepository {
         ...old.toJson(),
         'userSet': old.userSet.where((l) => l != lock).toList(),
       });
-      await tx.update(
-        'activities',
-        {'definition': jsonEncode(definition.toJson())},
-        where: 'id = ?',
-        whereArgs: [activityId],
-      );
+      await _writeDefinition(tx, activityId, jsonEncode(definition.toJson()));
     });
   }
 }

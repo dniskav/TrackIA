@@ -52,7 +52,7 @@ void main() {
       await repo.close();
 
       final after = await databaseFactoryFfi.openDatabase(path);
-      expect(await after.getVersion(), 7);
+      expect(await after.getVersion(), 8);
       await after.close();
       expect(await _tables(path), containsAll(trackiaV6Tables));
 
@@ -98,7 +98,7 @@ void main() {
       );
       await repo.close();
       final db = await databaseFactoryFfi.openDatabase(path);
-      expect(await db.getVersion(), 7);
+      expect(await db.getVersion(), 8);
       await db.close();
       expect(await _tables(path), containsAll(trackiaV6Tables));
     } finally {

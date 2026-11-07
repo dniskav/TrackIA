@@ -312,9 +312,17 @@ void main() {
         );
         await migrated.close();
         final current = await databaseFactoryFfi.openDatabase(path);
-        expect(await current.getVersion(), 7);
+        expect(await current.getVersion(), 8);
         for (final name in names) {
-          expect(await current.query(name), before[name], reason: name);
+          var rows = await current.query(name);
+          if (name == 'activities') {
+            // v8 adds the revision column (starts at 1); the rest is intact.
+            expect(rows.map((r) => r['revision']), everyElement(1));
+            rows = [
+              for (final r in rows) {...r}..remove('revision'),
+            ];
+          }
+          expect(rows, before[name], reason: name);
         }
         await current.close();
 

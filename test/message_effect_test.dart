@@ -411,4 +411,74 @@ void main() {
     expect(after, isNot(contains('Propuestas SIN confirmar')));
     expect(after, isNot(contains('Escribir en Sheets')));
   });
+
+  MessageEffect open1(String id, String what, EffectStatus st, {String kind = 'target'}) =>
+      MessageEffect(
+        id: id,
+        profileId: scope.profileId,
+        companionId: scope.companionId,
+        messageId: 'm1',
+        revisionId: 'rev-m1-1',
+        kind: kind,
+        targetId: 'act-1',
+        operationKey: MessageEffect.keyFor('m1', kind, what),
+        summary: 'Fijar $what',
+        createdAt: t0,
+        status: st,
+      );
+
+  test('una propuesta no cuenta como aplicada hasta confirmarla', () async {
+    await message('m1');
+    final key = MessageEffect.keyFor('m1', 'target', 'target:3');
+    await effects.record(open1('p1', 'target:3', EffectStatus.proposed));
+    expect(await effects.isApplied(key), isFalse);
+    expect(await effects.settle(key, EffectStatus.confirmed, summary: 'Fijé 3'), isTrue);
+    expect(await effects.isApplied(key), isTrue);
+    final one = (await effects.effectsFor('m1')).single;
+    expect((one.status, one.summary), (EffectStatus.confirmed, 'Fijé 3'));
+    // Lo confirmado no se vuelve a mover.
+    expect(await effects.settle(key, EffectStatus.failed), isFalse);
+    expect(await effects.settle(key, EffectStatus.proposed), isFalse);
+  });
+
+  test('propuesta rechazada queda fallida, no cuenta y puede reabrirse', () async {
+    await message('m1');
+    final key = MessageEffect.keyFor('m1', 'target', 'target:3');
+    await effects.record(open1('p1', 'target:3', EffectStatus.proposed));
+    expect(await effects.settle(key, EffectStatus.failed), isTrue);
+    expect(await effects.isApplied(key), isFalse);
+    final text = await effects.appliedEffectsSummary('m1');
+    expect(text, isEmpty);
+    expect(await effects.settle(key, EffectStatus.proposed), isTrue);
+    expect(await effects.appliedEffectsSummary('m1'), contains('SIN confirmar'));
+  });
+
+  test('un intento incierto no se repite a ciegas y se resuelve después', () async {
+    await message('m1');
+    final key = MessageEffect.keyFor('m1', 'target', 'target:3');
+    await effects.record(open1('u1', 'target:3', EffectStatus.uncertain));
+    expect(await effects.isApplied(key), isTrue);
+    final text = await effects.appliedEffectsSummary('m1');
+    expect(text, contains('Con resultado incierto'));
+    expect(text, isNot(contains('ya aplicados')));
+    expect(await effects.settle(key, EffectStatus.confirmed), isTrue);
+    expect(await effects.appliedEffectsSummary('m1'), contains('ya aplicados'));
+  });
+
+  test('corregir sobre una propuesta de la misma clave la convierte en el nuevo efecto', () async {
+    await message('m1');
+    await effects.record(open1('e1', 'target:10', EffectStatus.confirmed));
+    await effects.record(open1('p2', 'target:60', EffectStatus.proposed));
+    final replacement = open1('e2', 'target:60', EffectStatus.confirmed);
+    expect(
+      await effects.correct('e1', replacement, before: '10 series', after: '60 series'),
+      isTrue,
+    );
+    final all = await effects.effectsFor('m1');
+    expect(all.map((e) => (e.id, e.status)), [
+      ('e1', EffectStatus.superseded),
+      ('p2', EffectStatus.confirmed),
+    ]);
+    expect(await effects.correctionOf('e1'), (before: '10 series', after: '60 series'));
+  });
 }

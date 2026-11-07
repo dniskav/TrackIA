@@ -111,6 +111,14 @@ extension _ChatSheet on _AssistantChatScreenState {
       );
       return;
     }
+    // Mientras Google no confirme, el resultado es incierto (también si la app
+    // se cierra a mitad); solo la confirmación lo convierte en hecho.
+    await recordEffect(
+      'sheet-edit',
+      editKey,
+      'Editar la hoja de Google Sheets',
+      status: EffectStatus.uncertain,
+    );
     try {
       final receipt = await sheets.directEdit(
         answer,
