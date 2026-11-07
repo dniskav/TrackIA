@@ -33,4 +33,4 @@ una capacidad entregada. Las integraciones y casos de gimnasio se conservan.
 
 La estructura y las skills oficiales se inicializaron con [Spec Kit 1.2.2](../.specify/UPSTREAM.md).
 
-- [005 · Conversación fiable, memoria y apoyo adaptable](005-conversacion-memoria/spec.md): especificación, [plan](005-conversacion-memoria/plan.md) y [tareas](005-conversacion-memoria/tasks.md) propuestos el 2026-11-05; no implementados. Incluye plan iOS, no una versión iOS validada.
+- [005 · Conversación fiable, memoria y apoyo adaptable](005-conversacion-memoria/spec.md): especificación, [plan](005-conversacion-memoria/plan.md) y [tareas](005-conversacion-memoria/tasks.md) propuestos el 2026-11-05. Estado (2026-11-07): 46 de 53 tareas hechas, con 920 pruebas de Dart y 23 de 23 pruebas de integración en emulador; abiertas T030 (Drive real), T039, T042–T045 (localización, parcial avanzado) y T053. Matriz de requisitos en [docs/005-MATRIZ.md](../docs/005-MATRIZ.md). Incluye plan iOS, no una versión iOS validada.

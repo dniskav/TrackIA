@@ -1,0 +1,99 @@
+# Matriz de verificación FR-001–FR-015 y SC-001–SC-006 (spec 005)
+
+**Fecha**: 2026-11-07 · **Rama**: `feat/004-trackia-experience` · **Tarea**: T052
+**Fuentes**: `specs/005-conversacion-memoria/spec.md`, `specs/005-conversacion-memoria/tasks.md` (casillas y líneas «Evidencia»/«Estado» de 2026-11-07), `docs/005-QA.md`, `docs/005-MEMORIA.md`, `docs/005-IOS-PLAN.md`, `docs/005-LOCALIZACION.md`.
+
+**Alcance**: esta matriz no ejecuta pruebas. Comprueba con `ls`/`grep` que existen los archivos citados y toma los resultados de las pruebas de `tasks.md`. Antes de dar la spec por cerrada, hay que volver a ejecutar las pruebas (ver «Cómo verificar»).
+
+**Leyenda**
+- `cubierto`: tareas marcadas [x], evidencia de prueba o de código existente, y sin hueco que afecte al requisito.
+- `parcial`: hay implementación o prueba, pero falta una parte del requisito o una tarea relacionada está abierta o con pendiente declarado.
+- `sin cubrir`: no hay implementación o la tarea está abierta sin evidencia.
+- `sin validar con servicio real`: depende de Google real, IA real, Android antiguo, iOS o revisión humana del árabe. Las pruebas usan transporte o cliente simulado.
+
+**Tareas abiertas en tasks.md** (casilla vacía): T030, T039, T042, T043, T044, T045, T051, T052 (esta matriz), T053.
+
+**Nota de consistencia**: el «Resumen de estado» de tasks.md contradice varias casillas [x] (T013, T014, T017, T019, T021, T022, T026, T027, T029, T031, T032, T034, T036, T037, T038). Esta matriz sigue las casillas y las líneas de evidencia. Cuando una casilla [x] tiene un pendiente declarado que afecta a un requisito, el requisito se marca `parcial`. La corrección de tasks.md corresponde al integrador (ver Huecos, punto 9).
+
+## Requisitos funcionales
+
+| Requisito | Tareas | Evidencia (archivos reales) | Estado | Hueco o nota |
+|---|---|---|---|---|
+| FR-001 Edición de mensajes con original, revisiones, identidad y estado; la edición afecta a la versión correcta | T006, T007, T008, T012 | `test/message_revision_test.dart` (5), `test/message_revision_repository_test.dart` (3), `test/message_edit_widget_test.dart` (5); `lib/domain/message_revision.dart`, `lib/data/message_revision_repository.dart` | parcial | Decisión del dueño: solo se edita el último mensaje del usuario, mientras la spec dice «cada mensaje del usuario». Falta probar estados tras reinicio (T012). |
+| FR-002 Reenvío de mensajes sin respuesta con contexto y adjuntos, en orden, persistente tras reinicio, sin duplicar efectos | T009, T010, T011 | `test/message_delivery_test.dart` (5), `test/message_delivery_policy_test.dart` (3), `test/message_queue_widget_test.dart` (3); `lib/application/message_delivery.dart`, `lib/ui/chat/chat_delivery.dart` | parcial | Transporte falso. La IA real no se ha probado. No se probó cambiar de chat dentro del mismo acompañante (archivar está bloqueado con pendientes). |
+| FR-003 Corrección de un registro como revisión verificable, no como segunda serie; ante ambigüedad se pide confirmación | T013, T014 | `test/message_effect_test.dart`, `test/message_edit_widget_test.dart`, `test/message_edit_note_test.dart`; `lib/data/message_effect_repository.dart`, `lib/application/message_edit_note.dart` | parcial | La prueba es 3→5, no el 10×10→10×60 que pedía T013. Solo con mensaje durable: el primer envío con actividad abierta (`sendFocus`) no registra efectos. Con dos relaciones sí se pregunta a cuál se refiere. |
+| FR-004 Distinguir efectos en curso, confirmados, fallidos e inciertos; no afirmar sin confirmación | T010, T014 | `test/message_delivery_test.dart`, `test/message_effect_test.dart` (respuesta verbal sin efecto), `lib/domain/message_revision.dart` (estados), `lib/application/assistant_context.dart` (`appliedEffectsSummary`) | parcial | T014 declara pendiente: propuestas de logros, metas y textos de recordatorio no pasan por `proposed`/`confirmed`; solo se registran al confirmarse. |
+| FR-005 Modificar objetivo, nombre y descanso de la actividad activa con validación, sin pérdida de registros ni reinterpretar el historial | T015, T016, T017, T018, T019 | `test/activity_live_edit_test.dart` (9), `test/activity_focus_test.dart`; `lib/data/sqlite_activity_repository.dart`, `lib/domain/assistant_blocks.dart`, `lib/ui/activity_focus.dart` | parcial | El objetivo usa `expectedRevision` (esquema v8). `renameActivity` y `setActivityRest` no lo reciben (T017). El error visual del contador no se ha reproducido (T016). |
+| FR-006 Flujo Google: conectar, elegir hoja y pestaña, cargar o cancelar en una secuencia; respeta ámbitos y permisos | T020, T021, T022 | `test/sheets_onboarding_test.dart`, `test/google_sheets_import_test.dart`, `test/sheet_sync_ui_test.dart`, `test/ai_settings_chat_test.dart`; `integration_test/sheets_onboarding_test.dart`; `lib/ui/google_sheets_import.dart`, `lib/ui/sheet_sync.dart` | sin validar con servicio real | Transporte controlado y sintético. OAuth real y ámbitos reales de Google pendientes (T021, T022; `docs/005-QA.md`). |
+| FR-007 Memoria por perfil y acompañante; sobrevive al archivo; no se mezcla; visible, editable y borrable | T023, T024, T026, T027 | `test/companion_memory_test.dart`, `test/companion_memory_repository_test.dart` (SQLite real), `test/companion_memory_ui_test.dart` (13), `test/assistant_context_test.dart`; `lib/domain/companion_memory.dart`, `lib/data/companion_memory_repository.dart`, `lib/ui/companion_memory.dart` | parcial | Ningún flujo de `lib/ui/chat/` usa `CompanionMemoryService` ni pasa recuerdos al contexto (T026). «Persistencia al archivar» (T027) no está probada en flujo real. Lo verificado es repositorio y UI por separado. |
+| FR-008 Las peticiones explícitas de recordar se guardan; el modelo puede sugerir; los recuerdos recuperados se distinguen de instrucciones de sistema | T025, T026 | `test/memory_proposal_test.dart` (6), `test/assistant_context_test.dart` (6 nuevas), `test/companion_memory_test.dart`; `lib/application/companion_memory_service.dart`, `lib/application/assistant_context.dart` | parcial | El bloque de recuerdos está delimitado y etiquetado como dato no confiable (probado). El chat no llama a `acceptPersisted` (T026). El guardado automático de relevancia clara no tiene prueba de flujo. Lo que propone el modelo real: sin validar con IA real. |
+| FR-009 Copia Google opcional y explícita; guardar, cargar, borrar local y borrar nube separados; resultado y conflictos visibles | T028, T029, T030, T031, T032 | `test/memory_cloud_test.dart` (9, transporte simulado), `test/memory_snapshot_test.dart` (5), `test/memory_import_preview_test.dart` (3), `test/companion_memory_ui_test.dart`; `lib/data/memory_google_drive.dart` (solo sobre interfaz abstracta), `lib/data/memory_snapshot.dart`, `lib/application/memory_import_preview.dart`, `docs/005-MEMORIA.md` | parcial | T030 abierta: no hay adaptador `appDataFolder`, ni OAuth, ni comprobación de identidad. En la app, las acciones de nube están deshabilitadas. Aplicar la importación depende de T030. Validación con Google real: sin validar. |
+| FR-010 Personalidad libre y ayuda de IA por acompañante, sin cambiar permisos ni autorizar acciones | T033, T034 | `test/personality_custom_test.dart`, `test/companion_settings_test.dart` (16); `lib/ui/companion_settings.dart`, `lib/ui/companion_creator.dart` | sin validar con servicio real | La parte local está cubierta (límite de 4000 caracteres, sin cambios de permisos según tasks.md). La ayuda de IA solo se probó con cliente simulado. |
+| FR-011 Apoyo a hábitos: objetivos libres, seguimiento manual, límites, avisos y acuerdos editables, no limitado a una actividad | T035, T036, T037, T038, T039 | `test/support_agreement_test.dart` (5), `test/support_agreement_service_test.dart` (4), `test/support_agreement_repository_test.dart` (6), `test/support_agreement_ui_test.dart` (4); `lib/domain/support_agreement.dart`, `lib/data/support_agreement_repository.dart`, `lib/application/support_agreement_service.dart`, `lib/ui/support_agreement.dart` | parcial | T039 abierta: `integration_test/support_agreement_android_test.dart` no existe (permisos concedidos y denegados, reinicio). Los avisos no están asociados a cada acuerdo (T038). El acceso desde el chat no tiene prueba. |
+| FR-012 Logo en inicio y frases de espera variadas, veraces y localizadas | T046 | `test/companion_dashboard_test.dart`, `test/locale_settings_test.dart`, `test/ai_settings_chat_test.dart` (25 pruebas en conjunto); `lib/ui/companions.dart`, `lib/ui/chat/` | parcial | Probados el logo con alternativa semántica y cuatro frases es/en/ar. La veracidad y la variedad no tienen prueba específica. La traducción árabe necesita revisión humana (sin validar). |
+| FR-013 Interfaz en es, en y ar, y extensible; RTL, accesibilidad, plurales, fechas y contenido mixto | T040, T041, T042, T043, T044, T045 | `test/locale_settings_test.dart`, `test/localization_test.dart` (9), `test/localization_t042_test.dart` (RTL en bienvenida), `test/sheets_localization_t044_test.dart`; `l10n.yaml`, `lib/l10n/app_es.arb`, `lib/l10n/app_en.arb`, `lib/l10n/app_ar.arb`, `lib/application/locale_settings.dart`, `docs/005-LOCALIZACION.md` | parcial | T042–T045 abiertas. Faltan pruebas de fechas por idioma, fuente grande, lector de pantalla, RTL en todo el árbol, reinicio y aislamiento del texto mixto (T043). Pendientes de texto: nombres y descripciones de acompañantes por defecto, validación de `reminder.dart`, `SheetsWriter.kt`. Revisión humana del árabe: sin validar. |
+| FR-014 Plan iOS trazable que distingue investigación, compilación, dispositivo y distribución; ninguna capacidad se declara validada sin evidencia | T048, T049, T050 | `docs/005-IOS-PLAN.md` (§1 inventario, §2 preparación y matriz, §3 criterios, §4 distribución, §5 decisiones pendientes) | cubierto | Es un entregable documental. La validación iOS no existe: no hay Xcode completo, compilación, simulador ni dispositivo, y el propio plan lo indica. |
+| FR-015 Datos existentes, aislamiento y recuperación en migración; pruebas con errores y transportes simulados; validación real aparte | T003, T004, T005 | `test/feature_005_migration_test.dart`, `test/feature_005_scope_test.dart` (4), `test/trackia_migrations_test.dart`, `test/trackia_v6_migration_test.dart`, `test/chat_store_migration_test.dart`; `lib/data/trackia_migrations.dart`, `lib/data/feature_scope.dart`; existe `integration_test/feature_005_snapshot_android_test.dart`, que tasks.md no cita (no verificado en esta pasada) | sin validar con servicio real | Pruebas locales cubiertas. Pendiente real (T004): Android antiguo, interrupción de proceso (`kill -9`) y datos heredados en almacenamiento seguro. |
+
+## Criterios de éxito medibles
+
+| Criterio | Tareas | Evidencia (archivos reales) | Estado | Hueco o nota |
+|---|---|---|---|---|
+| SC-001 100 % de escenarios de corrección y reintento: sin serie adicional y original conservado | T006, T008, T009, T010, T011, T013, T014 | `test/message_revision_repository_test.dart`, `test/message_delivery_test.dart`, `test/message_effect_test.dart` | parcial | No hay una matriz exhaustiva de escenarios; el 100 % se refiere a los que cubren las pruebas. Huecos: estado tras reinicio de una edición (T012) y efectos con actividad abierta que no son durables (T013). |
+| SC-002 100 % de cambios de objetivo: contador igual al objetivo vigente y resultados previos conservados | T015, T016, T017, T018, T019 | `test/activity_live_edit_test.dart` (9), `test/activity_focus_test.dart` | parcial | Probados 4/3, A→B→A con versión esperada y objetivo menor al progreso. El error visual informado no se ha reproducido (T016). Nombre y descanso no usan versión (T017). |
+| SC-003 100 % de pruebas de aislamiento entre dos perfiles y dos acompañantes: no se recupera memoria ajena | T005, T023, T027, T036 | `test/feature_005_scope_test.dart` (4), `test/companion_memory_test.dart` («selection excludes other profile/companion scopes»), `test/companion_memory_ui_test.dart` (lista solo perfil y acompañante), `test/support_agreement_repository_test.dart` (aislamiento por ámbito) | cubierto | Verificado en repositorio y UI. La memoria no está conectada al chat (T026), así que no hay prueba de aislamiento en el flujo real de chat. |
+| SC-004 Los tres idiomas completan los cinco recorridos de US6 (inicio, chat, configuración, recordatorios, Sheets) sin texto sin traducir ni controles inaccesibles; árabe en RTL | T040–T047 | `test/localization_test.dart`, `test/localization_t042_test.dart`, `docs/005-LOCALIZACION.md` | parcial | No hay prueba de los cinco recorridos. T042–T045 están abiertas. No hay comprobación automatizada de accesibilidad. Revisión humana del árabe: sin validar. |
+| SC-005 Flujos de nube y Sheets distinguen éxito, cancelación, desconexión y conflicto; ningún resultado simulado se presenta como validación real | T020–T022, T028, T030, T031 | `test/memory_cloud_test.dart` (cancelación, permiso denegado, conflicto, resultado incierto), `test/companion_memory_ui_test.dart`, `test/sheets_onboarding_test.dart`, `integration_test/sheets_onboarding_test.dart` | sin validar con servicio real | Las distinciones están probadas con transporte simulado. Google real no se ha probado y T030 está abierta. La desconexión no aparece como caso explícito en las pruebas de nube. La app marca las acciones de nube como no conectadas. |
+| SC-006 Plan iOS con tareas, dependencias y evidencia requerida por capacidad; destino de distribución decidido antes de publicar | T048, T049, T050 | `docs/005-IOS-PLAN.md` (§§2–5) | cubierto | Es un plan documental. La distribución sigue pendiente (§4–5), lo que es correcto mientras no haya publicación. No hay validación iOS. |
+
+## Huecos para cerrar (prioridad)
+
+1. **Conectar la memoria al chat (T026, T027)**. Llamar a `acceptPersisted` desde `lib/ui/chat/` y pasar los recuerdos al `AssistantContextInput`. Probar la persistencia al archivar. Cierra FR-007, FR-008 y SC-003 en flujo real. Lo debe hacer el agente de chat (US1).
+2. **Localización restante (T042–T045)**. Fechas por idioma, fuente grande, lector de pantalla, RTL en todo el árbol, reinicio, textos de recordatorio y revisión del árabe. Cierra FR-013 y SC-004.
+3. **Acuerdos de apoyo (T039, T038)**. Crear `integration_test/support_agreement_android_test.dart` para permisos y reinicio. Asociar avisos por acuerdo. Probar el acceso desde el chat. Cierra FR-011.
+4. **Actividad en marcha (T017, T016)**. Añadir `expectedRevision` a `renameActivity` y `setActivityRest`. Reproducir o descartar el error visual del contador. Cierra FR-005 y SC-002.
+5. **Efectos (T013, T014)**. Registrar propuestas de logros, metas y recordatorios con su estado. Registrar efectos del primer envío con actividad abierta. Cierra FR-003, FR-004 y SC-001.
+6. **Edición de mensajes (T012)**. Probar los estados de un mensaje editado tras reinicio. Cierra parte de FR-001 y SC-001.
+7. **Decisión de producto (FR-001)**. Editar solo el último mensaje del usuario contradice «cada mensaje». El dueño decide si se amplía la implementación o se cambia la spec por escrito.
+8. **Adaptador Drive real (T030)**. Implementar `appDataFolder`, `drive.appdata`, OAuth e identidad. Requiere autorización del propietario y una cuenta desechable. Es un bloqueo externo que no se cierra solo con código. Cierra FR-009 y SC-005.
+9. **Reconciliar tasks.md** (lo hace el integrador; esta tarea no lo ha tocado). El resumen contradice las casillas [x] de T013, T014, T017, T019, T021, T022, T026, T027, T029, T031, T032, T034, T036, T037 y T038. `docs/005-QA.md` dice que T006 «falta cancelación», pero la evidencia actual de T006 ya la incluye. T017 dice que el A→B→A queda cubierto por el contador, y T018 dice que la firma no lo detecta.
+10. **Validaciones reales, fuera de código**: Google OAuth y Drive (T021, T022, T030); IA real (T034, FR-002, FR-008, FR-010); Android antiguo e interrupción con `kill -9` (T004, FR-015); revisión humana del árabe (FR-012, FR-013); iOS (no hay validación; el plan de FR-014 sigue como está).
+11. **Cierre (T051, T053)**. Ejecutar `analyze` y la suite completa, registrar resultados en `docs/005-QA.md` y preparar los recorridos de aceptación.
+
+## Cómo verificar
+
+Desde la raíz del proyecto (`cd "/Users/daniel/Desktop/TrackIA app"`). Usar siempre el script del proyecto, que ya configura las herramientas de `.tools/`.
+
+Análisis y suite completa (T051):
+
+```
+./scripts/flutter-local.sh analyze
+./scripts/flutter-local.sh test
+```
+
+Pruebas puntuales por bloque de requisitos (no requieren emulador):
+
+```
+./scripts/flutter-local.sh test --no-pub test/feature_005_migration_test.dart test/feature_005_scope_test.dart
+./scripts/flutter-local.sh test --no-pub test/message_revision_test.dart test/message_revision_repository_test.dart test/message_edit_widget_test.dart
+./scripts/flutter-local.sh test --no-pub test/message_delivery_test.dart test/message_delivery_policy_test.dart test/message_queue_widget_test.dart
+./scripts/flutter-local.sh test --no-pub test/message_effect_test.dart test/message_edit_note_test.dart
+./scripts/flutter-local.sh test --no-pub test/activity_live_edit_test.dart test/activity_focus_test.dart
+./scripts/flutter-local.sh test --no-pub test/sheets_onboarding_test.dart test/google_sheets_import_test.dart test/sheet_sync_ui_test.dart
+./scripts/flutter-local.sh test --no-pub test/companion_memory_test.dart test/companion_memory_repository_test.dart test/memory_proposal_test.dart test/assistant_context_test.dart test/companion_memory_ui_test.dart
+./scripts/flutter-local.sh test --no-pub test/memory_cloud_test.dart test/memory_snapshot_test.dart test/memory_import_preview_test.dart
+./scripts/flutter-local.sh test --no-pub test/personality_custom_test.dart test/companion_settings_test.dart
+./scripts/flutter-local.sh test --no-pub test/support_agreement_test.dart test/support_agreement_service_test.dart test/support_agreement_repository_test.dart test/support_agreement_ui_test.dart
+./scripts/flutter-local.sh test --no-pub test/localization_test.dart test/localization_t042_test.dart test/locale_settings_test.dart test/sheets_localization_t044_test.dart
+```
+
+Pruebas de integración, una por archivo, en emulador (cambiar `-d` por el dispositivo disponible; no usar el teléfono personal):
+
+```
+./scripts/flutter-local.sh test integration_test/sheets_onboarding_test.dart -d emulator-5556
+./scripts/flutter-local.sh test integration_test/feature_005_snapshot_android_test.dart -d emulator-5556
+```
+
+`integration_test/support_agreement_android_test.dart` (T039) aún no existe. Cuando se cree, se ejecutará igual que las anteriores.
+
+Validación real pendiente (no se hace con estos comandos): Google OAuth y Drive, IA real, Android antiguo, interrupción de proceso (`kill -9`) y cualquier prueba iOS. Registrar cada una por separado en `docs/005-QA.md`.
