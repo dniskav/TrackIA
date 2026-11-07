@@ -460,6 +460,10 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
             content: Text(appText(context).activityRestChangeNoticePrompt),
             actions: [
               TextButton(
+                onPressed: () => Navigator.pop(dialogContext),
+                child: Text(appText(context).cancel),
+              ),
+              TextButton(
                 onPressed: () => Navigator.pop(dialogContext, false),
                 child: Text(appText(context).activityKeepNotice),
               ),
@@ -529,6 +533,7 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
         a.id,
         target,
         expected: a.definition,
+        expectedRevision: a.revision,
       ),
     );
     if (done && mounted) {

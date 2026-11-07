@@ -1158,6 +1158,78 @@ void main() {
     );
   }
 
+  testWidgets('cancelling the active-notice dialog changes nothing', (
+    tester,
+  ) async {
+    final originalEnd = c.focus!.restEndsAt!;
+    final revision = c.focus!.revision;
+    await show(tester);
+    await tap(tester, const Key('activity-rest'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).last, '180');
+    await tester.tap(find.text('Guardar'));
+    await tester.pumpAndSettle();
+    await waitFor(
+      tester,
+      () => find.text('Descanso en curso').evaluate().isNotEmpty,
+    );
+    await tester.tap(find.text('Cancelar'));
+    await tester.pumpAndSettle();
+    expect(c.focus!.definition.restSeconds, 120);
+    expect(c.focus!.restEndsAt, originalEnd);
+    expect(c.focus!.revision, revision);
+    expect(tester.takeException(), isNull);
+    await disposeScreen(tester);
+  });
+
+  testWidgets('no active notice: rest edit applies without dialog', (
+    tester,
+  ) async {
+    await tester.runAsync(() async {
+      now = now.add(const Duration(minutes: 5));
+      await c.refresh();
+    });
+    final revision = c.focus!.revision;
+    await show(tester);
+    await tap(tester, const Key('activity-rest'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).last, '180');
+    await tester.tap(find.text('Guardar'));
+    await tester.pump();
+    expect(find.text('Descanso en curso'), findsNothing);
+    await waitFor(
+      tester,
+      () => c.focus!.definition.restSeconds == 180 && !c.busy,
+    );
+    expect(c.focus!.revision, greaterThan(revision));
+    expect(tester.takeException(), isNull);
+    await disposeScreen(tester);
+  });
+
+  testWidgets('local target edit with a stale revision is rejected', (
+    tester,
+  ) async {
+    await show(tester);
+    await tap(tester, const Key('edit-activity-target'));
+    await tester.pumpAndSettle();
+    await tester.runAsync(() async {
+      final id = c.focus!.id;
+      await repo.setActivityTarget(id, 5, expected: c.focus!.definition);
+      await repo.setActivityTarget(
+        id,
+        4,
+        expected: (await repo.loadActivities()).single.definition,
+      );
+    });
+    await tester.enterText(find.byType(TextField).last, '2');
+    await tester.tap(find.text('Guardar'));
+    await waitFor(tester, () => c.error != null && !c.busy);
+    expect(c.error, contains('cambió'));
+    expect(c.focus!.definition.targetSets, 4);
+    expect(tester.takeException(), isNull);
+    await disposeScreen(tester);
+  });
+
   testWidgets('with notices off the panel offers to turn them on', (
     tester,
   ) async {
