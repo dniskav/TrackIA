@@ -3,12 +3,15 @@ import '../application/localization.dart';
 import '../data/ai_client.dart';
 import '../data/ai_settings_store.dart';
 import '../application/reminder_scheduler.dart';
+import '../data/companion_memory_repository.dart';
 import '../data/companion_store.dart';
+import '../data/memory_google_drive.dart';
 import '../data/progress_repository.dart';
 import '../domain/companion.dart';
 import '../domain/progress.dart';
 import '../domain/reminder.dart';
 import '../domain/workout.dart';
+import 'companion_memory.dart';
 
 /// «Modo y avisos» of one companion: reminder or game, and the habit reminder
 /// itself (days, window, last call, tone and minimum). FR-026, FR-027.
@@ -22,6 +25,9 @@ class CompanionSettingsScreen extends StatefulWidget {
     this.clock,
     this.aiStore,
     this.aiClient,
+    this.memory,
+    this.memoryTransport,
+    this.memoryAccountId,
   });
 
   final ProgressRepository progress;
@@ -33,6 +39,11 @@ class CompanionSettingsScreen extends StatefulWidget {
   final DateTime Function()? clock;
   final AiSettingsStore? aiStore;
   final AiClient? aiClient;
+
+  /// Memory of this companion; the entry is hidden when absent.
+  final CompanionMemoryRepository? memory;
+  final MemoryCloudTransport? memoryTransport;
+  final String? memoryAccountId;
 
   @override
   State<CompanionSettingsScreen> createState() =>
@@ -333,6 +344,7 @@ class _CompanionSettingsScreenState extends State<CompanionSettingsScreen> {
       templates: ReminderTemplates.defaults(
         tone: tone,
         companionId: widget.companion.id,
+        phrases: reminderPhrasesFor(appText(context)),
       ),
     );
     return (
@@ -348,7 +360,7 @@ class _CompanionSettingsScreenState extends State<CompanionSettingsScreen> {
     return ReminderScheduler.minimumText({
       'metric': minimumMetric,
       'value': value,
-    });
+    }, phrases: reminderPhrasesFor(appText(context)));
   }
 
   Widget modeCard({
@@ -699,6 +711,27 @@ class _CompanionSettingsScreenState extends State<CompanionSettingsScreen> {
                             ),
                           ],
                         ],
+                      ),
+                    ),
+                  ),
+                ],
+                if (widget.memory != null) ...[
+                  const Divider(height: 32),
+                  ListTile(
+                    key: const Key('open-companion-memory'),
+                    leading: const Icon(Icons.psychology_outlined),
+                    title: Text(l.memoryOpen),
+                    subtitle: Text(l.memoryOpenHelp),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        builder: (_) => CompanionMemoryScreen(
+                          repository: widget.memory!,
+                          companion: widget.companion,
+                          transport: widget.memoryTransport,
+                          accountId: widget.memoryAccountId,
+                          clock: widget.clock,
+                        ),
                       ),
                     ),
                   ),

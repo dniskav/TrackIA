@@ -14,6 +14,7 @@ import '../domain/activity.dart';
 import '../domain/space.dart';
 import 'activity_template_repository.dart';
 import 'chat_store.dart';
+import 'companion_memory_repository.dart';
 import 'progress_repository.dart';
 import 'observation_repository.dart';
 import 'trackia_rename.dart';
@@ -45,6 +46,10 @@ class SqliteWorkoutRepository
 
   /// Chats and chat archives of this profile, with attachments as files.
   late final ChatStore chats = ChatStore(_db, _now, profileId);
+
+  /// Memory the user lets each companion keep (T027), scoped to this profile.
+  late final CompanionMemoryRepository companionMemory =
+      CompanionMemoryRepository(_db, profileId: profileId);
 
   /// Companion settings and reminders of this profile.
   late final ProgressRepository progress = ProgressRepository(

@@ -128,47 +128,24 @@ class ReminderTemplates {
         inactive: List<String>.from(json['inactive'] as List),
       );
 
-  /// Default Spanish copy of `contracts/reminders-android.md`. [custom] (the
-  /// companion's own `trackia-reminder-copy`) replaces any list it provides.
+  /// Default copy of `contracts/reminders-android.md` in the active language.
+  /// [custom] (the companion's own `trackia-reminder-copy`) replaces any list
+  /// it provides; [phrases] only fills in the defaults.
   static ReminderTemplates defaults({
     required String tone,
     required String companionId,
     ReminderTemplates? custom,
+    ReminderPhrases phrases = ReminderPhrases.spanish,
   }) {
     final cheer = tone == 'cheer';
     final base = ReminderTemplates(
       windowStart: cheer
-          ? const [
-              '{nombre} te espera: hoy toca {meta}.',
-              '{nombre} te espera hoy.',
-            ]
-          : const [
-              'Es buen momento para tu actividad. Meta de hoy: {meta}.',
-              'Es buen momento para tu actividad.',
-            ],
-      lastCall: cheer
-          ? const [
-              'Última llamada: con {minimo} mantienes tu racha de {racha} días.',
-              'No pierdas la racha: te faltan {faltan} esta semana.',
-              'Última llamada para hoy.',
-            ]
-          : const [
-              'Aún estás a tiempo hoy. Con {minimo} basta.',
-              'Te faltan {faltan} esta semana.',
-              'Aún estás a tiempo hoy.',
-            ],
+          ? phrases.windowStartCheer
+          : phrases.windowStartNeutral,
+      lastCall: cheer ? phrases.lastCallCheer : phrases.lastCallNeutral,
       inactive: [
-        if (cheer && companionId == 'gymbro')
-          'Amigo, llevamos {dias} días sin entrenar. Vamos a movernos un poco.',
-        ...cheer
-            ? const [
-                'Llevamos {dias} días sin vernos. ¿Algo corto hoy?',
-                '¿Algo corto hoy?',
-              ]
-            : const [
-                'Llevas {dias} días sin registrar.',
-                'Hace unos días que no registras.',
-              ],
+        if (cheer && companionId == 'gymbro') phrases.inactiveGymbroCheer,
+        ...cheer ? phrases.inactiveCheer : phrases.inactiveNeutral,
       ],
     );
     if (custom == null) return base;
@@ -180,6 +157,72 @@ class ReminderTemplates {
       inactive: pick(custom.inactive, base.inactive),
     );
   }
+}
+
+/// The default reminder phrases in one language. Markers such as `{nombre}`
+/// stay in the text and are filled by [renderReminder]; the `minimum…` texts
+/// use `{n}` (and `{campo}` for a field) and are filled by the scheduler.
+///
+/// [spanish] is the fallback used when no localization is given; the app
+/// builds the active language from its `reminderPhrase…` keys.
+class ReminderPhrases {
+  const ReminderPhrases({
+    required this.windowStartCheer,
+    required this.windowStartNeutral,
+    required this.lastCallCheer,
+    required this.lastCallNeutral,
+    required this.inactiveGymbroCheer,
+    required this.inactiveCheer,
+    required this.inactiveNeutral,
+    required this.minimumSessionOne,
+    required this.minimumSessions,
+    required this.minimumMinutes,
+    required this.minimumField,
+  });
+
+  final List<String> windowStartCheer,
+      windowStartNeutral,
+      lastCallCheer,
+      lastCallNeutral,
+      inactiveCheer,
+      inactiveNeutral;
+  final String inactiveGymbroCheer;
+  final String minimumSessionOne, minimumSessions, minimumMinutes, minimumField;
+
+  static const spanish = ReminderPhrases(
+    windowStartCheer: [
+      '{nombre} te espera: hoy toca {meta}.',
+      '{nombre} te espera hoy.',
+    ],
+    windowStartNeutral: [
+      'Es buen momento para tu actividad. Meta de hoy: {meta}.',
+      'Es buen momento para tu actividad.',
+    ],
+    lastCallCheer: [
+      'Última llamada: con {minimo} mantienes tu racha de {racha} días.',
+      'No pierdas la racha: te faltan {faltan} esta semana.',
+      'Última llamada para hoy.',
+    ],
+    lastCallNeutral: [
+      'Aún estás a tiempo hoy. Con {minimo} basta.',
+      'Te faltan {faltan} esta semana.',
+      'Aún estás a tiempo hoy.',
+    ],
+    inactiveGymbroCheer:
+        'Amigo, llevamos {dias} días sin entrenar. Vamos a movernos un poco.',
+    inactiveCheer: [
+      'Llevamos {dias} días sin vernos. ¿Algo corto hoy?',
+      '¿Algo corto hoy?',
+    ],
+    inactiveNeutral: [
+      'Llevas {dias} días sin registrar.',
+      'Hace unos días que no registras.',
+    ],
+    minimumSessionOne: '1 sesión',
+    minimumSessions: '{n} sesiones',
+    minimumMinutes: '{n} min',
+    minimumField: '{n} {campo}',
+  );
 }
 
 /// One reminder as the native side receives it (snapshot version 1).

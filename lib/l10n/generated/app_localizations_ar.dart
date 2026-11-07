@@ -3284,4 +3284,400 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get proposalGameSuggestion =>
       'لقد واظبت عدة أيام متتالية. هل تريد تفعيل وضع اللعب لرؤية الأهداف والسلاسل والإنجازات؟';
+
+  @override
+  String reminderPhraseWindowStartCheer1(Object nombre, Object meta) {
+    return '$nombre ينتظرك: هدف اليوم $meta.';
+  }
+
+  @override
+  String reminderPhraseWindowStartCheer2(Object nombre) {
+    return '$nombre ينتظرك اليوم.';
+  }
+
+  @override
+  String reminderPhraseWindowStartNeutral1(Object meta) {
+    return 'هذا وقت مناسب لنشاطك. هدف اليوم: $meta.';
+  }
+
+  @override
+  String get reminderPhraseWindowStartNeutral2 => 'هذا وقت مناسب لنشاطك.';
+
+  @override
+  String reminderPhraseLastCallCheer1(Object minimo, Object racha) {
+    return 'آخر فرصة: بـ$minimo تحافظ على سلسلة $racha يومًا.';
+  }
+
+  @override
+  String reminderPhraseLastCallCheer2(Object faltan) {
+    return 'لا تفقد سلسلتك: يتبقى $faltan هذا الأسبوع.';
+  }
+
+  @override
+  String get reminderPhraseLastCallCheer3 => 'آخر فرصة لليوم.';
+
+  @override
+  String reminderPhraseLastCallNeutral1(Object minimo) {
+    return 'ما زال أمامك وقت اليوم. يكفي $minimo.';
+  }
+
+  @override
+  String reminderPhraseLastCallNeutral2(Object faltan) {
+    return 'يتبقى $faltan هذا الأسبوع.';
+  }
+
+  @override
+  String get reminderPhraseLastCallNeutral3 => 'ما زال أمامك وقت اليوم.';
+
+  @override
+  String reminderPhraseInactiveGymbroCheer(Object dias) {
+    return 'يا صديقي، مرّت $dias أيام دون تدريب. هيا نتحرك قليلًا.';
+  }
+
+  @override
+  String reminderPhraseInactiveCheer1(Object dias) {
+    return 'لم نلتقِ منذ $dias أيام. شيء قصير اليوم؟';
+  }
+
+  @override
+  String get reminderPhraseInactiveCheer2 => 'شيء قصير اليوم؟';
+
+  @override
+  String reminderPhraseInactiveNeutral1(Object dias) {
+    return 'لم تسجّل شيئًا منذ $dias أيام.';
+  }
+
+  @override
+  String get reminderPhraseInactiveNeutral2 => 'لم تسجّل منذ بضعة أيام.';
+
+  @override
+  String get reminderPhraseMinimumSessionOne => 'جلسة واحدة';
+
+  @override
+  String reminderPhraseMinimumSessions(Object n) {
+    return '$n جلسات';
+  }
+
+  @override
+  String reminderPhraseMinimumMinutes(Object n) {
+    return '$n دقيقة';
+  }
+
+  @override
+  String reminderPhraseMinimumField(Object n, Object campo) {
+    return '$n $campo';
+  }
+
+  @override
+  String memoryTitle(Object name) {
+    return 'ذاكرة $name';
+  }
+
+  @override
+  String get memoryIntro =>
+      'ما يتذكره هذا المرافق عنك. يمكنك مراجعته أو تعديله أو حذفه في أي وقت. يُعامَل كمعلومات عنك وليس كتعليمات.';
+
+  @override
+  String get memoryOpen => 'ذاكرة المرافق';
+
+  @override
+  String get memoryOpenHelp => 'عرض ما يتذكره وتعديله وحذفه، والنسخة السحابية.';
+
+  @override
+  String get memoryEmpty => 'لا توجد ذكريات محفوظة بعد.';
+
+  @override
+  String get memoryLoadError => 'تعذّر تحميل الذكريات.';
+
+  @override
+  String get memoryActionError => 'تعذّر إكمال الإجراء. لم تتغير ذكرياتك.';
+
+  @override
+  String get memoryStatusActive => 'نشط';
+
+  @override
+  String get memoryStatusPending => 'بانتظار التأكيد';
+
+  @override
+  String get memorySourceExplicit => 'طلبتَه أنت';
+
+  @override
+  String get memorySourceInferred => 'اقتراح من الذكاء الاصطناعي';
+
+  @override
+  String get memorySourceEdited => 'عدّلتَه أنت';
+
+  @override
+  String get memoryConfirm => 'تأكيد';
+
+  @override
+  String get memoryConfirmed => 'تم تأكيد الذكرى.';
+
+  @override
+  String get memoryEdit => 'تعديل';
+
+  @override
+  String get memoryEditTitle => 'تعديل الذكرى';
+
+  @override
+  String get memoryEditLabel => 'الذكرى';
+
+  @override
+  String get memoryEditEmpty => 'لا يمكن أن تكون الذكرى فارغة.';
+
+  @override
+  String get memoryEditTooLong => 'لا يمكن أن تتجاوز الذكرى 2000 حرف.';
+
+  @override
+  String get memoryEdited => 'تم حفظ الذكرى.';
+
+  @override
+  String get memoryDeleteLocalAction => 'حذف من هذا الهاتف';
+
+  @override
+  String get memoryDeleteLocalTitle => 'هل تريد حذف هذه الذكرى من هذا الهاتف؟';
+
+  @override
+  String get memoryDeleteLocalBody =>
+      'سيُحذف من هذا الهاتف فقط وسيتوقف المرافق عن استخدامه. لا يحذف النسخة الموجودة في السحابة؛ استخدم «حذف من السحابة» لذلك.';
+
+  @override
+  String get memoryDeletedLocal =>
+      'تم حذف الذكرى من هذا الهاتف. لم تُمَسّ النسخة السحابية.';
+
+  @override
+  String get memoryCloudTitle => 'النسخة السحابية';
+
+  @override
+  String get memoryCloudHelp =>
+      'اختيارية وبطلب منك فقط. تُحفظ الذكريات النشطة لهذا المرافق دون محادثات أو مفاتيح. وهي غير مشفّرة من طرف إلى طرف.';
+
+  @override
+  String get memoryCloudUnavailable =>
+      'لم يتم ربط Google Drive بعد في هذا الإصدار';
+
+  @override
+  String get memoryCloudNoAccount =>
+      'اربط حساب Google لاستخدام النسخة السحابية.';
+
+  @override
+  String memoryCloudAccount(Object account) {
+    return 'الحساب: $account';
+  }
+
+  @override
+  String memoryCloudLastCopy(Object date, int revision) {
+    return 'آخر نسخة شوهدت: $date (المراجعة $revision)';
+  }
+
+  @override
+  String get memoryCloudSave => 'حفظ في السحابة';
+
+  @override
+  String get memoryCloudLoad => 'تحميل من السحابة';
+
+  @override
+  String get memoryCloudDelete => 'حذف من السحابة';
+
+  @override
+  String get memoryCloudSaveTitle => 'هل تريد الحفظ في السحابة؟';
+
+  @override
+  String memoryCloudSaveBody(Object account, int count) {
+    return 'ستُرفع الذكريات النشطة لهذا المرافق إلى الحساب $account. الذكريات المراد رفعها: $count. لا تُرفع الذكريات بانتظار التأكيد. إذا تغيّرت النسخة السحابية فلن تُستبدل.';
+  }
+
+  @override
+  String memoryCloudSaved(Object account) {
+    return 'تم حفظ النسخة في الحساب $account.';
+  }
+
+  @override
+  String memoryCloudLoaded(int count) {
+    return 'تم تحميل النسخة. الذكريات المضافة: $count.';
+  }
+
+  @override
+  String get memoryCloudLoadCancelled => 'أُلغي التحميل. لم يتغير شيء.';
+
+  @override
+  String get memoryCloudDeleteTitle => 'هل تريد حذف النسخة السحابية؟';
+
+  @override
+  String memoryCloudDeleteBody(Object account, Object date) {
+    return 'ستُحذف نسخة هذا المرافق من الحساب $account (المحفوظة في $date). لا يحذف الذكريات الموجودة على هذا الهاتف. لا يمكن التراجع عن ذلك.';
+  }
+
+  @override
+  String memoryCloudDeleted(Object account) {
+    return 'تم حذف النسخة من الحساب $account. لم تُمَسّ الذكريات على هذا الهاتف.';
+  }
+
+  @override
+  String get memoryCloudDeleteCancelled => 'أُلغي الحذف. لم يتغير شيء.';
+
+  @override
+  String get memoryCloudNotFound => 'لا توجد نسخة سحابية لهذا المرافق.';
+
+  @override
+  String get memoryCloudConflict =>
+      'النسخة السحابية تختلف عن آخر نسخة رأيتها. لم يتغير شيء؛ استخدم «تحميل من السحابة» لمراجعتها.';
+
+  @override
+  String get memoryCloudUncertain =>
+      'تعذّر تأكيد النتيجة؛ ربما نُفّذت العملية. حمّل من جديد للتحقق قبل التكرار.';
+
+  @override
+  String get memoryCloudCancelled => 'أُلغيت العملية. لم يتغير شيء.';
+
+  @override
+  String get memoryCloudDenied => 'لم تمنح Google الإذن. لم يتغير شيء.';
+
+  @override
+  String get memoryCloudFailed =>
+      'تعذّر إكمال العملية السحابية. لم تتغير ذكرياتك المحلية.';
+
+  @override
+  String get memoryPreviewTitle => 'معاينة النسخة';
+
+  @override
+  String memoryPreviewFrom(Object account, Object date) {
+    return 'الحساب $account، نسخة بتاريخ $date';
+  }
+
+  @override
+  String memoryPreviewAdd(int count) {
+    return 'ستُضاف: $count';
+  }
+
+  @override
+  String memoryPreviewSkip(int count) {
+    return 'تُتجاهل (موجودة مسبقًا): $count';
+  }
+
+  @override
+  String memoryPreviewConflict(int count) {
+    return 'متعارضة (لا تُطبّق): $count';
+  }
+
+  @override
+  String get memoryPreviewConflictHelp =>
+      'لا تُحلّ التعارضات تلقائيًا: تبقى ذكرياتك المحلية كما هي.';
+
+  @override
+  String get memoryPreviewNothing => 'لا يوجد ما يُضاف.';
+
+  @override
+  String get memoryPreviewApply => 'إضافة الذكريات';
+
+  @override
+  String get agreementTitle => 'اتفاقيات الدعم';
+
+  @override
+  String get agreementNew => 'اتفاقية جديدة';
+
+  @override
+  String get agreementEmpty =>
+      'ليس لديك اتفاقيات بعد. أنشئ واحدة بزر اتفاقية جديدة؛ لا يُسجَّل إلا ما تدوّنه أنت.';
+
+  @override
+  String get agreementLoadError => 'تعذّر تحميل الاتفاقيات.';
+
+  @override
+  String get agreementSaveError => 'تعذّر حفظ التغيير. الاتفاقية كما كانت.';
+
+  @override
+  String get agreementStatusActive => 'نشطة';
+
+  @override
+  String get agreementStatusPaused => 'متوقفة مؤقتًا';
+
+  @override
+  String get agreementStatusCompleted => 'منتهية';
+
+  @override
+  String get agreementObjectiveLabel => 'الهدف';
+
+  @override
+  String get agreementUnitLabel => 'الوحدة (اختياري)';
+
+  @override
+  String get agreementMeasureLabel => 'القياس';
+
+  @override
+  String get agreementMeasureOptionalLabel => 'القياس (اختياري)';
+
+  @override
+  String get agreementConsent =>
+      'أوافق على إنشاء هذه الاتفاقية. لن يُسجَّل إلا ما أدوّنه.';
+
+  @override
+  String get agreementErrorObjective => 'اكتب هدفًا (حتى 2000 حرف).';
+
+  @override
+  String get agreementErrorMeasure =>
+      'يجب أن يكون القياس رقمًا محدودًا يساوي 0 أو أكبر.';
+
+  @override
+  String get agreementErrorConsent => 'ضع علامة في المربع لإنشاء الاتفاقية.';
+
+  @override
+  String get agreementCancel => 'إلغاء';
+
+  @override
+  String get agreementCreate => 'إنشاء';
+
+  @override
+  String get agreementSave => 'حفظ';
+
+  @override
+  String get agreementModify => 'تعديل';
+
+  @override
+  String get agreementPause => 'إيقاف مؤقت';
+
+  @override
+  String get agreementResume => 'استئناف';
+
+  @override
+  String get agreementComplete => 'إنهاء';
+
+  @override
+  String get agreementCompleteTitle => 'إنهاء الاتفاقية؟';
+
+  @override
+  String get agreementCompleteBody =>
+      'لا يمكن تعديل الاتفاقية المنتهية ولا إضافة تقدم إليها. يبقى السجل محفوظًا.';
+
+  @override
+  String get agreementRecordProgress => 'تسجيل تقدم';
+
+  @override
+  String get agreementRecord => 'تسجيل';
+
+  @override
+  String get agreementAmountLabel => 'الكمية (اختياري)';
+
+  @override
+  String get agreementNoteLabel => 'ملاحظة (اختياري)';
+
+  @override
+  String get agreementReminderLabel => 'تنبيه';
+
+  @override
+  String get agreementEventsTitle => 'التقدم المسجّل';
+
+  @override
+  String get agreementNoEvents => 'لا يوجد تقدم مسجّل بعد.';
+
+  @override
+  String get agreementChangesTitle => 'سجل التغييرات';
+
+  @override
+  String get agreementNoChanges => 'لا تغييرات منذ الإنشاء.';
+
+  @override
+  String agreementRevisionLabel(int n) {
+    return 'المراجعة $n';
+  }
 }

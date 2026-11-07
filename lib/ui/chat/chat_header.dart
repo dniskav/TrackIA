@@ -120,6 +120,13 @@ extension _ChatHeader on _AssistantChatScreenState {
           Icons.tune,
           appText(context).modeAndNotices,
         ),
+      if (messageRevisions != null)
+        menuItem(
+          'menu-agreements',
+          'agreements',
+          Icons.handshake_outlined,
+          appText(context).agreementTitle,
+        ),
       menuItem(
         'menu-sheet-sync',
         'sheet-sync',
@@ -165,6 +172,21 @@ extension _ChatHeader on _AssistantChatScreenState {
     ],
   );
 
+  /// Acuerdos de apoyo de este acompañante, sobre la base SQLite del chat.
+  void openAgreements() {
+    final revisions = messageRevisions;
+    if (revisions == null) return;
+    final repository = SupportAgreementRepository(
+      revisions.database,
+      FeatureScope(profileId: profileId, companionId: companionId),
+    );
+    Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => SupportAgreementScreen(repository: repository),
+      ),
+    );
+  }
+
   void onMenu(String value) {
     switch (value) {
       case 'training':
@@ -173,6 +195,8 @@ extension _ChatHeader on _AssistantChatScreenState {
         widget.onCompanionSettings?.call();
       case 'progress':
         widget.onProgress?.call();
+      case 'agreements':
+        openAgreements();
       case 'sheet-sync':
         unawaited(openSheetSync());
       case 'archive':

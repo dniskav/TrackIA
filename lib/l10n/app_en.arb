@@ -1687,5 +1687,266 @@
   "proposalLabelUnitSeconds": "s",
   "creatorStaticGreeting": "Tell me what you want to keep up with and I'll help you create your companion.",
   "creatorStaticDayLetters": "M,T,W,T,F,S,S",
-  "proposalGameSuggestion": "You've kept up for several days in a row. Do you want to turn on Game mode to see goals, streaks and achievements?"
+  "proposalGameSuggestion": "You've kept up for several days in a row. Do you want to turn on Game mode to see goals, streaks and achievements?",
+  "reminderPhraseWindowStartCheer1": "{nombre} is waiting for you: today's goal is {meta}.",
+  "@reminderPhraseWindowStartCheer1": {
+    "placeholders": {
+      "nombre": {},
+      "meta": {}
+    }
+  },
+  "reminderPhraseWindowStartCheer2": "{nombre} is waiting for you today.",
+  "@reminderPhraseWindowStartCheer2": {
+    "placeholders": {
+      "nombre": {}
+    }
+  },
+  "reminderPhraseWindowStartNeutral1": "It's a good time for your activity. Today's goal: {meta}.",
+  "@reminderPhraseWindowStartNeutral1": {
+    "placeholders": {
+      "meta": {}
+    }
+  },
+  "reminderPhraseWindowStartNeutral2": "It's a good time for your activity.",
+  "reminderPhraseLastCallCheer1": "Last call: with {minimo} you keep your {racha}-day streak.",
+  "@reminderPhraseLastCallCheer1": {
+    "placeholders": {
+      "minimo": {},
+      "racha": {}
+    }
+  },
+  "reminderPhraseLastCallCheer2": "Don't lose your streak: {faltan} to go this week.",
+  "@reminderPhraseLastCallCheer2": {
+    "placeholders": {
+      "faltan": {}
+    }
+  },
+  "reminderPhraseLastCallCheer3": "Last call for today.",
+  "reminderPhraseLastCallNeutral1": "You still have time today. {minimo} is enough.",
+  "@reminderPhraseLastCallNeutral1": {
+    "placeholders": {
+      "minimo": {}
+    }
+  },
+  "reminderPhraseLastCallNeutral2": "{faltan} to go this week.",
+  "@reminderPhraseLastCallNeutral2": {
+    "placeholders": {
+      "faltan": {}
+    }
+  },
+  "reminderPhraseLastCallNeutral3": "You still have time today.",
+  "reminderPhraseInactiveGymbroCheer": "Buddy, we've gone {dias} days without training. Let's move a little.",
+  "@reminderPhraseInactiveGymbroCheer": {
+    "placeholders": {
+      "dias": {}
+    }
+  },
+  "reminderPhraseInactiveCheer1": "We haven't seen each other in {dias} days. Something short today?",
+  "@reminderPhraseInactiveCheer1": {
+    "placeholders": {
+      "dias": {}
+    }
+  },
+  "reminderPhraseInactiveCheer2": "Something short today?",
+  "reminderPhraseInactiveNeutral1": "You haven't logged anything for {dias} days.",
+  "@reminderPhraseInactiveNeutral1": {
+    "placeholders": {
+      "dias": {}
+    }
+  },
+  "reminderPhraseInactiveNeutral2": "You haven't logged anything in a few days.",
+  "reminderPhraseMinimumSessionOne": "1 session",
+  "reminderPhraseMinimumSessions": "{n} sessions",
+  "@reminderPhraseMinimumSessions": {
+    "placeholders": {
+      "n": {}
+    }
+  },
+  "reminderPhraseMinimumMinutes": "{n} min",
+  "@reminderPhraseMinimumMinutes": {
+    "placeholders": {
+      "n": {}
+    }
+  },
+  "reminderPhraseMinimumField": "{n} {campo}",
+  "@reminderPhraseMinimumField": {
+    "placeholders": {
+      "n": {},
+      "campo": {}
+    }
+  },
+  "memoryTitle": "{name}'s memory",
+  "@memoryTitle": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "memoryIntro": "What this companion remembers about you. You can review, edit or delete it at any time. It is treated as information about you, never as instructions.",
+  "memoryOpen": "Companion memory",
+  "memoryOpenHelp": "View, edit and delete what it remembers, and the cloud copy.",
+  "memoryEmpty": "No memories saved yet.",
+  "memoryLoadError": "Could not load the memories.",
+  "memoryActionError": "The action could not be completed. Your memories have not changed.",
+  "memoryStatusActive": "Active",
+  "memoryStatusPending": "Waiting for confirmation",
+  "memorySourceExplicit": "You asked for it",
+  "memorySourceInferred": "Suggested by the AI",
+  "memorySourceEdited": "Edited by you",
+  "memoryConfirm": "Confirm",
+  "memoryConfirmed": "Memory confirmed.",
+  "memoryEdit": "Edit",
+  "memoryEditTitle": "Edit memory",
+  "memoryEditLabel": "Memory",
+  "memoryEditEmpty": "The memory cannot be empty.",
+  "memoryEditTooLong": "The memory cannot exceed 2000 characters.",
+  "memoryEdited": "Memory saved.",
+  "memoryDeleteLocalAction": "Delete from this phone",
+  "memoryDeleteLocalTitle": "Delete this memory from this phone?",
+  "memoryDeleteLocalBody": "It will be deleted from this phone only and the companion will stop using it. It does not delete any copy you have in the cloud; use \"Delete from the cloud\" for that.",
+  "memoryDeletedLocal": "Memory deleted from this phone. The cloud copy was not touched.",
+  "memoryCloudTitle": "Cloud copy",
+  "memoryCloudHelp": "Optional and only when you ask. Active memories of this companion are saved, without chats or keys. It is not end-to-end encrypted.",
+  "memoryCloudUnavailable": "Google Drive is not connected yet in this version",
+  "memoryCloudNoAccount": "Connect a Google account to use the cloud copy.",
+  "memoryCloudAccount": "Account: {account}",
+  "@memoryCloudAccount": {
+    "placeholders": {
+      "account": {}
+    }
+  },
+  "memoryCloudLastCopy": "Last copy seen: {date} (revision {revision})",
+  "@memoryCloudLastCopy": {
+    "placeholders": {
+      "date": {},
+      "revision": {
+        "type": "int"
+      }
+    }
+  },
+  "memoryCloudSave": "Save to the cloud",
+  "memoryCloudLoad": "Load from the cloud",
+  "memoryCloudDelete": "Delete from the cloud",
+  "memoryCloudSaveTitle": "Save to the cloud?",
+  "memoryCloudSaveBody": "The active memories of this companion will be uploaded to the account {account}. Memories to upload: {count}. Those waiting for confirmation are not uploaded. If the cloud copy changed, it is not overwritten.",
+  "@memoryCloudSaveBody": {
+    "placeholders": {
+      "account": {},
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "memoryCloudSaved": "Copy saved to the account {account}.",
+  "@memoryCloudSaved": {
+    "placeholders": {
+      "account": {}
+    }
+  },
+  "memoryCloudLoaded": "Copy loaded. Memories added: {count}.",
+  "@memoryCloudLoaded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "memoryCloudLoadCancelled": "Load cancelled. Nothing was changed.",
+  "memoryCloudDeleteTitle": "Delete the cloud copy?",
+  "memoryCloudDeleteBody": "The copy of this companion in the account {account} (saved on {date}) will be deleted. It does not delete the memories on this phone. This cannot be undone.",
+  "@memoryCloudDeleteBody": {
+    "placeholders": {
+      "account": {},
+      "date": {}
+    }
+  },
+  "memoryCloudDeleted": "Copy deleted from the account {account}. The memories on this phone were not touched.",
+  "@memoryCloudDeleted": {
+    "placeholders": {
+      "account": {}
+    }
+  },
+  "memoryCloudDeleteCancelled": "Deletion cancelled. Nothing was changed.",
+  "memoryCloudNotFound": "There is no cloud copy for this companion.",
+  "memoryCloudConflict": "The cloud copy differs from the last one you saw. Nothing was changed; use \"Load from the cloud\" to review it.",
+  "memoryCloudUncertain": "The result could not be confirmed; the operation may have been applied. Load again to check before repeating.",
+  "memoryCloudCancelled": "Operation cancelled. Nothing was changed.",
+  "memoryCloudDenied": "Google did not grant permission. Nothing was changed.",
+  "memoryCloudFailed": "The cloud operation could not be completed. Your local memories were not changed.",
+  "memoryPreviewTitle": "Copy preview",
+  "memoryPreviewFrom": "Account {account}, copy from {date}",
+  "@memoryPreviewFrom": {
+    "placeholders": {
+      "account": {},
+      "date": {}
+    }
+  },
+  "memoryPreviewAdd": "Would be added: {count}",
+  "@memoryPreviewAdd": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "memoryPreviewSkip": "Skipped (already exist): {count}",
+  "@memoryPreviewSkip": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "memoryPreviewConflict": "In conflict (not applied): {count}",
+  "@memoryPreviewConflict": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "memoryPreviewConflictHelp": "Conflicts are never resolved automatically: your local memories stay as they are.",
+  "memoryPreviewNothing": "There is nothing to add.",
+  "memoryPreviewApply": "Add memories",
+  "agreementTitle": "Support agreements",
+  "agreementNew": "New agreement",
+  "agreementEmpty": "You have no agreements yet. Create one with the New agreement button; only what you record is tracked.",
+  "agreementLoadError": "Couldn't load the agreements.",
+  "agreementSaveError": "Couldn't save the change. The agreement is unchanged.",
+  "agreementStatusActive": "Active",
+  "agreementStatusPaused": "Paused",
+  "agreementStatusCompleted": "Completed",
+  "agreementObjectiveLabel": "Goal",
+  "agreementUnitLabel": "Unit (optional)",
+  "agreementMeasureLabel": "Measure",
+  "agreementMeasureOptionalLabel": "Measure (optional)",
+  "agreementConsent": "I agree to create this agreement. Only what I record will be tracked.",
+  "agreementErrorObjective": "Enter a goal (up to 2000 characters).",
+  "agreementErrorMeasure": "The measure must be a finite number, 0 or greater.",
+  "agreementErrorConsent": "Tick the box to create the agreement.",
+  "agreementCancel": "Cancel",
+  "agreementCreate": "Create",
+  "agreementSave": "Save",
+  "agreementModify": "Edit",
+  "agreementPause": "Pause",
+  "agreementResume": "Resume",
+  "agreementComplete": "Complete",
+  "agreementCompleteTitle": "Complete the agreement?",
+  "agreementCompleteBody": "A completed agreement can no longer be edited or receive progress. The history is kept.",
+  "agreementRecordProgress": "Record progress",
+  "agreementRecord": "Record",
+  "agreementAmountLabel": "Amount (optional)",
+  "agreementNoteLabel": "Note (optional)",
+  "agreementReminderLabel": "Notice",
+  "agreementEventsTitle": "Recorded progress",
+  "agreementNoEvents": "No progress recorded yet.",
+  "agreementChangesTitle": "Change history",
+  "agreementNoChanges": "No changes since creation.",
+  "agreementRevisionLabel": "Revision {n}",
+  "@agreementRevisionLabel": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  }
 }

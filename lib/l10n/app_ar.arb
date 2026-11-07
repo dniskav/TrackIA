@@ -1687,5 +1687,266 @@
   "proposalLabelUnitSeconds": "ث",
   "creatorStaticGreeting": "أخبرني بما تريد أن تواظب عليه وسأساعدك في إنشاء مرافقك.",
   "creatorStaticDayLetters": "ن,ث,ر,خ,ج,س,ح",
-  "proposalGameSuggestion": "لقد واظبت عدة أيام متتالية. هل تريد تفعيل وضع اللعب لرؤية الأهداف والسلاسل والإنجازات؟"
+  "proposalGameSuggestion": "لقد واظبت عدة أيام متتالية. هل تريد تفعيل وضع اللعب لرؤية الأهداف والسلاسل والإنجازات؟",
+  "reminderPhraseWindowStartCheer1": "{nombre} ينتظرك: هدف اليوم {meta}.",
+  "@reminderPhraseWindowStartCheer1": {
+    "placeholders": {
+      "nombre": {},
+      "meta": {}
+    }
+  },
+  "reminderPhraseWindowStartCheer2": "{nombre} ينتظرك اليوم.",
+  "@reminderPhraseWindowStartCheer2": {
+    "placeholders": {
+      "nombre": {}
+    }
+  },
+  "reminderPhraseWindowStartNeutral1": "هذا وقت مناسب لنشاطك. هدف اليوم: {meta}.",
+  "@reminderPhraseWindowStartNeutral1": {
+    "placeholders": {
+      "meta": {}
+    }
+  },
+  "reminderPhraseWindowStartNeutral2": "هذا وقت مناسب لنشاطك.",
+  "reminderPhraseLastCallCheer1": "آخر فرصة: بـ{minimo} تحافظ على سلسلة {racha} يومًا.",
+  "@reminderPhraseLastCallCheer1": {
+    "placeholders": {
+      "minimo": {},
+      "racha": {}
+    }
+  },
+  "reminderPhraseLastCallCheer2": "لا تفقد سلسلتك: يتبقى {faltan} هذا الأسبوع.",
+  "@reminderPhraseLastCallCheer2": {
+    "placeholders": {
+      "faltan": {}
+    }
+  },
+  "reminderPhraseLastCallCheer3": "آخر فرصة لليوم.",
+  "reminderPhraseLastCallNeutral1": "ما زال أمامك وقت اليوم. يكفي {minimo}.",
+  "@reminderPhraseLastCallNeutral1": {
+    "placeholders": {
+      "minimo": {}
+    }
+  },
+  "reminderPhraseLastCallNeutral2": "يتبقى {faltan} هذا الأسبوع.",
+  "@reminderPhraseLastCallNeutral2": {
+    "placeholders": {
+      "faltan": {}
+    }
+  },
+  "reminderPhraseLastCallNeutral3": "ما زال أمامك وقت اليوم.",
+  "reminderPhraseInactiveGymbroCheer": "يا صديقي، مرّت {dias} أيام دون تدريب. هيا نتحرك قليلًا.",
+  "@reminderPhraseInactiveGymbroCheer": {
+    "placeholders": {
+      "dias": {}
+    }
+  },
+  "reminderPhraseInactiveCheer1": "لم نلتقِ منذ {dias} أيام. شيء قصير اليوم؟",
+  "@reminderPhraseInactiveCheer1": {
+    "placeholders": {
+      "dias": {}
+    }
+  },
+  "reminderPhraseInactiveCheer2": "شيء قصير اليوم؟",
+  "reminderPhraseInactiveNeutral1": "لم تسجّل شيئًا منذ {dias} أيام.",
+  "@reminderPhraseInactiveNeutral1": {
+    "placeholders": {
+      "dias": {}
+    }
+  },
+  "reminderPhraseInactiveNeutral2": "لم تسجّل منذ بضعة أيام.",
+  "reminderPhraseMinimumSessionOne": "جلسة واحدة",
+  "reminderPhraseMinimumSessions": "{n} جلسات",
+  "@reminderPhraseMinimumSessions": {
+    "placeholders": {
+      "n": {}
+    }
+  },
+  "reminderPhraseMinimumMinutes": "{n} دقيقة",
+  "@reminderPhraseMinimumMinutes": {
+    "placeholders": {
+      "n": {}
+    }
+  },
+  "reminderPhraseMinimumField": "{n} {campo}",
+  "@reminderPhraseMinimumField": {
+    "placeholders": {
+      "n": {},
+      "campo": {}
+    }
+  },
+  "memoryTitle": "ذاكرة {name}",
+  "@memoryTitle": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "memoryIntro": "ما يتذكره هذا المرافق عنك. يمكنك مراجعته أو تعديله أو حذفه في أي وقت. يُعامَل كمعلومات عنك وليس كتعليمات.",
+  "memoryOpen": "ذاكرة المرافق",
+  "memoryOpenHelp": "عرض ما يتذكره وتعديله وحذفه، والنسخة السحابية.",
+  "memoryEmpty": "لا توجد ذكريات محفوظة بعد.",
+  "memoryLoadError": "تعذّر تحميل الذكريات.",
+  "memoryActionError": "تعذّر إكمال الإجراء. لم تتغير ذكرياتك.",
+  "memoryStatusActive": "نشط",
+  "memoryStatusPending": "بانتظار التأكيد",
+  "memorySourceExplicit": "طلبتَه أنت",
+  "memorySourceInferred": "اقتراح من الذكاء الاصطناعي",
+  "memorySourceEdited": "عدّلتَه أنت",
+  "memoryConfirm": "تأكيد",
+  "memoryConfirmed": "تم تأكيد الذكرى.",
+  "memoryEdit": "تعديل",
+  "memoryEditTitle": "تعديل الذكرى",
+  "memoryEditLabel": "الذكرى",
+  "memoryEditEmpty": "لا يمكن أن تكون الذكرى فارغة.",
+  "memoryEditTooLong": "لا يمكن أن تتجاوز الذكرى 2000 حرف.",
+  "memoryEdited": "تم حفظ الذكرى.",
+  "memoryDeleteLocalAction": "حذف من هذا الهاتف",
+  "memoryDeleteLocalTitle": "هل تريد حذف هذه الذكرى من هذا الهاتف؟",
+  "memoryDeleteLocalBody": "سيُحذف من هذا الهاتف فقط وسيتوقف المرافق عن استخدامه. لا يحذف النسخة الموجودة في السحابة؛ استخدم «حذف من السحابة» لذلك.",
+  "memoryDeletedLocal": "تم حذف الذكرى من هذا الهاتف. لم تُمَسّ النسخة السحابية.",
+  "memoryCloudTitle": "النسخة السحابية",
+  "memoryCloudHelp": "اختيارية وبطلب منك فقط. تُحفظ الذكريات النشطة لهذا المرافق دون محادثات أو مفاتيح. وهي غير مشفّرة من طرف إلى طرف.",
+  "memoryCloudUnavailable": "لم يتم ربط Google Drive بعد في هذا الإصدار",
+  "memoryCloudNoAccount": "اربط حساب Google لاستخدام النسخة السحابية.",
+  "memoryCloudAccount": "الحساب: {account}",
+  "@memoryCloudAccount": {
+    "placeholders": {
+      "account": {}
+    }
+  },
+  "memoryCloudLastCopy": "آخر نسخة شوهدت: {date} (المراجعة {revision})",
+  "@memoryCloudLastCopy": {
+    "placeholders": {
+      "date": {},
+      "revision": {
+        "type": "int"
+      }
+    }
+  },
+  "memoryCloudSave": "حفظ في السحابة",
+  "memoryCloudLoad": "تحميل من السحابة",
+  "memoryCloudDelete": "حذف من السحابة",
+  "memoryCloudSaveTitle": "هل تريد الحفظ في السحابة؟",
+  "memoryCloudSaveBody": "ستُرفع الذكريات النشطة لهذا المرافق إلى الحساب {account}. الذكريات المراد رفعها: {count}. لا تُرفع الذكريات بانتظار التأكيد. إذا تغيّرت النسخة السحابية فلن تُستبدل.",
+  "@memoryCloudSaveBody": {
+    "placeholders": {
+      "account": {},
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "memoryCloudSaved": "تم حفظ النسخة في الحساب {account}.",
+  "@memoryCloudSaved": {
+    "placeholders": {
+      "account": {}
+    }
+  },
+  "memoryCloudLoaded": "تم تحميل النسخة. الذكريات المضافة: {count}.",
+  "@memoryCloudLoaded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "memoryCloudLoadCancelled": "أُلغي التحميل. لم يتغير شيء.",
+  "memoryCloudDeleteTitle": "هل تريد حذف النسخة السحابية؟",
+  "memoryCloudDeleteBody": "ستُحذف نسخة هذا المرافق من الحساب {account} (المحفوظة في {date}). لا يحذف الذكريات الموجودة على هذا الهاتف. لا يمكن التراجع عن ذلك.",
+  "@memoryCloudDeleteBody": {
+    "placeholders": {
+      "account": {},
+      "date": {}
+    }
+  },
+  "memoryCloudDeleted": "تم حذف النسخة من الحساب {account}. لم تُمَسّ الذكريات على هذا الهاتف.",
+  "@memoryCloudDeleted": {
+    "placeholders": {
+      "account": {}
+    }
+  },
+  "memoryCloudDeleteCancelled": "أُلغي الحذف. لم يتغير شيء.",
+  "memoryCloudNotFound": "لا توجد نسخة سحابية لهذا المرافق.",
+  "memoryCloudConflict": "النسخة السحابية تختلف عن آخر نسخة رأيتها. لم يتغير شيء؛ استخدم «تحميل من السحابة» لمراجعتها.",
+  "memoryCloudUncertain": "تعذّر تأكيد النتيجة؛ ربما نُفّذت العملية. حمّل من جديد للتحقق قبل التكرار.",
+  "memoryCloudCancelled": "أُلغيت العملية. لم يتغير شيء.",
+  "memoryCloudDenied": "لم تمنح Google الإذن. لم يتغير شيء.",
+  "memoryCloudFailed": "تعذّر إكمال العملية السحابية. لم تتغير ذكرياتك المحلية.",
+  "memoryPreviewTitle": "معاينة النسخة",
+  "memoryPreviewFrom": "الحساب {account}، نسخة بتاريخ {date}",
+  "@memoryPreviewFrom": {
+    "placeholders": {
+      "account": {},
+      "date": {}
+    }
+  },
+  "memoryPreviewAdd": "ستُضاف: {count}",
+  "@memoryPreviewAdd": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "memoryPreviewSkip": "تُتجاهل (موجودة مسبقًا): {count}",
+  "@memoryPreviewSkip": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "memoryPreviewConflict": "متعارضة (لا تُطبّق): {count}",
+  "@memoryPreviewConflict": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "memoryPreviewConflictHelp": "لا تُحلّ التعارضات تلقائيًا: تبقى ذكرياتك المحلية كما هي.",
+  "memoryPreviewNothing": "لا يوجد ما يُضاف.",
+  "memoryPreviewApply": "إضافة الذكريات",
+  "agreementTitle": "اتفاقيات الدعم",
+  "agreementNew": "اتفاقية جديدة",
+  "agreementEmpty": "ليس لديك اتفاقيات بعد. أنشئ واحدة بزر اتفاقية جديدة؛ لا يُسجَّل إلا ما تدوّنه أنت.",
+  "agreementLoadError": "تعذّر تحميل الاتفاقيات.",
+  "agreementSaveError": "تعذّر حفظ التغيير. الاتفاقية كما كانت.",
+  "agreementStatusActive": "نشطة",
+  "agreementStatusPaused": "متوقفة مؤقتًا",
+  "agreementStatusCompleted": "منتهية",
+  "agreementObjectiveLabel": "الهدف",
+  "agreementUnitLabel": "الوحدة (اختياري)",
+  "agreementMeasureLabel": "القياس",
+  "agreementMeasureOptionalLabel": "القياس (اختياري)",
+  "agreementConsent": "أوافق على إنشاء هذه الاتفاقية. لن يُسجَّل إلا ما أدوّنه.",
+  "agreementErrorObjective": "اكتب هدفًا (حتى 2000 حرف).",
+  "agreementErrorMeasure": "يجب أن يكون القياس رقمًا محدودًا يساوي 0 أو أكبر.",
+  "agreementErrorConsent": "ضع علامة في المربع لإنشاء الاتفاقية.",
+  "agreementCancel": "إلغاء",
+  "agreementCreate": "إنشاء",
+  "agreementSave": "حفظ",
+  "agreementModify": "تعديل",
+  "agreementPause": "إيقاف مؤقت",
+  "agreementResume": "استئناف",
+  "agreementComplete": "إنهاء",
+  "agreementCompleteTitle": "إنهاء الاتفاقية؟",
+  "agreementCompleteBody": "لا يمكن تعديل الاتفاقية المنتهية ولا إضافة تقدم إليها. يبقى السجل محفوظًا.",
+  "agreementRecordProgress": "تسجيل تقدم",
+  "agreementRecord": "تسجيل",
+  "agreementAmountLabel": "الكمية (اختياري)",
+  "agreementNoteLabel": "ملاحظة (اختياري)",
+  "agreementReminderLabel": "تنبيه",
+  "agreementEventsTitle": "التقدم المسجّل",
+  "agreementNoEvents": "لا يوجد تقدم مسجّل بعد.",
+  "agreementChangesTitle": "سجل التغييرات",
+  "agreementNoChanges": "لا تغييرات منذ الإنشاء.",
+  "agreementRevisionLabel": "المراجعة {n}",
+  "@agreementRevisionLabel": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  }
 }

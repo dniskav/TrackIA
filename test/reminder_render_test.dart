@@ -18,6 +18,7 @@ void main() {
     int weekCount = 0,
     int? weekTarget,
     ReminderTemplates? custom,
+    ReminderPhrases phrases = ReminderPhrases.spanish,
   }) => ReminderEntry(
     id: 'r1',
     companionId: companionId,
@@ -40,12 +41,55 @@ void main() {
       tone: tone,
       companionId: companionId,
       custom: custom,
+      phrases: phrases,
     ),
   );
 
   String start(ReminderEntry e) =>
       renderReminder(e, ReminderKind.windowStart, now);
   String last(ReminderEntry e) => renderReminder(e, ReminderKind.lastCall, now);
+
+  group('default phrases follow the language they are given', () {
+    // Respaldo de prueba en otro idioma; el texto real sale de las claves l10n.
+    const en = ReminderPhrases(
+      windowStartCheer: ['{nombre} is waiting for you today.'],
+      windowStartNeutral: ['It is a good time for your activity.'],
+      lastCallCheer: ['Last call for today.'],
+      lastCallNeutral: ['You still have time today.'],
+      inactiveGymbroCheer: 'Buddy, {dias} days without training.',
+      inactiveCheer: ['Something short today?'],
+      inactiveNeutral: ['You have not logged anything for {dias} days.'],
+      minimumSessionOne: '1 session',
+      minimumSessions: '{n} sessions',
+      minimumMinutes: '{n} min',
+      minimumField: '{n} {campo}',
+    );
+
+    test('neutral and cheer defaults come from the given phrases', () {
+      expect(start(entry(phrases: en)), 'It is a good time for your activity.');
+      expect(last(entry(phrases: en)), 'You still have time today.');
+      expect(
+        start(entry(tone: 'cheer', name: 'Ana', phrases: en)),
+        'Ana is waiting for you today.',
+      );
+    });
+
+    test('inactivity uses the given phrases and keeps the day count', () {
+      final stale = entry(lastActivityDate: '2026-10-20', phrases: en);
+      expect(start(stale), 'You have not logged anything for 9 days.');
+    });
+
+    test('spanish is the fallback when no phrases are given', () {
+      final fallback = ReminderTemplates.defaults(
+        tone: 'neutral',
+        companionId: 'x',
+      );
+      expect(
+        fallback.lastCall.first,
+        'Aún estás a tiempo hoy. Con {minimo} basta.',
+      );
+    });
+  });
 
   group('start of the window', () {
     test('neutral uses the goal when there is one, else the plain text', () {

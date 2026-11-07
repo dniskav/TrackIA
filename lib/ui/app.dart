@@ -84,6 +84,12 @@ class _TrackiaRootState extends State<GymRoot> {
           companions: () =>
               CompanionStore(profileId: widget.controller.profileId).load(),
           doneDays: progressService!.doneDays,
+          // Las frases por defecto siguen el idioma activo de la app.
+          phrases: () => reminderPhrasesFor(
+            lookupAppLocalizations(
+              Locale(LocaleSettings.instance.assistantLanguage),
+            ),
+          ),
         );
 
   /// A tapped reminder opens that companion's chat; one of another profile
@@ -105,6 +111,10 @@ class _TrackiaRootState extends State<GymRoot> {
     if (companion != null) openCompanion(companion);
   }
 
+  /// Las frases de los recordatorios van en el snapshot que ya tiene Android:
+  /// al cambiar de idioma hay que reenviarlo.
+  void _languageChanged() => unawaited(reminders?.sync());
+
   void openCompanionSettings(Companion companion) {
     final progress = widget.controller.progress;
     if (progress == null) return;
@@ -116,6 +126,9 @@ class _TrackiaRootState extends State<GymRoot> {
           companion: companion,
           scheduler: reminders,
           aiStore: AiSettingsStore(profileId: widget.controller.profileId),
+          // Sin adaptador de Google Drive (T030) las acciones de nube salen
+          // deshabilitadas; la memoria local ya se puede consultar y editar.
+          memory: widget.controller.companionMemory,
         ),
       ),
     );
@@ -125,6 +138,7 @@ class _TrackiaRootState extends State<GymRoot> {
   void initState() {
     super.initState();
     widget.controller.addListener(_maybeWelcome);
+    LocaleSettings.instance.addListener(_languageChanged);
     reminders?.attach(widget.controller);
     // Attachments no chat refers to any more (a deleted companion) go away.
     unawaited(widget.controller.chats?.gcMedia());
@@ -217,6 +231,7 @@ class _TrackiaRootState extends State<GymRoot> {
   @override
   void dispose() {
     widget.controller.removeListener(_maybeWelcome);
+    LocaleSettings.instance.removeListener(_languageChanged);
     reminders?.dispose();
     _importChannel.setMethodCallHandler(null);
     ReminderScheduler.channel.setMethodCallHandler(null);

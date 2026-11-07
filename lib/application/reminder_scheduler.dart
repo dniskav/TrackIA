@@ -8,6 +8,42 @@ import 'package:flutter/services.dart';
 import '../data/progress_repository.dart';
 import '../domain/companion.dart';
 import '../domain/reminder.dart';
+import '../l10n/generated/app_localizations.dart';
+
+/// The default reminder phrases in the language of [l].
+ReminderPhrases reminderPhrasesFor(AppLocalizations l) => ReminderPhrases(
+  windowStartCheer: [
+    l.reminderPhraseWindowStartCheer1('{nombre}', '{meta}'),
+    l.reminderPhraseWindowStartCheer2('{nombre}'),
+  ],
+  windowStartNeutral: [
+    l.reminderPhraseWindowStartNeutral1('{meta}'),
+    l.reminderPhraseWindowStartNeutral2,
+  ],
+  lastCallCheer: [
+    l.reminderPhraseLastCallCheer1('{minimo}', '{racha}'),
+    l.reminderPhraseLastCallCheer2('{faltan}'),
+    l.reminderPhraseLastCallCheer3,
+  ],
+  lastCallNeutral: [
+    l.reminderPhraseLastCallNeutral1('{minimo}'),
+    l.reminderPhraseLastCallNeutral2('{faltan}'),
+    l.reminderPhraseLastCallNeutral3,
+  ],
+  inactiveGymbroCheer: l.reminderPhraseInactiveGymbroCheer('{dias}'),
+  inactiveCheer: [
+    l.reminderPhraseInactiveCheer1('{dias}'),
+    l.reminderPhraseInactiveCheer2,
+  ],
+  inactiveNeutral: [
+    l.reminderPhraseInactiveNeutral1('{dias}'),
+    l.reminderPhraseInactiveNeutral2,
+  ],
+  minimumSessionOne: l.reminderPhraseMinimumSessionOne,
+  minimumSessions: l.reminderPhraseMinimumSessions('{n}'),
+  minimumMinutes: l.reminderPhraseMinimumMinutes('{n}'),
+  minimumField: l.reminderPhraseMinimumField('{n}', '{campo}'),
+);
 
 /// Builds the reminders snapshot and hands it to Android, which schedules the
 /// notifications on its own (`contracts/reminders-android.md`). Flutter only
@@ -20,9 +56,13 @@ class ReminderScheduler {
     DateTime Function()? clock,
     bool? supported,
     this.doneDays,
+    ReminderPhrases Function()? phrases,
   }) : _invoke = invoke ?? _channelInvoke,
        _clock = clock ?? DateTime.now,
+       _phrases = phrases ?? _spanishPhrases,
        supported = supported ?? Platform.isAndroid;
+
+  static ReminderPhrases _spanishPhrases() => ReminderPhrases.spanish;
 
   static const channel = MethodChannel('com.gymia.app/reminders');
   static const pauseAfterMissedDays = 7;
@@ -42,6 +82,10 @@ class ReminderScheduler {
   final Future<Object?> Function(String method, Map<String, Object?> args)
   _invoke;
   final DateTime Function() _clock;
+
+  /// Default phrases for the snapshot, in the app's active language. Read on
+  /// every snapshot, so a language change applies at the next sync.
+  final ReminderPhrases Function() _phrases;
   final bool supported;
 
   Timer? _pending;
@@ -132,6 +176,7 @@ class ReminderScheduler {
     final now = _clock();
     final today = DateTime(now.year, now.month, now.day);
     final known = {for (final c in await companions()) c.id: c};
+    final phrases = _phrases();
     final entries = <Map<String, Object?>>[];
     for (var reminder in await progress.activeReminders()) {
       final companion = known[reminder.companionId];
@@ -140,7 +185,7 @@ class ReminderScheduler {
         reminder.companionId,
       );
       reminder = await _applyPause(reminder, done, today, now);
-      entries.add(_entry(reminder, companion, done, today).toJson());
+      entries.add(_entry(reminder, companion, done, today, phrases).toJson());
     }
     return {
       'version': 1,
@@ -191,6 +236,7 @@ class ReminderScheduler {
     Companion companion,
     Set<String> done,
     DateTime today,
+    ReminderPhrases phrases,
   ) {
     final todayKey = reminderDay(today);
     final past = done.where((d) => d.compareTo(todayKey) <= 0).toList()..sort();
@@ -227,7 +273,7 @@ class ReminderScheduler {
       lastDoneDate: last,
       lastActivityDate: last,
       streak: streak,
-      minimumText: minimumText(reminder.minimum),
+      minimumText: minimumText(reminder.minimum, phrases: phrases),
       weekId: isoWeekId(today),
       weekCount: weekCount,
       weekTarget: reminder.daysPerWeek,
@@ -235,13 +281,17 @@ class ReminderScheduler {
         tone: reminder.tone,
         companionId: reminder.companionId,
         custom: companion.reminderCopy,
+        phrases: phrases,
       ),
     );
   }
 
   /// «5 páginas»-style text for the reminder's minimum, if it has one. A
   /// field minimum may carry a `label` to show instead of the field key.
-  static String? minimumText(Map<String, Object?>? minimum) {
+  static String? minimumText(
+    Map<String, Object?>? minimum, {
+    ReminderPhrases phrases = ReminderPhrases.spanish,
+  }) {
     if (minimum == null) return null;
     final value = minimum['value'] as num;
     final n = value == value.roundToDouble()
@@ -249,9 +299,15 @@ class ReminderScheduler {
         : value.toString();
     final label = minimum['label'];
     return switch (minimum['metric']) {
-      'sessions' => value == 1 ? '1 sesión' : '$n sesiones',
-      'time' => '$n min',
-      final String field => '$n ${label is String ? label : field}',
+      'sessions' =>
+        value == 1
+            ? phrases.minimumSessionOne
+            : phrases.minimumSessions.replaceAll('{n}', n),
+      'time' => phrases.minimumMinutes.replaceAll('{n}', n),
+      final String field =>
+        phrases.minimumField
+            .replaceAll('{n}', n)
+            .replaceAll('{campo}', label is String ? label : field),
       _ => null,
     };
   }

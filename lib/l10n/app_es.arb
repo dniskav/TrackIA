@@ -1687,5 +1687,266 @@
   "proposalLabelUnitSeconds": "s",
   "creatorStaticGreeting": "Cuéntame qué quieres seguir y te ayudo a crear tu acompañante.",
   "creatorStaticDayLetters": "L,M,X,J,V,S,D",
-  "proposalGameSuggestion": "Llevas varios días seguidos cumpliendo. ¿Quieres activar el modo Juego para ver metas, rachas y logros?"
+  "proposalGameSuggestion": "Llevas varios días seguidos cumpliendo. ¿Quieres activar el modo Juego para ver metas, rachas y logros?",
+  "reminderPhraseWindowStartCheer1": "{nombre} te espera: hoy toca {meta}.",
+  "@reminderPhraseWindowStartCheer1": {
+    "placeholders": {
+      "nombre": {},
+      "meta": {}
+    }
+  },
+  "reminderPhraseWindowStartCheer2": "{nombre} te espera hoy.",
+  "@reminderPhraseWindowStartCheer2": {
+    "placeholders": {
+      "nombre": {}
+    }
+  },
+  "reminderPhraseWindowStartNeutral1": "Es buen momento para tu actividad. Meta de hoy: {meta}.",
+  "@reminderPhraseWindowStartNeutral1": {
+    "placeholders": {
+      "meta": {}
+    }
+  },
+  "reminderPhraseWindowStartNeutral2": "Es buen momento para tu actividad.",
+  "reminderPhraseLastCallCheer1": "Última llamada: con {minimo} mantienes tu racha de {racha} días.",
+  "@reminderPhraseLastCallCheer1": {
+    "placeholders": {
+      "minimo": {},
+      "racha": {}
+    }
+  },
+  "reminderPhraseLastCallCheer2": "No pierdas la racha: te faltan {faltan} esta semana.",
+  "@reminderPhraseLastCallCheer2": {
+    "placeholders": {
+      "faltan": {}
+    }
+  },
+  "reminderPhraseLastCallCheer3": "Última llamada para hoy.",
+  "reminderPhraseLastCallNeutral1": "Aún estás a tiempo hoy. Con {minimo} basta.",
+  "@reminderPhraseLastCallNeutral1": {
+    "placeholders": {
+      "minimo": {}
+    }
+  },
+  "reminderPhraseLastCallNeutral2": "Te faltan {faltan} esta semana.",
+  "@reminderPhraseLastCallNeutral2": {
+    "placeholders": {
+      "faltan": {}
+    }
+  },
+  "reminderPhraseLastCallNeutral3": "Aún estás a tiempo hoy.",
+  "reminderPhraseInactiveGymbroCheer": "Amigo, llevamos {dias} días sin entrenar. Vamos a movernos un poco.",
+  "@reminderPhraseInactiveGymbroCheer": {
+    "placeholders": {
+      "dias": {}
+    }
+  },
+  "reminderPhraseInactiveCheer1": "Llevamos {dias} días sin vernos. ¿Algo corto hoy?",
+  "@reminderPhraseInactiveCheer1": {
+    "placeholders": {
+      "dias": {}
+    }
+  },
+  "reminderPhraseInactiveCheer2": "¿Algo corto hoy?",
+  "reminderPhraseInactiveNeutral1": "Llevas {dias} días sin registrar.",
+  "@reminderPhraseInactiveNeutral1": {
+    "placeholders": {
+      "dias": {}
+    }
+  },
+  "reminderPhraseInactiveNeutral2": "Hace unos días que no registras.",
+  "reminderPhraseMinimumSessionOne": "1 sesión",
+  "reminderPhraseMinimumSessions": "{n} sesiones",
+  "@reminderPhraseMinimumSessions": {
+    "placeholders": {
+      "n": {}
+    }
+  },
+  "reminderPhraseMinimumMinutes": "{n} min",
+  "@reminderPhraseMinimumMinutes": {
+    "placeholders": {
+      "n": {}
+    }
+  },
+  "reminderPhraseMinimumField": "{n} {campo}",
+  "@reminderPhraseMinimumField": {
+    "placeholders": {
+      "n": {},
+      "campo": {}
+    }
+  },
+  "memoryTitle": "Memoria de {name}",
+  "@memoryTitle": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "memoryIntro": "Lo que este acompañante recuerda de ti. Puedes revisarlo, editarlo o borrarlo cuando quieras. Se trata como información tuya, nunca como instrucciones.",
+  "memoryOpen": "Memoria del acompañante",
+  "memoryOpenHelp": "Ver, editar y borrar lo que recuerda, y la copia en la nube.",
+  "memoryEmpty": "Aún no hay recuerdos guardados.",
+  "memoryLoadError": "No se pudieron cargar los recuerdos.",
+  "memoryActionError": "No se pudo completar la acción. Tus recuerdos no han cambiado.",
+  "memoryStatusActive": "Activo",
+  "memoryStatusPending": "Pendiente de confirmar",
+  "memorySourceExplicit": "Lo pediste tú",
+  "memorySourceInferred": "Sugerido por la IA",
+  "memorySourceEdited": "Editado por ti",
+  "memoryConfirm": "Confirmar",
+  "memoryConfirmed": "Recuerdo confirmado.",
+  "memoryEdit": "Editar",
+  "memoryEditTitle": "Editar recuerdo",
+  "memoryEditLabel": "Recuerdo",
+  "memoryEditEmpty": "El recuerdo no puede estar vacío.",
+  "memoryEditTooLong": "El recuerdo no puede superar 2000 caracteres.",
+  "memoryEdited": "Recuerdo guardado.",
+  "memoryDeleteLocalAction": "Borrar del móvil",
+  "memoryDeleteLocalTitle": "¿Borrar este recuerdo del móvil?",
+  "memoryDeleteLocalBody": "Se borrará solo de este móvil y el acompañante dejará de usarlo. No borra la copia que tengas en la nube; para eso usa «Borrar en la nube».",
+  "memoryDeletedLocal": "Recuerdo borrado de este móvil. La copia en la nube no se ha tocado.",
+  "memoryCloudTitle": "Copia en la nube",
+  "memoryCloudHelp": "Opcional y solo cuando tú lo pidas. Se guardan los recuerdos activos de este acompañante, sin chats ni claves. No está cifrada de extremo a extremo.",
+  "memoryCloudUnavailable": "Google Drive aún no está conectado en esta versión",
+  "memoryCloudNoAccount": "Conecta una cuenta de Google para usar la copia en la nube.",
+  "memoryCloudAccount": "Cuenta: {account}",
+  "@memoryCloudAccount": {
+    "placeholders": {
+      "account": {}
+    }
+  },
+  "memoryCloudLastCopy": "Última copia vista: {date} (revisión {revision})",
+  "@memoryCloudLastCopy": {
+    "placeholders": {
+      "date": {},
+      "revision": {
+        "type": "int"
+      }
+    }
+  },
+  "memoryCloudSave": "Guardar en la nube",
+  "memoryCloudLoad": "Cargar de la nube",
+  "memoryCloudDelete": "Borrar en la nube",
+  "memoryCloudSaveTitle": "¿Guardar en la nube?",
+  "memoryCloudSaveBody": "Se subirán a la cuenta {account} los recuerdos activos de este acompañante. Recuerdos a subir: {count}. Los pendientes de confirmar no se suben. Si la copia de la nube cambió, no se sobrescribe.",
+  "@memoryCloudSaveBody": {
+    "placeholders": {
+      "account": {},
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "memoryCloudSaved": "Copia guardada en la cuenta {account}.",
+  "@memoryCloudSaved": {
+    "placeholders": {
+      "account": {}
+    }
+  },
+  "memoryCloudLoaded": "Copia cargada. Recuerdos añadidos: {count}.",
+  "@memoryCloudLoaded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "memoryCloudLoadCancelled": "Carga cancelada. No se ha cambiado nada.",
+  "memoryCloudDeleteTitle": "¿Borrar la copia en la nube?",
+  "memoryCloudDeleteBody": "Se borrará de la cuenta {account} la copia de este acompañante (guardada el {date}). No borra los recuerdos de este móvil. No se puede deshacer.",
+  "@memoryCloudDeleteBody": {
+    "placeholders": {
+      "account": {},
+      "date": {}
+    }
+  },
+  "memoryCloudDeleted": "Copia borrada de la cuenta {account}. Los recuerdos de este móvil no se han tocado.",
+  "@memoryCloudDeleted": {
+    "placeholders": {
+      "account": {}
+    }
+  },
+  "memoryCloudDeleteCancelled": "Borrado cancelado. No se ha cambiado nada.",
+  "memoryCloudNotFound": "No hay copia en la nube para este acompañante.",
+  "memoryCloudConflict": "La copia de la nube es distinta de la última que viste. No se ha modificado nada; usa «Cargar de la nube» para revisarla.",
+  "memoryCloudUncertain": "No se pudo confirmar el resultado; puede que la operación sí se haya aplicado. Cárgala de nuevo para comprobarlo antes de repetir.",
+  "memoryCloudCancelled": "Operación cancelada. No se ha cambiado nada.",
+  "memoryCloudDenied": "Google no concedió el permiso. No se ha cambiado nada.",
+  "memoryCloudFailed": "No se pudo completar la operación con la nube. No se ha cambiado nada en tus recuerdos locales.",
+  "memoryPreviewTitle": "Vista previa de la copia",
+  "memoryPreviewFrom": "Cuenta {account}, copia del {date}",
+  "@memoryPreviewFrom": {
+    "placeholders": {
+      "account": {},
+      "date": {}
+    }
+  },
+  "memoryPreviewAdd": "Se añadirían: {count}",
+  "@memoryPreviewAdd": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "memoryPreviewSkip": "Se omiten (ya existen): {count}",
+  "@memoryPreviewSkip": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "memoryPreviewConflict": "En conflicto (no se aplican): {count}",
+  "@memoryPreviewConflict": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "memoryPreviewConflictHelp": "Los conflictos no se resuelven solos: tus recuerdos locales se conservan tal cual.",
+  "memoryPreviewNothing": "No hay nada que añadir.",
+  "memoryPreviewApply": "Añadir recuerdos",
+  "agreementTitle": "Acuerdos de apoyo",
+  "agreementNew": "Nuevo acuerdo",
+  "agreementEmpty": "Aún no tienes acuerdos. Crea uno con el botón Nuevo acuerdo; solo se anota lo que tú registres.",
+  "agreementLoadError": "No se pudieron cargar los acuerdos.",
+  "agreementSaveError": "No se pudo guardar el cambio. El acuerdo sigue como estaba.",
+  "agreementStatusActive": "Activos",
+  "agreementStatusPaused": "En pausa",
+  "agreementStatusCompleted": "Finalizados",
+  "agreementObjectiveLabel": "Objetivo",
+  "agreementUnitLabel": "Unidad (opcional)",
+  "agreementMeasureLabel": "Medida",
+  "agreementMeasureOptionalLabel": "Medida (opcional)",
+  "agreementConsent": "Acepto crear este acuerdo. Solo se anotará lo que yo registre.",
+  "agreementErrorObjective": "Escribe un objetivo (hasta 2000 caracteres).",
+  "agreementErrorMeasure": "La medida debe ser un número finito igual o mayor que 0.",
+  "agreementErrorConsent": "Marca la casilla para crear el acuerdo.",
+  "agreementCancel": "Cancelar",
+  "agreementCreate": "Crear",
+  "agreementSave": "Guardar",
+  "agreementModify": "Modificar",
+  "agreementPause": "Pausar",
+  "agreementResume": "Reanudar",
+  "agreementComplete": "Finalizar",
+  "agreementCompleteTitle": "¿Finalizar el acuerdo?",
+  "agreementCompleteBody": "Un acuerdo finalizado ya no se puede modificar ni admite más avances. El historial se conserva.",
+  "agreementRecordProgress": "Registrar avance",
+  "agreementRecord": "Registrar",
+  "agreementAmountLabel": "Cantidad (opcional)",
+  "agreementNoteLabel": "Nota (opcional)",
+  "agreementReminderLabel": "Aviso",
+  "agreementEventsTitle": "Avances anotados",
+  "agreementNoEvents": "Aún no hay avances anotados.",
+  "agreementChangesTitle": "Historial de cambios",
+  "agreementNoChanges": "Sin cambios desde la creación.",
+  "agreementRevisionLabel": "Revisión {n}",
+  "@agreementRevisionLabel": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  }
 }

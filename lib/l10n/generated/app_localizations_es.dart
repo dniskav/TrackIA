@@ -3367,4 +3367,412 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get proposalGameSuggestion =>
       'Llevas varios días seguidos cumpliendo. ¿Quieres activar el modo Juego para ver metas, rachas y logros?';
+
+  @override
+  String reminderPhraseWindowStartCheer1(Object nombre, Object meta) {
+    return '$nombre te espera: hoy toca $meta.';
+  }
+
+  @override
+  String reminderPhraseWindowStartCheer2(Object nombre) {
+    return '$nombre te espera hoy.';
+  }
+
+  @override
+  String reminderPhraseWindowStartNeutral1(Object meta) {
+    return 'Es buen momento para tu actividad. Meta de hoy: $meta.';
+  }
+
+  @override
+  String get reminderPhraseWindowStartNeutral2 =>
+      'Es buen momento para tu actividad.';
+
+  @override
+  String reminderPhraseLastCallCheer1(Object minimo, Object racha) {
+    return 'Última llamada: con $minimo mantienes tu racha de $racha días.';
+  }
+
+  @override
+  String reminderPhraseLastCallCheer2(Object faltan) {
+    return 'No pierdas la racha: te faltan $faltan esta semana.';
+  }
+
+  @override
+  String get reminderPhraseLastCallCheer3 => 'Última llamada para hoy.';
+
+  @override
+  String reminderPhraseLastCallNeutral1(Object minimo) {
+    return 'Aún estás a tiempo hoy. Con $minimo basta.';
+  }
+
+  @override
+  String reminderPhraseLastCallNeutral2(Object faltan) {
+    return 'Te faltan $faltan esta semana.';
+  }
+
+  @override
+  String get reminderPhraseLastCallNeutral3 => 'Aún estás a tiempo hoy.';
+
+  @override
+  String reminderPhraseInactiveGymbroCheer(Object dias) {
+    return 'Amigo, llevamos $dias días sin entrenar. Vamos a movernos un poco.';
+  }
+
+  @override
+  String reminderPhraseInactiveCheer1(Object dias) {
+    return 'Llevamos $dias días sin vernos. ¿Algo corto hoy?';
+  }
+
+  @override
+  String get reminderPhraseInactiveCheer2 => '¿Algo corto hoy?';
+
+  @override
+  String reminderPhraseInactiveNeutral1(Object dias) {
+    return 'Llevas $dias días sin registrar.';
+  }
+
+  @override
+  String get reminderPhraseInactiveNeutral2 =>
+      'Hace unos días que no registras.';
+
+  @override
+  String get reminderPhraseMinimumSessionOne => '1 sesión';
+
+  @override
+  String reminderPhraseMinimumSessions(Object n) {
+    return '$n sesiones';
+  }
+
+  @override
+  String reminderPhraseMinimumMinutes(Object n) {
+    return '$n min';
+  }
+
+  @override
+  String reminderPhraseMinimumField(Object n, Object campo) {
+    return '$n $campo';
+  }
+
+  @override
+  String memoryTitle(Object name) {
+    return 'Memoria de $name';
+  }
+
+  @override
+  String get memoryIntro =>
+      'Lo que este acompañante recuerda de ti. Puedes revisarlo, editarlo o borrarlo cuando quieras. Se trata como información tuya, nunca como instrucciones.';
+
+  @override
+  String get memoryOpen => 'Memoria del acompañante';
+
+  @override
+  String get memoryOpenHelp =>
+      'Ver, editar y borrar lo que recuerda, y la copia en la nube.';
+
+  @override
+  String get memoryEmpty => 'Aún no hay recuerdos guardados.';
+
+  @override
+  String get memoryLoadError => 'No se pudieron cargar los recuerdos.';
+
+  @override
+  String get memoryActionError =>
+      'No se pudo completar la acción. Tus recuerdos no han cambiado.';
+
+  @override
+  String get memoryStatusActive => 'Activo';
+
+  @override
+  String get memoryStatusPending => 'Pendiente de confirmar';
+
+  @override
+  String get memorySourceExplicit => 'Lo pediste tú';
+
+  @override
+  String get memorySourceInferred => 'Sugerido por la IA';
+
+  @override
+  String get memorySourceEdited => 'Editado por ti';
+
+  @override
+  String get memoryConfirm => 'Confirmar';
+
+  @override
+  String get memoryConfirmed => 'Recuerdo confirmado.';
+
+  @override
+  String get memoryEdit => 'Editar';
+
+  @override
+  String get memoryEditTitle => 'Editar recuerdo';
+
+  @override
+  String get memoryEditLabel => 'Recuerdo';
+
+  @override
+  String get memoryEditEmpty => 'El recuerdo no puede estar vacío.';
+
+  @override
+  String get memoryEditTooLong =>
+      'El recuerdo no puede superar 2000 caracteres.';
+
+  @override
+  String get memoryEdited => 'Recuerdo guardado.';
+
+  @override
+  String get memoryDeleteLocalAction => 'Borrar del móvil';
+
+  @override
+  String get memoryDeleteLocalTitle => '¿Borrar este recuerdo del móvil?';
+
+  @override
+  String get memoryDeleteLocalBody =>
+      'Se borrará solo de este móvil y el acompañante dejará de usarlo. No borra la copia que tengas en la nube; para eso usa «Borrar en la nube».';
+
+  @override
+  String get memoryDeletedLocal =>
+      'Recuerdo borrado de este móvil. La copia en la nube no se ha tocado.';
+
+  @override
+  String get memoryCloudTitle => 'Copia en la nube';
+
+  @override
+  String get memoryCloudHelp =>
+      'Opcional y solo cuando tú lo pidas. Se guardan los recuerdos activos de este acompañante, sin chats ni claves. No está cifrada de extremo a extremo.';
+
+  @override
+  String get memoryCloudUnavailable =>
+      'Google Drive aún no está conectado en esta versión';
+
+  @override
+  String get memoryCloudNoAccount =>
+      'Conecta una cuenta de Google para usar la copia en la nube.';
+
+  @override
+  String memoryCloudAccount(Object account) {
+    return 'Cuenta: $account';
+  }
+
+  @override
+  String memoryCloudLastCopy(Object date, int revision) {
+    return 'Última copia vista: $date (revisión $revision)';
+  }
+
+  @override
+  String get memoryCloudSave => 'Guardar en la nube';
+
+  @override
+  String get memoryCloudLoad => 'Cargar de la nube';
+
+  @override
+  String get memoryCloudDelete => 'Borrar en la nube';
+
+  @override
+  String get memoryCloudSaveTitle => '¿Guardar en la nube?';
+
+  @override
+  String memoryCloudSaveBody(Object account, int count) {
+    return 'Se subirán a la cuenta $account los recuerdos activos de este acompañante. Recuerdos a subir: $count. Los pendientes de confirmar no se suben. Si la copia de la nube cambió, no se sobrescribe.';
+  }
+
+  @override
+  String memoryCloudSaved(Object account) {
+    return 'Copia guardada en la cuenta $account.';
+  }
+
+  @override
+  String memoryCloudLoaded(int count) {
+    return 'Copia cargada. Recuerdos añadidos: $count.';
+  }
+
+  @override
+  String get memoryCloudLoadCancelled =>
+      'Carga cancelada. No se ha cambiado nada.';
+
+  @override
+  String get memoryCloudDeleteTitle => '¿Borrar la copia en la nube?';
+
+  @override
+  String memoryCloudDeleteBody(Object account, Object date) {
+    return 'Se borrará de la cuenta $account la copia de este acompañante (guardada el $date). No borra los recuerdos de este móvil. No se puede deshacer.';
+  }
+
+  @override
+  String memoryCloudDeleted(Object account) {
+    return 'Copia borrada de la cuenta $account. Los recuerdos de este móvil no se han tocado.';
+  }
+
+  @override
+  String get memoryCloudDeleteCancelled =>
+      'Borrado cancelado. No se ha cambiado nada.';
+
+  @override
+  String get memoryCloudNotFound =>
+      'No hay copia en la nube para este acompañante.';
+
+  @override
+  String get memoryCloudConflict =>
+      'La copia de la nube es distinta de la última que viste. No se ha modificado nada; usa «Cargar de la nube» para revisarla.';
+
+  @override
+  String get memoryCloudUncertain =>
+      'No se pudo confirmar el resultado; puede que la operación sí se haya aplicado. Cárgala de nuevo para comprobarlo antes de repetir.';
+
+  @override
+  String get memoryCloudCancelled =>
+      'Operación cancelada. No se ha cambiado nada.';
+
+  @override
+  String get memoryCloudDenied =>
+      'Google no concedió el permiso. No se ha cambiado nada.';
+
+  @override
+  String get memoryCloudFailed =>
+      'No se pudo completar la operación con la nube. No se ha cambiado nada en tus recuerdos locales.';
+
+  @override
+  String get memoryPreviewTitle => 'Vista previa de la copia';
+
+  @override
+  String memoryPreviewFrom(Object account, Object date) {
+    return 'Cuenta $account, copia del $date';
+  }
+
+  @override
+  String memoryPreviewAdd(int count) {
+    return 'Se añadirían: $count';
+  }
+
+  @override
+  String memoryPreviewSkip(int count) {
+    return 'Se omiten (ya existen): $count';
+  }
+
+  @override
+  String memoryPreviewConflict(int count) {
+    return 'En conflicto (no se aplican): $count';
+  }
+
+  @override
+  String get memoryPreviewConflictHelp =>
+      'Los conflictos no se resuelven solos: tus recuerdos locales se conservan tal cual.';
+
+  @override
+  String get memoryPreviewNothing => 'No hay nada que añadir.';
+
+  @override
+  String get memoryPreviewApply => 'Añadir recuerdos';
+
+  @override
+  String get agreementTitle => 'Acuerdos de apoyo';
+
+  @override
+  String get agreementNew => 'Nuevo acuerdo';
+
+  @override
+  String get agreementEmpty =>
+      'Aún no tienes acuerdos. Crea uno con el botón Nuevo acuerdo; solo se anota lo que tú registres.';
+
+  @override
+  String get agreementLoadError => 'No se pudieron cargar los acuerdos.';
+
+  @override
+  String get agreementSaveError =>
+      'No se pudo guardar el cambio. El acuerdo sigue como estaba.';
+
+  @override
+  String get agreementStatusActive => 'Activos';
+
+  @override
+  String get agreementStatusPaused => 'En pausa';
+
+  @override
+  String get agreementStatusCompleted => 'Finalizados';
+
+  @override
+  String get agreementObjectiveLabel => 'Objetivo';
+
+  @override
+  String get agreementUnitLabel => 'Unidad (opcional)';
+
+  @override
+  String get agreementMeasureLabel => 'Medida';
+
+  @override
+  String get agreementMeasureOptionalLabel => 'Medida (opcional)';
+
+  @override
+  String get agreementConsent =>
+      'Acepto crear este acuerdo. Solo se anotará lo que yo registre.';
+
+  @override
+  String get agreementErrorObjective =>
+      'Escribe un objetivo (hasta 2000 caracteres).';
+
+  @override
+  String get agreementErrorMeasure =>
+      'La medida debe ser un número finito igual o mayor que 0.';
+
+  @override
+  String get agreementErrorConsent => 'Marca la casilla para crear el acuerdo.';
+
+  @override
+  String get agreementCancel => 'Cancelar';
+
+  @override
+  String get agreementCreate => 'Crear';
+
+  @override
+  String get agreementSave => 'Guardar';
+
+  @override
+  String get agreementModify => 'Modificar';
+
+  @override
+  String get agreementPause => 'Pausar';
+
+  @override
+  String get agreementResume => 'Reanudar';
+
+  @override
+  String get agreementComplete => 'Finalizar';
+
+  @override
+  String get agreementCompleteTitle => '¿Finalizar el acuerdo?';
+
+  @override
+  String get agreementCompleteBody =>
+      'Un acuerdo finalizado ya no se puede modificar ni admite más avances. El historial se conserva.';
+
+  @override
+  String get agreementRecordProgress => 'Registrar avance';
+
+  @override
+  String get agreementRecord => 'Registrar';
+
+  @override
+  String get agreementAmountLabel => 'Cantidad (opcional)';
+
+  @override
+  String get agreementNoteLabel => 'Nota (opcional)';
+
+  @override
+  String get agreementReminderLabel => 'Aviso';
+
+  @override
+  String get agreementEventsTitle => 'Avances anotados';
+
+  @override
+  String get agreementNoEvents => 'Aún no hay avances anotados.';
+
+  @override
+  String get agreementChangesTitle => 'Historial de cambios';
+
+  @override
+  String get agreementNoChanges => 'Sin cambios desde la creación.';
+
+  @override
+  String agreementRevisionLabel(int n) {
+    return 'Revisión $n';
+  }
 }

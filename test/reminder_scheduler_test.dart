@@ -1,14 +1,15 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:trackia/application/reminder_scheduler.dart';
 import 'package:trackia/data/sqlite_workout_repository.dart';
 import 'package:trackia/domain/activity.dart';
 import 'package:trackia/domain/companion.dart';
 import 'package:trackia/domain/reminder.dart';
+import 'package:trackia/l10n/generated/app_localizations.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() {
@@ -310,6 +311,29 @@ void main() {
     await make().clear();
     expect(calls.single.method, 'clear');
     expect(calls.single.args, {'profileId': 'local'});
+  });
+
+  test('es phrases from the l10n keys match the spanish fallback', () {
+    final es = reminderPhrasesFor(lookupAppLocalizations(const Locale('es')));
+    final spanish = ReminderPhrases.spanish;
+    expect(es.windowStartCheer, spanish.windowStartCheer);
+    expect(es.windowStartNeutral, spanish.windowStartNeutral);
+    expect(es.lastCallCheer, spanish.lastCallCheer);
+    expect(es.lastCallNeutral, spanish.lastCallNeutral);
+    expect(es.inactiveGymbroCheer, spanish.inactiveGymbroCheer);
+    expect(es.inactiveCheer, spanish.inactiveCheer);
+    expect(es.inactiveNeutral, spanish.inactiveNeutral);
+    expect(es.minimumSessionOne, spanish.minimumSessionOne);
+    expect(es.minimumSessions, spanish.minimumSessions);
+    expect(es.minimumMinutes, spanish.minimumMinutes);
+    expect(es.minimumField, spanish.minimumField);
+    expect(
+      ReminderScheduler.minimumText({
+        'metric': 'sessions',
+        'value': 3,
+      }, phrases: es),
+      '3 sesiones',
+    );
   });
 
   test('minimum text covers sessions, time and fields', () {

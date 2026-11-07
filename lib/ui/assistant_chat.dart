@@ -15,6 +15,8 @@ import '../domain/message_revision.dart';
 import '../application/message_delivery_policy.dart';
 import '../application/progress_service.dart';
 import 'activity_summary.dart';
+import 'support_agreement.dart';
+import '../data/support_agreement_repository.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
@@ -29,6 +31,7 @@ import 'package:uuid/uuid.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import '../application/assistant_context.dart';
 import '../application/localization.dart';
+import '../application/reminder_scheduler.dart' show reminderPhrasesFor;
 import '../application/workout_controller.dart';
 import '../application/ai_availability.dart';
 import '../application/rest_notifications.dart';
@@ -681,6 +684,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
         tone: 'neutral',
         companionId: companionId,
         custom: copy,
+        phrases: reminderPhrasesFor(appText(context)),
       ),
     );
     final yesterday = now.subtract(const Duration(days: 1));

@@ -5863,6 +5863,666 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Llevas varios días seguidos cumpliendo. ¿Quieres activar el modo Juego para ver metas, rachas y logros?'**
   String get proposalGameSuggestion;
+
+  /// No description provided for @reminderPhraseWindowStartCheer1.
+  ///
+  /// In es, this message translates to:
+  /// **'{nombre} te espera: hoy toca {meta}.'**
+  String reminderPhraseWindowStartCheer1(Object nombre, Object meta);
+
+  /// No description provided for @reminderPhraseWindowStartCheer2.
+  ///
+  /// In es, this message translates to:
+  /// **'{nombre} te espera hoy.'**
+  String reminderPhraseWindowStartCheer2(Object nombre);
+
+  /// No description provided for @reminderPhraseWindowStartNeutral1.
+  ///
+  /// In es, this message translates to:
+  /// **'Es buen momento para tu actividad. Meta de hoy: {meta}.'**
+  String reminderPhraseWindowStartNeutral1(Object meta);
+
+  /// No description provided for @reminderPhraseWindowStartNeutral2.
+  ///
+  /// In es, this message translates to:
+  /// **'Es buen momento para tu actividad.'**
+  String get reminderPhraseWindowStartNeutral2;
+
+  /// No description provided for @reminderPhraseLastCallCheer1.
+  ///
+  /// In es, this message translates to:
+  /// **'Última llamada: con {minimo} mantienes tu racha de {racha} días.'**
+  String reminderPhraseLastCallCheer1(Object minimo, Object racha);
+
+  /// No description provided for @reminderPhraseLastCallCheer2.
+  ///
+  /// In es, this message translates to:
+  /// **'No pierdas la racha: te faltan {faltan} esta semana.'**
+  String reminderPhraseLastCallCheer2(Object faltan);
+
+  /// No description provided for @reminderPhraseLastCallCheer3.
+  ///
+  /// In es, this message translates to:
+  /// **'Última llamada para hoy.'**
+  String get reminderPhraseLastCallCheer3;
+
+  /// No description provided for @reminderPhraseLastCallNeutral1.
+  ///
+  /// In es, this message translates to:
+  /// **'Aún estás a tiempo hoy. Con {minimo} basta.'**
+  String reminderPhraseLastCallNeutral1(Object minimo);
+
+  /// No description provided for @reminderPhraseLastCallNeutral2.
+  ///
+  /// In es, this message translates to:
+  /// **'Te faltan {faltan} esta semana.'**
+  String reminderPhraseLastCallNeutral2(Object faltan);
+
+  /// No description provided for @reminderPhraseLastCallNeutral3.
+  ///
+  /// In es, this message translates to:
+  /// **'Aún estás a tiempo hoy.'**
+  String get reminderPhraseLastCallNeutral3;
+
+  /// No description provided for @reminderPhraseInactiveGymbroCheer.
+  ///
+  /// In es, this message translates to:
+  /// **'Amigo, llevamos {dias} días sin entrenar. Vamos a movernos un poco.'**
+  String reminderPhraseInactiveGymbroCheer(Object dias);
+
+  /// No description provided for @reminderPhraseInactiveCheer1.
+  ///
+  /// In es, this message translates to:
+  /// **'Llevamos {dias} días sin vernos. ¿Algo corto hoy?'**
+  String reminderPhraseInactiveCheer1(Object dias);
+
+  /// No description provided for @reminderPhraseInactiveCheer2.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Algo corto hoy?'**
+  String get reminderPhraseInactiveCheer2;
+
+  /// No description provided for @reminderPhraseInactiveNeutral1.
+  ///
+  /// In es, this message translates to:
+  /// **'Llevas {dias} días sin registrar.'**
+  String reminderPhraseInactiveNeutral1(Object dias);
+
+  /// No description provided for @reminderPhraseInactiveNeutral2.
+  ///
+  /// In es, this message translates to:
+  /// **'Hace unos días que no registras.'**
+  String get reminderPhraseInactiveNeutral2;
+
+  /// No description provided for @reminderPhraseMinimumSessionOne.
+  ///
+  /// In es, this message translates to:
+  /// **'1 sesión'**
+  String get reminderPhraseMinimumSessionOne;
+
+  /// No description provided for @reminderPhraseMinimumSessions.
+  ///
+  /// In es, this message translates to:
+  /// **'{n} sesiones'**
+  String reminderPhraseMinimumSessions(Object n);
+
+  /// No description provided for @reminderPhraseMinimumMinutes.
+  ///
+  /// In es, this message translates to:
+  /// **'{n} min'**
+  String reminderPhraseMinimumMinutes(Object n);
+
+  /// No description provided for @reminderPhraseMinimumField.
+  ///
+  /// In es, this message translates to:
+  /// **'{n} {campo}'**
+  String reminderPhraseMinimumField(Object n, Object campo);
+
+  /// No description provided for @memoryTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Memoria de {name}'**
+  String memoryTitle(Object name);
+
+  /// No description provided for @memoryIntro.
+  ///
+  /// In es, this message translates to:
+  /// **'Lo que este acompañante recuerda de ti. Puedes revisarlo, editarlo o borrarlo cuando quieras. Se trata como información tuya, nunca como instrucciones.'**
+  String get memoryIntro;
+
+  /// No description provided for @memoryOpen.
+  ///
+  /// In es, this message translates to:
+  /// **'Memoria del acompañante'**
+  String get memoryOpen;
+
+  /// No description provided for @memoryOpenHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver, editar y borrar lo que recuerda, y la copia en la nube.'**
+  String get memoryOpenHelp;
+
+  /// No description provided for @memoryEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'Aún no hay recuerdos guardados.'**
+  String get memoryEmpty;
+
+  /// No description provided for @memoryLoadError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudieron cargar los recuerdos.'**
+  String get memoryLoadError;
+
+  /// No description provided for @memoryActionError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo completar la acción. Tus recuerdos no han cambiado.'**
+  String get memoryActionError;
+
+  /// No description provided for @memoryStatusActive.
+  ///
+  /// In es, this message translates to:
+  /// **'Activo'**
+  String get memoryStatusActive;
+
+  /// No description provided for @memoryStatusPending.
+  ///
+  /// In es, this message translates to:
+  /// **'Pendiente de confirmar'**
+  String get memoryStatusPending;
+
+  /// No description provided for @memorySourceExplicit.
+  ///
+  /// In es, this message translates to:
+  /// **'Lo pediste tú'**
+  String get memorySourceExplicit;
+
+  /// No description provided for @memorySourceInferred.
+  ///
+  /// In es, this message translates to:
+  /// **'Sugerido por la IA'**
+  String get memorySourceInferred;
+
+  /// No description provided for @memorySourceEdited.
+  ///
+  /// In es, this message translates to:
+  /// **'Editado por ti'**
+  String get memorySourceEdited;
+
+  /// No description provided for @memoryConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'Confirmar'**
+  String get memoryConfirm;
+
+  /// No description provided for @memoryConfirmed.
+  ///
+  /// In es, this message translates to:
+  /// **'Recuerdo confirmado.'**
+  String get memoryConfirmed;
+
+  /// No description provided for @memoryEdit.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar'**
+  String get memoryEdit;
+
+  /// No description provided for @memoryEditTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar recuerdo'**
+  String get memoryEditTitle;
+
+  /// No description provided for @memoryEditLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Recuerdo'**
+  String get memoryEditLabel;
+
+  /// No description provided for @memoryEditEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'El recuerdo no puede estar vacío.'**
+  String get memoryEditEmpty;
+
+  /// No description provided for @memoryEditTooLong.
+  ///
+  /// In es, this message translates to:
+  /// **'El recuerdo no puede superar 2000 caracteres.'**
+  String get memoryEditTooLong;
+
+  /// No description provided for @memoryEdited.
+  ///
+  /// In es, this message translates to:
+  /// **'Recuerdo guardado.'**
+  String get memoryEdited;
+
+  /// No description provided for @memoryDeleteLocalAction.
+  ///
+  /// In es, this message translates to:
+  /// **'Borrar del móvil'**
+  String get memoryDeleteLocalAction;
+
+  /// No description provided for @memoryDeleteLocalTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Borrar este recuerdo del móvil?'**
+  String get memoryDeleteLocalTitle;
+
+  /// No description provided for @memoryDeleteLocalBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Se borrará solo de este móvil y el acompañante dejará de usarlo. No borra la copia que tengas en la nube; para eso usa «Borrar en la nube».'**
+  String get memoryDeleteLocalBody;
+
+  /// No description provided for @memoryDeletedLocal.
+  ///
+  /// In es, this message translates to:
+  /// **'Recuerdo borrado de este móvil. La copia en la nube no se ha tocado.'**
+  String get memoryDeletedLocal;
+
+  /// No description provided for @memoryCloudTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Copia en la nube'**
+  String get memoryCloudTitle;
+
+  /// No description provided for @memoryCloudHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Opcional y solo cuando tú lo pidas. Se guardan los recuerdos activos de este acompañante, sin chats ni claves. No está cifrada de extremo a extremo.'**
+  String get memoryCloudHelp;
+
+  /// No description provided for @memoryCloudUnavailable.
+  ///
+  /// In es, this message translates to:
+  /// **'Google Drive aún no está conectado en esta versión'**
+  String get memoryCloudUnavailable;
+
+  /// No description provided for @memoryCloudNoAccount.
+  ///
+  /// In es, this message translates to:
+  /// **'Conecta una cuenta de Google para usar la copia en la nube.'**
+  String get memoryCloudNoAccount;
+
+  /// No description provided for @memoryCloudAccount.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuenta: {account}'**
+  String memoryCloudAccount(Object account);
+
+  /// No description provided for @memoryCloudLastCopy.
+  ///
+  /// In es, this message translates to:
+  /// **'Última copia vista: {date} (revisión {revision})'**
+  String memoryCloudLastCopy(Object date, int revision);
+
+  /// No description provided for @memoryCloudSave.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardar en la nube'**
+  String get memoryCloudSave;
+
+  /// No description provided for @memoryCloudLoad.
+  ///
+  /// In es, this message translates to:
+  /// **'Cargar de la nube'**
+  String get memoryCloudLoad;
+
+  /// No description provided for @memoryCloudDelete.
+  ///
+  /// In es, this message translates to:
+  /// **'Borrar en la nube'**
+  String get memoryCloudDelete;
+
+  /// No description provided for @memoryCloudSaveTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Guardar en la nube?'**
+  String get memoryCloudSaveTitle;
+
+  /// No description provided for @memoryCloudSaveBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Se subirán a la cuenta {account} los recuerdos activos de este acompañante. Recuerdos a subir: {count}. Los pendientes de confirmar no se suben. Si la copia de la nube cambió, no se sobrescribe.'**
+  String memoryCloudSaveBody(Object account, int count);
+
+  /// No description provided for @memoryCloudSaved.
+  ///
+  /// In es, this message translates to:
+  /// **'Copia guardada en la cuenta {account}.'**
+  String memoryCloudSaved(Object account);
+
+  /// No description provided for @memoryCloudLoaded.
+  ///
+  /// In es, this message translates to:
+  /// **'Copia cargada. Recuerdos añadidos: {count}.'**
+  String memoryCloudLoaded(int count);
+
+  /// No description provided for @memoryCloudLoadCancelled.
+  ///
+  /// In es, this message translates to:
+  /// **'Carga cancelada. No se ha cambiado nada.'**
+  String get memoryCloudLoadCancelled;
+
+  /// No description provided for @memoryCloudDeleteTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Borrar la copia en la nube?'**
+  String get memoryCloudDeleteTitle;
+
+  /// No description provided for @memoryCloudDeleteBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Se borrará de la cuenta {account} la copia de este acompañante (guardada el {date}). No borra los recuerdos de este móvil. No se puede deshacer.'**
+  String memoryCloudDeleteBody(Object account, Object date);
+
+  /// No description provided for @memoryCloudDeleted.
+  ///
+  /// In es, this message translates to:
+  /// **'Copia borrada de la cuenta {account}. Los recuerdos de este móvil no se han tocado.'**
+  String memoryCloudDeleted(Object account);
+
+  /// No description provided for @memoryCloudDeleteCancelled.
+  ///
+  /// In es, this message translates to:
+  /// **'Borrado cancelado. No se ha cambiado nada.'**
+  String get memoryCloudDeleteCancelled;
+
+  /// No description provided for @memoryCloudNotFound.
+  ///
+  /// In es, this message translates to:
+  /// **'No hay copia en la nube para este acompañante.'**
+  String get memoryCloudNotFound;
+
+  /// No description provided for @memoryCloudConflict.
+  ///
+  /// In es, this message translates to:
+  /// **'La copia de la nube es distinta de la última que viste. No se ha modificado nada; usa «Cargar de la nube» para revisarla.'**
+  String get memoryCloudConflict;
+
+  /// No description provided for @memoryCloudUncertain.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo confirmar el resultado; puede que la operación sí se haya aplicado. Cárgala de nuevo para comprobarlo antes de repetir.'**
+  String get memoryCloudUncertain;
+
+  /// No description provided for @memoryCloudCancelled.
+  ///
+  /// In es, this message translates to:
+  /// **'Operación cancelada. No se ha cambiado nada.'**
+  String get memoryCloudCancelled;
+
+  /// No description provided for @memoryCloudDenied.
+  ///
+  /// In es, this message translates to:
+  /// **'Google no concedió el permiso. No se ha cambiado nada.'**
+  String get memoryCloudDenied;
+
+  /// No description provided for @memoryCloudFailed.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo completar la operación con la nube. No se ha cambiado nada en tus recuerdos locales.'**
+  String get memoryCloudFailed;
+
+  /// No description provided for @memoryPreviewTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Vista previa de la copia'**
+  String get memoryPreviewTitle;
+
+  /// No description provided for @memoryPreviewFrom.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuenta {account}, copia del {date}'**
+  String memoryPreviewFrom(Object account, Object date);
+
+  /// No description provided for @memoryPreviewAdd.
+  ///
+  /// In es, this message translates to:
+  /// **'Se añadirían: {count}'**
+  String memoryPreviewAdd(int count);
+
+  /// No description provided for @memoryPreviewSkip.
+  ///
+  /// In es, this message translates to:
+  /// **'Se omiten (ya existen): {count}'**
+  String memoryPreviewSkip(int count);
+
+  /// No description provided for @memoryPreviewConflict.
+  ///
+  /// In es, this message translates to:
+  /// **'En conflicto (no se aplican): {count}'**
+  String memoryPreviewConflict(int count);
+
+  /// No description provided for @memoryPreviewConflictHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Los conflictos no se resuelven solos: tus recuerdos locales se conservan tal cual.'**
+  String get memoryPreviewConflictHelp;
+
+  /// No description provided for @memoryPreviewNothing.
+  ///
+  /// In es, this message translates to:
+  /// **'No hay nada que añadir.'**
+  String get memoryPreviewNothing;
+
+  /// No description provided for @memoryPreviewApply.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir recuerdos'**
+  String get memoryPreviewApply;
+
+  /// No description provided for @agreementTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Acuerdos de apoyo'**
+  String get agreementTitle;
+
+  /// No description provided for @agreementNew.
+  ///
+  /// In es, this message translates to:
+  /// **'Nuevo acuerdo'**
+  String get agreementNew;
+
+  /// No description provided for @agreementEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'Aún no tienes acuerdos. Crea uno con el botón Nuevo acuerdo; solo se anota lo que tú registres.'**
+  String get agreementEmpty;
+
+  /// No description provided for @agreementLoadError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudieron cargar los acuerdos.'**
+  String get agreementLoadError;
+
+  /// No description provided for @agreementSaveError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo guardar el cambio. El acuerdo sigue como estaba.'**
+  String get agreementSaveError;
+
+  /// No description provided for @agreementStatusActive.
+  ///
+  /// In es, this message translates to:
+  /// **'Activos'**
+  String get agreementStatusActive;
+
+  /// No description provided for @agreementStatusPaused.
+  ///
+  /// In es, this message translates to:
+  /// **'En pausa'**
+  String get agreementStatusPaused;
+
+  /// No description provided for @agreementStatusCompleted.
+  ///
+  /// In es, this message translates to:
+  /// **'Finalizados'**
+  String get agreementStatusCompleted;
+
+  /// No description provided for @agreementObjectiveLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Objetivo'**
+  String get agreementObjectiveLabel;
+
+  /// No description provided for @agreementUnitLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Unidad (opcional)'**
+  String get agreementUnitLabel;
+
+  /// No description provided for @agreementMeasureLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Medida'**
+  String get agreementMeasureLabel;
+
+  /// No description provided for @agreementMeasureOptionalLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Medida (opcional)'**
+  String get agreementMeasureOptionalLabel;
+
+  /// No description provided for @agreementConsent.
+  ///
+  /// In es, this message translates to:
+  /// **'Acepto crear este acuerdo. Solo se anotará lo que yo registre.'**
+  String get agreementConsent;
+
+  /// No description provided for @agreementErrorObjective.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe un objetivo (hasta 2000 caracteres).'**
+  String get agreementErrorObjective;
+
+  /// No description provided for @agreementErrorMeasure.
+  ///
+  /// In es, this message translates to:
+  /// **'La medida debe ser un número finito igual o mayor que 0.'**
+  String get agreementErrorMeasure;
+
+  /// No description provided for @agreementErrorConsent.
+  ///
+  /// In es, this message translates to:
+  /// **'Marca la casilla para crear el acuerdo.'**
+  String get agreementErrorConsent;
+
+  /// No description provided for @agreementCancel.
+  ///
+  /// In es, this message translates to:
+  /// **'Cancelar'**
+  String get agreementCancel;
+
+  /// No description provided for @agreementCreate.
+  ///
+  /// In es, this message translates to:
+  /// **'Crear'**
+  String get agreementCreate;
+
+  /// No description provided for @agreementSave.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardar'**
+  String get agreementSave;
+
+  /// No description provided for @agreementModify.
+  ///
+  /// In es, this message translates to:
+  /// **'Modificar'**
+  String get agreementModify;
+
+  /// No description provided for @agreementPause.
+  ///
+  /// In es, this message translates to:
+  /// **'Pausar'**
+  String get agreementPause;
+
+  /// No description provided for @agreementResume.
+  ///
+  /// In es, this message translates to:
+  /// **'Reanudar'**
+  String get agreementResume;
+
+  /// No description provided for @agreementComplete.
+  ///
+  /// In es, this message translates to:
+  /// **'Finalizar'**
+  String get agreementComplete;
+
+  /// No description provided for @agreementCompleteTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Finalizar el acuerdo?'**
+  String get agreementCompleteTitle;
+
+  /// No description provided for @agreementCompleteBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Un acuerdo finalizado ya no se puede modificar ni admite más avances. El historial se conserva.'**
+  String get agreementCompleteBody;
+
+  /// No description provided for @agreementRecordProgress.
+  ///
+  /// In es, this message translates to:
+  /// **'Registrar avance'**
+  String get agreementRecordProgress;
+
+  /// No description provided for @agreementRecord.
+  ///
+  /// In es, this message translates to:
+  /// **'Registrar'**
+  String get agreementRecord;
+
+  /// No description provided for @agreementAmountLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Cantidad (opcional)'**
+  String get agreementAmountLabel;
+
+  /// No description provided for @agreementNoteLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Nota (opcional)'**
+  String get agreementNoteLabel;
+
+  /// No description provided for @agreementReminderLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Aviso'**
+  String get agreementReminderLabel;
+
+  /// No description provided for @agreementEventsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Avances anotados'**
+  String get agreementEventsTitle;
+
+  /// No description provided for @agreementNoEvents.
+  ///
+  /// In es, this message translates to:
+  /// **'Aún no hay avances anotados.'**
+  String get agreementNoEvents;
+
+  /// No description provided for @agreementChangesTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Historial de cambios'**
+  String get agreementChangesTitle;
+
+  /// No description provided for @agreementNoChanges.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin cambios desde la creación.'**
+  String get agreementNoChanges;
+
+  /// No description provided for @agreementRevisionLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Revisión {n}'**
+  String agreementRevisionLabel(int n);
 }
 
 class _AppLocalizationsDelegate
