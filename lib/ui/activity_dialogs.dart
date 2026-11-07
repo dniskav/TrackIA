@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../application/localization.dart';
 import '../application/workout_controller.dart';
 import '../domain/activity.dart';
 import '../domain/workout.dart';
@@ -32,21 +33,21 @@ class _ActivityNameDialogState extends State<ActivityNameDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Nombre de la actividad'),
+    title: Text(appText(context).activityDialogNameTitle),
     content: TextField(
       key: const Key('activity-name-input'),
       controller: input,
       autofocus: true,
       maxLength: 80,
-      decoration: InputDecoration(labelText: 'Nombre', errorText: error),
+      decoration: InputDecoration(labelText: appText(context).companionName, errorText: error),
       onSubmitted: (_) => save(),
     ),
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('Cancelar'),
+        child: Text(appText(context).cancel),
       ),
-      FilledButton(onPressed: save, child: const Text('Guardar nombre')),
+      FilledButton(onPressed: save, child: Text(appText(context).activityDialogSaveName)),
     ],
   );
 }
@@ -140,10 +141,10 @@ class _ActivityChooserState extends State<ActivityChooser> {
         height: MediaQuery.sizeOf(context).height * .65,
         child: Column(
           children: [
-            const Padding(
+            Padding(
               padding: EdgeInsets.all(16),
               child: Text(
-                '¿Qué vas a hacer?',
+                appText(context).activityDialogWhatToDo,
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
             ),
@@ -151,9 +152,9 @@ class _ActivityChooserState extends State<ActivityChooser> {
               child: ListView(
                 children: [
                   if (templates.isNotEmpty) ...[
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.fromLTRB(16, 0, 16, 4),
-                      child: Text('Tus actividades'),
+                      child: Text(appText(context).activityDialogYourActivities),
                     ),
                     for (final t in templates)
                       ListTile(
@@ -165,7 +166,7 @@ class _ActivityChooserState extends State<ActivityChooser> {
                         ),
                         title: Text(t.definition.name),
                         subtitle: Text(
-                          t.instant ? 'Registro puntual' : 'Tu actividad',
+                          t.instant ? appText(context).activityDialogInstantRecord : appText(context).activityDialogYourActivity,
                         ),
                         onTap: () => Navigator.pop(
                           context,
@@ -182,8 +183,8 @@ class _ActivityChooserState extends State<ActivityChooser> {
                       title: Text(e.name),
                       subtitle: Text(
                         e.targetSets == null
-                            ? 'Del entrenamiento actual'
-                            : '${e.sets.length + controller.activities.where((a) => a.exerciseId == e.id).fold<int>(0, (n, a) => n + a.intervals.where((i) => i.endedAt != null).length)}/${e.targetSets} series · ${e.repsMin}–${e.repsMax} reps',
+                            ? appText(context).activityDialogFromCurrentWorkout
+                            : appText(context).activityDialogSetsProgress('${e.sets.length + controller.activities.where((a) => a.exerciseId == e.id).fold<int>(0, (n, a) => n + a.intervals.where((i) => i.endedAt != null).length)}', '${e.targetSets}', '${e.repsMin}', '${e.repsMax}'),
                       ),
                       onTap: () => Navigator.pop(
                         context,
@@ -212,7 +213,7 @@ class _ActivityChooserState extends State<ActivityChooser> {
                   for (final d in unique.values)
                     ListTile(
                       title: Text(d.name),
-                      subtitle: const Text('Volver a hacer'),
+                      subtitle: Text(appText(context).activityDialogRepeat),
                       onTap: () => Navigator.pop(
                         context,
                         ActivityChoice(
@@ -228,7 +229,7 @@ class _ActivityChooserState extends State<ActivityChooser> {
                       ListTile(
                         title: Text(e.name),
                         subtitle: Text(
-                          '${routine.name} · ${e.targetSets} series',
+                          appText(context).activityDialogRoutineSets(routine.name, e.targetSets),
                         ),
                         onTap: () => Navigator.pop(
                           context,
@@ -245,7 +246,7 @@ class _ActivityChooserState extends State<ActivityChooser> {
                       ),
                   ListTile(
                     leading: const Icon(Icons.add),
-                    title: const Text('Nueva actividad'),
+                    title: Text(appText(context).activityNewActivity),
                     onTap: () async {
                       final built = await Navigator.of(context)
                           .push<ActivityBuilderResult>(
@@ -295,27 +296,27 @@ class _ActivityRestDialogState extends State<ActivityRestDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Descanso'),
+    title: Text(appText(context).activityRestLabel),
     content: TextField(
       controller: input,
       keyboardType: TextInputType.number,
-      decoration: InputDecoration(labelText: 'Segundos', errorText: error),
+      decoration: InputDecoration(labelText: appText(context).activityRestSecondsLabel, errorText: error),
     ),
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('Cancelar'),
+        child: Text(appText(context).cancel),
       ),
       FilledButton(
         onPressed: () {
           final value = int.tryParse(input.text);
           if (value == null || value < 0 || value > 1800) {
-            setState(() => error = 'Entre 0 y 1800');
+            setState(() => error = appText(context).activityDialogRestRange);
             return;
           }
           Navigator.pop(context, value);
         },
-        child: const Text('Guardar'),
+        child: Text(appText(context).save),
       ),
     ],
   );
@@ -332,7 +333,7 @@ class _ActivityEndDialogState extends State<ActivityEndDialog> {
   late DateTime end = widget.initial.toLocal();
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Terminar actividad'),
+    title: Text(appText(context).activityDialogEndTitle),
     content: Row(
       children: [
         Expanded(
@@ -359,7 +360,7 @@ class _ActivityEndDialogState extends State<ActivityEndDialog> {
               }
             },
             child: InputDecorator(
-              decoration: const InputDecoration(labelText: 'Fecha'),
+              decoration: InputDecoration(labelText: appText(context).activityDialogDate),
               child: Text(DateFormat('d/M/yyyy').format(end)),
             ),
           ),
@@ -393,7 +394,7 @@ class _ActivityEndDialogState extends State<ActivityEndDialog> {
               }
             },
             child: InputDecorator(
-              decoration: const InputDecoration(labelText: 'Hora'),
+              decoration: InputDecoration(labelText: appText(context).activityDialogTime),
               child: Text(DateFormat('HH:mm').format(end)),
             ),
           ),
@@ -403,11 +404,11 @@ class _ActivityEndDialogState extends State<ActivityEndDialog> {
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('Cancelar'),
+        child: Text(appText(context).cancel),
       ),
       FilledButton(
         onPressed: () => Navigator.pop(context, end),
-        child: const Text('Guardar'),
+        child: Text(appText(context).save),
       ),
     ],
   );

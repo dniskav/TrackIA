@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 import '../application/ai_availability.dart';
 import '../application/assistant_context.dart';
 import '../application/companion_creation.dart';
+import '../application/localization.dart';
 import '../data/activity_template_repository.dart';
 import '../data/ai_client.dart';
 import '../data/ai_settings_store.dart';
@@ -59,7 +60,8 @@ class _CompanionCreatorScreenState extends State<CompanionCreatorScreen> {
   Future<void> manual() async {
     final draft = await Navigator.of(context).push<CompanionDraft>(
       MaterialPageRoute(
-        builder: (_) => const CompanionBuilderScreen(submitLabel: 'Crear'),
+        builder: (_) =>
+            CompanionBuilderScreen(submitLabel: appText(context).creatorCreate),
       ),
     );
     if (draft == null || !mounted) return;
@@ -75,7 +77,7 @@ class _CompanionCreatorScreenState extends State<CompanionCreatorScreen> {
         setState(
           () => error = e is ValidationException
               ? e.message
-              : 'No se pudo crear el acompañante. No se guardó nada.',
+              : appText(context).creatorCreateFailed,
         );
       }
     } finally {
@@ -104,7 +106,7 @@ class _CompanionCreatorScreenState extends State<CompanionCreatorScreen> {
 
   Widget _chooser(BuildContext context, bool ready) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Crear acompañante')),
+      appBar: AppBar(title: Text(appText(context).createCompanionTitle)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -112,11 +114,11 @@ class _CompanionCreatorScreenState extends State<CompanionCreatorScreen> {
             key: const Key('creator-ai'),
             child: ListTile(
               leading: const Icon(Icons.auto_awesome),
-              title: const Text('Con ayuda de la IA'),
+              title: Text(appText(context).creatorAiTitle),
               subtitle: Text(
                 ready
-                    ? 'Cuéntale qué quieres seguir y te propone un acompañante.'
-                    : 'Necesitas conectar y verificar un proveedor de IA.',
+                    ? appText(context).creatorAiReadySubtitle
+                    : appText(context).creatorAiNotReadySubtitle,
               ),
               enabled: ready && !busy,
               onTap: ready && !busy ? assisted : null,
@@ -129,17 +131,15 @@ class _CompanionCreatorScreenState extends State<CompanionCreatorScreen> {
                 key: const Key('creator-open-ai-settings'),
                 onPressed: widget.onOpenAiSettings,
                 icon: const Icon(Icons.settings_outlined),
-                label: const Text('Abrir Ajustes de IA'),
+                label: Text(appText(context).creatorOpenAiSettings),
               ),
             ),
           Card(
             key: const Key('creator-manual'),
             child: ListTile(
               leading: const Icon(Icons.edit_outlined),
-              title: const Text('A mano'),
-              subtitle: const Text(
-                'Elige nombre, icono, color, modo y aviso tú mismo.',
-              ),
+              title: Text(appText(context).creatorManualTitle),
+              subtitle: Text(appText(context).creatorManualSubtitle),
               enabled: !busy,
               onTap: busy ? null : manual,
             ),
@@ -210,7 +210,7 @@ class _CompanionBuilderScreenState extends State<CompanionBuilderScreen> {
     final picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay(hour: current ~/ 60, minute: current % 60),
-      helpText: 'Elige la hora',
+      helpText: appText(context).chooseTime,
     );
     if (picked != null) setState(() => set(picked.hour * 60 + picked.minute));
   }
@@ -219,9 +219,7 @@ class _CompanionBuilderScreenState extends State<CompanionBuilderScreen> {
     try {
       final clean = name.text.trim();
       if (clean.isEmpty || clean.length > 40) {
-        throw const ValidationException(
-          'Escribe un nombre de entre 1 y 40 caracteres.',
-        );
+        throw ValidationException(appText(context).creatorNameLength);
       }
       ReminderProposal? reminder;
       if (remind) {
@@ -279,7 +277,9 @@ class _CompanionBuilderScreenState extends State<CompanionBuilderScreen> {
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(
       title: Text(
-        widget.initial == null ? 'Nuevo acompañante' : 'Editar propuesta',
+        widget.initial == null
+            ? appText(context).creatorNewTitle
+            : appText(context).creatorEditProposalTitle,
       ),
     ),
     body: ListView(
@@ -289,26 +289,33 @@ class _CompanionBuilderScreenState extends State<CompanionBuilderScreen> {
           key: const Key('builder-name'),
           controller: name,
           maxLength: 40,
-          decoration: const InputDecoration(labelText: 'Nombre'),
+          decoration: InputDecoration(
+            labelText: appText(context).companionName,
+          ),
         ),
         TextField(
           key: const Key('builder-description'),
           controller: description,
           maxLength: 80,
-          decoration: const InputDecoration(labelText: '¿Para qué sirve?'),
+          decoration: InputDecoration(
+            labelText: appText(context).companionPurpose,
+          ),
         ),
         TextField(
           key: const Key('builder-prompt'),
           controller: prompt,
           maxLines: 4,
           maxLength: 4000,
-          decoration: const InputDecoration(
-            labelText: 'Instrucciones para la IA (opcional)',
-            helperText: 'Se usan cuando conectes un proveedor.',
+          decoration: InputDecoration(
+            labelText: appText(context).companionInstructions,
+            helperText: appText(context).creatorPromptHelper,
           ),
         ),
         const SizedBox(height: 8),
-        Text('Icono', style: Theme.of(context).textTheme.labelLarge),
+        Text(
+          appText(context).icon,
+          style: Theme.of(context).textTheme.labelLarge,
+        ),
         Wrap(
           spacing: 4,
           children: [
@@ -326,7 +333,10 @@ class _CompanionBuilderScreenState extends State<CompanionBuilderScreen> {
               ),
           ],
         ),
-        Text('Color', style: Theme.of(context).textTheme.labelLarge),
+        Text(
+          appText(context).color,
+          style: Theme.of(context).textTheme.labelLarge,
+        ),
         Wrap(
           spacing: 4,
           children: [
@@ -345,19 +355,30 @@ class _CompanionBuilderScreenState extends State<CompanionBuilderScreen> {
           ],
         ),
         const Divider(height: 24),
-        Text('Nivel', style: Theme.of(context).textTheme.titleSmall),
+        Text(
+          appText(context).creatorLevelSection,
+          style: Theme.of(context).textTheme.titleSmall,
+        ),
         RadioGroup<String>(
           groupValue: mode,
           onChanged: (v) => setState(() => mode = v!),
           child: Column(
             children: [
-              level('reminder', 'Solo recordatorio', 'Te avisa y ya.'),
+              level(
+                'reminder',
+                appText(context).creatorLevelReminderTitle,
+                appText(context).creatorLevelReminderDetail,
+              ),
               level(
                 'goals',
-                'Metas y rachas',
-                'Recomendado: metas y rachas, sin logros.',
+                appText(context).creatorLevelGoalsTitle,
+                appText(context).creatorLevelGoalsDetail,
               ),
-              level('game', 'Juego completo', 'Metas, rachas y logros.'),
+              level(
+                'game',
+                appText(context).creatorLevelGameTitle,
+                appText(context).creatorLevelGameDetail,
+              ),
             ],
           ),
         ),
@@ -365,11 +386,13 @@ class _CompanionBuilderScreenState extends State<CompanionBuilderScreen> {
           ListTile(
             key: const Key('builder-activity'),
             leading: const Icon(Icons.edit_note),
-            title: Text('Qué anotas: ${activity!.name}'),
+            title: Text(
+              appText(context).creatorActivityLabel(activity!.name),
+            ),
             subtitle: Text(activity!.fields.map((f) => f['label']).join(', ')),
             trailing: IconButton(
               key: const Key('builder-remove-activity'),
-              tooltip: 'Quitar actividad',
+              tooltip: appText(context).creatorRemoveActivity,
               icon: const Icon(Icons.close),
               onPressed: () => setState(() => activity = null),
             ),
@@ -379,11 +402,16 @@ class _CompanionBuilderScreenState extends State<CompanionBuilderScreen> {
             key: const Key('builder-goal'),
             leading: const Icon(Icons.flag_outlined),
             title: Text(
-              'Meta: ${goalText(goal!, {for (final f in activity?.fields ?? const []) '${f['key']}': '${f['label']}'})}',
+              appText(context).creatorGoalLabel(
+                goalText(goal!, {
+                  for (final f in activity?.fields ?? const [])
+                    '${f['key']}': '${f['label']}',
+                }),
+              ),
             ),
             trailing: IconButton(
               key: const Key('builder-remove-goal'),
-              tooltip: 'Quitar meta',
+              tooltip: appText(context).creatorRemoveGoal,
               icon: const Icon(Icons.close),
               onPressed: () => setState(() => goal = null),
             ),
@@ -391,7 +419,7 @@ class _CompanionBuilderScreenState extends State<CompanionBuilderScreen> {
         const Divider(height: 24),
         SwitchListTile(
           key: const Key('builder-remind'),
-          title: const Text('Recordarme'),
+          title: Text(appText(context).creatorRemind),
           value: remind,
           onChanged: (v) => setState(() => remind = v),
         ),
@@ -412,21 +440,27 @@ class _CompanionBuilderScreenState extends State<CompanionBuilderScreen> {
           ),
           ListTile(
             key: const Key('builder-start'),
-            title: const Text('Desde'),
+            title: Text(appText(context).from),
             trailing: Text(clockText(start)),
             onTap: () => pick(start, (v) => start = v),
           ),
           ListTile(
             key: const Key('builder-end'),
-            title: const Text('Hasta'),
+            title: Text(appText(context).until),
             trailing: Text(clockText(end)),
             onTap: () => pick(end, (v) => end = v),
           ),
           SegmentedButton<String>(
             key: const Key('builder-tone'),
-            segments: const [
-              ButtonSegment(value: 'neutral', label: Text('Neutro')),
-              ButtonSegment(value: 'cheer', label: Text('Motivador')),
+            segments: [
+              ButtonSegment(
+                value: 'neutral',
+                label: Text(appText(context).neutral),
+              ),
+              ButtonSegment(
+                value: 'cheer',
+                label: Text(appText(context).motivating),
+              ),
             ],
             selected: {tone},
             onSelectionChanged: (v) => setState(() => tone = v.first),
@@ -508,16 +542,31 @@ class CompanionPreviewCard extends StatelessWidget {
             if (draft.description.isNotEmpty) Text(draft.description),
             const SizedBox(height: 8),
             Text(
-              'Qué anotas: ${activity == null ? 'lo decides al empezar' : '${activity.name}${activity.fields.isEmpty ? '' : ' (${activity.fields.map((f) => f['label']).join(', ')})'}${draft.instant ? ' · registro puntual' : ''}'}',
+              appText(context).creatorActivityLabel(
+                activity == null
+                    ? appText(context).creatorDecideOnStart
+                    : '${activity.name}${activity.fields.isEmpty ? '' : ' (${activity.fields.map((f) => f['label']).join(', ')})'}${draft.instant ? appText(context).creatorPunctualSuffix : ''}',
+              ),
               key: const Key('preview-activity'),
             ),
             Text(
-              'Meta: ${draft.goal == null ? 'sin meta' : goalText(draft.goal!, labels)}',
+              appText(context).creatorGoalLabel(
+                draft.goal == null
+                    ? appText(context).creatorNoGoal
+                    : goalText(draft.goal!, labels),
+              ),
               key: const Key('preview-goal'),
             ),
-            Text('Nivel: ${draft.levelText}', key: const Key('preview-level')),
             Text(
-              'Aviso: ${draft.reminder == null ? 'sin aviso' : reminderText(draft.reminder!)}',
+              appText(context).creatorLevelLabel(draft.levelText),
+              key: const Key('preview-level'),
+            ),
+            Text(
+              appText(context).creatorReminderLabel(
+                draft.reminder == null
+                    ? appText(context).creatorNoReminder
+                    : reminderText(draft.reminder!),
+              ),
               key: const Key('preview-reminder'),
             ),
             if (error != null)
@@ -536,17 +585,17 @@ class CompanionPreviewCard extends StatelessWidget {
                 FilledButton(
                   key: const Key('creator-create'),
                   onPressed: busy ? null : onCreate,
-                  child: const Text('Crear'),
+                  child: Text(appText(context).creatorCreate),
                 ),
                 OutlinedButton(
                   key: const Key('creator-edit'),
                   onPressed: busy ? null : onEdit,
-                  child: const Text('Editar'),
+                  child: Text(appText(context).edit),
                 ),
                 TextButton(
                   key: const Key('creator-discard'),
                   onPressed: busy ? null : onDiscard,
-                  child: const Text('Descartar'),
+                  child: Text(appText(context).creatorDiscard),
                 ),
               ],
             ),
@@ -602,6 +651,7 @@ class _CompanionAssistedScreenState extends State<CompanionAssistedScreen> {
   Future<void> send() async {
     final text = input.text.trim();
     if (text.isEmpty || busy) return;
+    final t = appText(context);
     setState(() {
       busy = true;
       error = null;
@@ -611,7 +661,7 @@ class _CompanionAssistedScreenState extends State<CompanionAssistedScreen> {
     try {
       final config = await widget.aiStore.load();
       if (config == null) {
-        throw const ValidationException('No hay una IA conectada.');
+        throw ValidationException(t.creatorNoAiConnected);
       }
       final answer = await (widget.client ?? AiClient()).reply(
         config,
@@ -638,7 +688,7 @@ class _CompanionAssistedScreenState extends State<CompanionAssistedScreen> {
       if (mounted) {
         setState(
           () => error =
-              'No se pudo completar la conversación. Puedes volver a intentarlo.',
+              t.creatorConversationFailed,
         );
       }
     } finally {
@@ -661,7 +711,7 @@ class _CompanionAssistedScreenState extends State<CompanionAssistedScreen> {
         setState(
           () => createError = e is ValidationException
               ? e.message
-              : 'No se pudo crear el acompañante. No se guardó nada.',
+              : appText(context).creatorCreateFailed,
         );
       }
     } finally {
@@ -682,7 +732,7 @@ class _CompanionAssistedScreenState extends State<CompanionAssistedScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Crear con ayuda de la IA')),
+    appBar: AppBar(title: Text(appText(context).creatorAssistedTitle)),
     body: Column(
       children: [
         Expanded(
@@ -748,12 +798,14 @@ class _CompanionAssistedScreenState extends State<CompanionAssistedScreen> {
                     maxLines: 4,
                     textInputAction: TextInputAction.send,
                     onSubmitted: (_) => send(),
-                    decoration: const InputDecoration(hintText: 'Escribe aquí'),
+                    decoration: InputDecoration(
+                      hintText: appText(context).creatorInputHint,
+                    ),
                   ),
                 ),
                 IconButton(
                   key: const Key('creator-send'),
-                  tooltip: 'Enviar',
+                  tooltip: appText(context).chatSend,
                   onPressed: busy ? null : send,
                   icon: const Icon(Icons.send),
                 ),

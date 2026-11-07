@@ -43,7 +43,7 @@ extension _ChatArchive on _AssistantChatScreenState {
       update(
         () =>
             error =
-                'El modelo pidió archivar con datos incompletos. El chat sigue abierto.',
+                appText(context).chatArchiveIncompleteDirective,
       );
     }
     if (directive != null && mounted && pending == null && !hasDeliveryBacklog) {
@@ -164,11 +164,11 @@ extension _ChatArchive on _AssistantChatScreenState {
         SnackBar(
           content: Text(
             automatic
-                ? 'El asistente archivó el chat. Puedes consultarlo en Chats archivados.'
-                : 'Chat archivado. El contexto activo se ha liberado.',
+                ? appText(context).chatArchiveDoneAuto
+                : appText(context).chatArchiveDone,
           ),
           action: SnackBarAction(
-            label: 'Ver archivos',
+            label: appText(context).chatArchiveViewAction,
             onPressed: openArchives,
           ),
         ),
@@ -178,7 +178,7 @@ extension _ChatArchive on _AssistantChatScreenState {
         update(
           () =>
               error =
-                  'No se pudo archivar. La conversación y los entrenamientos se conservan.',
+                  appText(context).chatArchiveError,
         );
       }
     } finally {
@@ -450,7 +450,7 @@ extension _ChatArchive on _AssistantChatScreenState {
         update(
           () =>
               error =
-                  'La propuesta de envío no es válida. Usa Enviar a Google Sheets en el menú.',
+                  appText(context).chatArchiveSyncInvalid,
         );
       }
     } else {
@@ -472,14 +472,14 @@ extension _ChatArchive on _AssistantChatScreenState {
       if (!mounted) return;
       update(() => recalledArchive = data);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text(
-            'Archivo disponible para tu próximo mensaje al asistente.',
+            appText(context).chatArchiveRecalled,
           ),
         ),
       );
     } catch (_) {
-      if (mounted) update(() => error = 'No se pudo consultar el archivo.');
+      if (mounted) update(() => error = appText(context).chatArchiveReadError);
     }
   }
 }

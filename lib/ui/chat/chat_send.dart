@@ -65,7 +65,7 @@ extension _ChatSend on _AssistantChatScreenState {
             ? 'Interpreta el adjunto de esta actividad.'
             : input.text;
     if (text.length > 8000) {
-      update(() => error = 'El registro supera 8000 caracteres.');
+      update(() => error = appText(context).chatSendFocusTooLong);
       return;
     }
     final interval = a.intervals.lastOrNull?.id;
@@ -76,6 +76,7 @@ extension _ChatSend on _AssistantChatScreenState {
       partialReply = '';
     });
     scrollToLatest();
+    final l = appText(context);
     try {
       final messageId = await captureFocusInput();
       if (messageId == null) return;
@@ -103,12 +104,12 @@ extension _ChatSend on _AssistantChatScreenState {
       final config = await aiStore.load();
       if (!aiReady) {
         error =
-            'Registro guardado en el móvil. La IA no está disponible para interpretarlo.';
+            l.chatSendSavedNoAi;
         return;
       }
       if (config == null) {
-        throw const ValidationException(
-          'Registro guardado en el móvil. Configura el proveedor para consultar al asistente.',
+        throw ValidationException(
+          l.chatSendSavedNoProvider,
         );
       }
       final activityHistory =
@@ -184,7 +185,7 @@ extension _ChatSend on _AssistantChatScreenState {
       error = e.message;
       if (aiReady && media == null) availability.failed();
     } catch (_) {
-      error = 'No se pudo consultar al asistente. Revisa el registro local.';
+      error = l.chatSendAssistantError;
       if (media == null) availability.failed();
     } finally {
       if (mounted) {
@@ -214,7 +215,7 @@ extension _ChatSend on _AssistantChatScreenState {
     if (deliveryInitializationFailed) {
       update(
         () => error =
-            'La cola durable no está disponible. Conserva el texto y vuelve a abrir el chat.',
+            appText(context).chatSendQueueUnavailable,
       );
       return;
     }
@@ -235,7 +236,7 @@ extension _ChatSend on _AssistantChatScreenState {
             : typed;
     if (busy || listening || text.isEmpty) return;
     if (text.length > 8000) {
-      update(() => error = 'El mensaje supera 8000 caracteres.');
+      update(() => error = appText(context).chatSendTooLong);
       return;
     }
     final previousPending = pending;
@@ -247,11 +248,12 @@ extension _ChatSend on _AssistantChatScreenState {
       partialReply = '';
     });
     scrollToLatest();
+    final l = appText(context);
     try {
       final config = await aiStore.load();
       if (config == null) {
-        throw const ValidationException(
-          'Configura el proveedor con el botón de ajustes para empezar.',
+        throw ValidationException(
+          l.chatSendConfigureProvider,
         );
       }
       final outgoing = AiMessage(
@@ -283,7 +285,7 @@ extension _ChatSend on _AssistantChatScreenState {
       } catch (_) {
         if (!reuse) messages.remove(outgoing);
         error =
-            'No se pudo guardar el mensaje en el móvil. Conserva el texto y vuelve a intentarlo.';
+            l.chatSendSaveError;
         return;
       }
       if (mounted) update(() {});
@@ -312,7 +314,7 @@ extension _ChatSend on _AssistantChatScreenState {
           !hasBlock(answer, 'activity-target') &&
           proposal == null) {
         error =
-            'El modelo envió una propuesta incompleta. Pídele que prepare de nuevo el ejercicio para mostrar Iniciar.';
+            appText(context).chatSendProposalIncomplete;
       }
       await aiStore.markVerified(config);
       messages.add(
@@ -335,14 +337,14 @@ extension _ChatSend on _AssistantChatScreenState {
         recalledArchive = null;
       } catch (_) {
         error =
-            'La respuesta llegó, pero no se pudo guardar la conversación en el móvil.';
+            l.chatSendAnswerSaveError;
       }
     } on ValidationException catch (e) {
       error = e.message;
       if (media == null) availability.failed();
     } catch (_) {
       error =
-          'No se pudo completar la conversación. Puedes volver a intentarlo.';
+          l.chatSendFailed;
       if (media == null) availability.failed();
     } finally {
       if (mounted) {

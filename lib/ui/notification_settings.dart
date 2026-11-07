@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../application/localization.dart';
 import '../application/rest_notifications.dart';
 
 /// Android's interruption filter that blocks everything, alarms included.
@@ -39,18 +40,16 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Avisos')),
+    appBar: AppBar(title: Text(appText(context).notices)),
     body: ListenableBuilder(
       listenable: n,
       builder: (context, _) {
         final scheme = Theme.of(context).colorScheme;
         final textTheme = Theme.of(context).textTheme;
         if (!n.supported) {
-          return const Padding(
-            padding: EdgeInsets.all(24),
-            child: Text(
-              'Los avisos de descanso solo están disponibles en Android.',
-            ),
+          return Padding(
+            padding: const EdgeInsets.all(24),
+            child: Text(appText(context).notifUnsupported),
           );
         }
         return ListView(
@@ -75,16 +74,16 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'No molestar está activo',
+                            appText(context).notifDndActive,
                             style: textTheme.titleSmall,
                           ),
                           const SizedBox(height: 4),
                           Text(
                             n.dndFilter == _totalSilence
-                                ? 'Estás en «Silencio total»: Android bloquea los avisos, incluso como alarma.'
+                                ? appText(context).notifDndTotalSilence
                                 : n.alarmStyle
-                                ? 'Los avisos de descanso suenan como alarma. Los demás avisos no sonarían ni vibrarían.'
-                                : 'Ahora mismo los avisos de descanso no sonarían ni vibrarían.',
+                                ? appText(context).notifDndAlarm
+                                : appText(context).notifDndPlain,
                             style: textTheme.bodySmall,
                           ),
                         ],
@@ -95,19 +94,15 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
               ),
             SwitchListTile(
               key: const Key('notify-enabled'),
-              title: const Text('Avisos de actividad y descanso'),
-              subtitle: const Text(
-                'Actividad lista, tramo en marcha, fin de tramo y fin de descanso.',
-              ),
+              title: Text(appText(context).notifEnabledTitle),
+              subtitle: Text(appText(context).notifEnabledSubtitle),
               value: n.enabled,
               onChanged: n.busy ? null : n.toggle,
             ),
             SwitchListTile(
               key: const Key('notify-alarm-style'),
-              title: const Text('Tratar como alarma'),
-              subtitle: const Text(
-                'El fin de descanso y de tramo suenan y vibran aunque No molestar esté en modo Prioridad.',
-              ),
+              title: Text(appText(context).notifAlarmStyleTitle),
+              subtitle: Text(appText(context).notifAlarmStyleSubtitle),
               value: n.alarmStyle,
               onChanged: n.busy ? null : n.setAlarmStyle,
             ),
@@ -115,17 +110,15 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
               ListTile(
                 key: const Key('notify-channel-blocked'),
                 leading: Icon(Icons.block, color: scheme.error),
-                title: const Text('Android bloquea el canal de alarma'),
-                subtitle: const Text('Actívalo en los ajustes del canal.'),
+                title: Text(appText(context).notifChannelBlockedTitle),
+                subtitle: Text(appText(context).notifChannelBlockedSubtitle),
                 trailing: const Icon(Icons.open_in_new),
                 onTap: () => n.openChannelSettings('alarm'),
               ),
             if (n.enabled && !n.exact)
               ListTile(
-                title: const Text('Permitir avisos puntuales'),
-                subtitle: const Text(
-                  'Sin este permiso Android puede retrasar el aviso.',
-                ),
+                title: Text(appText(context).notifExactTitle),
+                subtitle: Text(appText(context).notifExactSubtitle),
                 onTap: n.allowExact,
               ),
             if (n.error != null)
@@ -136,7 +129,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
               child: Text(
-                'Comprobar',
+                appText(context).notifCheck,
                 style: textTheme.labelLarge?.copyWith(color: scheme.primary),
               ),
             ),
@@ -146,7 +139,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                 key: const Key('notify-test'),
                 onPressed: n.busy ? null : n.testNotification,
                 icon: const Icon(Icons.notifications_active_outlined),
-                label: const Text('Probar aviso'),
+                label: Text(appText(context).notifTest),
               ),
             ),
             Padding(
@@ -155,7 +148,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                 key: const Key('notify-test-alarm'),
                 onPressed: n.busy ? null : () => n.testAlarm(),
                 icon: const Icon(Icons.timer_outlined),
-                label: const Text('Probar con No molestar activo'),
+                label: Text(appText(context).notifTestAlarm),
               ),
             ),
             if (n.testStatus != null)
@@ -169,13 +162,13 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                 key: const Key('notify-open-dnd'),
                 onPressed: n.openDndSettings,
                 icon: const Icon(Icons.open_in_new),
-                label: const Text('Abrir ajustes de No molestar'),
+                label: Text(appText(context).notifOpenDnd),
               ),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
               child: Text(
-                'En «Silencio total» Android bloquea todo, incluidas las alarmas. Ahí solo ayuda permitirlas en los ajustes de tu móvil.',
+                appText(context).notifSilenceNote,
                 style: textTheme.bodySmall?.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../application/localization.dart';
 import '../application/progress_service.dart';
 import '../domain/companion.dart';
 import '../domain/progress.dart';
@@ -37,24 +38,31 @@ class _ProgressScreenState extends State<ProgressScreen> {
       final loaded = await widget.service.state(widget.companion.id);
       if (mounted) setState(() => state = loaded);
     } catch (_) {
-      if (mounted) setState(() => error = 'No se pudo calcular el progreso.');
+      if (mounted) {
+        setState(() => error = appText(context).progressLoadError);
+      }
     }
   }
 
-  static const _months = [
-    'enero',
-    'febrero',
-    'marzo',
-    'abril',
-    'mayo',
-    'junio',
-    'julio',
-    'agosto',
-    'septiembre',
-    'octubre',
-    'noviembre',
-    'diciembre',
-  ];
+  /// Month name for the calendar labels, from the active catalog (1 = January).
+  static String monthName(BuildContext context, int month) {
+    final t = appText(context);
+    final names = [
+      t.progressMonth1,
+      t.progressMonth2,
+      t.progressMonth3,
+      t.progressMonth4,
+      t.progressMonth5,
+      t.progressMonth6,
+      t.progressMonth7,
+      t.progressMonth8,
+      t.progressMonth9,
+      t.progressMonth10,
+      t.progressMonth11,
+      t.progressMonth12,
+    ];
+    return names[month - 1];
+  }
 
   Widget calendar(ProgressState s) {
     final todayKey = widget.service.today;
@@ -85,12 +93,17 @@ class _ProgressScreenState extends State<ProgressScreen> {
                     final done = s.doneDays.contains(key);
                     final future = day.isAfter(today);
                     final isToday = key == todayKey;
-                    final label =
-                        '${day.day} de ${_months[day.month - 1]}: ${done
-                            ? 'cumplido'
-                            : future
-                            ? 'pendiente'
-                            : 'sin cumplir'}';
+                    final t = appText(context);
+                    final status = done
+                        ? t.progressDayDone
+                        : future
+                        ? t.progressDayPending
+                        : t.progressDayMissed;
+                    final label = t.progressDayStatus(
+                      day.day,
+                      monthName(context, day.month),
+                      status,
+                    );
                     return Expanded(
                       child: Semantics(
                         label: label,
@@ -134,8 +147,10 @@ class _ProgressScreenState extends State<ProgressScreen> {
     final fraction = unlocked ? 1.0 : (s.achievementFractions[a.id] ?? 0);
     return Semantics(
       label: unlocked
-          ? '${a.title}, desbloqueado'
-          : '${a.title}, bloqueado, ${(fraction * 100).round()} % de progreso',
+          ? appText(context).progressAchievementUnlocked(a.title)
+          : appText(
+              context,
+            ).progressAchievementLocked(a.title, (fraction * 100).round()),
       excludeSemantics: true,
       child: Column(
         key: Key('achievement-${a.ruleHash}'),
@@ -171,7 +186,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
     final s = state;
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: AppBar(title: Text('Progreso · ${widget.companion.name}')),
+      appBar: AppBar(
+        title: Text(appText(context).progressTitle(widget.companion.name)),
+      ),
       body: error != null
           ? Center(child: Text(error!))
           : s == null
@@ -183,20 +200,21 @@ class _ProgressScreenState extends State<ProgressScreen> {
                   child: ListTile(
                     leading: const Icon(Icons.local_fire_department, size: 32),
                     title: Text(
-                      s.streak.current == 1
-                          ? 'Racha actual: 1 día'
-                          : 'Racha actual: ${s.streak.current} días',
+                      appText(context).progressStreakCurrent(s.streak.current),
                       key: const Key('streak-current'),
                     ),
                     subtitle: Text(
-                      'Mejor racha: ${s.streak.best}'
-                      '${s.settings.freeDaysPerWeek == 0 ? '' : ' · Días libres esta semana: ${s.streak.freeDaysUsedThisWeek}/${s.settings.freeDaysPerWeek}'}',
+                      '${appText(context).progressStreakBest(s.streak.best)}'
+                      '${s.settings.freeDaysPerWeek == 0 ? '' : ' · ${appText(context).progressFreeDays(s.streak.freeDaysUsedThisWeek, s.settings.freeDaysPerWeek)}'}',
                       key: const Key('streak-best'),
                     ),
                   ),
                 ),
                 const SizedBox(height: 12),
-                Text('Últimas 4 semanas', style: theme.textTheme.titleSmall),
+                Text(
+                  appText(context).progressLastFourWeeks,
+                  style: theme.textTheme.titleSmall,
+                ),
                 const SizedBox(height: 4),
                 calendar(s),
                 const SizedBox(height: 16),
@@ -212,11 +230,14 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       ),
                       title: Text(
                         s.goal!.period == 'day'
-                            ? 'Meta de hoy'
-                            : 'Meta de la semana',
+                            ? appText(context).progressGoalToday
+                            : appText(context).progressGoalWeek,
                       ),
                       subtitle: Text(
-                        '${_n(s.goalProgress!.value)} de ${_n(s.goal!.target)}',
+                        appText(context).progressGoalValues(
+                          _n(s.goalProgress!.value),
+                          _n(s.goal!.target),
+                        ),
                         key: const Key('goal-text'),
                       ),
                       trailing: s.goalProgress!.met
@@ -226,7 +247,10 @@ class _ProgressScreenState extends State<ProgressScreen> {
                   ),
                 const SizedBox(height: 8),
                 Text(
-                  'Logros · ${s.unlockedCount} de ${s.achievements.length}',
+                  appText(context).progressAchievementsTitle(
+                    s.unlockedCount,
+                    s.achievements.length,
+                  ),
                   key: const Key('achievements-title'),
                   style: theme.textTheme.titleSmall,
                 ),
@@ -234,8 +258,10 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 if (s.achievements.isEmpty)
                   Text(
                     s.settings.game && s.settings.achievementsEnabled
-                        ? 'Tus logros aparecerán al terminar tu primera actividad.'
-                        : 'Activa el modo Juego y los logros en «Modo y avisos».',
+                        ? appText(context).progressAchievementsEmptyPlay
+                        : appText(context).progressAchievementsEmptyEnable(
+                            appText(context).modeAndNotices,
+                          ),
                     key: const Key('achievements-empty'),
                   )
                 else

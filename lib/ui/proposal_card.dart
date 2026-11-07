@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../application/localization.dart';
+
 /// Una propuesta de la IA sobre una propiedad fija por el usuario (FR-023).
 class LockedProposal {
   const LockedProposal(this.property, this.currentValue, this.proposedValue);
@@ -37,15 +39,20 @@ class ProposalCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Propuesta de la IA sobre datos fijados por ti',
-            style: TextStyle(fontWeight: FontWeight.bold),
+          Text(
+            appText(context).proposalLockedTitle,
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           for (final p in proposals)
             Padding(
               padding: const EdgeInsets.only(top: 4),
               child: Text(
-                '${_label(p.property)}: ${p.currentValue} ${_unit(p.property)} → ${p.proposedValue} ${_unit(p.property)}',
+                appText(context).proposalChangeLine(
+                  _label(p.property),
+                  p.currentValue,
+                  _unit(p.property),
+                  p.proposedValue,
+                ),
               ),
             ),
           const SizedBox(height: 8),
@@ -54,13 +61,13 @@ class ProposalCard extends StatelessWidget {
               OutlinedButton(
                 key: const Key('proposal-ignore'),
                 onPressed: onIgnore,
-                child: const Text('Ignorar'),
+                child: Text(appText(context).proposalIgnore),
               ),
               const SizedBox(width: 12),
               FilledButton(
                 key: const Key('proposal-apply'),
                 onPressed: onApply,
-                child: const Text('Aplicar'),
+                child: Text(appText(context).proposalApply),
               ),
             ],
           ),
@@ -79,7 +86,7 @@ class LockBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Semantics(
     button: true,
-    label: 'Fijado por ti. Toca para liberar',
+    label: appText(context).proposalLockLabel,
     excludeSemantics: true,
     onTap: onRelease,
     child: InkResponse(

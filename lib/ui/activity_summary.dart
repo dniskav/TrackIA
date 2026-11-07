@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../application/localization.dart';
 import '../application/progress_engine.dart' show formatCount;
 import '../domain/progress.dart';
 import 'goal_ring.dart';
@@ -50,7 +51,10 @@ class ActivitySummary extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Sesión terminada', style: theme.textTheme.titleLarge),
+            Text(
+              appText(context).homeSessionFinished,
+              style: theme.textTheme.titleLarge,
+            ),
             const SizedBox(height: 16),
             const GoalRing(
               key: Key('summary-ring'),
@@ -67,7 +71,7 @@ class ActivitySummary extends StatelessWidget {
             const SizedBox(height: 12),
             if (delta.isEmpty)
               Text(
-                'Sin novedades esta vez. Seguimos.',
+                appText(context).homeSummaryEmpty,
                 key: const Key('summary-empty'),
                 style: theme.textTheme.bodyMedium,
               ),
@@ -87,13 +91,13 @@ class ActivitySummary extends StatelessWidget {
                 dense: true,
                 leading: Icon(achievementIcon(achievement.icon)),
                 title: Text(achievement.title),
-                subtitle: const Text('Logro nuevo'),
+                subtitle: Text(appText(context).homeNewAchievement),
               ),
             const SizedBox(height: 8),
             FilledButton(
               key: const Key('summary-close'),
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Listo'),
+              child: Text(appText(context).homeDone),
             ),
           ],
         ),

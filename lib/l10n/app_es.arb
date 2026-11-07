@@ -590,5 +590,1076 @@
     "placeholders": {
       "version": {}
     }
+  },
+  "activityIdleOtherActive": "Otro acompañante activo",
+  "activityIdleNoActivity": "Sin actividad",
+  "activityIdleEndOther": "Termina la otra actividad para iniciar aquí",
+  "activityIdleRegisterAnytime": "Registra una cuando quieras",
+  "activityNewActivity": "Nueva actividad",
+  "activityIdleRecord": "Registrar",
+  "activityRestLabel": "Descanso",
+  "activityRestDone": "Descanso terminado",
+  "activityRestPaused": "Descanso pausado",
+  "activityRestPause": "Pausar",
+  "activityRestContinue": "Continuar",
+  "activityRestStart": "Iniciar descanso",
+  "activityRestRestart": "Reiniciar descanso",
+  "activityRestAdjust": "{seconds}s · Ajustar",
+  "@activityRestAdjust": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "activityRestNotice": "Aviso con esta pantalla abierta; el tiempo sigue al salir.",
+  "activityRestDurationTitle": "Tiempo de descanso",
+  "activityRestSecondsLabel": "Segundos",
+  "activityRestRangeHint": "Entre 5 y 1800 segundos. Al aplicar, el contador queda listo para empezar.",
+  "activityRestApply": "Aplicar",
+  "activityDialogNameTitle": "Nombre de la actividad",
+  "activityDialogSaveName": "Guardar nombre",
+  "activityDialogRestRange": "Entre 0 y 1800",
+  "activityDialogWhatToDo": "¿Qué vas a hacer?",
+  "activityDialogYourActivities": "Tus actividades",
+  "activityDialogInstantRecord": "Registro puntual",
+  "activityDialogYourActivity": "Tu actividad",
+  "activityDialogFromCurrentWorkout": "Del entrenamiento actual",
+  "activityDialogSetsProgress": "{done}/{target} series · {repsMin}–{repsMax} reps",
+  "@activityDialogSetsProgress": {
+    "placeholders": {
+      "done": {},
+      "target": {},
+      "repsMin": {},
+      "repsMax": {}
+    }
+  },
+  "activityDialogRepeat": "Volver a hacer",
+  "activityDialogRoutineSets": "{routine} · {sets} series",
+  "@activityDialogRoutineSets": {
+    "placeholders": {
+      "routine": {},
+      "sets": {
+        "type": "int"
+      }
+    }
+  },
+  "activityDialogEndTitle": "Terminar actividad",
+  "activityDialogDate": "Fecha",
+  "activityDialogTime": "Hora",
+  "activityBuilderNameRequired": "Escribe un nombre para la actividad.",
+  "activityBuilderOnlyIntegers": "Escribe solo números enteros.",
+  "activityBuilderRange": "{what} va de {min} a {max}.",
+  "@activityBuilderRange": {
+    "placeholders": {
+      "what": {},
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "activityBuilderWhatDuration": "La duración",
+  "activityBuilderWhatRest": "El descanso",
+  "activityBuilderWhatSegments": "Los tramos previstos",
+  "activityBuilderWhatCycles": "Los ciclos previstos",
+  "activityBuilderDurationRequired": "Indica la duración en minutos.",
+  "activityBuilderSegmentNamesPair": "Indica singular y plural del tramo, o deja los dos vacíos.",
+  "activityBuilderFromTemplate": "Empezar desde una plantilla",
+  "activityBuilderHowMeasured": "¿Cómo se mide?",
+  "activityBuilderInstantTitle": "Puntual",
+  "activityBuilderInstantDetail": "Un registro sin cronómetro",
+  "activityBuilderFreeTitle": "Libre",
+  "activityBuilderFreeDetail": "Cronómetro, sin cuenta atrás",
+  "activityBuilderTimedTitle": "Con duración",
+  "activityBuilderTimedDetail": "Cuenta atrás de un tiempo fijo",
+  "activityBuilderSegmentsTitle": "Por tramos",
+  "activityBuilderSegmentsDetail": "Varios tramos con descanso",
+  "activityBuilderDuration": "Duración (minutos)",
+  "activityBuilderSegmentHelper": "Opcional: de cada tramo",
+  "activityBuilderPlannedSegments": "Tramos previstos (opcional)",
+  "activityBuilderRestBetween": "Descanso entre tramos (segundos)",
+  "activityBuilderRestHelper": "90 es un minuto y medio",
+  "activityBuilderPlannedCycles": "Ciclos previstos (opcional)",
+  "activityBuilderSegmentSingular": "Un tramo se llama",
+  "activityBuilderSegmentPlural": "Varios se llaman",
+  "activityBuilderWhatToNote": "¿Qué quieres anotar? (opcional)",
+  "activityBuilderRemoveField": "Quitar {label}",
+  "@activityBuilderRemoveField": {
+    "placeholders": {
+      "label": {}
+    }
+  },
+  "activityBuilderMaxFields": "Máximo 12 campos",
+  "activityBuilderAddField": "Añadir campo",
+  "activityBuilderSaveInActivities": "Guardar en tus actividades",
+  "activityBuilderSaveInActivitiesHelp": "Para repetirla sin volver a crearla.",
+  "activityBuilderPrepare": "Preparar actividad",
+  "activityBuilderNewField": "Nuevo campo",
+  "activityBuilderFieldNameRequired": "Escribe un nombre de campo de hasta 80 caracteres.",
+  "activityBuilderFieldName": "Nombre del campo",
+  "activityBuilderFieldType": "Tipo",
+  "activityBuilderFieldUnit": "Unidad (opcional)",
+  "activityBuilderOptions": "Opciones",
+  "activityBuilderOptionsHelp": "Separadas por comas",
+  "activityBuilderScaleMin": "Mínimo",
+  "activityBuilderScaleMax": "Máximo",
+  "activityBuilderScaleRange": "Escribe el mínimo y el máximo de la escala.",
+  "activityBuilderAggregate": "Cómo cuenta",
+  "activityBuilderCountSingular": "Se cuenta como (uno)",
+  "activityBuilderCountSingularHelp": "Opcional, p. ej. libro",
+  "activityBuilderCountPlural": "Se cuenta como (varios)",
+  "activityBuilderCountPluralHelp": "Opcional, p. ej. libros",
+  "activityBuilderAdd": "Añadir",
+  "aiPerReadError": "No se pudo leer la configuración por acompañante.",
+  "aiPerSaveError": "No se pudo guardar el cambio.",
+  "aiPerTitle": "Por acompañante",
+  "aiPerNoProvider": "Conecta primero un proveedor para poder elegir un modelo distinto en cada acompañante.",
+  "aiPerHelp": "Cada acompañante usa tu proveedor, o un modelo propio de ese mismo proveedor.",
+  "aiPerDefault": "Por defecto",
+  "aiPerDialogTitle": "IA de {name}",
+  "@aiPerDialogTitle": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "aiPerDialogHelp": "Usa {service} con la clave de tu perfil. Solo cambia el modelo de este acompañante.",
+  "@aiPerDialogHelp": {
+    "placeholders": {
+      "service": {}
+    }
+  },
+  "aiPerUseDefault": "Usar el predeterminado",
+  "aiSetAndroidFileAccess": "Android no entregó acceso al archivo seleccionado.",
+  "aiSetGgufTitle": "Modelo GGUF",
+  "aiSetLocalContextHelp": "TrackIA recomienda {context} para sus instrucciones, historial y datos. La recomendación es para las necesidades de la app, no para el límite de este GGUF. Si el modelo no soporta el tamaño elegido, puede fallar; tú decides si bajarlo.",
+  "@aiSetLocalContextHelp": {
+    "placeholders": {
+      "context": {}
+    }
+  },
+  "aiSetModelsCountChatGpt": "Modelos disponibles para esta cuenta: {count}. La prueba de conexión confirma el acceso al elegido.",
+  "@aiSetModelsCountChatGpt": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiSetCatalogCountApi": "{count} modelos obtenidos del proveedor. La prueba de conexión confirma si tu clave puede usar el elegido.",
+  "@aiSetCatalogCountApi": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiSetCatalogErrorChatGpt": "No se pudo obtener el catálogo de esta cuenta. Comprueba la conexión e inténtalo de nuevo.",
+  "aiSetCatalogErrorApi": "No se pudo obtener el catálogo. Puedes volver a intentarlo o indicar el modelo manualmente.",
+  "transferSheetReadError": "No se pudo leer la hoja.",
+  "transferSheetTooLarge": "La hoja supera 20 MB.",
+  "transferSheetLoadError": "No se pudo cargar la hoja. Vuelve a intentarlo.",
+  "transferSheetLoaded": "Hoja cargada. Pendiente de interpretación por la IA.",
+  "transferFileTooLarge": "El archivo supera 20 MB.",
+  "transferSheetSelectedError": "No se pudo leer la hoja seleccionada.",
+  "transferFileReadError": "No se pudo leer o compartir el archivo.",
+  "transferDefaultSheetName": "Hoja cargada",
+  "transferShareSubject": "Copia de seguridad TrackIA",
+  "transferShareText": "Guarda este archivo en Drive o en un lugar seguro.",
+  "transferRestoreTitle": "¿Restaurar esta copia?",
+  "transferRestoreBody": "Contiene {workouts, plural, one{1 sesión} other{{workouts} sesiones}} y {routines, plural, one{1 rutina} other{{routines} rutinas}}{active}. Sustituirá todos los datos que hay ahora en este teléfono. Guarda antes una copia actual si quieres conservarlos.",
+  "@transferRestoreBody": {
+    "placeholders": {
+      "workouts": {
+        "type": "int"
+      },
+      "routines": {
+        "type": "int"
+      },
+      "active": {}
+    }
+  },
+  "transferRestoreActive": ", incluida una sesión en curso",
+  "transferRestoreAction": "Restaurar",
+  "transferRestored": "Copia restaurada. Sesiones y rutinas actualizadas.",
+  "transferNoAccessSheet": "No se pudo leer esa hoja. En Google Sheets usa «Enviar una copia» como Excel o CSV y elige TrackIA.",
+  "transferHeadline": "Tu historial, bajo tu control",
+  "transferIntro": "Guarda una copia fuera de este móvil para recuperarla o pasarla a otro teléfono.",
+  "transferBackupTitle": "Copia de seguridad",
+  "transferBackupHelp": "Incluye historial, rutinas y sesión en curso.",
+  "transferSheetsTitle": "Histórico de Google Sheets",
+  "transferSheetsHelpAndroid": "Carga tu hoja y pestaña con autorización de Google, o elige una copia Excel o CSV. Se conservan las celdas originales; la IA podrá interpretar tu formato cuando esté conectada.",
+  "transferSheetsHelpOther": "Carga una copia Excel o CSV. Se conservan las celdas originales, pendientes de interpretación por la IA.",
+  "transferImportSheets": "Importar desde Google Sheets",
+  "transferChooseFileAndroid": "Elegir archivo del móvil o Drive",
+  "transferChooseFileOther": "Elegir copia XLSX o CSV",
+  "transferWorkoutSubtitle": "{date} · {exercises} ejercicios · {sets} series",
+  "@transferWorkoutSubtitle": {
+    "placeholders": {
+      "date": {},
+      "exercises": {
+        "type": "int"
+      },
+      "sets": {
+        "type": "int"
+      }
+    }
+  },
+  "transferNoColumnWorkout": "Sin columna · Entrenamiento",
+  "transferChooseColumn": "Elegir columna",
+  "transferCsvReviewError": "No se pudo revisar el CSV.",
+  "transferImportSessionsTitle": "¿Importar estas sesiones?",
+  "transferImportSessionsBody": "Se añadirán {count, plural, one{1 sesión} other{{count} sesiones}} con {sets} series. Filas omitidas por error: {errors}.",
+  "@transferImportSessionsBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "sets": {
+        "type": "int"
+      },
+      "errors": {
+        "type": "int"
+      }
+    }
+  },
+  "transferImportAction": "Importar",
+  "transferImportError": "No se pudo importar.",
+  "transferImportSheetTitle": "Importar hoja",
+  "transferImportedSummary": "{added, plural, one{1 sesión importada} other{{added} sesiones importadas}} · {duplicates, plural, one{1 duplicada omitida} other{{duplicates} duplicadas omitidas}}.",
+  "@transferImportedSummary": {
+    "placeholders": {
+      "added": {
+        "type": "int"
+      },
+      "duplicates": {
+        "type": "int"
+      }
+    }
+  },
+  "transferRowsFound": "{count} filas encontradas",
+  "@transferRowsFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "transferMapHelp": "Asocia las columnas de tu hoja. Una fila representa una serie.",
+  "transferDate": "Fecha",
+  "transferSessionOptional": "Sesión (opcional)",
+  "transferExercise": "Ejercicio",
+  "transferWeightKg": "Peso (kg)",
+  "transferReps": "Repeticiones",
+  "transferReviewImport": "Revisar importación",
+  "transferPreviewSummary": "{newCount, plural, one{1 sesión nueva} other{{newCount} sesiones nuevas}} · {duplicateCount, plural, one{1 duplicada} other{{duplicateCount} duplicadas}} · {errorCount, plural, one{1 fila con error} other{{errorCount} filas con errores}}",
+  "@transferPreviewSummary": {
+    "placeholders": {
+      "newCount": {
+        "type": "int"
+      },
+      "duplicateCount": {
+        "type": "int"
+      },
+      "errorCount": {
+        "type": "int"
+      }
+    }
+  },
+  "transferValidRows": "{valid} series válidas de {total} filas.",
+  "@transferValidRows": {
+    "placeholders": {
+      "valid": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "transferAllSessions": "Todas las sesiones",
+  "transferSeeSessions": "Ver las {count} sesiones",
+  "@transferSeeSessions": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "transferErrorRows": "Filas con errores",
+  "transferSeeErrors": "Ver los {count} errores",
+  "@transferSeeErrors": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "transferImportNew": "Importar sesiones nuevas",
+  "transferCloseAction": "Cerrar",
+  "chatAttachVoiceError": "No se pudo reconocer la voz. Comprueba el permiso de micrófono o escribe tu mensaje.",
+  "chatAttachVoiceUnavailable": "El reconocimiento de voz no está disponible. Revisa el permiso de micrófono y el servicio de voz del teléfono.",
+  "chatAttachDictationStart": "No se pudo iniciar el dictado.",
+  "chatAttachCamera": "Cámara",
+  "chatAttachPhotos": "Fotos",
+  "chatAttachPdf": "Documento PDF",
+  "chatAttachPdfHint": "Necesita un modelo que admita documentos",
+  "chatAttachAudio": "Archivo de audio",
+  "chatAttachAudioHint": "Requiere un modelo de Gemini que admita audio",
+  "chatAttachSpreadsheet": "Hoja Excel o CSV",
+  "chatAttachSheet": "Google Sheets / Drive",
+  "chatAttachNeedsAi": "Conecta la IA para enviar imágenes, documentos o audio. Puedes cargar una hoja sin IA.",
+  "chatAttachPhotoTooLarge": "La foto supera 4 MB.",
+  "chatAttachPhotoFormat": "Elige una foto JPG, PNG o WebP.",
+  "chatAttachPhotoEmpty": "La foto debe tener contenido y no superar 4 MB.",
+  "chatAttachAudioNeedsGemini": "Para enviar un archivo de audio configura un modelo de Gemini con audio. Puedes usar el micrófono del chat para dictar el mensaje.",
+  "chatAttachTooLarge": "El adjunto supera 4 MB.",
+  "chatAttachUnreadable": "No se pudo leer el adjunto.",
+  "chatAttachFormat": "Formato de adjunto no compatible.",
+  "chatAttachInvalidPdf": "El archivo no contiene un PDF válido.",
+  "chatAttachOpenFailed": "No se pudo abrir el adjunto.",
+  "chatAttachRecoveredTooLarge": "La foto recuperada supera 4 MB. Elige una más pequeña.",
+  "chatMenuCompanionsError": "No se pudieron cargar los acompañantes.",
+  "chatMenuMore": "Más opciones",
+  "chatMenuTraining": "Rutinas e historial",
+  "chatMenuProgress": "Progreso",
+  "chatMenuSheet": "Hoja cargada",
+  "chatMenuRecover": "Recuperar preparación",
+  "chatSendFocusTooLong": "El registro supera 8000 caracteres.",
+  "chatSendSavedNoAi": "Registro guardado en el móvil. La IA no está disponible para interpretarlo.",
+  "chatSendSavedNoProvider": "Registro guardado en el móvil. Configura el proveedor para consultar al asistente.",
+  "chatSendAssistantError": "No se pudo consultar al asistente. Revisa el registro local.",
+  "chatSendQueueUnavailable": "La cola durable no está disponible. Conserva el texto y vuelve a abrir el chat.",
+  "chatSendTooLong": "El mensaje supera 8000 caracteres.",
+  "chatSendConfigureProvider": "Configura el proveedor con el botón de ajustes para empezar.",
+  "chatSendSaveError": "No se pudo guardar el mensaje en el móvil. Conserva el texto y vuelve a intentarlo.",
+  "chatSendProposalIncomplete": "El modelo envió una propuesta incompleta. Pídele que prepare de nuevo el ejercicio para mostrar Iniciar.",
+  "chatSendAnswerSaveError": "La respuesta llegó, pero no se pudo guardar la conversación en el móvil.",
+  "chatSendFailed": "No se pudo completar la conversación. Puedes volver a intentarlo.",
+  "chatMsgOnlyLastEditable": "Solo se puede editar el último mensaje. Escribe una corrección como mensaje nuevo.",
+  "chatMsgPending": "Pendiente de envío",
+  "chatMsgSending": "Enviando",
+  "chatMsgAnswered": "Respondido",
+  "chatMsgFailed": "No aceptado; puedes reenviar",
+  "chatMsgUncertain": "Resultado incierto; reenvío bloqueado hasta revisar",
+  "chatMsgHistory": "Historial",
+  "chatMsgResend": "Reenviar",
+  "chatMsgAiNotReady": "La IA no está lista.",
+  "chatMsgSendInProgress": "Hay un envío en curso.",
+  "chatMsgChangedWhileEditing": "El mensaje cambió mientras lo editabas. Revisa el historial.",
+  "chatMsgSaveNotSent": "Edición guardada, pero no se pudo enviar ahora. Usa Reenviar cuando puedas.",
+  "chatMsgSavedOnly": "Edición guardada. Usa Reenviar para enviar esta versión.",
+  "chatMsgLengthError": "Escribe un mensaje de 1 a 8000 caracteres.",
+  "chatMsgEditError": "No se pudo guardar la edición; el original se conserva.",
+  "chatMsgHistoryTitle": "Historial de versiones",
+  "chatMsgVersion": "Versión {n}",
+  "@chatMsgVersion": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "chatMsgVersionCurrent": "Versión {n} · actual",
+  "@chatMsgVersionCurrent": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "chatMsgClose": "Cerrar",
+  "chatMsgHistoryError": "No se pudo abrir el historial.",
+  "chatMsgEditTitle": "Editar mensaje",
+  "chatMsgEditLabel": "Texto corregido",
+  "chatMsgEditHelper": "La versión original se conserva en el historial.",
+  "chatMsgSendBlocked": "No se puede enviar ahora: {reason}",
+  "@chatMsgSendBlocked": {
+    "placeholders": {
+      "reason": {}
+    }
+  },
+  "chatMsgSaveAndSend": "Guardar y enviar",
+  "chatSheetReloadError": "No se pudo recuperar la hoja cargada.",
+  "chatSheetAndroidOnly": "La conexión con Google Sheets está disponible en Android.",
+  "chatSheetSaveError": "No se pudo guardar la hoja en el móvil. La copia anterior se conserva.",
+  "chatSheetInterpretPending": "La respuesta llegó, pero la hoja sigue pendiente de interpretación en el móvil.",
+  "chatSheetRefreshError": "No se pudo actualizar la hoja. La copia anterior se conserva.",
+  "chatSheetRemoveError": "No se pudo quitar la copia de la hoja.",
+  "chatSheetDialogBody": "{title} · {rows} filas\nÚltima lectura: {date}.\n\n{status}",
+  "@chatSheetDialogBody": {
+    "placeholders": {
+      "title": {},
+      "rows": {
+        "type": "int"
+      },
+      "date": {},
+      "status": {}
+    }
+  },
+  "chatSheetStatusPending": "Pendiente de interpretación por la IA. No se han importado entrenamientos.",
+  "chatSheetStatusAnalyzed": "El asistente ha analizado esta copia; no se han importado entrenamientos.",
+  "chatSheetRemove": "Quitar del contexto",
+  "chatSheetChange": "Cambiar hoja",
+  "chatSheetRefresh": "Actualizar hoja",
+  "chatSheetLabel": "Hoja · {title}",
+  "@chatSheetLabel": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "chatProposalRepeated": "Series / tramos · {seconds}s de descanso",
+  "@chatProposalRepeated": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "chatProposalContinuous": "Actividad continua · {seconds}s de descanso",
+  "@chatProposalContinuous": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "chatSheetPendingInfo": "«{name}» cargada · pendiente de interpretación. Los datos originales se conservan.",
+  "@chatSheetPendingInfo": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "chatGameFocusOpen": "Termina la actividad abierta en el otro acompañante antes de preparar esta.",
+  "chatGamePrepareError": "No se pudo preparar la actividad. Vuelve a intentarlo.",
+  "chatGameGoalTitle": "Meta propuesta: {goal}",
+  "@chatGameGoalTitle": {
+    "placeholders": {
+      "goal": {}
+    }
+  },
+  "chatGameAchievementTitle": "Logro propuesto: {title}",
+  "@chatGameAchievementTitle": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "chatGameCopyTitle": "Textos de recordatorio propuestos",
+  "chatDeliveryQueueError": "No se pudo abrir la cola durable del chat. No se enviarán mensajes por un almacenamiento alternativo.",
+  "chatDeliveryRestoredPending": "Tu mensaje quedó guardado sin respuesta. Puedes volver a enviarlo.",
+  "chatDeliveryUncertain": "Hay un envío con resultado incierto. No se reenviará automáticamente; revisa el historial antes de decidir.",
+  "chatDeliveryBacklog": "Tienes mensajes guardados sin respuesta. Usa Reenviar cuando quieras; no se enviarán automáticamente.",
+  "chatDeliveryOtherChat": "El mensaje pertenece a otro chat y no se enviará aquí.",
+  "chatDeliveryNotSafe": "Este mensaje no es seguro de reenviar.",
+  "chatDeliveryStateChanged": "El mensaje ya cambió de estado; no se hizo otro envío.",
+  "chatDeliveryUncertainSend": "El resultado del envío es incierto. No se reenviará automáticamente; comprueba si llegó una respuesta.",
+  "chatDeliveryFailed": "No se pudo completar la conversación. El mensaje permanece guardado; no se hará un reenvío automático.",
+  "chatArchiveIncompleteDirective": "El modelo pidió archivar con datos incompletos. El chat sigue abierto.",
+  "chatArchiveDoneAuto": "El asistente archivó el chat. Puedes consultarlo en Chats archivados.",
+  "chatArchiveDone": "Chat archivado. El contexto activo se ha liberado.",
+  "chatArchiveViewAction": "Ver archivos",
+  "chatArchiveError": "No se pudo archivar. La conversación y los entrenamientos se conservan.",
+  "chatArchiveSyncInvalid": "La propuesta de envío no es válida. Usa Enviar a Google Sheets en el menú.",
+  "chatArchiveRecalled": "Archivo disponible para tu próximo mensaje al asistente.",
+  "chatArchiveReadError": "No se pudo consultar el archivo.",
+  "chatDraftSaveError": "No se pudo guardar el borrador. Conserva el texto y vuelve a intentarlo.",
+  "chatLoadError": "No se pudo recuperar la conversación anterior.",
+  "chatLoadSheetError": "No se pudo recuperar la hoja guardada. Vuelve a cargarla desde Google Sheets.",
+  "chatPersistTooLarge": "El chat supera 20 MB; no se pudo guardar completo.",
+  "creatorCreate": "Crear",
+  "creatorCreateFailed": "No se pudo crear el acompañante. No se guardó nada.",
+  "creatorAssistedTitle": "Crear con ayuda de la IA",
+  "creatorAiTitle": "Con ayuda de la IA",
+  "creatorAiReadySubtitle": "Cuéntale qué quieres seguir y te propone un acompañante.",
+  "creatorAiNotReadySubtitle": "Necesitas conectar y verificar un proveedor de IA.",
+  "creatorOpenAiSettings": "Abrir Ajustes de IA",
+  "creatorManualTitle": "A mano",
+  "creatorManualSubtitle": "Elige nombre, icono, color, modo y aviso tú mismo.",
+  "creatorNewTitle": "Nuevo acompañante",
+  "creatorEditProposalTitle": "Editar propuesta",
+  "creatorNameLength": "Escribe un nombre de entre 1 y 40 caracteres.",
+  "creatorLevelReminderTitle": "Solo recordatorio",
+  "creatorLevelReminderDetail": "Te avisa y ya.",
+  "creatorLevelGoalsTitle": "Metas y rachas",
+  "creatorLevelGoalsDetail": "Recomendado: metas y rachas, sin logros.",
+  "creatorLevelGameTitle": "Juego completo",
+  "creatorLevelGameDetail": "Metas, rachas y logros.",
+  "creatorActivityLabel": "Qué anotas: {name}",
+  "@creatorActivityLabel": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "creatorRemoveActivity": "Quitar actividad",
+  "creatorGoalLabel": "Meta: {text}",
+  "@creatorGoalLabel": {
+    "placeholders": {
+      "text": {}
+    }
+  },
+  "creatorRemoveGoal": "Quitar meta",
+  "creatorRemind": "Recordarme",
+  "creatorDecideOnStart": "lo decides al empezar",
+  "creatorPunctualSuffix": " · registro puntual",
+  "creatorNoGoal": "sin meta",
+  "creatorNoReminder": "sin aviso",
+  "creatorReminderLabel": "Aviso: {text}",
+  "@creatorReminderLabel": {
+    "placeholders": {
+      "text": {}
+    }
+  },
+  "creatorLevelLabel": "Nivel: {text}",
+  "@creatorLevelLabel": {
+    "placeholders": {
+      "text": {}
+    }
+  },
+  "creatorDiscard": "Descartar",
+  "creatorNoAiConnected": "No hay una IA conectada.",
+  "creatorConversationFailed": "No se pudo completar la conversación. Puedes volver a intentarlo.",
+  "creatorInputHint": "Escribe aquí",
+  "creatorPromptHelper": "Se usan cuando conectes un proveedor.",
+  "creatorLevelSection": "Nivel",
+  "proposalIgnore": "Ignorar",
+  "proposalAdd": "Añadir",
+  "proposalUseTexts": "Usar estos textos",
+  "proposalSuggestLater": "Ahora no",
+  "proposalSuggestNever": "No volver a sugerir",
+  "proposalLockedTitle": "Propuesta de la IA sobre datos fijados por ti",
+  "proposalApply": "Aplicar",
+  "proposalChangeLine": "{label}: {current} {unit} → {proposed} {unit}",
+  "@proposalChangeLine": {
+    "placeholders": {
+      "label": {},
+      "current": {
+        "type": "int"
+      },
+      "unit": {},
+      "proposed": {
+        "type": "int"
+      }
+    }
+  },
+  "proposalLockLabel": "Fijado por ti. Toca para liberar",
+  "homeNewWorkoutTitle": "Nuevo entrenamiento",
+  "homeSessionNameLabel": "Nombre de la sesión",
+  "homeWorkout": "Entrenamiento",
+  "homeAddExerciseTitle": "Añadir ejercicio",
+  "homeExerciseNameLabel": "Nombre del ejercicio",
+  "homeAdd": "Añadir",
+  "homeBack": "Volver",
+  "homeYourSession": "Tu sesión",
+  "homeAssistantTooltip": "Asistente TrackIA",
+  "homeReload": "Recargar",
+  "homeLoadLog": "Cargar bitácora",
+  "homeHeroTitle": "Tu esfuerzo.\nTu progreso.",
+  "homeHeroSubtitle": "Una serie a la vez. Lleva el registro de lo que haces hoy.",
+  "homeNextSession": "TU PRÓXIMA SESIÓN",
+  "homeInProgress": "SESIÓN EN CURSO",
+  "homeReadyQuestion": "¿Vamos a entrenar?",
+  "homeAddExercisesHint": "Añade tus ejercicios y registra cada serie.",
+  "homeActivitiesRecords": "{activities, plural, one{1 actividad} other{{activities} actividades}} · {records, plural, one{1 registro} other{{records} registros}}",
+  "@homeActivitiesRecords": {
+    "placeholders": {
+      "activities": {
+        "type": "int"
+      },
+      "records": {
+        "type": "int"
+      }
+    }
+  },
+  "homeStartWorkout": "Empezar entrenamiento",
+  "homeContinueWorkout": "Continuar entrenamiento",
+  "homeCompletedSessions": "sesiones completas",
+  "homeRecords": "registros",
+  "homeLastActivity": "ÚLTIMA ACTIVIDAD",
+  "homeEmptyHistoryTitle": "Aquí empieza tu historia",
+  "homeEmptyHistorySubtitle": "Tu primer entrenamiento aparecerá aquí cuando lo finalices.",
+  "homeSavedOffline": "Guardado en este dispositivo · Sin conexión",
+  "homeJourneyTitle": "Tu recorrido",
+  "homeEverySessionCounts": "Cada sesión cuenta.",
+  "homeNoSessionsTitle": "Todavía no hay sesiones",
+  "homeNoSessionsSubtitle": "Finaliza un entrenamiento y consulta aquí todos sus ejercicios y series.",
+  "homeStatusInProgress": "EN CURSO",
+  "homeStatusCompleted": "COMPLETADO",
+  "homeFinishedAt": "Finalizó: {date}",
+  "@homeFinishedAt": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "homeFinishRecorded": "Cierre registrado: {date}",
+  "@homeFinishRecorded": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "homeFinishRecordedByUser": "Cierre registrado: {date} · hora elegida por ti",
+  "@homeFinishRecordedByUser": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "homeTimeKeptWarning": "Horario conservado con aviso. Puedes revisarlo más adelante.",
+  "homeTimeKeptWarningShort": "Horario conservado con aviso.",
+  "homeActivities": "actividades",
+  "homeIntervalsRepeated": "{count, plural, one{1 serie / tramo} other{{count} series / tramos}}",
+  "@homeIntervalsRepeated": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeIntervals": "{count, plural, one{1 tramo} other{{count} tramos}}",
+  "@homeIntervals": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeNotStarted": "Sin iniciar",
+  "homeEndedAt": "Fin: {date}",
+  "@homeEndedAt": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "homeDraft": "Borrador: {draft}",
+  "@homeDraft": {
+    "placeholders": {
+      "draft": {}
+    }
+  },
+  "homeFinishWorkout": "Finalizar entrenamiento",
+  "homeAddSetToFinish": "Registra al menos una serie para finalizar.",
+  "homeEachSetSaved": "Cada serie se guarda al pulsar Guardar.",
+  "homeDiscardTitle": "¿Descartar sesión?",
+  "homeDiscardBody": "Se eliminarán esta sesión y todas sus series. Esta acción no se puede deshacer.",
+  "homeDiscard": "Descartar",
+  "homeDiscardSession": "Descartar sesión",
+  "homeSavedWellDone": "Sesión guardada. Buen trabajo.",
+  "homeViewHistory": "Ver historial",
+  "homeDeleteExerciseTooltip": "Eliminar ejercicio {name}",
+  "@homeDeleteExerciseTooltip": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "homeDeleteExerciseTitle": "¿Eliminar ejercicio?",
+  "homeDeleteExerciseBody": "Se eliminará {name} y sus {count, plural, one{1 serie} other{{count} series}}.",
+  "@homeDeleteExerciseBody": {
+    "placeholders": {
+      "name": {},
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeDelete": "Eliminar",
+  "homeTargetProgress": "Objetivo: {target, plural, one{1 serie} other{{target} series}} de {repsMin}–{repsMax} reps · {done}/{target} registradas",
+  "@homeTargetProgress": {
+    "placeholders": {
+      "target": {
+        "type": "int"
+      },
+      "repsMin": {},
+      "repsMax": {},
+      "done": {
+        "type": "int"
+      }
+    }
+  },
+  "homeNoPreviousSession": "Sin sesión anterior registrada",
+  "homeLastTime": "Última vez · {date}",
+  "@homeLastTime": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "homeNoSetsYet": "Todavía no has registrado series.",
+  "homeSetHeader": "SERIE",
+  "homeKgHeader": "KG",
+  "homeRepsHeader": "REPS",
+  "homeSetOptionsTooltip": "Opciones de la serie {number}",
+  "@homeSetOptionsTooltip": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "homeSetDeleteBody": "{weight} kg × {reps, plural, one{1 repetición} other{{reps} repeticiones}}.",
+  "@homeSetDeleteBody": {
+    "placeholders": {
+      "weight": {},
+      "reps": {
+        "type": "int"
+      }
+    }
+  },
+  "homeWeightReps": "{weight} kg × {reps}",
+  "@homeWeightReps": {
+    "placeholders": {
+      "weight": {},
+      "reps": {
+        "type": "int"
+      }
+    }
+  },
+  "homeEditSet": "Editar serie",
+  "homeDeleteSet": "Eliminar serie",
+  "homeAddSet": "Añadir serie",
+  "homeRest": "Descansar {seconds}s",
+  "@homeRest": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "homeFirstSetTitle": "Prepara tu primera serie",
+  "homeFirstSetSubtitle": "Añade un ejercicio para empezar a registrar peso y repeticiones.",
+  "homeFinishSession": "Finalizar entreno",
+  "homeTabToday": "Hoy",
+  "homeTabRoutines": "Rutinas",
+  "homeTabHistory": "Historial",
+  "homeSessionStarted": "Entreno iniciado. Puedes abrir Entrenamiento para registrar.",
+  "homeSessionStartFailed": "No se pudo iniciar el entreno.",
+  "homeActiveSessionChanged": "La sesión activa ha cambiado. Revísala.",
+  "homeSavedSheetPending": "Entreno guardado en el móvil. El envío a Google Sheets queda pendiente de confirmación.",
+  "homeSavedSheetNotUpdated": "Entreno guardado en el móvil. Google Sheets no se ha actualizado.",
+  "homeFinishFailed": "No se pudo finalizar el entreno.",
+  "homeReviewFinishTitle": "Revisar hora de finalización",
+  "homeFinishIssuesBody": "{issues}\n\n¿Quieres guardar la hora elegida tal cual? Los registros se conservarán para revisarlos después si lo deseas.",
+  "@homeFinishIssuesBody": {
+    "placeholders": {
+      "issues": {}
+    }
+  },
+  "homeBackAndFix": "Volver y corregir",
+  "homeSaveThatTime": "Guardar esa hora",
+  "homeDate": "Fecha",
+  "homeTime": "Hora",
+  "homeStartSession": "Iniciar entreno",
+  "homeOptionYes": "Sí",
+  "homeOptionNo": "No",
+  "homeBoolYes": "sí",
+  "homeBoolNo": "no",
+  "homeNoteOptional": "Nota (opcional)",
+  "homeNumberInvalid": "{label}: escribe un número.",
+  "@homeNumberInvalid": {
+    "placeholders": {
+      "label": {}
+    }
+  },
+  "homeNoteOrValueRequired": "Anota algún valor o escribe una nota.",
+  "homeSessionFinished": "Sesión terminada",
+  "homeSummaryEmpty": "Sin novedades esta vez. Seguimos.",
+  "homeNewAchievement": "Logro nuevo",
+  "homeDone": "Listo",
+  "homeSuggestionSquat": "Sentadilla",
+  "homeSuggestionBench": "Press banca",
+  "homeSuggestionRow": "Remo",
+  "homeNewSet": "Nueva serie",
+  "homeWeightLabel": "Peso (kg)",
+  "homeWeightHint": "Ej. 20,5",
+  "homeRepsLabel": "Repeticiones",
+  "homeRepsHint": "Ej. 10",
+  "homeZeroWeightHint": "Usa 0 kg si entrenas sin carga externa.",
+  "homeExercisesLabel": "EJERCICIOS",
+  "homeDeleteSetTitle": "¿Eliminar serie?",
+  "accountsConnectError": "No se pudo conectar con Google.",
+  "accountsSwitchError": "No se pudo cambiar de cuenta. Tus datos se conservan.",
+  "accountsDescription": "Cada cuenta tiene su conversación, configuración de IA, hoja y entrenamientos en este móvil. El histórico anterior permanece en el perfil local. Conectar no copia ni sube esos datos.",
+  "accountsConnectAnother": "Conectar otra cuenta de Google",
+  "accountsActiveProfile": "Perfil activo",
+  "accountsReconnectProfile": "Volver a este perfil con Google",
+  "accountsDisconnect": "Desconectar y volver al perfil local",
+  "accountsDisconnectNotice": "Desconectar conserva los datos de cada perfil en este móvil. No borra archivos de Google ni revoca el acceso desde tu cuenta de Google.",
+  "appearanceSaveError": "No se pudo guardar el tema. Vuelve a intentarlo.",
+  "appearanceIntro": "Elige cómo quieres ver TrackIA. La elección se guarda en este móvil.",
+  "appearanceSystemHint": "Usar el tema del dispositivo",
+  "archiveSearchLabel": "Buscar por título o resumen",
+  "archiveRecoverError": "No se pudo recuperar el chat. El archivo se conserva.",
+  "archiveEmpty": "Todavía no hay chats archivados.",
+  "archiveChatSubtitle": "{date} · {count} mensajes",
+  "@archiveChatSubtitle": {
+    "placeholders": {
+      "date": {},
+      "count": {}
+    }
+  },
+  "archiveAutomaticTag": "archivado por el asistente",
+  "archiveContinuityTitle": "Resumen de continuidad",
+  "archiveReasonLine": "Motivo del asistente: {reason}",
+  "@archiveReasonLine": {
+    "placeholders": {
+      "reason": {}
+    }
+  },
+  "archiveConsultFromChat": "Consultar desde el chat",
+  "archiveYou": "Tú",
+  "archiveAttachmentKept": "Adjunto conservado: {name}",
+  "@archiveAttachmentKept": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "notifUnsupported": "Los avisos de descanso solo están disponibles en Android.",
+  "notifDndActive": "No molestar está activo",
+  "notifDndTotalSilence": "Estás en «Silencio total»: Android bloquea los avisos, incluso como alarma.",
+  "notifDndAlarm": "Los avisos de descanso suenan como alarma. Los demás avisos no sonarían ni vibrarían.",
+  "notifDndPlain": "Ahora mismo los avisos de descanso no sonarían ni vibrarían.",
+  "notifEnabledTitle": "Avisos de actividad y descanso",
+  "notifEnabledSubtitle": "Actividad lista, tramo en marcha, fin de tramo y fin de descanso.",
+  "notifAlarmStyleTitle": "Tratar como alarma",
+  "notifAlarmStyleSubtitle": "El fin de descanso y de tramo suenan y vibran aunque No molestar esté en modo Prioridad.",
+  "notifChannelBlockedTitle": "Android bloquea el canal de alarma",
+  "notifChannelBlockedSubtitle": "Actívalo en los ajustes del canal.",
+  "notifExactTitle": "Permitir avisos puntuales",
+  "notifExactSubtitle": "Sin este permiso Android puede retrasar el aviso.",
+  "notifCheck": "Comprobar",
+  "notifTest": "Probar aviso",
+  "notifTestAlarm": "Probar con No molestar activo",
+  "notifOpenDnd": "Abrir ajustes de No molestar",
+  "notifSilenceNote": "En «Silencio total» Android bloquea todo, incluidas las alarmas. Ahí solo ayuda permitirlas en los ajustes de tu móvil.",
+  "progressLoadError": "No se pudo calcular el progreso.",
+  "progressMonth1": "enero",
+  "progressMonth2": "febrero",
+  "progressMonth3": "marzo",
+  "progressMonth4": "abril",
+  "progressMonth5": "mayo",
+  "progressMonth6": "junio",
+  "progressMonth7": "julio",
+  "progressMonth8": "agosto",
+  "progressMonth9": "septiembre",
+  "progressMonth10": "octubre",
+  "progressMonth11": "noviembre",
+  "progressMonth12": "diciembre",
+  "progressDayStatus": "{day} de {month}: {status}",
+  "@progressDayStatus": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "month": {},
+      "status": {}
+    }
+  },
+  "progressDayDone": "cumplido",
+  "progressDayPending": "pendiente",
+  "progressDayMissed": "sin cumplir",
+  "progressTitle": "Progreso · {name}",
+  "@progressTitle": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "progressStreakCurrent": "{n, plural, one{Racha actual: 1 día} other{Racha actual: {n} días}}",
+  "@progressStreakCurrent": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "progressStreakBest": "Mejor racha: {best}",
+  "@progressStreakBest": {
+    "placeholders": {
+      "best": {
+        "type": "int"
+      }
+    }
+  },
+  "progressFreeDays": "Días libres esta semana: {used}/{total}",
+  "@progressFreeDays": {
+    "placeholders": {
+      "used": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "progressGoalToday": "Meta de hoy",
+  "progressGoalWeek": "Meta de la semana",
+  "progressGoalValues": "{value} de {target}",
+  "@progressGoalValues": {
+    "placeholders": {
+      "value": {},
+      "target": {}
+    }
+  },
+  "progressLastFourWeeks": "Últimas 4 semanas",
+  "progressAchievementUnlocked": "{title}, desbloqueado",
+  "@progressAchievementUnlocked": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "progressAchievementLocked": "{title}, bloqueado, {percent} % de progreso",
+  "@progressAchievementLocked": {
+    "placeholders": {
+      "title": {},
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "progressAchievementsTitle": "Logros · {unlocked} de {total}",
+  "@progressAchievementsTitle": {
+    "placeholders": {
+      "unlocked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "progressAchievementsEmptyPlay": "Tus logros aparecerán al terminar tu primera actividad.",
+  "progressAchievementsEmptyEnable": "Activa el modo Juego y los logros en «{place}».",
+  "@progressAchievementsEmptyEnable": {
+    "placeholders": {
+      "place": {}
+    }
+  },
+  "routinesTitle": "Tus rutinas",
+  "routinesSubtitle": "Prepara una vez. Entrena a tu ritmo.",
+  "routinesCreate": "Crear rutina",
+  "routinesEmptyTitle": "Tu próxima sesión, preparada",
+  "routinesEmptyBody": "Crea, por ejemplo, «Pierna A» con tus ejercicios, series y rango de repeticiones.",
+  "routinesOptionsTooltip": "Opciones de {name}",
+  "@routinesOptionsTooltip": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "routinesDeleteTitle": "¿Eliminar rutina?",
+  "routinesDeleteBody": "Se eliminará «{name}». Tus entrenamientos guardados y la sesión en curso se conservarán.",
+  "@routinesDeleteBody": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "routinesEditMenu": "Editar rutina",
+  "routinesDeleteMenu": "Eliminar rutina",
+  "routinesDelete": "Eliminar",
+  "routinesTrain": "Entrenar",
+  "routinesContinueSession": "Continuar sesión activa",
+  "routinesNeedExercise": "Añade al menos un ejercicio.",
+  "routinesNameLabel": "Nombre de la rutina",
+  "routinesNameHint": "Ej. Pierna A",
+  "routinesEditorHelp": "Define tus objetivos. Las series se registrarán cuando entrenes.",
+  "routinesMoveUp": "Subir ejercicio {n}",
+  "@routinesMoveUp": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "routinesMoveDown": "Bajar ejercicio {n}",
+  "@routinesMoveDown": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "routinesEditExercise": "Editar ejercicio {n}",
+  "@routinesEditExercise": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "routinesRemoveExercise": "Quitar ejercicio {n}",
+  "@routinesRemoveExercise": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "routinesAddExercise": "Añadir ejercicio a rutina",
+  "routinesSaving": "Guardando…",
+  "routinesSave": "Guardar rutina",
+  "routinesLeaveTitle": "¿Salir sin guardar?",
+  "routinesLeaveBody": "Los cambios en esta rutina se perderán.",
+  "routinesKeepEditing": "Seguir editando",
+  "routinesDiscard": "Descartar cambios",
+  "routinesBack": "Volver",
+  "routinesExerciseDialogTitle": "Ejercicio de rutina",
+  "routinesEditTargetTitle": "Editar objetivo",
+  "routinesExerciseLabel": "Ejercicio",
+  "routinesExerciseHint": "Ej. Sentadilla",
+  "routinesTargetSets": "Series previstas",
+  "routinesRepsMin": "Reps mín.",
+  "routinesRepsMax": "Reps máx.",
+  "routinesRestSeconds": "Descanso (segundos)",
+  "routinesSaveExercise": "Guardar ejercicio",
+  "focusCounterSaveError": "No se pudo guardar el contador. Vuelve a intentarlo.",
+  "focusResultSaveError": "No se pudo guardar el resultado. Conserva el texto y vuelve a intentarlo.",
+  "focusSaveActivityError": "No se pudo guardar en tus actividades.",
+  "focusRecordSaveError": "No se pudo guardar el registro. Vuelve a intentarlo.",
+  "focusReviewTimeTitle": "Revisar hora",
+  "focusReviewTimeBody": "La hora elegida no coincide con los registros. ¿Guardar esa hora y conservarlos?",
+  "focusBack": "Volver",
+  "focusSaveThatTime": "Guardar esa hora",
+  "focusRunning": "En marcha",
+  "focusReady": "Listo",
+  "focusRest": "Descanso",
+  "focusRepeatedRest": "{progress} {segments} · Descanso",
+  "@focusRepeatedRest": {
+    "placeholders": {
+      "progress": {},
+      "segments": {}
+    }
+  },
+  "focusSegmentCount": "{segment} {count}",
+  "@focusSegmentCount": {
+    "placeholders": {
+      "segment": {},
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "focusSegmentCountOfTarget": "{segment} {count} de {target}",
+  "@focusSegmentCountOfTarget": {
+    "placeholders": {
+      "segment": {},
+      "count": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "focusSegmentSerie": "serie",
+  "focusSegmentTramo": "tramo",
+  "focusSegmentSeries": "series",
+  "focusSegmentTramos": "tramos",
+  "focusRemoveField": "Quitar {label}",
+  "@focusRemoveField": {
+    "placeholders": {
+      "label": {}
+    }
+  },
+  "focusAddField": "Añadir {label}",
+  "@focusAddField": {
+    "placeholders": {
+      "label": {}
+    }
   }
 }

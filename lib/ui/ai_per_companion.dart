@@ -6,6 +6,7 @@ import '../data/progress_repository.dart';
 import '../domain/ai_config.dart';
 import '../domain/companion.dart';
 import '../domain/workout.dart';
+import '../application/localization.dart';
 
 /// «Por acompañante» (US11): each companion uses the profile's AI setup or
 /// its own model of the same provider. Credentials are never edited here.
@@ -57,14 +58,16 @@ class _AiPerCompanionSectionState extends State<AiPerCompanionSection> {
       if (mounted) {
         setState(() {
           loaded = true;
-          error = 'No se pudo leer la configuración por acompañante.';
+          error = appText(context).aiPerReadError;
         });
       }
     }
   }
 
   String describe(AiOverride? value) =>
-      value == null ? 'Por defecto' : '${value.model} · ${value.service.label}';
+      value == null
+          ? appText(context).aiPerDefault
+          : '${value.model} · ${value.service.label}';
 
   Future<void> edit(Companion companion) async {
     final base = defaults;
@@ -97,7 +100,7 @@ class _AiPerCompanionSectionState extends State<AiPerCompanionSection> {
     } on ValidationException catch (e) {
       if (mounted) setState(() => error = e.message);
     } catch (_) {
-      if (mounted) setState(() => error = 'No se pudo guardar el cambio.');
+      if (mounted) setState(() => error = appText(context).aiPerSaveError);
     }
   }
 
@@ -111,12 +114,12 @@ class _AiPerCompanionSectionState extends State<AiPerCompanionSection> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 28),
-        Text('Por acompañante', style: Theme.of(context).textTheme.titleLarge),
+        Text(appText(context).aiPerTitle, style: Theme.of(context).textTheme.titleLarge),
         const SizedBox(height: 8),
         Text(
           defaults == null
-              ? 'Conecta primero un proveedor para poder elegir un modelo distinto en cada acompañante.'
-              : 'Cada acompañante usa tu proveedor, o un modelo propio de ese mismo proveedor.',
+              ? appText(context).aiPerNoProvider
+              : appText(context).aiPerHelp,
         ),
         for (final c in companions)
           ListTile(
@@ -174,19 +177,19 @@ class _ModelDialogState extends State<_ModelDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: Text('IA de ${widget.companion.name}'),
+    title: Text(appText(context).aiPerDialogTitle(widget.companion.name)),
     content: Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Usa ${widget.service.label} con la clave de tu perfil. Solo cambia el modelo de este acompañante.',
+          appText(context).aiPerDialogHelp(widget.service.label),
         ),
         const SizedBox(height: 12),
         TextField(
           key: const Key('ai-override-model'),
           controller: controller,
-          decoration: const InputDecoration(labelText: 'Modelo'),
+          decoration: InputDecoration(labelText: appText(context).aiModelLabel),
         ),
       ],
     ),
@@ -194,16 +197,16 @@ class _ModelDialogState extends State<_ModelDialog> {
       TextButton(
         key: const Key('ai-override-default'),
         onPressed: () => Navigator.pop(context, const _Choice.useDefault()),
-        child: const Text('Usar el predeterminado'),
+        child: Text(appText(context).aiPerUseDefault),
       ),
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('Cancelar'),
+        child: Text(appText(context).cancel),
       ),
       FilledButton(
         key: const Key('ai-override-save'),
         onPressed: () => Navigator.pop(context, _Choice.save(controller.text)),
-        child: const Text('Guardar'),
+        child: Text(appText(context).save),
       ),
     ],
   );

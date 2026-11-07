@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../application/localization.dart';
 import '../application/workout_controller.dart';
 import '../domain/workout.dart';
 import '../data/sheet_sync_service.dart';
@@ -39,8 +40,8 @@ class SessionControl extends StatelessWidget {
           SnackBar(
             content: Text(
               ok
-                  ? 'Entreno iniciado. Puedes abrir Entrenamiento para registrar.'
-                  : controller.error ?? 'No se pudo iniciar el entreno.',
+                  ? appText(context).homeSessionStarted
+                  : controller.error ?? appText(context).homeSessionStartFailed,
             ),
           ),
         );
@@ -62,7 +63,11 @@ class SessionControl extends StatelessWidget {
                 ? () => _act(context, active)
                 : null,
         icon: Icon(active == null ? Icons.play_arrow : Icons.stop_rounded),
-        label: Text(active == null ? 'Iniciar entreno' : 'Finalizar entreno'),
+        label: Text(
+          active == null
+              ? appText(context).homeStartSession
+              : appText(context).homeFinishSession,
+        ),
       );
     },
   );
@@ -73,7 +78,7 @@ Future<void> finishSession(
   WorkoutController controller,
   Workout active, {
   String? sheetLabel,
-  String title = 'Finalizar entreno',
+  String? title,
 }) async {
   if (controller.busy) return;
   final selection = await showDialog<_FinishSelection>(
@@ -88,7 +93,7 @@ Future<void> finishSession(
   if (selection == null || !context.mounted) return;
   if (controller.active?.id != active.id) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('La sesión activa ha cambiado. Revísala.')),
+      SnackBar(content: Text(appText(context).homeActiveSessionChanged)),
     );
     return;
   }
@@ -118,9 +123,9 @@ Future<void> finishSession(
         content: Text(
           ok
               ? automaticSheet
-                  ? 'Entreno guardado en el móvil. El envío a Google Sheets queda pendiente de confirmación.'
-                  : 'Entreno guardado en el móvil. Google Sheets no se ha actualizado.'
-              : controller.error ?? 'No se pudo finalizar el entreno.',
+                  ? appText(context).homeSavedSheetPending
+                  : appText(context).homeSavedSheetNotUpdated
+              : controller.error ?? appText(context).homeFinishFailed,
         ),
       ),
     );
@@ -136,11 +141,11 @@ class _FinishSessionDialog extends StatefulWidget {
   const _FinishSessionDialog({
     required this.controller,
     required this.workout,
-    this.title = 'Finalizar entreno',
+    this.title,
   });
   final WorkoutController controller;
   final Workout workout;
-  final String title;
+  final String? title;
   @override
   State<_FinishSessionDialog> createState() => _FinishSessionDialogState();
 }
@@ -211,21 +216,23 @@ class _FinishSessionDialogState extends State<_FinishSessionDialog> {
             context: context,
             builder:
                 (dialogContext) => AlertDialog(
-                  title: const Text('Revisar hora de finalización'),
+                  title: Text(appText(context).homeReviewFinishTitle),
                   content: SingleChildScrollView(
                     child: Text(
-                      '${issues.map((i) => i.message).join('\n\n')}\n\n¿Quieres guardar la hora elegida tal cual? Los registros se conservarán para revisarlos después si lo deseas.',
+                      appText(context).homeFinishIssuesBody(
+                        issues.map((i) => i.message).join('\n\n'),
+                      ),
                     ),
                   ),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(dialogContext, false),
-                      child: const Text('Volver y corregir'),
+                      child: Text(appText(context).homeBackAndFix),
                     ),
                     FilledButton(
                       key: const Key('accept-finish-time'),
                       onPressed: () => Navigator.pop(dialogContext, true),
-                      child: const Text('Guardar esa hora'),
+                      child: Text(appText(context).homeSaveThatTime),
                     ),
                   ],
                 ),
@@ -242,7 +249,7 @@ class _FinishSessionDialogState extends State<_FinishSessionDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: Text(widget.title),
+    title: Text(widget.title ?? appText(context).homeFinishSession),
     content: SizedBox(
       width: 340,
       child: Row(
@@ -253,7 +260,7 @@ class _FinishSessionDialogState extends State<_FinishSessionDialog> {
               key: const Key('change-finish-date'),
               onTap: confirming ? null : chooseDate,
               child: InputDecorator(
-                decoration: const InputDecoration(labelText: 'Fecha'),
+                decoration: InputDecoration(labelText: appText(context).homeDate),
                 child: Text(DateFormat('d/M/yyyy').format(end)),
               ),
             ),
@@ -265,7 +272,7 @@ class _FinishSessionDialogState extends State<_FinishSessionDialog> {
               key: const Key('change-finish-time'),
               onTap: confirming ? null : chooseTime,
               child: InputDecorator(
-                decoration: const InputDecoration(labelText: 'Hora'),
+                decoration: InputDecoration(labelText: appText(context).homeTime),
                 child: Text(
                   DateFormat('HH:mm').format(end),
                   key: const Key('finish-time-value'),
@@ -279,12 +286,12 @@ class _FinishSessionDialogState extends State<_FinishSessionDialog> {
     actions: [
       TextButton(
         onPressed: confirming ? null : () => Navigator.pop(context),
-        child: const Text('Cancelar'),
+        child: Text(appText(context).cancel),
       ),
       FilledButton(
         key: const Key('confirm-finish-session'),
         onPressed: confirming ? null : submit,
-        child: const Text('Guardar'),
+        child: Text(appText(context).save),
       ),
     ],
   );
@@ -314,7 +321,7 @@ class _SessionNameDialogState extends State<_SessionNameDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Iniciar entreno'),
+    title: Text(appText(context).homeStartSession),
     content: SingleChildScrollView(
       child: Form(
         key: form,
@@ -325,7 +332,7 @@ class _SessionNameDialogState extends State<_SessionNameDialog> {
           maxLength: 80,
           textCapitalization: TextCapitalization.sentences,
           textInputAction: TextInputAction.done,
-          decoration: const InputDecoration(labelText: 'Nombre de la sesión'),
+          decoration: InputDecoration(labelText: appText(context).homeSessionNameLabel),
           onFieldSubmitted: (_) => submit(),
           validator: (value) {
             try {
@@ -341,12 +348,12 @@ class _SessionNameDialogState extends State<_SessionNameDialog> {
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('Cancelar'),
+        child: Text(appText(context).cancel),
       ),
       FilledButton(
         key: const Key('confirm-start-session'),
         onPressed: submit,
-        child: const Text('Iniciar'),
+        child: Text(appText(context).activityStart),
       ),
     ],
   );

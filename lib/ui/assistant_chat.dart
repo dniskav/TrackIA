@@ -315,7 +315,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
         context,
         widget.controller,
         active,
-        title: 'Finalizar día',
+        title: appText(context).activityFinishDay,
       );
     }
   }
@@ -447,7 +447,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
           setState(
             () =>
                 error =
-                    'No se pudo guardar el borrador. Conserva el texto y vuelve a intentarlo.',
+                    appText(context).chatDraftSaveError,
           );
         }
       }),
@@ -586,7 +586,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
         }
       }
     } catch (_) {
-      if (mounted) error = 'No se pudo recuperar la conversación anterior.';
+      if (mounted) error = appText(context).chatLoadError;
     } finally {
       try {
         final saved = await sheetStore.load();
@@ -594,7 +594,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
       } catch (_) {
         if (mounted) {
           error =
-              'No se pudo recuperar la hoja guardada. Vuelve a cargarla desde Google Sheets.';
+              appText(context).chatLoadSheetError;
         }
       }
       if (mounted) {
@@ -609,8 +609,8 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
   Future<void> persist() async {
     final value = jsonEncode(chatState());
     if (utf8.encode(value).length > 20 * 1024 * 1024) {
-      throw const ValidationException(
-        'El chat supera 20 MB; no se pudo guardar completo.',
+      throw ValidationException(
+        appText(context).chatPersistTooLarge,
       );
     }
     await archiveStore.saveActive(chatState());
@@ -801,7 +801,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
                       ),
                       if (widget.onData != null)
                         IconButton(
-                          tooltip: 'Tus datos',
+                          tooltip: appText(context).yourData,
                           onPressed: () async {
                             await widget.onData!();
                             if (mounted) await reloadSheet();
@@ -942,7 +942,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
                       label: Text(
                         sheetContext == null
                             ? appText(context).chatLoadSheets
-                            : 'Hoja · ${sheetContext!.title}',
+                            : appText(context).chatSheetLabel(sheetContext!.title),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -1001,7 +1001,7 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
                                 child: Column(
                                   children: [
                                     Text(
-                                      '«${sheetContext!.name}» cargada · pendiente de interpretación. Los datos originales se conservan.',
+                                      appText(context).chatSheetPendingInfo(sheetContext!.name),
                                     ),
                                     if (aiReady)
                                       TextButton(
@@ -1059,7 +1059,9 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
                                         ),
                                       ),
                                       Text(
-                                        '${proposal!.repeated ? 'Series / tramos' : 'Actividad continua'} · ${proposal!.restSeconds}s de descanso',
+                                        proposal!.repeated
+                                          ? appText(context).chatProposalRepeated(proposal!.restSeconds)
+                                          : appText(context).chatProposalContinuous(proposal!.restSeconds),
                                       ),
                                       if (proposal!.fields.isNotEmpty)
                                         Text(

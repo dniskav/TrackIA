@@ -36,15 +36,15 @@ extension _ChatAttachments on _AssistantChatScreenState {
             update(() {
               listening = false;
               error =
-                  'No se pudo reconocer la voz. Comprueba el permiso de micrófono o escribe tu mensaje.';
+                  appText(context).chatAttachVoiceError;
             });
           }
         },
       );
       if (!mounted) return;
       if (!available) {
-        throw const ValidationException(
-          'El reconocimiento de voz no está disponible. Revisa el permiso de micrófono y el servicio de voz del teléfono.',
+        throw ValidationException(
+          appText(context).chatAttachVoiceUnavailable,
         );
       }
       final locales = await speech.locales();
@@ -86,7 +86,7 @@ extension _ChatAttachments on _AssistantChatScreenState {
       if (mounted) {
         update(() {
           listening = false;
-          error = 'No se pudo iniciar el dictado.';
+          error = appText(context).chatAttachDictationStart;
         });
       }
     } finally {
@@ -95,6 +95,7 @@ extension _ChatAttachments on _AssistantChatScreenState {
   }
 
   Future<void> pickAttachment() async {
+    final l = appText(context);
     FocusScope.of(context).unfocus();
     final kind = await showModalBottomSheet<String>(
       isScrollControlled: true,
@@ -105,37 +106,37 @@ extension _ChatAttachments on _AssistantChatScreenState {
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt_outlined),
-              title: const Text('Cámara'),
+              title: Text(appText(context).chatAttachCamera),
               onTap: () => Navigator.pop(context, 'camera'),
             ),
             ListTile(
               leading: const Icon(Icons.image_outlined),
-              title: const Text('Fotos'),
+              title: Text(appText(context).chatAttachPhotos),
               onTap: () => Navigator.pop(context, 'image'),
             ),
             ListTile(
               leading: const Icon(Icons.description_outlined),
-              title: const Text('Documento PDF'),
-              subtitle: const Text('Necesita un modelo que admita documentos'),
+              title: Text(appText(context).chatAttachPdf),
+              subtitle: Text(appText(context).chatAttachPdfHint),
               onTap: () => Navigator.pop(context, 'pdf'),
             ),
             ListTile(
               leading: const Icon(Icons.audio_file_outlined),
-              title: const Text('Archivo de audio'),
-              subtitle: const Text(
-                'Requiere un modelo de Gemini que admita audio',
+              title: Text(appText(context).chatAttachAudio),
+              subtitle: Text(
+                appText(context).chatAttachAudioHint,
               ),
               onTap: () => Navigator.pop(context, 'audio'),
             ),
             ListTile(
               leading: const Icon(Icons.table_chart_outlined),
-              title: const Text('Hoja Excel o CSV'),
+              title: Text(appText(context).chatAttachSpreadsheet),
               onTap: () => Navigator.pop(context, 'spreadsheet'),
             ),
             if (defaultTargetPlatform == TargetPlatform.android)
               ListTile(
                 leading: const Icon(Icons.cloud_outlined),
-                title: const Text('Google Sheets / Drive'),
+                title: Text(appText(context).chatAttachSheet),
                 onTap: () => Navigator.pop(context, 'sheet'),
               ),
           ],
@@ -158,7 +159,7 @@ extension _ChatAttachments on _AssistantChatScreenState {
     if (!aiReady && !canRecord) {
       update(
         () => error =
-            'Conecta la IA para enviar imágenes, documentos o audio. Puedes cargar una hoja sin IA.',
+            appText(context).chatAttachNeedsAi,
       );
       return;
     }
@@ -169,7 +170,7 @@ extension _ChatAttachments on _AssistantChatScreenState {
         );
         if (photo == null) return;
         if (await photo.length() > 4 * 1024 * 1024) {
-          throw const ValidationException('La foto supera 4 MB.');
+          throw ValidationException(l.chatAttachPhotoTooLarge);
         }
         final bytes = await photo.readAsBytes();
         final extension = photo.name.split('.').last.toLowerCase();
@@ -180,11 +181,11 @@ extension _ChatAttachments on _AssistantChatScreenState {
           _ => null,
         };
         if (mime == null) {
-          throw const ValidationException('Elige una foto JPG, PNG o WebP.');
+          throw ValidationException(l.chatAttachPhotoFormat);
         }
         if (bytes.isEmpty || bytes.length > 4 * 1024 * 1024) {
-          throw const ValidationException(
-            'La foto debe tener contenido y no superar 4 MB.',
+          throw ValidationException(
+            l.chatAttachPhotoEmpty,
           );
         }
         if (mounted) {
@@ -202,8 +203,8 @@ extension _ChatAttachments on _AssistantChatScreenState {
       if (kind == 'audio') {
         final config = await aiStore.load();
         if (config?.protocol != AiProtocol.gemini) {
-          throw const ValidationException(
-            'Para enviar un archivo de audio configura un modelo de Gemini con audio. Puedes usar el micrófono del chat para dictar el mensaje.',
+          throw ValidationException(
+            l.chatAttachAudioNeedsGemini,
           );
         }
       }
@@ -217,13 +218,13 @@ extension _ChatAttachments on _AssistantChatScreenState {
       if (picked == null || !mounted) return;
       final file = picked.files.single;
       if (file.size > 4 * 1024 * 1024) {
-        throw const ValidationException('El adjunto supera 4 MB.');
+        throw ValidationException(appText(context).chatAttachTooLarge);
       }
       final bytes =
           file.bytes ??
           (file.path == null ? null : await File(file.path!).readAsBytes());
       if (bytes == null || bytes.isEmpty) {
-        throw const ValidationException('No se pudo leer el adjunto.');
+        throw ValidationException(l.chatAttachUnreadable);
       }
       final mime = switch (file.extension?.toLowerCase()) {
         'jpg' || 'jpeg' => 'image/jpeg',
@@ -235,16 +236,16 @@ extension _ChatAttachments on _AssistantChatScreenState {
         'ogg' => 'audio/ogg',
         'flac' => 'audio/flac',
         'pdf' => 'application/pdf',
-        _ => throw const ValidationException(
-          'Formato de adjunto no compatible.',
+        _ => throw ValidationException(
+          l.chatAttachFormat,
         ),
       };
       if (mime == 'application/pdf' &&
           (bytes.length < 5 ||
               utf8.decode(bytes.take(5).toList(), allowMalformed: true) !=
                   '%PDF-')) {
-        throw const ValidationException(
-          'El archivo no contiene un PDF válido.',
+        throw ValidationException(
+          l.chatAttachInvalidPdf,
         );
       }
       if (mounted) {
@@ -256,7 +257,7 @@ extension _ChatAttachments on _AssistantChatScreenState {
     } on ValidationException catch (e) {
       if (mounted) update(() => error = e.message);
     } catch (_) {
-      if (mounted) update(() => error = 'No se pudo abrir el adjunto.');
+      if (mounted) update(() => error = appText(context).chatAttachOpenFailed);
     }
   }
 
@@ -269,7 +270,7 @@ extension _ChatAttachments on _AssistantChatScreenState {
       if (await photo.length() > 4 * 1024 * 1024) {
         update(
           () =>
-              error = 'La foto recuperada supera 4 MB. Elige una más pequeña.',
+              error = appText(context).chatAttachRecoveredTooLarge,
         );
         return;
       }

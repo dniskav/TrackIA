@@ -1339,4 +1339,1960 @@ class AppLocalizationsAr extends AppLocalizations {
   String appVersion(Object version) {
     return 'الإصدار $version';
   }
+
+  @override
+  String get activityIdleOtherActive => 'مرافق آخر نشط';
+
+  @override
+  String get activityIdleNoActivity => 'لا يوجد نشاط';
+
+  @override
+  String get activityIdleEndOther => 'أنهِ النشاط الآخر لتبدأ هنا';
+
+  @override
+  String get activityIdleRegisterAnytime => 'سجّل نشاطًا متى شئت';
+
+  @override
+  String get activityNewActivity => 'نشاط جديد';
+
+  @override
+  String get activityIdleRecord => 'تسجيل';
+
+  @override
+  String get activityRestLabel => 'الراحة';
+
+  @override
+  String get activityRestDone => 'انتهت الراحة';
+
+  @override
+  String get activityRestPaused => 'الراحة متوقفة مؤقتًا';
+
+  @override
+  String get activityRestPause => 'إيقاف مؤقت';
+
+  @override
+  String get activityRestContinue => 'متابعة';
+
+  @override
+  String get activityRestStart => 'ابدأ الراحة';
+
+  @override
+  String get activityRestRestart => 'إعادة تشغيل الراحة';
+
+  @override
+  String activityRestAdjust(int seconds) {
+    return '$seconds ث · تعديل';
+  }
+
+  @override
+  String get activityRestNotice =>
+      'تنبيه مع بقاء هذه الشاشة مفتوحة؛ يستمر الوقت عند الخروج.';
+
+  @override
+  String get activityRestDurationTitle => 'مدة الراحة';
+
+  @override
+  String get activityRestSecondsLabel => 'ثوانٍ';
+
+  @override
+  String get activityRestRangeHint =>
+      'بين 5 و1800 ثانية. عند التطبيق يصبح المؤقت جاهزًا للبدء.';
+
+  @override
+  String get activityRestApply => 'تطبيق';
+
+  @override
+  String get activityDialogNameTitle => 'اسم النشاط';
+
+  @override
+  String get activityDialogSaveName => 'حفظ الاسم';
+
+  @override
+  String get activityDialogRestRange => 'بين 0 و1800';
+
+  @override
+  String get activityDialogWhatToDo => 'ماذا ستفعل؟';
+
+  @override
+  String get activityDialogYourActivities => 'أنشطتك';
+
+  @override
+  String get activityDialogInstantRecord => 'تسجيل لحظي';
+
+  @override
+  String get activityDialogYourActivity => 'نشاطك';
+
+  @override
+  String get activityDialogFromCurrentWorkout => 'من التمرين الحالي';
+
+  @override
+  String activityDialogSetsProgress(
+    Object done,
+    Object target,
+    Object repsMin,
+    Object repsMax,
+  ) {
+    return '$done/$target مجموعات · $repsMin–$repsMax تكرارات';
+  }
+
+  @override
+  String get activityDialogRepeat => 'أعد تنفيذه';
+
+  @override
+  String activityDialogRoutineSets(Object routine, int sets) {
+    return '$routine · $sets مجموعات';
+  }
+
+  @override
+  String get activityDialogEndTitle => 'إنهاء النشاط';
+
+  @override
+  String get activityDialogDate => 'التاريخ';
+
+  @override
+  String get activityDialogTime => 'الوقت';
+
+  @override
+  String get activityBuilderNameRequired => 'اكتب اسمًا للنشاط.';
+
+  @override
+  String get activityBuilderOnlyIntegers => 'اكتب أعدادًا صحيحة فقط.';
+
+  @override
+  String activityBuilderRange(Object what, int min, int max) {
+    return '$what بين $min و$max.';
+  }
+
+  @override
+  String get activityBuilderWhatDuration => 'المدة';
+
+  @override
+  String get activityBuilderWhatRest => 'الراحة';
+
+  @override
+  String get activityBuilderWhatSegments => 'الأجزاء المخططة';
+
+  @override
+  String get activityBuilderWhatCycles => 'الدورات المخططة';
+
+  @override
+  String get activityBuilderDurationRequired => 'حدد المدة بالدقائق.';
+
+  @override
+  String get activityBuilderSegmentNamesPair =>
+      'حدد صيغة المفرد والجمع للجزء، أو اترك الحقلين فارغين.';
+
+  @override
+  String get activityBuilderFromTemplate => 'ابدأ من قالب';
+
+  @override
+  String get activityBuilderHowMeasured => 'كيف يُقاس؟';
+
+  @override
+  String get activityBuilderInstantTitle => 'لحظي';
+
+  @override
+  String get activityBuilderInstantDetail => 'تسجيل بدون مؤقت';
+
+  @override
+  String get activityBuilderFreeTitle => 'مفتوح';
+
+  @override
+  String get activityBuilderFreeDetail => 'ساعة إيقاف، بلا عد تنازلي';
+
+  @override
+  String get activityBuilderTimedTitle => 'بمدة محددة';
+
+  @override
+  String get activityBuilderTimedDetail => 'عد تنازلي لمدة ثابتة';
+
+  @override
+  String get activityBuilderSegmentsTitle => 'على أجزاء';
+
+  @override
+  String get activityBuilderSegmentsDetail => 'عدة أجزاء مع راحة';
+
+  @override
+  String get activityBuilderDuration => 'المدة (بالدقائق)';
+
+  @override
+  String get activityBuilderSegmentHelper => 'اختياري: لكل جزء';
+
+  @override
+  String get activityBuilderPlannedSegments => 'الأجزاء المخططة (اختياري)';
+
+  @override
+  String get activityBuilderRestBetween => 'الراحة بين الأجزاء (ثوانٍ)';
+
+  @override
+  String get activityBuilderRestHelper => '90 تعني دقيقة ونصفًا';
+
+  @override
+  String get activityBuilderPlannedCycles => 'الدورات المخططة (اختياري)';
+
+  @override
+  String get activityBuilderSegmentSingular => 'الجزء الواحد يسمى';
+
+  @override
+  String get activityBuilderSegmentPlural => 'الأجزاء المتعددة تسمى';
+
+  @override
+  String get activityBuilderWhatToNote => 'ماذا تريد أن تدوّن؟ (اختياري)';
+
+  @override
+  String activityBuilderRemoveField(Object label) {
+    return 'إزالة $label';
+  }
+
+  @override
+  String get activityBuilderMaxFields => 'الحد الأقصى 12 حقلًا';
+
+  @override
+  String get activityBuilderAddField => 'إضافة حقل';
+
+  @override
+  String get activityBuilderSaveInActivities => 'حفظ في أنشطتك';
+
+  @override
+  String get activityBuilderSaveInActivitiesHelp =>
+      'لتكرارها دون إعادة إنشائها.';
+
+  @override
+  String get activityBuilderPrepare => 'تجهيز النشاط';
+
+  @override
+  String get activityBuilderNewField => 'حقل جديد';
+
+  @override
+  String get activityBuilderFieldNameRequired =>
+      'اكتب اسم حقل من 80 حرفًا كحد أقصى.';
+
+  @override
+  String get activityBuilderFieldName => 'اسم الحقل';
+
+  @override
+  String get activityBuilderFieldType => 'النوع';
+
+  @override
+  String get activityBuilderFieldUnit => 'الوحدة (اختياري)';
+
+  @override
+  String get activityBuilderOptions => 'الخيارات';
+
+  @override
+  String get activityBuilderOptionsHelp => 'مفصولة بفواصل';
+
+  @override
+  String get activityBuilderScaleMin => 'الحد الأدنى';
+
+  @override
+  String get activityBuilderScaleMax => 'الحد الأقصى';
+
+  @override
+  String get activityBuilderScaleRange =>
+      'اكتب الحد الأدنى والحد الأقصى للمقياس.';
+
+  @override
+  String get activityBuilderAggregate => 'طريقة الحساب';
+
+  @override
+  String get activityBuilderCountSingular => 'يُحسب كـ (مفرد)';
+
+  @override
+  String get activityBuilderCountSingularHelp => 'اختياري، مثلًا: كتاب';
+
+  @override
+  String get activityBuilderCountPlural => 'يُحسب كـ (جمع)';
+
+  @override
+  String get activityBuilderCountPluralHelp => 'اختياري، مثلًا: كتب';
+
+  @override
+  String get activityBuilderAdd => 'إضافة';
+
+  @override
+  String get aiPerReadError => 'تعذّرت قراءة إعدادات IA لكل مرافق.';
+
+  @override
+  String get aiPerSaveError => 'تعذّر حفظ التغيير.';
+
+  @override
+  String get aiPerTitle => 'لكل مرافق';
+
+  @override
+  String get aiPerNoProvider =>
+      'اربط مزوّدًا أولًا لتتمكن من اختيار نموذج مختلف لكل مرافق.';
+
+  @override
+  String get aiPerHelp =>
+      'يستخدم كل مرافق مزوّدك، أو نموذجًا خاصًا به من المزوّد نفسه.';
+
+  @override
+  String get aiPerDefault => 'افتراضي';
+
+  @override
+  String aiPerDialogTitle(Object name) {
+    return 'الذكاء الاصطناعي لـ $name';
+  }
+
+  @override
+  String aiPerDialogHelp(Object service) {
+    return 'يستخدم $service بمفتاح ملفك الشخصي. يغيّر النموذج الخاص بهذا المرافق فقط.';
+  }
+
+  @override
+  String get aiPerUseDefault => 'استخدام الإعداد الافتراضي';
+
+  @override
+  String get aiSetAndroidFileAccess =>
+      'لم يتح Android الوصول إلى الملف المحدد.';
+
+  @override
+  String get aiSetGgufTitle => 'نموذج GGUF';
+
+  @override
+  String aiSetLocalContextHelp(Object context) {
+    return 'توصي TrackIA بـ $context لتعليماتها وسجلها وبياناتها. التوصية تلبي احتياجات التطبيق، وليست الحد الأقصى لملف GGUF هذا. إذا لم يدعم النموذج الحجم المختار فقد يفشل؛ القرار لك في خفضه.';
+  }
+
+  @override
+  String aiSetModelsCountChatGpt(int count) {
+    return 'النماذج المتاحة لهذا الحساب: $count. اختبار الاتصال يؤكد الوصول إلى النموذج الذي تختاره.';
+  }
+
+  @override
+  String aiSetCatalogCountApi(int count) {
+    return 'تم جلب $count نموذجًا من المزوّد. يؤكد اختبار الاتصال ما إذا كان مفتاحك يستطيع استخدام النموذج الذي تختاره.';
+  }
+
+  @override
+  String get aiSetCatalogErrorChatGpt =>
+      'تعذّر جلب قائمة النماذج لهذا الحساب. تحقق من الاتصال وحاول مرة أخرى.';
+
+  @override
+  String get aiSetCatalogErrorApi =>
+      'تعذّر جلب القائمة. يمكنك المحاولة مرة أخرى أو إدخال النموذج يدويًا.';
+
+  @override
+  String get transferSheetReadError => 'تعذّرت قراءة الجدول.';
+
+  @override
+  String get transferSheetTooLarge => 'حجم الجدول يتجاوز 20 ميغابايت.';
+
+  @override
+  String get transferSheetLoadError => 'تعذّر تحميل الجدول. حاول مرة أخرى.';
+
+  @override
+  String get transferSheetLoaded =>
+      'تم تحميل الجدول. في انتظار تفسيره بواسطة الذكاء الاصطناعي.';
+
+  @override
+  String get transferFileTooLarge => 'حجم الملف يتجاوز 20 ميغابايت.';
+
+  @override
+  String get transferSheetSelectedError => 'تعذّرت قراءة الجدول المحدد.';
+
+  @override
+  String get transferFileReadError => 'تعذّرت قراءة الملف أو مشاركته.';
+
+  @override
+  String get transferDefaultSheetName => 'الجدول المحمّل';
+
+  @override
+  String get transferShareSubject => 'نسخة احتياطية من TrackIA';
+
+  @override
+  String get transferShareText => 'احفظ هذا الملف في Drive أو في مكان آمن.';
+
+  @override
+  String get transferRestoreTitle => 'هل تريد استعادة هذه النسخة؟';
+
+  @override
+  String transferRestoreBody(int workouts, int routines, Object active) {
+    String _temp0 = intl.Intl.pluralLogic(
+      workouts,
+      locale: localeName,
+      other: '$workouts جلسة',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      routines,
+      locale: localeName,
+      other: '$routines روتين',
+    );
+    return 'تحتوي على $_temp0 و$_temp1$active. ستستبدل جميع البيانات الموجودة حاليًا على هذا الهاتف. احفظ نسخة حالية أولًا إن أردت الاحتفاظ بها.';
+  }
+
+  @override
+  String get transferRestoreActive => '، بما في ذلك جلسة قيد التنفيذ';
+
+  @override
+  String get transferRestoreAction => 'استعادة';
+
+  @override
+  String get transferRestored =>
+      'تمت استعادة النسخة. تم تحديث الجلسات والروتينات.';
+
+  @override
+  String get transferNoAccessSheet =>
+      'تعذّرت قراءة هذا الجدول. في Google Sheets استخدم «إرسال نسخة» بصيغة Excel أو CSV واختر TrackIA.';
+
+  @override
+  String get transferHeadline => 'سجلك، تحت سيطرتك';
+
+  @override
+  String get transferIntro =>
+      'احفظ نسخة خارج هذا الهاتف لاستعادتها أو نقلها إلى هاتف آخر.';
+
+  @override
+  String get transferBackupTitle => 'نسخة احتياطية';
+
+  @override
+  String get transferBackupHelp => 'تتضمن السجل والروتينات والجلسة الجارية.';
+
+  @override
+  String get transferSheetsTitle => 'سجل Google Sheets';
+
+  @override
+  String get transferSheetsHelpAndroid =>
+      'حمّل جدولك وعلامة التبويب بإذن من Google، أو اختر نسخة Excel أو CSV. تُحفظ الخلايا الأصلية، وسيتمكن الذكاء الاصطناعي من تفسير تنسيقك عند الاتصال.';
+
+  @override
+  String get transferSheetsHelpOther =>
+      'حمّل نسخة Excel أو CSV. تُحفظ الخلايا الأصلية، في انتظار تفسيرها بواسطة الذكاء الاصطناعي.';
+
+  @override
+  String get transferImportSheets => 'استيراد من Google Sheets';
+
+  @override
+  String get transferChooseFileAndroid => 'اختر ملفًا من الهاتف أو Drive';
+
+  @override
+  String get transferChooseFileOther => 'اختر نسخة XLSX أو CSV';
+
+  @override
+  String transferWorkoutSubtitle(Object date, int exercises, int sets) {
+    return '$date · $exercises تمارين · $sets مجموعات';
+  }
+
+  @override
+  String get transferNoColumnWorkout => 'بدون عمود · التدريب';
+
+  @override
+  String get transferChooseColumn => 'اختر عمودًا';
+
+  @override
+  String get transferCsvReviewError => 'تعذّر فحص ملف CSV.';
+
+  @override
+  String get transferImportSessionsTitle => 'هل تريد استيراد هذه الجلسات؟';
+
+  @override
+  String transferImportSessionsBody(int count, int sets, int errors) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count جلسة',
+    );
+    return 'ستتم إضافة $_temp0 مع $sets مجموعة. الصفوف المتخطاة بسبب أخطاء: $errors.';
+  }
+
+  @override
+  String get transferImportAction => 'استيراد';
+
+  @override
+  String get transferImportError => 'تعذّر الاستيراد.';
+
+  @override
+  String get transferImportSheetTitle => 'استيراد الجدول';
+
+  @override
+  String transferImportedSummary(int added, int duplicates) {
+    String _temp0 = intl.Intl.pluralLogic(
+      added,
+      locale: localeName,
+      other: 'تمت إضافة $added جلسة',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      duplicates,
+      locale: localeName,
+      other: 'تم تخطي $duplicates جلسة مكررة',
+    );
+    return '$_temp0 · $_temp1.';
+  }
+
+  @override
+  String transferRowsFound(int count) {
+    return 'تم العثور على $count صفًا';
+  }
+
+  @override
+  String get transferMapHelp => 'طابق أعمدة جدولك. كل صف يمثل مجموعة واحدة.';
+
+  @override
+  String get transferDate => 'التاريخ';
+
+  @override
+  String get transferSessionOptional => 'الجلسة (اختياري)';
+
+  @override
+  String get transferExercise => 'التمرين';
+
+  @override
+  String get transferWeightKg => 'الوزن (كجم)';
+
+  @override
+  String get transferReps => 'التكرارات';
+
+  @override
+  String get transferReviewImport => 'مراجعة الاستيراد';
+
+  @override
+  String transferPreviewSummary(
+    int newCount,
+    int duplicateCount,
+    int errorCount,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      newCount,
+      locale: localeName,
+      other: '$newCount جلسة جديدة',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      duplicateCount,
+      locale: localeName,
+      other: '$duplicateCount مكررة',
+    );
+    String _temp2 = intl.Intl.pluralLogic(
+      errorCount,
+      locale: localeName,
+      other: '$errorCount صف به خطأ',
+    );
+    return '$_temp0 · $_temp1 · $_temp2';
+  }
+
+  @override
+  String transferValidRows(int valid, int total) {
+    return '$valid مجموعة صالحة من $total صفًا.';
+  }
+
+  @override
+  String get transferAllSessions => 'كل الجلسات';
+
+  @override
+  String transferSeeSessions(int count) {
+    return 'عرض $count جلسة';
+  }
+
+  @override
+  String get transferErrorRows => 'صفوف بها أخطاء';
+
+  @override
+  String transferSeeErrors(int count) {
+    return 'عرض $count خطأ';
+  }
+
+  @override
+  String get transferImportNew => 'استيراد الجلسات الجديدة';
+
+  @override
+  String get transferCloseAction => 'إغلاق';
+
+  @override
+  String get chatAttachVoiceError =>
+      'تعذّر التعرّف على الصوت. تحقّق من إذن الميكروفون أو اكتب رسالتك.';
+
+  @override
+  String get chatAttachVoiceUnavailable =>
+      'التعرّف على الصوت غير متاح. تحقّق من إذن الميكروفون وخدمة الصوت في الهاتف.';
+
+  @override
+  String get chatAttachDictationStart => 'تعذّر بدء الإملاء الصوتي.';
+
+  @override
+  String get chatAttachCamera => 'الكاميرا';
+
+  @override
+  String get chatAttachPhotos => 'الصور';
+
+  @override
+  String get chatAttachPdf => 'مستند PDF';
+
+  @override
+  String get chatAttachPdfHint => 'يحتاج نموذجًا يدعم المستندات';
+
+  @override
+  String get chatAttachAudio => 'ملف صوتي';
+
+  @override
+  String get chatAttachAudioHint => 'يتطلب نموذج Gemini يدعم الصوت';
+
+  @override
+  String get chatAttachSpreadsheet => 'جدول Excel أو CSV';
+
+  @override
+  String get chatAttachSheet => 'Google Sheets / Drive';
+
+  @override
+  String get chatAttachNeedsAi =>
+      'صل الذكاء الاصطناعي لإرسال الصور أو المستندات أو الصوت. يمكنك تحميل جدول بدون ذكاء اصطناعي.';
+
+  @override
+  String get chatAttachPhotoTooLarge => 'الصورة أكبر من 4 MB.';
+
+  @override
+  String get chatAttachPhotoFormat => 'اختر صورة بصيغة JPG أو PNG أو WebP.';
+
+  @override
+  String get chatAttachPhotoEmpty =>
+      'يجب أن تحتوي الصورة على محتوى ولا تتجاوز 4 MB.';
+
+  @override
+  String get chatAttachAudioNeedsGemini =>
+      'لإرسال ملف صوتي، اضبط نموذج Gemini يدعم الصوت. يمكنك استخدام ميكروفون الدردشة لإملاء رسالتك.';
+
+  @override
+  String get chatAttachTooLarge => 'المرفق أكبر من 4 MB.';
+
+  @override
+  String get chatAttachUnreadable => 'تعذّرت قراءة المرفق.';
+
+  @override
+  String get chatAttachFormat => 'صيغة المرفق غير مدعومة.';
+
+  @override
+  String get chatAttachInvalidPdf => 'الملف لا يحتوي على PDF صالح.';
+
+  @override
+  String get chatAttachOpenFailed => 'تعذّر فتح المرفق.';
+
+  @override
+  String get chatAttachRecoveredTooLarge =>
+      'الصورة المستعادة أكبر من 4 MB. اختر صورة أصغر.';
+
+  @override
+  String get chatMenuCompanionsError => 'تعذّر تحميل المرافقين.';
+
+  @override
+  String get chatMenuMore => 'خيارات إضافية';
+
+  @override
+  String get chatMenuTraining => 'الروتينات والسجل';
+
+  @override
+  String get chatMenuProgress => 'التقدم';
+
+  @override
+  String get chatMenuSheet => 'الجدول المحمّل';
+
+  @override
+  String get chatMenuRecover => 'استعادة التحضير';
+
+  @override
+  String get chatSendFocusTooLong => 'السجل يتجاوز 8000 حرف.';
+
+  @override
+  String get chatSendSavedNoAi =>
+      'تم حفظ السجل على الهاتف. الذكاء الاصطناعي غير متاح لتفسيره.';
+
+  @override
+  String get chatSendSavedNoProvider =>
+      'تم حفظ السجل على الهاتف. اضبط المزوّد لاستشارة المساعد.';
+
+  @override
+  String get chatSendAssistantError =>
+      'تعذّر الاتصال بالمساعد. راجع السجل المحلي.';
+
+  @override
+  String get chatSendQueueUnavailable =>
+      'طابور الإرسال الدائم غير متاح. احتفظ بالنص وأعد فتح الدردشة.';
+
+  @override
+  String get chatSendTooLong => 'الرسالة تتجاوز 8000 حرف.';
+
+  @override
+  String get chatSendConfigureProvider => 'اضبط المزوّد بزر الإعدادات للبدء.';
+
+  @override
+  String get chatSendSaveError =>
+      'تعذّر حفظ الرسالة على الهاتف. احتفظ بالنص وحاول مرة أخرى.';
+
+  @override
+  String get chatSendProposalIncomplete =>
+      'أرسل النموذج اقتراحًا غير مكتمل. اطلب منه إعداد التمرين مرة أخرى ليظهر زر البدء.';
+
+  @override
+  String get chatSendAnswerSaveError =>
+      'وصل الرد، لكن تعذّر حفظ المحادثة على الهاتف.';
+
+  @override
+  String get chatSendFailed => 'تعذّر إكمال المحادثة. يمكنك المحاولة مرة أخرى.';
+
+  @override
+  String get chatMsgOnlyLastEditable =>
+      'يمكن تعديل آخر رسالة فقط. اكتب التصحيح كرسالة جديدة.';
+
+  @override
+  String get chatMsgPending => 'في انتظار الإرسال';
+
+  @override
+  String get chatMsgSending => 'جارٍ الإرسال';
+
+  @override
+  String get chatMsgAnswered => 'تم الرد';
+
+  @override
+  String get chatMsgFailed => 'لم يُقبل؛ يمكنك إعادة الإرسال';
+
+  @override
+  String get chatMsgUncertain =>
+      'نتيجة غير مؤكدة؛ إعادة الإرسال محظورة حتى المراجعة';
+
+  @override
+  String get chatMsgHistory => 'السجل';
+
+  @override
+  String get chatMsgResend => 'إعادة الإرسال';
+
+  @override
+  String get chatMsgAiNotReady => 'الذكاء الاصطناعي غير جاهز.';
+
+  @override
+  String get chatMsgSendInProgress => 'هناك إرسال جارٍ.';
+
+  @override
+  String get chatMsgChangedWhileEditing =>
+      'تغيّرت الرسالة أثناء التعديل. راجع السجل.';
+
+  @override
+  String get chatMsgSaveNotSent =>
+      'تم حفظ التعديل، لكن تعذّر إرساله الآن. استخدم إعادة الإرسال عندما تستطيع.';
+
+  @override
+  String get chatMsgSavedOnly =>
+      'تم حفظ التعديل. استخدم إعادة الإرسال لإرسال هذه النسخة.';
+
+  @override
+  String get chatMsgLengthError => 'اكتب رسالة من 1 إلى 8000 حرف.';
+
+  @override
+  String get chatMsgEditError => 'تعذّر حفظ التعديل؛ يُحتفظ بالأصل.';
+
+  @override
+  String get chatMsgHistoryTitle => 'سجل النسخ';
+
+  @override
+  String chatMsgVersion(int n) {
+    return 'النسخة $n';
+  }
+
+  @override
+  String chatMsgVersionCurrent(int n) {
+    return 'النسخة $n · الحالية';
+  }
+
+  @override
+  String get chatMsgClose => 'إغلاق';
+
+  @override
+  String get chatMsgHistoryError => 'تعذّر فتح السجل.';
+
+  @override
+  String get chatMsgEditTitle => 'تعديل الرسالة';
+
+  @override
+  String get chatMsgEditLabel => 'النص المصحح';
+
+  @override
+  String get chatMsgEditHelper => 'تُحفظ النسخة الأصلية في السجل.';
+
+  @override
+  String chatMsgSendBlocked(Object reason) {
+    return 'لا يمكن الإرسال الآن: $reason';
+  }
+
+  @override
+  String get chatMsgSaveAndSend => 'حفظ وإرسال';
+
+  @override
+  String get chatSheetReloadError => 'تعذّر استعادة الجدول المحمّل.';
+
+  @override
+  String get chatSheetAndroidOnly => 'الاتصال بجداول Google متاح على Android.';
+
+  @override
+  String get chatSheetSaveError =>
+      'تعذّر حفظ الجدول على الهاتف. تُحفظ النسخة السابقة.';
+
+  @override
+  String get chatSheetInterpretPending =>
+      'وصل الرد، لكن الجدول ما زال بانتظار التفسير على الهاتف.';
+
+  @override
+  String get chatSheetRefreshError =>
+      'تعذّر تحديث الجدول. تُحفظ النسخة السابقة.';
+
+  @override
+  String get chatSheetRemoveError => 'تعذّر إزالة نسخة الجدول.';
+
+  @override
+  String chatSheetDialogBody(
+    Object title,
+    int rows,
+    Object date,
+    Object status,
+  ) {
+    return '$title · $rows صف\nآخر قراءة: $date.\n\n$status';
+  }
+
+  @override
+  String get chatSheetStatusPending =>
+      'بانتظار تفسير الذكاء الاصطناعي. لم يتم استيراد أي تدريبات.';
+
+  @override
+  String get chatSheetStatusAnalyzed =>
+      'حلّل المساعد هذه النسخة؛ لم يتم استيراد أي تدريبات.';
+
+  @override
+  String get chatSheetRemove => 'إزالة من السياق';
+
+  @override
+  String get chatSheetChange => 'تغيير الجدول';
+
+  @override
+  String get chatSheetRefresh => 'تحديث الجدول';
+
+  @override
+  String chatSheetLabel(Object title) {
+    return 'الجدول · $title';
+  }
+
+  @override
+  String chatProposalRepeated(int seconds) {
+    return 'مجموعات / فترات · راحة $seconds ث';
+  }
+
+  @override
+  String chatProposalContinuous(int seconds) {
+    return 'نشاط متواصل · راحة $seconds ث';
+  }
+
+  @override
+  String chatSheetPendingInfo(Object name) {
+    return '«$name» محمّل · بانتظار التفسير. تُحفظ البيانات الأصلية.';
+  }
+
+  @override
+  String get chatGameFocusOpen =>
+      'أنهِ النشاط المفتوح مع المرافق الآخر قبل تحضير هذا.';
+
+  @override
+  String get chatGamePrepareError => 'تعذّر تحضير النشاط. حاول مرة أخرى.';
+
+  @override
+  String chatGameGoalTitle(Object goal) {
+    return 'هدف مقترح: $goal';
+  }
+
+  @override
+  String chatGameAchievementTitle(Object title) {
+    return 'إنجاز مقترح: $title';
+  }
+
+  @override
+  String get chatGameCopyTitle => 'نصوص تذكير مقترحة';
+
+  @override
+  String get chatDeliveryQueueError =>
+      'تعذّر فتح طابور الدردشة الدائم. لن تُرسل الرسائل عبر تخزين بديل.';
+
+  @override
+  String get chatDeliveryRestoredPending =>
+      'حُفظت رسالتك بدون رد. يمكنك إرسالها مرة أخرى.';
+
+  @override
+  String get chatDeliveryUncertain =>
+      'هناك إرسال بنتيجة غير مؤكدة. لن يُعاد إرساله تلقائيًا؛ راجع السجل قبل القرار.';
+
+  @override
+  String get chatDeliveryBacklog =>
+      'لديك رسائل محفوظة بلا رد. استخدم إعادة الإرسال عندما تريد؛ لن تُرسل تلقائيًا.';
+
+  @override
+  String get chatDeliveryOtherChat =>
+      'الرسالة تنتمي إلى دردشة أخرى ولن تُرسل هنا.';
+
+  @override
+  String get chatDeliveryNotSafe => 'إعادة إرسال هذه الرسالة غير آمنة.';
+
+  @override
+  String get chatDeliveryStateChanged =>
+      'تغيّرت حالة الرسالة بالفعل؛ لم يُجرَ إرسال آخر.';
+
+  @override
+  String get chatDeliveryUncertainSend =>
+      'نتيجة الإرسال غير مؤكدة. لن يُعاد إرساله تلقائيًا؛ تحقّق مما إذا وصل رد.';
+
+  @override
+  String get chatDeliveryFailed =>
+      'تعذّر إكمال المحادثة. تبقى الرسالة محفوظة ولن يُعاد إرسالها تلقائيًا.';
+
+  @override
+  String get chatArchiveIncompleteDirective =>
+      'طلب النموذج الأرشفة ببيانات ناقصة. تبقى الدردشة مفتوحة.';
+
+  @override
+  String get chatArchiveDoneAuto =>
+      'أرشف المساعد الدردشة. يمكنك عرضها في الدردشات المؤرشفة.';
+
+  @override
+  String get chatArchiveDone => 'تمت أرشفة الدردشة. تم تحرير السياق النشط.';
+
+  @override
+  String get chatArchiveViewAction => 'عرض الأرشيف';
+
+  @override
+  String get chatArchiveError => 'تعذّرت الأرشفة. تُحفظ المحادثة والتدريبات.';
+
+  @override
+  String get chatArchiveSyncInvalid =>
+      'اقتراح الإرسال غير صالح. استخدم خيار «إرسال إلى Google Sheets» في القائمة.';
+
+  @override
+  String get chatArchiveRecalled => 'الأرشيف متاح لرسالتك التالية إلى المساعد.';
+
+  @override
+  String get chatArchiveReadError => 'تعذّر فتح الأرشيف.';
+
+  @override
+  String get chatDraftSaveError =>
+      'تعذّر حفظ المسودة. احتفظ بالنص وحاول مرة أخرى.';
+
+  @override
+  String get chatLoadError => 'تعذّر استعادة المحادثة السابقة.';
+
+  @override
+  String get chatLoadSheetError =>
+      'تعذّر استعادة الجدول المحفوظ. أعد تحميله من Google Sheets.';
+
+  @override
+  String get chatPersistTooLarge => 'الدردشة تتجاوز 20 MB؛ تعذّر حفظها كاملة.';
+
+  @override
+  String get creatorCreate => 'إنشاء';
+
+  @override
+  String get creatorCreateFailed => 'تعذّر إنشاء الرفيق. لم يُحفظ أي شيء.';
+
+  @override
+  String get creatorAssistedTitle => 'الإنشاء بمساعدة الذكاء الاصطناعي';
+
+  @override
+  String get creatorAiTitle => 'بمساعدة الذكاء الاصطناعي';
+
+  @override
+  String get creatorAiReadySubtitle =>
+      'أخبره بما تريد متابعته وسيقترح عليك رفيقًا.';
+
+  @override
+  String get creatorAiNotReadySubtitle =>
+      'عليك ربط مزوّد ذكاء اصطناعي والتحقق منه.';
+
+  @override
+  String get creatorOpenAiSettings => 'فتح إعدادات الذكاء الاصطناعي';
+
+  @override
+  String get creatorManualTitle => 'يدويًا';
+
+  @override
+  String get creatorManualSubtitle =>
+      'اختر الاسم والأيقونة واللون والوضع والتنبيه بنفسك.';
+
+  @override
+  String get creatorNewTitle => 'رفيق جديد';
+
+  @override
+  String get creatorEditProposalTitle => 'تعديل الاقتراح';
+
+  @override
+  String get creatorNameLength => 'اكتب اسمًا من 1 إلى 40 حرفًا.';
+
+  @override
+  String get creatorLevelReminderTitle => 'تذكير فقط';
+
+  @override
+  String get creatorLevelReminderDetail => 'يذكّرك فقط.';
+
+  @override
+  String get creatorLevelGoalsTitle => 'الأهداف والسلاسل';
+
+  @override
+  String get creatorLevelGoalsDetail =>
+      'موصى به: الأهداف والسلاسل بلا إنجازات.';
+
+  @override
+  String get creatorLevelGameTitle => 'اللعبة الكاملة';
+
+  @override
+  String get creatorLevelGameDetail => 'أهداف وسلاسل وإنجازات.';
+
+  @override
+  String creatorActivityLabel(Object name) {
+    return 'ما تسجّله: $name';
+  }
+
+  @override
+  String get creatorRemoveActivity => 'إزالة النشاط';
+
+  @override
+  String creatorGoalLabel(Object text) {
+    return 'الهدف: $text';
+  }
+
+  @override
+  String get creatorRemoveGoal => 'إزالة الهدف';
+
+  @override
+  String get creatorRemind => 'ذكّرني';
+
+  @override
+  String get creatorDecideOnStart => 'تحدده عند البدء';
+
+  @override
+  String get creatorPunctualSuffix => ' · تسجيل لمرة واحدة';
+
+  @override
+  String get creatorNoGoal => 'بلا هدف';
+
+  @override
+  String get creatorNoReminder => 'بلا تنبيه';
+
+  @override
+  String creatorReminderLabel(Object text) {
+    return 'التنبيه: $text';
+  }
+
+  @override
+  String creatorLevelLabel(Object text) {
+    return 'المستوى: $text';
+  }
+
+  @override
+  String get creatorDiscard => 'تجاهل';
+
+  @override
+  String get creatorNoAiConnected => 'لا يوجد ذكاء اصطناعي متصل.';
+
+  @override
+  String get creatorConversationFailed =>
+      'تعذّر إكمال المحادثة. يمكنك المحاولة مرة أخرى.';
+
+  @override
+  String get creatorInputHint => 'اكتب هنا';
+
+  @override
+  String get creatorPromptHelper => 'تُستخدم عند ربط مزوّد.';
+
+  @override
+  String get creatorLevelSection => 'المستوى';
+
+  @override
+  String get proposalIgnore => 'تجاهل';
+
+  @override
+  String get proposalAdd => 'إضافة';
+
+  @override
+  String get proposalUseTexts => 'استخدام هذه النصوص';
+
+  @override
+  String get proposalSuggestLater => 'ليس الآن';
+
+  @override
+  String get proposalSuggestNever => 'عدم الاقتراح مرة أخرى';
+
+  @override
+  String get proposalLockedTitle =>
+      'اقتراح الذكاء الاصطناعي حول بيانات ثبّتها بنفسك';
+
+  @override
+  String get proposalApply => 'تطبيق';
+
+  @override
+  String proposalChangeLine(
+    Object label,
+    int current,
+    Object unit,
+    int proposed,
+  ) {
+    return '$label: $current $unit → $proposed $unit';
+  }
+
+  @override
+  String get proposalLockLabel => 'ثبّتّه أنت. المس لإلغاء التثبيت';
+
+  @override
+  String get homeNewWorkoutTitle => 'جلسة تدريب جديدة';
+
+  @override
+  String get homeSessionNameLabel => 'اسم الجلسة';
+
+  @override
+  String get homeWorkout => 'جلسة تدريب';
+
+  @override
+  String get homeAddExerciseTitle => 'إضافة تمرين';
+
+  @override
+  String get homeExerciseNameLabel => 'اسم التمرين';
+
+  @override
+  String get homeAdd => 'إضافة';
+
+  @override
+  String get homeBack => 'رجوع';
+
+  @override
+  String get homeYourSession => 'جلستك';
+
+  @override
+  String get homeAssistantTooltip => 'مساعد TrackIA';
+
+  @override
+  String get homeReload => 'إعادة التحميل';
+
+  @override
+  String get homeLoadLog => 'تحميل السجل';
+
+  @override
+  String get homeHeroTitle => 'جهدك.\nتقدّمك.';
+
+  @override
+  String get homeHeroSubtitle => 'مجموعة واحدة في كل مرة. سجّل ما تفعله اليوم.';
+
+  @override
+  String get homeNextSession => 'جلستك القادمة';
+
+  @override
+  String get homeInProgress => 'الجلسة جارية';
+
+  @override
+  String get homeReadyQuestion => 'هل نتدرّب؟';
+
+  @override
+  String get homeAddExercisesHint => 'أضف تمارينك وسجّل كل مجموعة.';
+
+  @override
+  String homeActivitiesRecords(int activities, int records) {
+    String _temp0 = intl.Intl.pluralLogic(
+      activities,
+      locale: localeName,
+      other: '$activities نشاط',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      records,
+      locale: localeName,
+      other: '$records سجل',
+    );
+    return '$_temp0 · $_temp1';
+  }
+
+  @override
+  String get homeStartWorkout => 'بدء التدريب';
+
+  @override
+  String get homeContinueWorkout => 'متابعة التدريب';
+
+  @override
+  String get homeCompletedSessions => 'جلسات مكتملة';
+
+  @override
+  String get homeRecords => 'سجلات';
+
+  @override
+  String get homeLastActivity => 'آخر نشاط';
+
+  @override
+  String get homeEmptyHistoryTitle => 'هنا تبدأ قصتك';
+
+  @override
+  String get homeEmptyHistorySubtitle => 'سيظهر تدريبك الأول هنا عندما تنهيه.';
+
+  @override
+  String get homeSavedOffline => 'محفوظ على هذا الجهاز · بلا اتصال';
+
+  @override
+  String get homeJourneyTitle => 'رحلتك';
+
+  @override
+  String get homeEverySessionCounts => 'كل جلسة تُحتسب.';
+
+  @override
+  String get homeNoSessionsTitle => 'لا توجد جلسات بعد';
+
+  @override
+  String get homeNoSessionsSubtitle =>
+      'أنهِ تدريبًا وراجع هنا جميع تمارينه ومجموعاته.';
+
+  @override
+  String get homeStatusInProgress => 'جارٍ';
+
+  @override
+  String get homeStatusCompleted => 'مكتمل';
+
+  @override
+  String homeFinishedAt(Object date) {
+    return 'انتهت: $date';
+  }
+
+  @override
+  String homeFinishRecorded(Object date) {
+    return 'تم تسجيل الإنهاء: $date';
+  }
+
+  @override
+  String homeFinishRecordedByUser(Object date) {
+    return 'تم تسجيل الإنهاء: $date · وقت اخترته بنفسك';
+  }
+
+  @override
+  String get homeTimeKeptWarning =>
+      'تم حفظ الوقت مع تنبيه. يمكنك مراجعته لاحقًا.';
+
+  @override
+  String get homeTimeKeptWarningShort => 'تم حفظ الوقت مع تنبيه.';
+
+  @override
+  String get homeActivities => 'أنشطة';
+
+  @override
+  String homeIntervalsRepeated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count مجموعات / مقاطع',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String homeIntervals(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count مقاطع',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get homeNotStarted => 'لم تبدأ';
+
+  @override
+  String homeEndedAt(Object date) {
+    return 'النهاية: $date';
+  }
+
+  @override
+  String homeDraft(Object draft) {
+    return 'مسودة: $draft';
+  }
+
+  @override
+  String get homeFinishWorkout => 'إنهاء التدريب';
+
+  @override
+  String get homeAddSetToFinish =>
+      'سجّل مجموعة واحدة على الأقل لإنهاء التدريب.';
+
+  @override
+  String get homeEachSetSaved => 'تُحفظ كل مجموعة عند الضغط على حفظ.';
+
+  @override
+  String get homeDiscardTitle => 'هل تريد تجاهل الجلسة؟';
+
+  @override
+  String get homeDiscardBody =>
+      'ستُحذف هذه الجلسة وجميع مجموعاتها. لا يمكن التراجع عن هذا الإجراء.';
+
+  @override
+  String get homeDiscard => 'تجاهل';
+
+  @override
+  String get homeDiscardSession => 'تجاهل الجلسة';
+
+  @override
+  String get homeSavedWellDone => 'تم حفظ الجلسة. أحسنت.';
+
+  @override
+  String get homeViewHistory => 'عرض السجل';
+
+  @override
+  String homeDeleteExerciseTooltip(Object name) {
+    return 'حذف التمرين $name';
+  }
+
+  @override
+  String get homeDeleteExerciseTitle => 'هل تريد حذف التمرين؟';
+
+  @override
+  String homeDeleteExerciseBody(Object name, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count مجموعة',
+    );
+    return 'سيُحذف $name و$_temp0.';
+  }
+
+  @override
+  String get homeDelete => 'حذف';
+
+  @override
+  String homeTargetProgress(
+    int target,
+    Object repsMin,
+    Object repsMax,
+    int done,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      target,
+      locale: localeName,
+      other: '$target مجموعة',
+    );
+    return 'الهدف: $_temp0 من $repsMin–$repsMax تكرار · $done/$target مسجّلة';
+  }
+
+  @override
+  String get homeNoPreviousSession => 'لا توجد جلسة سابقة مسجّلة';
+
+  @override
+  String homeLastTime(Object date) {
+    return 'آخر مرة · $date';
+  }
+
+  @override
+  String get homeNoSetsYet => 'لم تسجّل أي مجموعات بعد.';
+
+  @override
+  String get homeSetHeader => 'المجموعة';
+
+  @override
+  String get homeKgHeader => 'كغ';
+
+  @override
+  String get homeRepsHeader => 'التكرارات';
+
+  @override
+  String homeSetOptionsTooltip(int number) {
+    return 'خيارات المجموعة $number';
+  }
+
+  @override
+  String homeSetDeleteBody(Object weight, int reps) {
+    String _temp0 = intl.Intl.pluralLogic(
+      reps,
+      locale: localeName,
+      other: '$reps تكرار',
+    );
+    return '$weight كغ × $_temp0.';
+  }
+
+  @override
+  String homeWeightReps(Object weight, int reps) {
+    return '$weight كغ × $reps';
+  }
+
+  @override
+  String get homeEditSet => 'تعديل المجموعة';
+
+  @override
+  String get homeDeleteSet => 'حذف المجموعة';
+
+  @override
+  String get homeAddSet => 'إضافة مجموعة';
+
+  @override
+  String homeRest(int seconds) {
+    return 'راحة $seconds ث';
+  }
+
+  @override
+  String get homeFirstSetTitle => 'جهّز مجموعتك الأولى';
+
+  @override
+  String get homeFirstSetSubtitle =>
+      'أضف تمرينًا لتبدأ بتسجيل الوزن والتكرارات.';
+
+  @override
+  String get homeFinishSession => 'إنهاء الجلسة';
+
+  @override
+  String get homeTabToday => 'اليوم';
+
+  @override
+  String get homeTabRoutines => 'الروتينات';
+
+  @override
+  String get homeTabHistory => 'السجل';
+
+  @override
+  String get homeSessionStarted =>
+      'بدأت الجلسة. يمكنك فتح قسم التدريب للتسجيل.';
+
+  @override
+  String get homeSessionStartFailed => 'تعذّر بدء التدريب.';
+
+  @override
+  String get homeActiveSessionChanged => 'تغيّرت الجلسة النشطة. راجعها.';
+
+  @override
+  String get homeSavedSheetPending =>
+      'تم حفظ التدريب على الهاتف. إرسال البيانات إلى Google Sheets بانتظار التأكيد.';
+
+  @override
+  String get homeSavedSheetNotUpdated =>
+      'تم حفظ التدريب على الهاتف. لم يتم تحديث Google Sheets.';
+
+  @override
+  String get homeFinishFailed => 'تعذّر إنهاء التدريب.';
+
+  @override
+  String get homeReviewFinishTitle => 'مراجعة وقت الانتهاء';
+
+  @override
+  String homeFinishIssuesBody(Object issues) {
+    return '$issues\n\nهل تريد حفظ الوقت المختار كما هو؟ ستُحفظ السجلات لمراجعتها لاحقًا إن رغبت.';
+  }
+
+  @override
+  String get homeBackAndFix => 'رجوع وتصحيح';
+
+  @override
+  String get homeSaveThatTime => 'حفظ ذلك الوقت';
+
+  @override
+  String get homeDate => 'التاريخ';
+
+  @override
+  String get homeTime => 'الوقت';
+
+  @override
+  String get homeStartSession => 'بدء الجلسة';
+
+  @override
+  String get homeOptionYes => 'نعم';
+
+  @override
+  String get homeOptionNo => 'لا';
+
+  @override
+  String get homeBoolYes => 'نعم';
+
+  @override
+  String get homeBoolNo => 'لا';
+
+  @override
+  String get homeNoteOptional => 'ملاحظة (اختياري)';
+
+  @override
+  String homeNumberInvalid(Object label) {
+    return '$label: اكتب رقمًا.';
+  }
+
+  @override
+  String get homeNoteOrValueRequired => 'أدخل قيمة أو اكتب ملاحظة.';
+
+  @override
+  String get homeSessionFinished => 'انتهت الجلسة';
+
+  @override
+  String get homeSummaryEmpty => 'لا جديد هذه المرة. نواصل.';
+
+  @override
+  String get homeNewAchievement => 'إنجاز جديد';
+
+  @override
+  String get homeDone => 'تم';
+
+  @override
+  String get homeSuggestionSquat => 'القرفصاء';
+
+  @override
+  String get homeSuggestionBench => 'ضغط المقعد';
+
+  @override
+  String get homeSuggestionRow => 'تجديف';
+
+  @override
+  String get homeNewSet => 'مجموعة جديدة';
+
+  @override
+  String get homeWeightLabel => 'الوزن (كغ)';
+
+  @override
+  String get homeWeightHint => 'مثال: 20.5';
+
+  @override
+  String get homeRepsLabel => 'التكرارات';
+
+  @override
+  String get homeRepsHint => 'مثال: 10';
+
+  @override
+  String get homeZeroWeightHint => 'استخدم 0 كغ إذا كنت تتدرّب بدون وزن خارجي.';
+
+  @override
+  String get homeExercisesLabel => 'التمارين';
+
+  @override
+  String get homeDeleteSetTitle => 'هل تريد حذف المجموعة؟';
+
+  @override
+  String get accountsConnectError => 'تعذّر الاتصال بجوجل.';
+
+  @override
+  String get accountsSwitchError => 'تعذّر تبديل الحساب. بياناتك محفوظة.';
+
+  @override
+  String get accountsDescription =>
+      'لكل حساب محادثته وإعدادات الذكاء الاصطناعي وجدوله وتدريباته على هذا الهاتف. يبقى السجل السابق في الملف المحلي. الربط لا ينسخ هذه البيانات ولا يرفعها.';
+
+  @override
+  String get accountsConnectAnother => 'ربط حساب Google آخر';
+
+  @override
+  String get accountsActiveProfile => 'الملف النشط';
+
+  @override
+  String get accountsReconnectProfile => 'العودة إلى هذا الملف عبر Google';
+
+  @override
+  String get accountsDisconnect => 'قطع الاتصال والعودة إلى الملف المحلي';
+
+  @override
+  String get accountsDisconnectNotice =>
+      'قطع الاتصال يحتفظ ببيانات كل ملف على هذا الهاتف. لا يحذف ملفات Google ولا يلغي الوصول من حسابك في Google.';
+
+  @override
+  String get appearanceSaveError => 'تعذّر حفظ السمة. حاول مرة أخرى.';
+
+  @override
+  String get appearanceIntro =>
+      'اختر الطريقة التي تفضّل بها رؤية TrackIA. يُحفظ اختيارك على هذا الهاتف.';
+
+  @override
+  String get appearanceSystemHint => 'استخدام سمة الجهاز';
+
+  @override
+  String get archiveSearchLabel => 'البحث بالعنوان أو الملخص';
+
+  @override
+  String get archiveRecoverError => 'تعذّر استرجاع المحادثة. الأرشيف محفوظ.';
+
+  @override
+  String get archiveEmpty => 'لا توجد محادثات مؤرشفة بعد.';
+
+  @override
+  String archiveChatSubtitle(Object date, Object count) {
+    return '$date · عدد الرسائل: $count';
+  }
+
+  @override
+  String get archiveAutomaticTag => 'أرشفه المساعد';
+
+  @override
+  String get archiveContinuityTitle => 'ملخص الاستمرارية';
+
+  @override
+  String archiveReasonLine(Object reason) {
+    return 'سبب المساعد: $reason';
+  }
+
+  @override
+  String get archiveConsultFromChat => 'الاستعلام من المحادثة';
+
+  @override
+  String get archiveYou => 'أنت';
+
+  @override
+  String archiveAttachmentKept(Object name) {
+    return 'المرفق المحفوظ: $name';
+  }
+
+  @override
+  String get notifUnsupported => 'تنبيهات الراحة متاحة على Android فقط.';
+
+  @override
+  String get notifDndActive => 'وضع عدم الإزعاج مفعّل';
+
+  @override
+  String get notifDndTotalSilence =>
+      'أنت في وضع «الصمت التام»: يحظر Android التنبيهات، حتى بوصفها منبهات.';
+
+  @override
+  String get notifDndAlarm =>
+      'تنبيهات الراحة تُسمع كمنبه. التنبيهات الأخرى لن تُسمع ولن تهتز.';
+
+  @override
+  String get notifDndPlain =>
+      'في الوقت الحالي لن تُسمع تنبيهات الراحة ولن تهتز.';
+
+  @override
+  String get notifEnabledTitle => 'تنبيهات النشاط والراحة';
+
+  @override
+  String get notifEnabledSubtitle =>
+      'النشاط جاهز، والمقطع جارٍ، ونهاية المقطع، ونهاية الراحة.';
+
+  @override
+  String get notifAlarmStyleTitle => 'التعامل معها كمنبه';
+
+  @override
+  String get notifAlarmStyleSubtitle =>
+      'تُسمع نهايات الراحة والمقاطع وتهتز حتى إن كان وضع عدم الإزعاج على الأولوية.';
+
+  @override
+  String get notifChannelBlockedTitle => 'يحظر Android قناة المنبه';
+
+  @override
+  String get notifChannelBlockedSubtitle => 'فعّلها من إعدادات القناة.';
+
+  @override
+  String get notifExactTitle => 'السماح بالتنبيهات الدقيقة';
+
+  @override
+  String get notifExactSubtitle => 'بدون هذا الإذن قد يؤخر Android التنبيه.';
+
+  @override
+  String get notifCheck => 'التحقق';
+
+  @override
+  String get notifTest => 'اختبار التنبيه';
+
+  @override
+  String get notifTestAlarm => 'اختبار مع تفعيل عدم الإزعاج';
+
+  @override
+  String get notifOpenDnd => 'فتح إعدادات عدم الإزعاج';
+
+  @override
+  String get notifSilenceNote =>
+      'في «الصمت التام» يحظر Android كل شيء، بما في ذلك المنبهات. وهناك لا يفيد إلا السماح بها من إعدادات هاتفك.';
+
+  @override
+  String get progressLoadError => 'تعذّر حساب التقدم.';
+
+  @override
+  String get progressMonth1 => 'يناير';
+
+  @override
+  String get progressMonth2 => 'فبراير';
+
+  @override
+  String get progressMonth3 => 'مارس';
+
+  @override
+  String get progressMonth4 => 'أبريل';
+
+  @override
+  String get progressMonth5 => 'مايو';
+
+  @override
+  String get progressMonth6 => 'يونيو';
+
+  @override
+  String get progressMonth7 => 'يوليو';
+
+  @override
+  String get progressMonth8 => 'أغسطس';
+
+  @override
+  String get progressMonth9 => 'سبتمبر';
+
+  @override
+  String get progressMonth10 => 'أكتوبر';
+
+  @override
+  String get progressMonth11 => 'نوفمبر';
+
+  @override
+  String get progressMonth12 => 'ديسمبر';
+
+  @override
+  String progressDayStatus(int day, Object month, Object status) {
+    return '$day $month: $status';
+  }
+
+  @override
+  String get progressDayDone => 'تم';
+
+  @override
+  String get progressDayPending => 'معلّق';
+
+  @override
+  String get progressDayMissed => 'لم يتم';
+
+  @override
+  String progressTitle(Object name) {
+    return 'التقدم · $name';
+  }
+
+  @override
+  String progressStreakCurrent(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'السلسلة الحالية: $n أيام',
+      one: 'السلسلة الحالية: يوم واحد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String progressStreakBest(int best) {
+    return 'أفضل سلسلة: $best';
+  }
+
+  @override
+  String progressFreeDays(int used, int total) {
+    return 'أيام الراحة هذا الأسبوع: $used/$total';
+  }
+
+  @override
+  String get progressGoalToday => 'هدف اليوم';
+
+  @override
+  String get progressGoalWeek => 'هدف الأسبوع';
+
+  @override
+  String progressGoalValues(Object value, Object target) {
+    return '$value من $target';
+  }
+
+  @override
+  String get progressLastFourWeeks => 'آخر 4 أسابيع';
+
+  @override
+  String progressAchievementUnlocked(Object title) {
+    return '$title، تم فتحه';
+  }
+
+  @override
+  String progressAchievementLocked(Object title, int percent) {
+    return '$title، مقفل، تقدم $percent%';
+  }
+
+  @override
+  String progressAchievementsTitle(int unlocked, int total) {
+    return 'الإنجازات · $unlocked من $total';
+  }
+
+  @override
+  String get progressAchievementsEmptyPlay =>
+      'ستظهر إنجازاتك عند إنهاء نشاطك الأول.';
+
+  @override
+  String progressAchievementsEmptyEnable(Object place) {
+    return 'فعّل وضع اللعب والإنجازات من «$place».';
+  }
+
+  @override
+  String get routinesTitle => 'روتيناتك';
+
+  @override
+  String get routinesSubtitle => 'جهّز مرة واحدة. تدرّب بإيقاعك.';
+
+  @override
+  String get routinesCreate => 'إنشاء روتين';
+
+  @override
+  String get routinesEmptyTitle => 'جلستك القادمة، جاهزة';
+
+  @override
+  String get routinesEmptyBody =>
+      'أنشئ مثلاً «الساق A» مع تمارينك ومجموعاتك ونطاق تكراراتك.';
+
+  @override
+  String routinesOptionsTooltip(Object name) {
+    return 'خيارات $name';
+  }
+
+  @override
+  String get routinesDeleteTitle => 'حذف الروتين؟';
+
+  @override
+  String routinesDeleteBody(Object name) {
+    return 'سيُحذف «$name». ستبقى تدريباتك المحفوظة والجلسة الجارية.';
+  }
+
+  @override
+  String get routinesEditMenu => 'تعديل الروتين';
+
+  @override
+  String get routinesDeleteMenu => 'حذف الروتين';
+
+  @override
+  String get routinesDelete => 'حذف';
+
+  @override
+  String get routinesTrain => 'تدرّب';
+
+  @override
+  String get routinesContinueSession => 'متابعة الجلسة النشطة';
+
+  @override
+  String get routinesNeedExercise => 'أضف تمريناً واحداً على الأقل.';
+
+  @override
+  String get routinesNameLabel => 'اسم الروتين';
+
+  @override
+  String get routinesNameHint => 'مثال: الساق A';
+
+  @override
+  String get routinesEditorHelp =>
+      'حدّد أهدافك. ستُسجَّل المجموعات عند التدريب.';
+
+  @override
+  String routinesMoveUp(int n) {
+    return 'نقل التمرين $n للأعلى';
+  }
+
+  @override
+  String routinesMoveDown(int n) {
+    return 'نقل التمرين $n للأسفل';
+  }
+
+  @override
+  String routinesEditExercise(int n) {
+    return 'تعديل التمرين $n';
+  }
+
+  @override
+  String routinesRemoveExercise(int n) {
+    return 'إزالة التمرين $n';
+  }
+
+  @override
+  String get routinesAddExercise => 'إضافة تمرين إلى الروتين';
+
+  @override
+  String get routinesSaving => 'جارٍ الحفظ…';
+
+  @override
+  String get routinesSave => 'حفظ الروتين';
+
+  @override
+  String get routinesLeaveTitle => 'الخروج دون حفظ؟';
+
+  @override
+  String get routinesLeaveBody => 'ستُفقد التغييرات على هذا الروتين.';
+
+  @override
+  String get routinesKeepEditing => 'متابعة التعديل';
+
+  @override
+  String get routinesDiscard => 'تجاهل التغييرات';
+
+  @override
+  String get routinesBack => 'رجوع';
+
+  @override
+  String get routinesExerciseDialogTitle => 'تمرين الروتين';
+
+  @override
+  String get routinesEditTargetTitle => 'تعديل الهدف';
+
+  @override
+  String get routinesExerciseLabel => 'التمرين';
+
+  @override
+  String get routinesExerciseHint => 'مثال: القرفصاء';
+
+  @override
+  String get routinesTargetSets => 'المجموعات المخططة';
+
+  @override
+  String get routinesRepsMin => 'أدنى تكرارات';
+
+  @override
+  String get routinesRepsMax => 'أقصى تكرارات';
+
+  @override
+  String get routinesRestSeconds => 'الراحة (ثوانٍ)';
+
+  @override
+  String get routinesSaveExercise => 'حفظ التمرين';
+
+  @override
+  String get focusCounterSaveError => 'تعذّر حفظ العداد. حاول مرة أخرى.';
+
+  @override
+  String get focusResultSaveError =>
+      'تعذّر حفظ النتيجة. احتفظ بالنص وحاول مرة أخرى.';
+
+  @override
+  String get focusSaveActivityError => 'تعذّر الحفظ في أنشطتك.';
+
+  @override
+  String get focusRecordSaveError => 'تعذّر حفظ السجل. حاول مرة أخرى.';
+
+  @override
+  String get focusReviewTimeTitle => 'مراجعة الوقت';
+
+  @override
+  String get focusReviewTimeBody =>
+      'الوقت المختار لا يطابق السجلات. هل تريد حفظ هذا الوقت والإبقاء عليها؟';
+
+  @override
+  String get focusBack => 'رجوع';
+
+  @override
+  String get focusSaveThatTime => 'حفظ هذا الوقت';
+
+  @override
+  String get focusRunning => 'جارٍ';
+
+  @override
+  String get focusReady => 'جاهز';
+
+  @override
+  String get focusRest => 'راحة';
+
+  @override
+  String focusRepeatedRest(Object progress, Object segments) {
+    return '$progress $segments · راحة';
+  }
+
+  @override
+  String focusSegmentCount(Object segment, int count) {
+    return '$segment $count';
+  }
+
+  @override
+  String focusSegmentCountOfTarget(Object segment, int count, int target) {
+    return '$segment $count من $target';
+  }
+
+  @override
+  String get focusSegmentSerie => 'مجموعة';
+
+  @override
+  String get focusSegmentTramo => 'مقطع';
+
+  @override
+  String get focusSegmentSeries => 'مجموعات';
+
+  @override
+  String get focusSegmentTramos => 'مقاطع';
+
+  @override
+  String focusRemoveField(Object label) {
+    return 'إزالة $label';
+  }
+
+  @override
+  String focusAddField(Object label) {
+    return 'إضافة $label';
+  }
 }

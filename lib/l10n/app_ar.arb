@@ -590,5 +590,1076 @@
     "placeholders": {
       "version": {}
     }
+  },
+  "activityIdleOtherActive": "مرافق آخر نشط",
+  "activityIdleNoActivity": "لا يوجد نشاط",
+  "activityIdleEndOther": "أنهِ النشاط الآخر لتبدأ هنا",
+  "activityIdleRegisterAnytime": "سجّل نشاطًا متى شئت",
+  "activityNewActivity": "نشاط جديد",
+  "activityIdleRecord": "تسجيل",
+  "activityRestLabel": "الراحة",
+  "activityRestDone": "انتهت الراحة",
+  "activityRestPaused": "الراحة متوقفة مؤقتًا",
+  "activityRestPause": "إيقاف مؤقت",
+  "activityRestContinue": "متابعة",
+  "activityRestStart": "ابدأ الراحة",
+  "activityRestRestart": "إعادة تشغيل الراحة",
+  "activityRestAdjust": "{seconds} ث · تعديل",
+  "@activityRestAdjust": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "activityRestNotice": "تنبيه مع بقاء هذه الشاشة مفتوحة؛ يستمر الوقت عند الخروج.",
+  "activityRestDurationTitle": "مدة الراحة",
+  "activityRestSecondsLabel": "ثوانٍ",
+  "activityRestRangeHint": "بين 5 و1800 ثانية. عند التطبيق يصبح المؤقت جاهزًا للبدء.",
+  "activityRestApply": "تطبيق",
+  "activityDialogNameTitle": "اسم النشاط",
+  "activityDialogSaveName": "حفظ الاسم",
+  "activityDialogRestRange": "بين 0 و1800",
+  "activityDialogWhatToDo": "ماذا ستفعل؟",
+  "activityDialogYourActivities": "أنشطتك",
+  "activityDialogInstantRecord": "تسجيل لحظي",
+  "activityDialogYourActivity": "نشاطك",
+  "activityDialogFromCurrentWorkout": "من التمرين الحالي",
+  "activityDialogSetsProgress": "{done}/{target} مجموعات · {repsMin}–{repsMax} تكرارات",
+  "@activityDialogSetsProgress": {
+    "placeholders": {
+      "done": {},
+      "target": {},
+      "repsMin": {},
+      "repsMax": {}
+    }
+  },
+  "activityDialogRepeat": "أعد تنفيذه",
+  "activityDialogRoutineSets": "{routine} · {sets} مجموعات",
+  "@activityDialogRoutineSets": {
+    "placeholders": {
+      "routine": {},
+      "sets": {
+        "type": "int"
+      }
+    }
+  },
+  "activityDialogEndTitle": "إنهاء النشاط",
+  "activityDialogDate": "التاريخ",
+  "activityDialogTime": "الوقت",
+  "activityBuilderNameRequired": "اكتب اسمًا للنشاط.",
+  "activityBuilderOnlyIntegers": "اكتب أعدادًا صحيحة فقط.",
+  "activityBuilderRange": "{what} بين {min} و{max}.",
+  "@activityBuilderRange": {
+    "placeholders": {
+      "what": {},
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "activityBuilderWhatDuration": "المدة",
+  "activityBuilderWhatRest": "الراحة",
+  "activityBuilderWhatSegments": "الأجزاء المخططة",
+  "activityBuilderWhatCycles": "الدورات المخططة",
+  "activityBuilderDurationRequired": "حدد المدة بالدقائق.",
+  "activityBuilderSegmentNamesPair": "حدد صيغة المفرد والجمع للجزء، أو اترك الحقلين فارغين.",
+  "activityBuilderFromTemplate": "ابدأ من قالب",
+  "activityBuilderHowMeasured": "كيف يُقاس؟",
+  "activityBuilderInstantTitle": "لحظي",
+  "activityBuilderInstantDetail": "تسجيل بدون مؤقت",
+  "activityBuilderFreeTitle": "مفتوح",
+  "activityBuilderFreeDetail": "ساعة إيقاف، بلا عد تنازلي",
+  "activityBuilderTimedTitle": "بمدة محددة",
+  "activityBuilderTimedDetail": "عد تنازلي لمدة ثابتة",
+  "activityBuilderSegmentsTitle": "على أجزاء",
+  "activityBuilderSegmentsDetail": "عدة أجزاء مع راحة",
+  "activityBuilderDuration": "المدة (بالدقائق)",
+  "activityBuilderSegmentHelper": "اختياري: لكل جزء",
+  "activityBuilderPlannedSegments": "الأجزاء المخططة (اختياري)",
+  "activityBuilderRestBetween": "الراحة بين الأجزاء (ثوانٍ)",
+  "activityBuilderRestHelper": "90 تعني دقيقة ونصفًا",
+  "activityBuilderPlannedCycles": "الدورات المخططة (اختياري)",
+  "activityBuilderSegmentSingular": "الجزء الواحد يسمى",
+  "activityBuilderSegmentPlural": "الأجزاء المتعددة تسمى",
+  "activityBuilderWhatToNote": "ماذا تريد أن تدوّن؟ (اختياري)",
+  "activityBuilderRemoveField": "إزالة {label}",
+  "@activityBuilderRemoveField": {
+    "placeholders": {
+      "label": {}
+    }
+  },
+  "activityBuilderMaxFields": "الحد الأقصى 12 حقلًا",
+  "activityBuilderAddField": "إضافة حقل",
+  "activityBuilderSaveInActivities": "حفظ في أنشطتك",
+  "activityBuilderSaveInActivitiesHelp": "لتكرارها دون إعادة إنشائها.",
+  "activityBuilderPrepare": "تجهيز النشاط",
+  "activityBuilderNewField": "حقل جديد",
+  "activityBuilderFieldNameRequired": "اكتب اسم حقل من 80 حرفًا كحد أقصى.",
+  "activityBuilderFieldName": "اسم الحقل",
+  "activityBuilderFieldType": "النوع",
+  "activityBuilderFieldUnit": "الوحدة (اختياري)",
+  "activityBuilderOptions": "الخيارات",
+  "activityBuilderOptionsHelp": "مفصولة بفواصل",
+  "activityBuilderScaleMin": "الحد الأدنى",
+  "activityBuilderScaleMax": "الحد الأقصى",
+  "activityBuilderScaleRange": "اكتب الحد الأدنى والحد الأقصى للمقياس.",
+  "activityBuilderAggregate": "طريقة الحساب",
+  "activityBuilderCountSingular": "يُحسب كـ (مفرد)",
+  "activityBuilderCountSingularHelp": "اختياري، مثلًا: كتاب",
+  "activityBuilderCountPlural": "يُحسب كـ (جمع)",
+  "activityBuilderCountPluralHelp": "اختياري، مثلًا: كتب",
+  "activityBuilderAdd": "إضافة",
+  "aiPerReadError": "تعذّرت قراءة إعدادات IA لكل مرافق.",
+  "aiPerSaveError": "تعذّر حفظ التغيير.",
+  "aiPerTitle": "لكل مرافق",
+  "aiPerNoProvider": "اربط مزوّدًا أولًا لتتمكن من اختيار نموذج مختلف لكل مرافق.",
+  "aiPerHelp": "يستخدم كل مرافق مزوّدك، أو نموذجًا خاصًا به من المزوّد نفسه.",
+  "aiPerDefault": "افتراضي",
+  "aiPerDialogTitle": "الذكاء الاصطناعي لـ {name}",
+  "@aiPerDialogTitle": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "aiPerDialogHelp": "يستخدم {service} بمفتاح ملفك الشخصي. يغيّر النموذج الخاص بهذا المرافق فقط.",
+  "@aiPerDialogHelp": {
+    "placeholders": {
+      "service": {}
+    }
+  },
+  "aiPerUseDefault": "استخدام الإعداد الافتراضي",
+  "aiSetAndroidFileAccess": "لم يتح Android الوصول إلى الملف المحدد.",
+  "aiSetGgufTitle": "نموذج GGUF",
+  "aiSetLocalContextHelp": "توصي TrackIA بـ {context} لتعليماتها وسجلها وبياناتها. التوصية تلبي احتياجات التطبيق، وليست الحد الأقصى لملف GGUF هذا. إذا لم يدعم النموذج الحجم المختار فقد يفشل؛ القرار لك في خفضه.",
+  "@aiSetLocalContextHelp": {
+    "placeholders": {
+      "context": {}
+    }
+  },
+  "aiSetModelsCountChatGpt": "النماذج المتاحة لهذا الحساب: {count}. اختبار الاتصال يؤكد الوصول إلى النموذج الذي تختاره.",
+  "@aiSetModelsCountChatGpt": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiSetCatalogCountApi": "تم جلب {count} نموذجًا من المزوّد. يؤكد اختبار الاتصال ما إذا كان مفتاحك يستطيع استخدام النموذج الذي تختاره.",
+  "@aiSetCatalogCountApi": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiSetCatalogErrorChatGpt": "تعذّر جلب قائمة النماذج لهذا الحساب. تحقق من الاتصال وحاول مرة أخرى.",
+  "aiSetCatalogErrorApi": "تعذّر جلب القائمة. يمكنك المحاولة مرة أخرى أو إدخال النموذج يدويًا.",
+  "transferSheetReadError": "تعذّرت قراءة الجدول.",
+  "transferSheetTooLarge": "حجم الجدول يتجاوز 20 ميغابايت.",
+  "transferSheetLoadError": "تعذّر تحميل الجدول. حاول مرة أخرى.",
+  "transferSheetLoaded": "تم تحميل الجدول. في انتظار تفسيره بواسطة الذكاء الاصطناعي.",
+  "transferFileTooLarge": "حجم الملف يتجاوز 20 ميغابايت.",
+  "transferSheetSelectedError": "تعذّرت قراءة الجدول المحدد.",
+  "transferFileReadError": "تعذّرت قراءة الملف أو مشاركته.",
+  "transferDefaultSheetName": "الجدول المحمّل",
+  "transferShareSubject": "نسخة احتياطية من TrackIA",
+  "transferShareText": "احفظ هذا الملف في Drive أو في مكان آمن.",
+  "transferRestoreTitle": "هل تريد استعادة هذه النسخة؟",
+  "transferRestoreBody": "تحتوي على {workouts, plural, other{{workouts} جلسة}} و{routines, plural, other{{routines} روتين}}{active}. ستستبدل جميع البيانات الموجودة حاليًا على هذا الهاتف. احفظ نسخة حالية أولًا إن أردت الاحتفاظ بها.",
+  "@transferRestoreBody": {
+    "placeholders": {
+      "workouts": {
+        "type": "int"
+      },
+      "routines": {
+        "type": "int"
+      },
+      "active": {}
+    }
+  },
+  "transferRestoreActive": "، بما في ذلك جلسة قيد التنفيذ",
+  "transferRestoreAction": "استعادة",
+  "transferRestored": "تمت استعادة النسخة. تم تحديث الجلسات والروتينات.",
+  "transferNoAccessSheet": "تعذّرت قراءة هذا الجدول. في Google Sheets استخدم «إرسال نسخة» بصيغة Excel أو CSV واختر TrackIA.",
+  "transferHeadline": "سجلك، تحت سيطرتك",
+  "transferIntro": "احفظ نسخة خارج هذا الهاتف لاستعادتها أو نقلها إلى هاتف آخر.",
+  "transferBackupTitle": "نسخة احتياطية",
+  "transferBackupHelp": "تتضمن السجل والروتينات والجلسة الجارية.",
+  "transferSheetsTitle": "سجل Google Sheets",
+  "transferSheetsHelpAndroid": "حمّل جدولك وعلامة التبويب بإذن من Google، أو اختر نسخة Excel أو CSV. تُحفظ الخلايا الأصلية، وسيتمكن الذكاء الاصطناعي من تفسير تنسيقك عند الاتصال.",
+  "transferSheetsHelpOther": "حمّل نسخة Excel أو CSV. تُحفظ الخلايا الأصلية، في انتظار تفسيرها بواسطة الذكاء الاصطناعي.",
+  "transferImportSheets": "استيراد من Google Sheets",
+  "transferChooseFileAndroid": "اختر ملفًا من الهاتف أو Drive",
+  "transferChooseFileOther": "اختر نسخة XLSX أو CSV",
+  "transferWorkoutSubtitle": "{date} · {exercises} تمارين · {sets} مجموعات",
+  "@transferWorkoutSubtitle": {
+    "placeholders": {
+      "date": {},
+      "exercises": {
+        "type": "int"
+      },
+      "sets": {
+        "type": "int"
+      }
+    }
+  },
+  "transferNoColumnWorkout": "بدون عمود · التدريب",
+  "transferChooseColumn": "اختر عمودًا",
+  "transferCsvReviewError": "تعذّر فحص ملف CSV.",
+  "transferImportSessionsTitle": "هل تريد استيراد هذه الجلسات؟",
+  "transferImportSessionsBody": "ستتم إضافة {count, plural, other{{count} جلسة}} مع {sets} مجموعة. الصفوف المتخطاة بسبب أخطاء: {errors}.",
+  "@transferImportSessionsBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "sets": {
+        "type": "int"
+      },
+      "errors": {
+        "type": "int"
+      }
+    }
+  },
+  "transferImportAction": "استيراد",
+  "transferImportError": "تعذّر الاستيراد.",
+  "transferImportSheetTitle": "استيراد الجدول",
+  "transferImportedSummary": "{added, plural, other{تمت إضافة {added} جلسة}} · {duplicates, plural, other{تم تخطي {duplicates} جلسة مكررة}}.",
+  "@transferImportedSummary": {
+    "placeholders": {
+      "added": {
+        "type": "int"
+      },
+      "duplicates": {
+        "type": "int"
+      }
+    }
+  },
+  "transferRowsFound": "تم العثور على {count} صفًا",
+  "@transferRowsFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "transferMapHelp": "طابق أعمدة جدولك. كل صف يمثل مجموعة واحدة.",
+  "transferDate": "التاريخ",
+  "transferSessionOptional": "الجلسة (اختياري)",
+  "transferExercise": "التمرين",
+  "transferWeightKg": "الوزن (كجم)",
+  "transferReps": "التكرارات",
+  "transferReviewImport": "مراجعة الاستيراد",
+  "transferPreviewSummary": "{newCount, plural, other{{newCount} جلسة جديدة}} · {duplicateCount, plural, other{{duplicateCount} مكررة}} · {errorCount, plural, other{{errorCount} صف به خطأ}}",
+  "@transferPreviewSummary": {
+    "placeholders": {
+      "newCount": {
+        "type": "int"
+      },
+      "duplicateCount": {
+        "type": "int"
+      },
+      "errorCount": {
+        "type": "int"
+      }
+    }
+  },
+  "transferValidRows": "{valid} مجموعة صالحة من {total} صفًا.",
+  "@transferValidRows": {
+    "placeholders": {
+      "valid": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "transferAllSessions": "كل الجلسات",
+  "transferSeeSessions": "عرض {count} جلسة",
+  "@transferSeeSessions": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "transferErrorRows": "صفوف بها أخطاء",
+  "transferSeeErrors": "عرض {count} خطأ",
+  "@transferSeeErrors": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "transferImportNew": "استيراد الجلسات الجديدة",
+  "transferCloseAction": "إغلاق",
+  "chatAttachVoiceError": "تعذّر التعرّف على الصوت. تحقّق من إذن الميكروفون أو اكتب رسالتك.",
+  "chatAttachVoiceUnavailable": "التعرّف على الصوت غير متاح. تحقّق من إذن الميكروفون وخدمة الصوت في الهاتف.",
+  "chatAttachDictationStart": "تعذّر بدء الإملاء الصوتي.",
+  "chatAttachCamera": "الكاميرا",
+  "chatAttachPhotos": "الصور",
+  "chatAttachPdf": "مستند PDF",
+  "chatAttachPdfHint": "يحتاج نموذجًا يدعم المستندات",
+  "chatAttachAudio": "ملف صوتي",
+  "chatAttachAudioHint": "يتطلب نموذج Gemini يدعم الصوت",
+  "chatAttachSpreadsheet": "جدول Excel أو CSV",
+  "chatAttachSheet": "Google Sheets / Drive",
+  "chatAttachNeedsAi": "صل الذكاء الاصطناعي لإرسال الصور أو المستندات أو الصوت. يمكنك تحميل جدول بدون ذكاء اصطناعي.",
+  "chatAttachPhotoTooLarge": "الصورة أكبر من 4 MB.",
+  "chatAttachPhotoFormat": "اختر صورة بصيغة JPG أو PNG أو WebP.",
+  "chatAttachPhotoEmpty": "يجب أن تحتوي الصورة على محتوى ولا تتجاوز 4 MB.",
+  "chatAttachAudioNeedsGemini": "لإرسال ملف صوتي، اضبط نموذج Gemini يدعم الصوت. يمكنك استخدام ميكروفون الدردشة لإملاء رسالتك.",
+  "chatAttachTooLarge": "المرفق أكبر من 4 MB.",
+  "chatAttachUnreadable": "تعذّرت قراءة المرفق.",
+  "chatAttachFormat": "صيغة المرفق غير مدعومة.",
+  "chatAttachInvalidPdf": "الملف لا يحتوي على PDF صالح.",
+  "chatAttachOpenFailed": "تعذّر فتح المرفق.",
+  "chatAttachRecoveredTooLarge": "الصورة المستعادة أكبر من 4 MB. اختر صورة أصغر.",
+  "chatMenuCompanionsError": "تعذّر تحميل المرافقين.",
+  "chatMenuMore": "خيارات إضافية",
+  "chatMenuTraining": "الروتينات والسجل",
+  "chatMenuProgress": "التقدم",
+  "chatMenuSheet": "الجدول المحمّل",
+  "chatMenuRecover": "استعادة التحضير",
+  "chatSendFocusTooLong": "السجل يتجاوز 8000 حرف.",
+  "chatSendSavedNoAi": "تم حفظ السجل على الهاتف. الذكاء الاصطناعي غير متاح لتفسيره.",
+  "chatSendSavedNoProvider": "تم حفظ السجل على الهاتف. اضبط المزوّد لاستشارة المساعد.",
+  "chatSendAssistantError": "تعذّر الاتصال بالمساعد. راجع السجل المحلي.",
+  "chatSendQueueUnavailable": "طابور الإرسال الدائم غير متاح. احتفظ بالنص وأعد فتح الدردشة.",
+  "chatSendTooLong": "الرسالة تتجاوز 8000 حرف.",
+  "chatSendConfigureProvider": "اضبط المزوّد بزر الإعدادات للبدء.",
+  "chatSendSaveError": "تعذّر حفظ الرسالة على الهاتف. احتفظ بالنص وحاول مرة أخرى.",
+  "chatSendProposalIncomplete": "أرسل النموذج اقتراحًا غير مكتمل. اطلب منه إعداد التمرين مرة أخرى ليظهر زر البدء.",
+  "chatSendAnswerSaveError": "وصل الرد، لكن تعذّر حفظ المحادثة على الهاتف.",
+  "chatSendFailed": "تعذّر إكمال المحادثة. يمكنك المحاولة مرة أخرى.",
+  "chatMsgOnlyLastEditable": "يمكن تعديل آخر رسالة فقط. اكتب التصحيح كرسالة جديدة.",
+  "chatMsgPending": "في انتظار الإرسال",
+  "chatMsgSending": "جارٍ الإرسال",
+  "chatMsgAnswered": "تم الرد",
+  "chatMsgFailed": "لم يُقبل؛ يمكنك إعادة الإرسال",
+  "chatMsgUncertain": "نتيجة غير مؤكدة؛ إعادة الإرسال محظورة حتى المراجعة",
+  "chatMsgHistory": "السجل",
+  "chatMsgResend": "إعادة الإرسال",
+  "chatMsgAiNotReady": "الذكاء الاصطناعي غير جاهز.",
+  "chatMsgSendInProgress": "هناك إرسال جارٍ.",
+  "chatMsgChangedWhileEditing": "تغيّرت الرسالة أثناء التعديل. راجع السجل.",
+  "chatMsgSaveNotSent": "تم حفظ التعديل، لكن تعذّر إرساله الآن. استخدم إعادة الإرسال عندما تستطيع.",
+  "chatMsgSavedOnly": "تم حفظ التعديل. استخدم إعادة الإرسال لإرسال هذه النسخة.",
+  "chatMsgLengthError": "اكتب رسالة من 1 إلى 8000 حرف.",
+  "chatMsgEditError": "تعذّر حفظ التعديل؛ يُحتفظ بالأصل.",
+  "chatMsgHistoryTitle": "سجل النسخ",
+  "chatMsgVersion": "النسخة {n}",
+  "@chatMsgVersion": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "chatMsgVersionCurrent": "النسخة {n} · الحالية",
+  "@chatMsgVersionCurrent": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "chatMsgClose": "إغلاق",
+  "chatMsgHistoryError": "تعذّر فتح السجل.",
+  "chatMsgEditTitle": "تعديل الرسالة",
+  "chatMsgEditLabel": "النص المصحح",
+  "chatMsgEditHelper": "تُحفظ النسخة الأصلية في السجل.",
+  "chatMsgSendBlocked": "لا يمكن الإرسال الآن: {reason}",
+  "@chatMsgSendBlocked": {
+    "placeholders": {
+      "reason": {}
+    }
+  },
+  "chatMsgSaveAndSend": "حفظ وإرسال",
+  "chatSheetReloadError": "تعذّر استعادة الجدول المحمّل.",
+  "chatSheetAndroidOnly": "الاتصال بجداول Google متاح على Android.",
+  "chatSheetSaveError": "تعذّر حفظ الجدول على الهاتف. تُحفظ النسخة السابقة.",
+  "chatSheetInterpretPending": "وصل الرد، لكن الجدول ما زال بانتظار التفسير على الهاتف.",
+  "chatSheetRefreshError": "تعذّر تحديث الجدول. تُحفظ النسخة السابقة.",
+  "chatSheetRemoveError": "تعذّر إزالة نسخة الجدول.",
+  "chatSheetDialogBody": "{title} · {rows} صف\nآخر قراءة: {date}.\n\n{status}",
+  "@chatSheetDialogBody": {
+    "placeholders": {
+      "title": {},
+      "rows": {
+        "type": "int"
+      },
+      "date": {},
+      "status": {}
+    }
+  },
+  "chatSheetStatusPending": "بانتظار تفسير الذكاء الاصطناعي. لم يتم استيراد أي تدريبات.",
+  "chatSheetStatusAnalyzed": "حلّل المساعد هذه النسخة؛ لم يتم استيراد أي تدريبات.",
+  "chatSheetRemove": "إزالة من السياق",
+  "chatSheetChange": "تغيير الجدول",
+  "chatSheetRefresh": "تحديث الجدول",
+  "chatSheetLabel": "الجدول · {title}",
+  "@chatSheetLabel": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "chatProposalRepeated": "مجموعات / فترات · راحة {seconds} ث",
+  "@chatProposalRepeated": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "chatProposalContinuous": "نشاط متواصل · راحة {seconds} ث",
+  "@chatProposalContinuous": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "chatSheetPendingInfo": "«{name}» محمّل · بانتظار التفسير. تُحفظ البيانات الأصلية.",
+  "@chatSheetPendingInfo": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "chatGameFocusOpen": "أنهِ النشاط المفتوح مع المرافق الآخر قبل تحضير هذا.",
+  "chatGamePrepareError": "تعذّر تحضير النشاط. حاول مرة أخرى.",
+  "chatGameGoalTitle": "هدف مقترح: {goal}",
+  "@chatGameGoalTitle": {
+    "placeholders": {
+      "goal": {}
+    }
+  },
+  "chatGameAchievementTitle": "إنجاز مقترح: {title}",
+  "@chatGameAchievementTitle": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "chatGameCopyTitle": "نصوص تذكير مقترحة",
+  "chatDeliveryQueueError": "تعذّر فتح طابور الدردشة الدائم. لن تُرسل الرسائل عبر تخزين بديل.",
+  "chatDeliveryRestoredPending": "حُفظت رسالتك بدون رد. يمكنك إرسالها مرة أخرى.",
+  "chatDeliveryUncertain": "هناك إرسال بنتيجة غير مؤكدة. لن يُعاد إرساله تلقائيًا؛ راجع السجل قبل القرار.",
+  "chatDeliveryBacklog": "لديك رسائل محفوظة بلا رد. استخدم إعادة الإرسال عندما تريد؛ لن تُرسل تلقائيًا.",
+  "chatDeliveryOtherChat": "الرسالة تنتمي إلى دردشة أخرى ولن تُرسل هنا.",
+  "chatDeliveryNotSafe": "إعادة إرسال هذه الرسالة غير آمنة.",
+  "chatDeliveryStateChanged": "تغيّرت حالة الرسالة بالفعل؛ لم يُجرَ إرسال آخر.",
+  "chatDeliveryUncertainSend": "نتيجة الإرسال غير مؤكدة. لن يُعاد إرساله تلقائيًا؛ تحقّق مما إذا وصل رد.",
+  "chatDeliveryFailed": "تعذّر إكمال المحادثة. تبقى الرسالة محفوظة ولن يُعاد إرسالها تلقائيًا.",
+  "chatArchiveIncompleteDirective": "طلب النموذج الأرشفة ببيانات ناقصة. تبقى الدردشة مفتوحة.",
+  "chatArchiveDoneAuto": "أرشف المساعد الدردشة. يمكنك عرضها في الدردشات المؤرشفة.",
+  "chatArchiveDone": "تمت أرشفة الدردشة. تم تحرير السياق النشط.",
+  "chatArchiveViewAction": "عرض الأرشيف",
+  "chatArchiveError": "تعذّرت الأرشفة. تُحفظ المحادثة والتدريبات.",
+  "chatArchiveSyncInvalid": "اقتراح الإرسال غير صالح. استخدم خيار «إرسال إلى Google Sheets» في القائمة.",
+  "chatArchiveRecalled": "الأرشيف متاح لرسالتك التالية إلى المساعد.",
+  "chatArchiveReadError": "تعذّر فتح الأرشيف.",
+  "chatDraftSaveError": "تعذّر حفظ المسودة. احتفظ بالنص وحاول مرة أخرى.",
+  "chatLoadError": "تعذّر استعادة المحادثة السابقة.",
+  "chatLoadSheetError": "تعذّر استعادة الجدول المحفوظ. أعد تحميله من Google Sheets.",
+  "chatPersistTooLarge": "الدردشة تتجاوز 20 MB؛ تعذّر حفظها كاملة.",
+  "creatorCreate": "إنشاء",
+  "creatorCreateFailed": "تعذّر إنشاء الرفيق. لم يُحفظ أي شيء.",
+  "creatorAssistedTitle": "الإنشاء بمساعدة الذكاء الاصطناعي",
+  "creatorAiTitle": "بمساعدة الذكاء الاصطناعي",
+  "creatorAiReadySubtitle": "أخبره بما تريد متابعته وسيقترح عليك رفيقًا.",
+  "creatorAiNotReadySubtitle": "عليك ربط مزوّد ذكاء اصطناعي والتحقق منه.",
+  "creatorOpenAiSettings": "فتح إعدادات الذكاء الاصطناعي",
+  "creatorManualTitle": "يدويًا",
+  "creatorManualSubtitle": "اختر الاسم والأيقونة واللون والوضع والتنبيه بنفسك.",
+  "creatorNewTitle": "رفيق جديد",
+  "creatorEditProposalTitle": "تعديل الاقتراح",
+  "creatorNameLength": "اكتب اسمًا من 1 إلى 40 حرفًا.",
+  "creatorLevelReminderTitle": "تذكير فقط",
+  "creatorLevelReminderDetail": "يذكّرك فقط.",
+  "creatorLevelGoalsTitle": "الأهداف والسلاسل",
+  "creatorLevelGoalsDetail": "موصى به: الأهداف والسلاسل بلا إنجازات.",
+  "creatorLevelGameTitle": "اللعبة الكاملة",
+  "creatorLevelGameDetail": "أهداف وسلاسل وإنجازات.",
+  "creatorActivityLabel": "ما تسجّله: {name}",
+  "@creatorActivityLabel": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "creatorRemoveActivity": "إزالة النشاط",
+  "creatorGoalLabel": "الهدف: {text}",
+  "@creatorGoalLabel": {
+    "placeholders": {
+      "text": {}
+    }
+  },
+  "creatorRemoveGoal": "إزالة الهدف",
+  "creatorRemind": "ذكّرني",
+  "creatorDecideOnStart": "تحدده عند البدء",
+  "creatorPunctualSuffix": " · تسجيل لمرة واحدة",
+  "creatorNoGoal": "بلا هدف",
+  "creatorNoReminder": "بلا تنبيه",
+  "creatorReminderLabel": "التنبيه: {text}",
+  "@creatorReminderLabel": {
+    "placeholders": {
+      "text": {}
+    }
+  },
+  "creatorLevelLabel": "المستوى: {text}",
+  "@creatorLevelLabel": {
+    "placeholders": {
+      "text": {}
+    }
+  },
+  "creatorDiscard": "تجاهل",
+  "creatorNoAiConnected": "لا يوجد ذكاء اصطناعي متصل.",
+  "creatorConversationFailed": "تعذّر إكمال المحادثة. يمكنك المحاولة مرة أخرى.",
+  "creatorInputHint": "اكتب هنا",
+  "creatorPromptHelper": "تُستخدم عند ربط مزوّد.",
+  "creatorLevelSection": "المستوى",
+  "proposalIgnore": "تجاهل",
+  "proposalAdd": "إضافة",
+  "proposalUseTexts": "استخدام هذه النصوص",
+  "proposalSuggestLater": "ليس الآن",
+  "proposalSuggestNever": "عدم الاقتراح مرة أخرى",
+  "proposalLockedTitle": "اقتراح الذكاء الاصطناعي حول بيانات ثبّتها بنفسك",
+  "proposalApply": "تطبيق",
+  "proposalChangeLine": "{label}: {current} {unit} → {proposed} {unit}",
+  "@proposalChangeLine": {
+    "placeholders": {
+      "label": {},
+      "current": {
+        "type": "int"
+      },
+      "unit": {},
+      "proposed": {
+        "type": "int"
+      }
+    }
+  },
+  "proposalLockLabel": "ثبّتّه أنت. المس لإلغاء التثبيت",
+  "homeNewWorkoutTitle": "جلسة تدريب جديدة",
+  "homeSessionNameLabel": "اسم الجلسة",
+  "homeWorkout": "جلسة تدريب",
+  "homeAddExerciseTitle": "إضافة تمرين",
+  "homeExerciseNameLabel": "اسم التمرين",
+  "homeAdd": "إضافة",
+  "homeBack": "رجوع",
+  "homeYourSession": "جلستك",
+  "homeAssistantTooltip": "مساعد TrackIA",
+  "homeReload": "إعادة التحميل",
+  "homeLoadLog": "تحميل السجل",
+  "homeHeroTitle": "جهدك.\nتقدّمك.",
+  "homeHeroSubtitle": "مجموعة واحدة في كل مرة. سجّل ما تفعله اليوم.",
+  "homeNextSession": "جلستك القادمة",
+  "homeInProgress": "الجلسة جارية",
+  "homeReadyQuestion": "هل نتدرّب؟",
+  "homeAddExercisesHint": "أضف تمارينك وسجّل كل مجموعة.",
+  "homeActivitiesRecords": "{activities, plural, other{{activities} نشاط}} · {records, plural, other{{records} سجل}}",
+  "@homeActivitiesRecords": {
+    "placeholders": {
+      "activities": {
+        "type": "int"
+      },
+      "records": {
+        "type": "int"
+      }
+    }
+  },
+  "homeStartWorkout": "بدء التدريب",
+  "homeContinueWorkout": "متابعة التدريب",
+  "homeCompletedSessions": "جلسات مكتملة",
+  "homeRecords": "سجلات",
+  "homeLastActivity": "آخر نشاط",
+  "homeEmptyHistoryTitle": "هنا تبدأ قصتك",
+  "homeEmptyHistorySubtitle": "سيظهر تدريبك الأول هنا عندما تنهيه.",
+  "homeSavedOffline": "محفوظ على هذا الجهاز · بلا اتصال",
+  "homeJourneyTitle": "رحلتك",
+  "homeEverySessionCounts": "كل جلسة تُحتسب.",
+  "homeNoSessionsTitle": "لا توجد جلسات بعد",
+  "homeNoSessionsSubtitle": "أنهِ تدريبًا وراجع هنا جميع تمارينه ومجموعاته.",
+  "homeStatusInProgress": "جارٍ",
+  "homeStatusCompleted": "مكتمل",
+  "homeFinishedAt": "انتهت: {date}",
+  "@homeFinishedAt": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "homeFinishRecorded": "تم تسجيل الإنهاء: {date}",
+  "@homeFinishRecorded": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "homeFinishRecordedByUser": "تم تسجيل الإنهاء: {date} · وقت اخترته بنفسك",
+  "@homeFinishRecordedByUser": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "homeTimeKeptWarning": "تم حفظ الوقت مع تنبيه. يمكنك مراجعته لاحقًا.",
+  "homeTimeKeptWarningShort": "تم حفظ الوقت مع تنبيه.",
+  "homeActivities": "أنشطة",
+  "homeIntervalsRepeated": "{count, plural, other{{count} مجموعات / مقاطع}}",
+  "@homeIntervalsRepeated": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeIntervals": "{count, plural, other{{count} مقاطع}}",
+  "@homeIntervals": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeNotStarted": "لم تبدأ",
+  "homeEndedAt": "النهاية: {date}",
+  "@homeEndedAt": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "homeDraft": "مسودة: {draft}",
+  "@homeDraft": {
+    "placeholders": {
+      "draft": {}
+    }
+  },
+  "homeFinishWorkout": "إنهاء التدريب",
+  "homeAddSetToFinish": "سجّل مجموعة واحدة على الأقل لإنهاء التدريب.",
+  "homeEachSetSaved": "تُحفظ كل مجموعة عند الضغط على حفظ.",
+  "homeDiscardTitle": "هل تريد تجاهل الجلسة؟",
+  "homeDiscardBody": "ستُحذف هذه الجلسة وجميع مجموعاتها. لا يمكن التراجع عن هذا الإجراء.",
+  "homeDiscard": "تجاهل",
+  "homeDiscardSession": "تجاهل الجلسة",
+  "homeSavedWellDone": "تم حفظ الجلسة. أحسنت.",
+  "homeViewHistory": "عرض السجل",
+  "homeDeleteExerciseTooltip": "حذف التمرين {name}",
+  "@homeDeleteExerciseTooltip": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "homeDeleteExerciseTitle": "هل تريد حذف التمرين؟",
+  "homeDeleteExerciseBody": "سيُحذف {name} و{count, plural, other{{count} مجموعة}}.",
+  "@homeDeleteExerciseBody": {
+    "placeholders": {
+      "name": {},
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeDelete": "حذف",
+  "homeTargetProgress": "الهدف: {target, plural, other{{target} مجموعة}} من {repsMin}–{repsMax} تكرار · {done}/{target} مسجّلة",
+  "@homeTargetProgress": {
+    "placeholders": {
+      "target": {
+        "type": "int"
+      },
+      "repsMin": {},
+      "repsMax": {},
+      "done": {
+        "type": "int"
+      }
+    }
+  },
+  "homeNoPreviousSession": "لا توجد جلسة سابقة مسجّلة",
+  "homeLastTime": "آخر مرة · {date}",
+  "@homeLastTime": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "homeNoSetsYet": "لم تسجّل أي مجموعات بعد.",
+  "homeSetHeader": "المجموعة",
+  "homeKgHeader": "كغ",
+  "homeRepsHeader": "التكرارات",
+  "homeSetOptionsTooltip": "خيارات المجموعة {number}",
+  "@homeSetOptionsTooltip": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "homeSetDeleteBody": "{weight} كغ × {reps, plural, other{{reps} تكرار}}.",
+  "@homeSetDeleteBody": {
+    "placeholders": {
+      "weight": {},
+      "reps": {
+        "type": "int"
+      }
+    }
+  },
+  "homeWeightReps": "{weight} كغ × {reps}",
+  "@homeWeightReps": {
+    "placeholders": {
+      "weight": {},
+      "reps": {
+        "type": "int"
+      }
+    }
+  },
+  "homeEditSet": "تعديل المجموعة",
+  "homeDeleteSet": "حذف المجموعة",
+  "homeAddSet": "إضافة مجموعة",
+  "homeRest": "راحة {seconds} ث",
+  "@homeRest": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "homeFirstSetTitle": "جهّز مجموعتك الأولى",
+  "homeFirstSetSubtitle": "أضف تمرينًا لتبدأ بتسجيل الوزن والتكرارات.",
+  "homeFinishSession": "إنهاء الجلسة",
+  "homeTabToday": "اليوم",
+  "homeTabRoutines": "الروتينات",
+  "homeTabHistory": "السجل",
+  "homeSessionStarted": "بدأت الجلسة. يمكنك فتح قسم التدريب للتسجيل.",
+  "homeSessionStartFailed": "تعذّر بدء التدريب.",
+  "homeActiveSessionChanged": "تغيّرت الجلسة النشطة. راجعها.",
+  "homeSavedSheetPending": "تم حفظ التدريب على الهاتف. إرسال البيانات إلى Google Sheets بانتظار التأكيد.",
+  "homeSavedSheetNotUpdated": "تم حفظ التدريب على الهاتف. لم يتم تحديث Google Sheets.",
+  "homeFinishFailed": "تعذّر إنهاء التدريب.",
+  "homeReviewFinishTitle": "مراجعة وقت الانتهاء",
+  "homeFinishIssuesBody": "{issues}\n\nهل تريد حفظ الوقت المختار كما هو؟ ستُحفظ السجلات لمراجعتها لاحقًا إن رغبت.",
+  "@homeFinishIssuesBody": {
+    "placeholders": {
+      "issues": {}
+    }
+  },
+  "homeBackAndFix": "رجوع وتصحيح",
+  "homeSaveThatTime": "حفظ ذلك الوقت",
+  "homeDate": "التاريخ",
+  "homeTime": "الوقت",
+  "homeStartSession": "بدء الجلسة",
+  "homeOptionYes": "نعم",
+  "homeOptionNo": "لا",
+  "homeBoolYes": "نعم",
+  "homeBoolNo": "لا",
+  "homeNoteOptional": "ملاحظة (اختياري)",
+  "homeNumberInvalid": "{label}: اكتب رقمًا.",
+  "@homeNumberInvalid": {
+    "placeholders": {
+      "label": {}
+    }
+  },
+  "homeNoteOrValueRequired": "أدخل قيمة أو اكتب ملاحظة.",
+  "homeSessionFinished": "انتهت الجلسة",
+  "homeSummaryEmpty": "لا جديد هذه المرة. نواصل.",
+  "homeNewAchievement": "إنجاز جديد",
+  "homeDone": "تم",
+  "homeSuggestionSquat": "القرفصاء",
+  "homeSuggestionBench": "ضغط المقعد",
+  "homeSuggestionRow": "تجديف",
+  "homeNewSet": "مجموعة جديدة",
+  "homeWeightLabel": "الوزن (كغ)",
+  "homeWeightHint": "مثال: 20.5",
+  "homeRepsLabel": "التكرارات",
+  "homeRepsHint": "مثال: 10",
+  "homeZeroWeightHint": "استخدم 0 كغ إذا كنت تتدرّب بدون وزن خارجي.",
+  "homeExercisesLabel": "التمارين",
+  "homeDeleteSetTitle": "هل تريد حذف المجموعة؟",
+  "accountsConnectError": "تعذّر الاتصال بجوجل.",
+  "accountsSwitchError": "تعذّر تبديل الحساب. بياناتك محفوظة.",
+  "accountsDescription": "لكل حساب محادثته وإعدادات الذكاء الاصطناعي وجدوله وتدريباته على هذا الهاتف. يبقى السجل السابق في الملف المحلي. الربط لا ينسخ هذه البيانات ولا يرفعها.",
+  "accountsConnectAnother": "ربط حساب Google آخر",
+  "accountsActiveProfile": "الملف النشط",
+  "accountsReconnectProfile": "العودة إلى هذا الملف عبر Google",
+  "accountsDisconnect": "قطع الاتصال والعودة إلى الملف المحلي",
+  "accountsDisconnectNotice": "قطع الاتصال يحتفظ ببيانات كل ملف على هذا الهاتف. لا يحذف ملفات Google ولا يلغي الوصول من حسابك في Google.",
+  "appearanceSaveError": "تعذّر حفظ السمة. حاول مرة أخرى.",
+  "appearanceIntro": "اختر الطريقة التي تفضّل بها رؤية TrackIA. يُحفظ اختيارك على هذا الهاتف.",
+  "appearanceSystemHint": "استخدام سمة الجهاز",
+  "archiveSearchLabel": "البحث بالعنوان أو الملخص",
+  "archiveRecoverError": "تعذّر استرجاع المحادثة. الأرشيف محفوظ.",
+  "archiveEmpty": "لا توجد محادثات مؤرشفة بعد.",
+  "archiveChatSubtitle": "{date} · عدد الرسائل: {count}",
+  "@archiveChatSubtitle": {
+    "placeholders": {
+      "date": {},
+      "count": {}
+    }
+  },
+  "archiveAutomaticTag": "أرشفه المساعد",
+  "archiveContinuityTitle": "ملخص الاستمرارية",
+  "archiveReasonLine": "سبب المساعد: {reason}",
+  "@archiveReasonLine": {
+    "placeholders": {
+      "reason": {}
+    }
+  },
+  "archiveConsultFromChat": "الاستعلام من المحادثة",
+  "archiveYou": "أنت",
+  "archiveAttachmentKept": "المرفق المحفوظ: {name}",
+  "@archiveAttachmentKept": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "notifUnsupported": "تنبيهات الراحة متاحة على Android فقط.",
+  "notifDndActive": "وضع عدم الإزعاج مفعّل",
+  "notifDndTotalSilence": "أنت في وضع «الصمت التام»: يحظر Android التنبيهات، حتى بوصفها منبهات.",
+  "notifDndAlarm": "تنبيهات الراحة تُسمع كمنبه. التنبيهات الأخرى لن تُسمع ولن تهتز.",
+  "notifDndPlain": "في الوقت الحالي لن تُسمع تنبيهات الراحة ولن تهتز.",
+  "notifEnabledTitle": "تنبيهات النشاط والراحة",
+  "notifEnabledSubtitle": "النشاط جاهز، والمقطع جارٍ، ونهاية المقطع، ونهاية الراحة.",
+  "notifAlarmStyleTitle": "التعامل معها كمنبه",
+  "notifAlarmStyleSubtitle": "تُسمع نهايات الراحة والمقاطع وتهتز حتى إن كان وضع عدم الإزعاج على الأولوية.",
+  "notifChannelBlockedTitle": "يحظر Android قناة المنبه",
+  "notifChannelBlockedSubtitle": "فعّلها من إعدادات القناة.",
+  "notifExactTitle": "السماح بالتنبيهات الدقيقة",
+  "notifExactSubtitle": "بدون هذا الإذن قد يؤخر Android التنبيه.",
+  "notifCheck": "التحقق",
+  "notifTest": "اختبار التنبيه",
+  "notifTestAlarm": "اختبار مع تفعيل عدم الإزعاج",
+  "notifOpenDnd": "فتح إعدادات عدم الإزعاج",
+  "notifSilenceNote": "في «الصمت التام» يحظر Android كل شيء، بما في ذلك المنبهات. وهناك لا يفيد إلا السماح بها من إعدادات هاتفك.",
+  "progressLoadError": "تعذّر حساب التقدم.",
+  "progressMonth1": "يناير",
+  "progressMonth2": "فبراير",
+  "progressMonth3": "مارس",
+  "progressMonth4": "أبريل",
+  "progressMonth5": "مايو",
+  "progressMonth6": "يونيو",
+  "progressMonth7": "يوليو",
+  "progressMonth8": "أغسطس",
+  "progressMonth9": "سبتمبر",
+  "progressMonth10": "أكتوبر",
+  "progressMonth11": "نوفمبر",
+  "progressMonth12": "ديسمبر",
+  "progressDayStatus": "{day} {month}: {status}",
+  "@progressDayStatus": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "month": {},
+      "status": {}
+    }
+  },
+  "progressDayDone": "تم",
+  "progressDayPending": "معلّق",
+  "progressDayMissed": "لم يتم",
+  "progressTitle": "التقدم · {name}",
+  "@progressTitle": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "progressStreakCurrent": "{n, plural, one{السلسلة الحالية: يوم واحد} other{السلسلة الحالية: {n} أيام}}",
+  "@progressStreakCurrent": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "progressStreakBest": "أفضل سلسلة: {best}",
+  "@progressStreakBest": {
+    "placeholders": {
+      "best": {
+        "type": "int"
+      }
+    }
+  },
+  "progressFreeDays": "أيام الراحة هذا الأسبوع: {used}/{total}",
+  "@progressFreeDays": {
+    "placeholders": {
+      "used": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "progressGoalToday": "هدف اليوم",
+  "progressGoalWeek": "هدف الأسبوع",
+  "progressGoalValues": "{value} من {target}",
+  "@progressGoalValues": {
+    "placeholders": {
+      "value": {},
+      "target": {}
+    }
+  },
+  "progressLastFourWeeks": "آخر 4 أسابيع",
+  "progressAchievementUnlocked": "{title}، تم فتحه",
+  "@progressAchievementUnlocked": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "progressAchievementLocked": "{title}، مقفل، تقدم {percent}%",
+  "@progressAchievementLocked": {
+    "placeholders": {
+      "title": {},
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "progressAchievementsTitle": "الإنجازات · {unlocked} من {total}",
+  "@progressAchievementsTitle": {
+    "placeholders": {
+      "unlocked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "progressAchievementsEmptyPlay": "ستظهر إنجازاتك عند إنهاء نشاطك الأول.",
+  "progressAchievementsEmptyEnable": "فعّل وضع اللعب والإنجازات من «{place}».",
+  "@progressAchievementsEmptyEnable": {
+    "placeholders": {
+      "place": {}
+    }
+  },
+  "routinesTitle": "روتيناتك",
+  "routinesSubtitle": "جهّز مرة واحدة. تدرّب بإيقاعك.",
+  "routinesCreate": "إنشاء روتين",
+  "routinesEmptyTitle": "جلستك القادمة، جاهزة",
+  "routinesEmptyBody": "أنشئ مثلاً «الساق A» مع تمارينك ومجموعاتك ونطاق تكراراتك.",
+  "routinesOptionsTooltip": "خيارات {name}",
+  "@routinesOptionsTooltip": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "routinesDeleteTitle": "حذف الروتين؟",
+  "routinesDeleteBody": "سيُحذف «{name}». ستبقى تدريباتك المحفوظة والجلسة الجارية.",
+  "@routinesDeleteBody": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "routinesEditMenu": "تعديل الروتين",
+  "routinesDeleteMenu": "حذف الروتين",
+  "routinesDelete": "حذف",
+  "routinesTrain": "تدرّب",
+  "routinesContinueSession": "متابعة الجلسة النشطة",
+  "routinesNeedExercise": "أضف تمريناً واحداً على الأقل.",
+  "routinesNameLabel": "اسم الروتين",
+  "routinesNameHint": "مثال: الساق A",
+  "routinesEditorHelp": "حدّد أهدافك. ستُسجَّل المجموعات عند التدريب.",
+  "routinesMoveUp": "نقل التمرين {n} للأعلى",
+  "@routinesMoveUp": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "routinesMoveDown": "نقل التمرين {n} للأسفل",
+  "@routinesMoveDown": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "routinesEditExercise": "تعديل التمرين {n}",
+  "@routinesEditExercise": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "routinesRemoveExercise": "إزالة التمرين {n}",
+  "@routinesRemoveExercise": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "routinesAddExercise": "إضافة تمرين إلى الروتين",
+  "routinesSaving": "جارٍ الحفظ…",
+  "routinesSave": "حفظ الروتين",
+  "routinesLeaveTitle": "الخروج دون حفظ؟",
+  "routinesLeaveBody": "ستُفقد التغييرات على هذا الروتين.",
+  "routinesKeepEditing": "متابعة التعديل",
+  "routinesDiscard": "تجاهل التغييرات",
+  "routinesBack": "رجوع",
+  "routinesExerciseDialogTitle": "تمرين الروتين",
+  "routinesEditTargetTitle": "تعديل الهدف",
+  "routinesExerciseLabel": "التمرين",
+  "routinesExerciseHint": "مثال: القرفصاء",
+  "routinesTargetSets": "المجموعات المخططة",
+  "routinesRepsMin": "أدنى تكرارات",
+  "routinesRepsMax": "أقصى تكرارات",
+  "routinesRestSeconds": "الراحة (ثوانٍ)",
+  "routinesSaveExercise": "حفظ التمرين",
+  "focusCounterSaveError": "تعذّر حفظ العداد. حاول مرة أخرى.",
+  "focusResultSaveError": "تعذّر حفظ النتيجة. احتفظ بالنص وحاول مرة أخرى.",
+  "focusSaveActivityError": "تعذّر الحفظ في أنشطتك.",
+  "focusRecordSaveError": "تعذّر حفظ السجل. حاول مرة أخرى.",
+  "focusReviewTimeTitle": "مراجعة الوقت",
+  "focusReviewTimeBody": "الوقت المختار لا يطابق السجلات. هل تريد حفظ هذا الوقت والإبقاء عليها؟",
+  "focusBack": "رجوع",
+  "focusSaveThatTime": "حفظ هذا الوقت",
+  "focusRunning": "جارٍ",
+  "focusReady": "جاهز",
+  "focusRest": "راحة",
+  "focusRepeatedRest": "{progress} {segments} · راحة",
+  "@focusRepeatedRest": {
+    "placeholders": {
+      "progress": {},
+      "segments": {}
+    }
+  },
+  "focusSegmentCount": "{segment} {count}",
+  "@focusSegmentCount": {
+    "placeholders": {
+      "segment": {},
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "focusSegmentCountOfTarget": "{segment} {count} من {target}",
+  "@focusSegmentCountOfTarget": {
+    "placeholders": {
+      "segment": {},
+      "count": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "focusSegmentSerie": "مجموعة",
+  "focusSegmentTramo": "مقطع",
+  "focusSegmentSeries": "مجموعات",
+  "focusSegmentTramos": "مقاطع",
+  "focusRemoveField": "إزالة {label}",
+  "@focusRemoveField": {
+    "placeholders": {
+      "label": {}
+    }
+  },
+  "focusAddField": "إضافة {label}",
+  "@focusAddField": {
+    "placeholders": {
+      "label": {}
+    }
   }
 }

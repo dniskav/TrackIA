@@ -172,13 +172,9 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
       }
     });
     counterTimer?.cancel();
-    counterTimer =
-        pending.isEmpty
-            ? null
-            : Timer(
-              const Duration(seconds: 3),
-              () => unawaited(flushCounters()),
-            );
+    counterTimer = pending.isEmpty
+        ? null
+        : Timer(const Duration(seconds: 3), () => unawaited(flushCounters()));
   }
 
   /// Records the pending taps as a single message with their quantities (never
@@ -206,9 +202,7 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
       pending.addAll(batch);
       setState(() {});
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No se pudo guardar el contador. Vuelve a intentarlo.'),
-        ),
+        SnackBar(content: Text(appText(context).focusCounterSaveError)),
       );
     }
   }
@@ -254,11 +248,7 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'No se pudo guardar el resultado. Conserva el texto y vuelve a intentarlo.',
-            ),
-          ),
+          SnackBar(content: Text(appText(context).focusResultSaveError)),
         );
       }
       return false;
@@ -287,23 +277,20 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
         accept =
             await showDialog<bool>(
               context: context,
-              builder:
-                  (context) => AlertDialog(
-                    title: const Text('Revisar hora'),
-                    content: const Text(
-                      'La hora elegida no coincide con los registros. ¿Guardar esa hora y conservarlos?',
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, false),
-                        child: const Text('Volver'),
-                      ),
-                      FilledButton(
-                        onPressed: () => Navigator.pop(context, true),
-                        child: const Text('Guardar esa hora'),
-                      ),
-                    ],
+              builder: (context) => AlertDialog(
+                title: Text(appText(context).focusReviewTimeTitle),
+                content: Text(appText(context).focusReviewTimeBody),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: Text(appText(context).focusBack),
                   ),
+                  FilledButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    child: Text(appText(context).focusSaveThatTime),
+                  ),
+                ],
+              ),
             ) ??
             false;
         if (!accept) return;
@@ -336,9 +323,7 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('No se pudo guardar en tus actividades.'),
-          ),
+          SnackBar(content: Text(appText(context).focusSaveActivityError)),
         );
       }
     }
@@ -350,9 +335,8 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
     final choice = await showModalBottomSheet<ActivityChoice>(
       context: context,
       isScrollControlled: true,
-      builder:
-          (_) =>
-              ActivityChooser(controller: c, companionId: widget.companionId),
+      builder: (_) =>
+          ActivityChooser(controller: c, companionId: widget.companionId),
     );
     if (choice == null) return;
     await saveChoice(choice);
@@ -372,9 +356,8 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
     final choice = await showModalBottomSheet<ActivityChoice>(
       context: context,
       isScrollControlled: true,
-      builder:
-          (_) =>
-              ActivityChooser(controller: c, companionId: widget.companionId),
+      builder: (_) =>
+          ActivityChooser(controller: c, companionId: widget.companionId),
     );
     if (choice == null || focus?.id != a.id) return;
     await saveChoice(choice);
@@ -409,11 +392,7 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'No se pudo guardar el registro. Vuelve a intentarlo.',
-            ),
-          ),
+          SnackBar(content: Text(appText(context).focusRecordSaveError)),
         );
       }
     }
@@ -427,20 +406,19 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
     }
     final picked = await showModalBottomSheet<ActivityTemplate>(
       context: context,
-      builder:
-          (sheet) => SafeArea(
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                for (final t in instantTemplates)
-                  ListTile(
-                    leading: const Icon(Icons.touch_app_outlined),
-                    title: Text(t.definition.name),
-                    onTap: () => Navigator.pop(sheet, t),
-                  ),
-              ],
-            ),
-          ),
+      builder: (sheet) => SafeArea(
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            for (final t in instantTemplates)
+              ListTile(
+                leading: const Icon(Icons.touch_app_outlined),
+                title: Text(t.definition.name),
+                onTap: () => Navigator.pop(sheet, t),
+              ),
+          ],
+        ),
+      ),
     );
     if (picked != null) await recordInstant(picked.definition);
   }
@@ -477,21 +455,20 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
         if (!mounted) return;
         final choice = await showDialog<bool>(
           context: context,
-          builder:
-              (dialogContext) => AlertDialog(
-                title: Text(appText(context).activityRestInProgress),
-                content: Text(appText(context).activityRestChangeNoticePrompt),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(dialogContext, false),
-                    child: Text(appText(context).activityKeepNotice),
-                  ),
-                  TextButton(
-                    onPressed: () => Navigator.pop(dialogContext, true),
-                    child: Text(appText(context).activityChangeNotice),
-                  ),
-                ],
+          builder: (dialogContext) => AlertDialog(
+            title: Text(appText(context).activityRestInProgress),
+            content: Text(appText(context).activityRestChangeNoticePrompt),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, false),
+                child: Text(appText(context).activityKeepNotice),
               ),
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, true),
+                child: Text(appText(context).activityChangeNotice),
+              ),
+            ],
+          ),
         );
         if (choice == null) return;
         updateActiveRest = choice;
@@ -516,28 +493,27 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
     var input = a.definition.targetSets?.toString() ?? '';
     final result = await showDialog<String>(
       context: context,
-      builder:
-          (dialog) => AlertDialog(
-            title: Text(appText(context).activityTargetTitle),
-            content: TextFormField(
-              initialValue: input,
-              onChanged: (value) => input = value,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: appText(context).activityTargetLabel,
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(dialog),
-                child: Text(appText(context).cancel),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.pop(dialog, input.trim()),
-                child: Text(appText(context).save),
-              ),
-            ],
+      builder: (dialog) => AlertDialog(
+        title: Text(appText(context).activityTargetTitle),
+        content: TextFormField(
+          initialValue: input,
+          onChanged: (value) => input = value,
+          keyboardType: TextInputType.number,
+          decoration: InputDecoration(
+            labelText: appText(context).activityTargetLabel,
           ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialog),
+            child: Text(appText(context).cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialog, input.trim()),
+            child: Text(appText(context).save),
+          ),
+        ],
+      ),
     );
     if (result == null || !mounted) return;
     final target = result.isEmpty ? null : int.tryParse(result);
@@ -556,17 +532,16 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
       ),
     );
     if (done && mounted) {
-      final completed =
-          (c.focus?.id == a.id ? c.focus! : a).intervals
-              .where((i) => i.endedAt != null)
-              .length;
+      final completed = (c.focus?.id == a.id ? c.focus! : a).intervals
+          .where((i) => i.endedAt != null)
+          .length;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             target != null && completed > target
                 ? appText(
-                  context,
-                ).activityTargetPreservedProgress(target, completed)
+                    context,
+                  ).activityTargetPreservedProgress(target, completed)
                 : appText(context).activityTargetUpdated,
           ),
         ),
@@ -594,7 +569,12 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
         workout != null &&
         c.focus == null &&
         widget.companionId == 'gymbro') {
-      await finishSession(context, c, workout, title: 'Finalizar día');
+      await finishSession(
+        context,
+        c,
+        workout,
+        title: appText(context).activityFinishDay,
+      );
     }
   }
 
@@ -624,15 +604,11 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
           widget.companionId == 'gymbro';
       final finishButton = TextButton(
         key: const Key('finish-activity'),
-        onPressed:
-            closingDay
-                ? (enabled ? closeDay : null)
-                : enabled &&
-                    running == null &&
-                    a != null &&
-                    a.intervals.isNotEmpty
-                ? finish
-                : null,
+        onPressed: closingDay
+            ? (enabled ? closeDay : null)
+            : enabled && running == null && a != null && a.intervals.isNotEmpty
+            ? finish
+            : null,
         child: Text(
           closingDay
               ? appText(context).activityFinishDay
@@ -650,16 +626,16 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
             Text(
               restOwner == null
                   ? a == null
-                      ? '—'
-                      : '${a.definition.restSeconds}s'
+                        ? '—'
+                        : '${a.definition.restSeconds}s'
                   : '${_clock(remaining)} · ${restOwner.definition.restSeconds}s',
             ),
             if ((restOwner ?? a)?.definition.userSet.contains('restSeconds') ??
                 false)
               LockBadge(
                 key: const Key('lock-restSeconds'),
-                onRelease:
-                    () => releaseLock((restOwner ?? a)!.id, 'restSeconds'),
+                onRelease: () =>
+                    releaseLock((restOwner ?? a)!.id, 'restSeconds'),
               ),
           ],
         ),
@@ -679,28 +655,45 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
       // every other companion «tramo», as before.
       final segment =
           definition.segmentSingular ??
-          (definition.companionId == 'gymbro' ? 'serie' : 'tramo');
+          (definition.companionId == 'gymbro'
+              ? appText(context).focusSegmentSerie
+              : appText(context).focusSegmentTramo);
       final segments =
           definition.segmentPlural ??
-          (definition.companionId == 'gymbro' ? 'series' : 'tramos');
-      final status =
-          running != null
-              ? definition.repeated
-                  ? '${segment[0].toUpperCase()}${segment.substring(1)} ${a.intervals.length}${definition.targetSets == null ? '' : ' de ${definition.targetSets}'}'
-                  : 'En marcha'
-              : a.intervals.isEmpty
-              ? 'Listo'
-              : definition.repeated
-              ? '${a.intervals.where((i) => i.endedAt != null).length}${definition.targetSets == null ? '' : '/${definition.targetSets}'} $segments · Descanso'
-              : 'Descanso';
-      final elapsed =
-          running == null
-              ? Duration.zero
-              : c.now().difference(running.startedAt);
-      final total =
-          definition.activitySeconds == null
-              ? null
-              : Duration(seconds: definition.activitySeconds!);
+          (definition.companionId == 'gymbro'
+              ? appText(context).focusSegmentSeries
+              : appText(context).focusSegmentTramos);
+      final doneCount = a.intervals.where((i) => i.endedAt != null).length;
+      final capitalSegment =
+          '${segment[0].toUpperCase()}${segment.substring(1)}';
+      final status = running != null
+          ? definition.repeated
+                ? definition.targetSets == null
+                      ? appText(
+                          context,
+                        ).focusSegmentCount(capitalSegment, a.intervals.length)
+                      : appText(context).focusSegmentCountOfTarget(
+                          capitalSegment,
+                          a.intervals.length,
+                          definition.targetSets!,
+                        )
+                : appText(context).focusRunning
+          : a.intervals.isEmpty
+          ? appText(context).focusReady
+          : definition.repeated
+          ? appText(context).focusRepeatedRest(
+              definition.targetSets == null
+                  ? '$doneCount'
+                  : '$doneCount/${definition.targetSets}',
+              segments,
+            )
+          : appText(context).focusRest;
+      final elapsed = running == null
+          ? Duration.zero
+          : c.now().difference(running.startedAt);
+      final total = definition.activitySeconds == null
+          ? null
+          : Duration(seconds: definition.activitySeconds!);
       final canAct = enabled && (running != null || !widget.hideStart);
       return Padding(
         padding: const EdgeInsets.fromLTRB(12, 4, 12, 8),
@@ -748,8 +741,8 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
                                     if (definition.userSet.contains('name'))
                                       LockBadge(
                                         key: const Key('lock-name'),
-                                        onRelease:
-                                            () => releaseLock(a.id, 'name'),
+                                        onRelease: () =>
+                                            releaseLock(a.id, 'name'),
                                       ),
                                   ],
                                 ),
@@ -759,18 +752,18 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
                           if (definition.repeated)
                             IconButton(
                               key: const Key('edit-activity-target'),
-                              tooltip:
-                                  appText(context).activityTargetEditTooltip,
+                              tooltip: appText(
+                                context,
+                              ).activityTargetEditTooltip,
                               onPressed: enabled ? editTarget : null,
                               icon: const Icon(Icons.flag_outlined),
                             ),
                           IconButton(
                             key: const Key('change-activity'),
                             tooltip: appText(context).activityChooseAnother,
-                            onPressed:
-                                enabled && a.intervals.isEmpty
-                                    ? changePreparation
-                                    : null,
+                            onPressed: enabled && a.intervals.isEmpty
+                                ? changePreparation
+                                : null,
                             icon: const Icon(Icons.swap_horiz),
                           ),
                           finishButton,
@@ -795,9 +788,9 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
                                   total == null
                                       ? elapsed.inSeconds.clamp(0, 8640000)
                                       : (total - elapsed).inSeconds.clamp(
-                                        0,
-                                        total.inSeconds,
-                                      ),
+                                          0,
+                                          total.inSeconds,
+                                        ),
                                 ),
                                 key: const Key('activity-clock'),
                                 style: const TextStyle(
@@ -833,8 +826,8 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
                                 tooltip: appText(context).activitySubtractCycle,
                                 onPressed:
                                     enabled && definition.completedCycles > 0
-                                        ? () => changeCycle(-1)
-                                        : null,
+                                    ? () => changeCycle(-1)
+                                    : null,
                                 icon: const Icon(Icons.remove_circle_outline),
                               ),
                               IconButton(
@@ -842,8 +835,8 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
                                 tooltip: appText(context).activityAddCycle,
                                 onPressed:
                                     enabled && definition.completedCycles < 999
-                                        ? () => changeCycle(1)
-                                        : null,
+                                    ? () => changeCycle(1)
+                                    : null,
                                 icon: const Icon(Icons.add_circle_outline),
                               ),
                             ],
@@ -867,12 +860,12 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
                                 ),
                                 IconButton(
                                   key: Key('counter-dec-${field['key']}'),
-                                  tooltip: 'Quitar ${field['label']}',
-                                  onPressed:
-                                      (pending[field['key']] ?? 0) > 0
-                                          ? () =>
-                                              bump(field['key'] as String, -1)
-                                          : null,
+                                  tooltip: appText(
+                                    context,
+                                  ).focusRemoveField(field['label'] as String),
+                                  onPressed: (pending[field['key']] ?? 0) > 0
+                                      ? () => bump(field['key'] as String, -1)
+                                      : null,
                                   icon: const Icon(Icons.remove_circle_outline),
                                 ),
                                 SizedBox(
@@ -892,12 +885,12 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
                                 ),
                                 IconButton(
                                   key: Key('counter-inc-${field['key']}'),
-                                  tooltip: 'Añadir ${field['label']}',
-                                  onPressed:
-                                      enabled
-                                          ? () =>
-                                              bump(field['key'] as String, 1)
-                                          : null,
+                                  tooltip: appText(
+                                    context,
+                                  ).focusAddField(field['label'] as String),
+                                  onPressed: enabled
+                                      ? () => bump(field['key'] as String, 1)
+                                      : null,
                                   icon: const Icon(Icons.add_circle_outline),
                                 ),
                               ],
@@ -910,10 +903,9 @@ class _ActivityFocusControlsState extends State<ActivityFocusControls>
                             width: double.infinity,
                             child: FilledButton.icon(
                               key: const Key('activity-start-stop'),
-                              style:
-                                  running == null
-                                      ? startButtonStyle(context)
-                                      : stopButtonStyle(context),
+                              style: running == null
+                                  ? startButtonStyle(context)
+                                  : stopButtonStyle(context),
                               onPressed: canAct ? act : null,
                               icon: Icon(
                                 running == null ? Icons.play_arrow : Icons.stop,

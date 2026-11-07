@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../application/localization.dart';
 import '../application/workout_controller.dart';
 import '../domain/rest_timer.dart';
 import '../domain/routine.dart';
@@ -124,10 +125,10 @@ class _RestTimerPanelState extends State<RestTimerPanel>
               Expanded(
                 child: Text(
                   remaining == 0
-                      ? 'Descanso terminado'
+                      ? appText(context).activityRestDone
                       : paused
-                      ? 'Descanso pausado'
-                      : 'Descanso',
+                      ? appText(context).activityRestPaused
+                      : appText(context).activityRestLabel,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                     fontSize: 12,
@@ -136,7 +137,7 @@ class _RestTimerPanelState extends State<RestTimerPanel>
               ),
               Semantics(
                 liveRegion: remaining == 0,
-                label: remaining == 0 ? 'Descanso terminado' : null,
+                label: remaining == 0 ? appText(context).activityRestDone : null,
                 child: Text(
                   timer.displayAt(now),
                   key: const Key('rest-clock'),
@@ -172,14 +173,14 @@ class _RestTimerPanelState extends State<RestTimerPanel>
                 icon: Icon(running ? Icons.pause : Icons.play_arrow, size: 20),
                 label: Text(
                   running
-                      ? 'Pausar'
+                      ? appText(context).activityRestPause
                       : paused
-                      ? 'Continuar'
-                      : 'Iniciar descanso',
+                      ? appText(context).activityRestContinue
+                      : appText(context).activityRestStart,
                 ),
               ),
               IconButton(
-                tooltip: 'Reiniciar descanso',
+                tooltip: appText(context).activityRestRestart,
                 onPressed:
                     c.busy
                         ? null
@@ -193,12 +194,12 @@ class _RestTimerPanelState extends State<RestTimerPanel>
               ),
               TextButton(
                 onPressed: c.busy ? null : configure,
-                child: Text('${timer.durationSeconds}s · Ajustar'),
+                child: Text(appText(context).activityRestAdjust(timer.durationSeconds)),
               ),
             ],
           ),
           Text(
-            'Aviso con esta pantalla abierta; el tiempo sigue al salir.',
+            appText(context).activityRestNotice,
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
               fontSize: 10,
@@ -228,7 +229,7 @@ class _RestDurationDialogState extends State<RestDurationDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: const Text('Tiempo de descanso'),
+    title: Text(appText(context).activityRestDurationTitle),
     content: SingleChildScrollView(
       child: Form(
         key: form,
@@ -239,8 +240,8 @@ class _RestDurationDialogState extends State<RestDurationDialog> {
               key: const Key('timer-duration'),
               controller: input,
               keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Segundos',
+              decoration: InputDecoration(
+                labelText: appText(context).activityRestSecondsLabel,
                 errorMaxLines: 2,
               ),
               validator: (v) {
@@ -254,7 +255,7 @@ class _RestDurationDialogState extends State<RestDurationDialog> {
             ),
             const SizedBox(height: 12),
             Text(
-              'Entre 5 y 1800 segundos. Al aplicar, el contador queda listo para empezar.',
+              appText(context).activityRestRangeHint,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontSize: 12,
@@ -267,7 +268,7 @@ class _RestDurationDialogState extends State<RestDurationDialog> {
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('Cancelar'),
+        child: Text(appText(context).cancel),
       ),
       FilledButton(
         onPressed: () {
@@ -275,7 +276,7 @@ class _RestDurationDialogState extends State<RestDurationDialog> {
             Navigator.pop(context, parseRestSeconds(input.text));
           }
         },
-        child: const Text('Aplicar'),
+        child: Text(appText(context).activityRestApply),
       ),
     ],
   );

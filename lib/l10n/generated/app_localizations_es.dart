@@ -1353,4 +1353,2010 @@ class AppLocalizationsEs extends AppLocalizations {
   String appVersion(Object version) {
     return 'Versión $version';
   }
+
+  @override
+  String get activityIdleOtherActive => 'Otro acompañante activo';
+
+  @override
+  String get activityIdleNoActivity => 'Sin actividad';
+
+  @override
+  String get activityIdleEndOther =>
+      'Termina la otra actividad para iniciar aquí';
+
+  @override
+  String get activityIdleRegisterAnytime => 'Registra una cuando quieras';
+
+  @override
+  String get activityNewActivity => 'Nueva actividad';
+
+  @override
+  String get activityIdleRecord => 'Registrar';
+
+  @override
+  String get activityRestLabel => 'Descanso';
+
+  @override
+  String get activityRestDone => 'Descanso terminado';
+
+  @override
+  String get activityRestPaused => 'Descanso pausado';
+
+  @override
+  String get activityRestPause => 'Pausar';
+
+  @override
+  String get activityRestContinue => 'Continuar';
+
+  @override
+  String get activityRestStart => 'Iniciar descanso';
+
+  @override
+  String get activityRestRestart => 'Reiniciar descanso';
+
+  @override
+  String activityRestAdjust(int seconds) {
+    return '${seconds}s · Ajustar';
+  }
+
+  @override
+  String get activityRestNotice =>
+      'Aviso con esta pantalla abierta; el tiempo sigue al salir.';
+
+  @override
+  String get activityRestDurationTitle => 'Tiempo de descanso';
+
+  @override
+  String get activityRestSecondsLabel => 'Segundos';
+
+  @override
+  String get activityRestRangeHint =>
+      'Entre 5 y 1800 segundos. Al aplicar, el contador queda listo para empezar.';
+
+  @override
+  String get activityRestApply => 'Aplicar';
+
+  @override
+  String get activityDialogNameTitle => 'Nombre de la actividad';
+
+  @override
+  String get activityDialogSaveName => 'Guardar nombre';
+
+  @override
+  String get activityDialogRestRange => 'Entre 0 y 1800';
+
+  @override
+  String get activityDialogWhatToDo => '¿Qué vas a hacer?';
+
+  @override
+  String get activityDialogYourActivities => 'Tus actividades';
+
+  @override
+  String get activityDialogInstantRecord => 'Registro puntual';
+
+  @override
+  String get activityDialogYourActivity => 'Tu actividad';
+
+  @override
+  String get activityDialogFromCurrentWorkout => 'Del entrenamiento actual';
+
+  @override
+  String activityDialogSetsProgress(
+    Object done,
+    Object target,
+    Object repsMin,
+    Object repsMax,
+  ) {
+    return '$done/$target series · $repsMin–$repsMax reps';
+  }
+
+  @override
+  String get activityDialogRepeat => 'Volver a hacer';
+
+  @override
+  String activityDialogRoutineSets(Object routine, int sets) {
+    return '$routine · $sets series';
+  }
+
+  @override
+  String get activityDialogEndTitle => 'Terminar actividad';
+
+  @override
+  String get activityDialogDate => 'Fecha';
+
+  @override
+  String get activityDialogTime => 'Hora';
+
+  @override
+  String get activityBuilderNameRequired =>
+      'Escribe un nombre para la actividad.';
+
+  @override
+  String get activityBuilderOnlyIntegers => 'Escribe solo números enteros.';
+
+  @override
+  String activityBuilderRange(Object what, int min, int max) {
+    return '$what va de $min a $max.';
+  }
+
+  @override
+  String get activityBuilderWhatDuration => 'La duración';
+
+  @override
+  String get activityBuilderWhatRest => 'El descanso';
+
+  @override
+  String get activityBuilderWhatSegments => 'Los tramos previstos';
+
+  @override
+  String get activityBuilderWhatCycles => 'Los ciclos previstos';
+
+  @override
+  String get activityBuilderDurationRequired =>
+      'Indica la duración en minutos.';
+
+  @override
+  String get activityBuilderSegmentNamesPair =>
+      'Indica singular y plural del tramo, o deja los dos vacíos.';
+
+  @override
+  String get activityBuilderFromTemplate => 'Empezar desde una plantilla';
+
+  @override
+  String get activityBuilderHowMeasured => '¿Cómo se mide?';
+
+  @override
+  String get activityBuilderInstantTitle => 'Puntual';
+
+  @override
+  String get activityBuilderInstantDetail => 'Un registro sin cronómetro';
+
+  @override
+  String get activityBuilderFreeTitle => 'Libre';
+
+  @override
+  String get activityBuilderFreeDetail => 'Cronómetro, sin cuenta atrás';
+
+  @override
+  String get activityBuilderTimedTitle => 'Con duración';
+
+  @override
+  String get activityBuilderTimedDetail => 'Cuenta atrás de un tiempo fijo';
+
+  @override
+  String get activityBuilderSegmentsTitle => 'Por tramos';
+
+  @override
+  String get activityBuilderSegmentsDetail => 'Varios tramos con descanso';
+
+  @override
+  String get activityBuilderDuration => 'Duración (minutos)';
+
+  @override
+  String get activityBuilderSegmentHelper => 'Opcional: de cada tramo';
+
+  @override
+  String get activityBuilderPlannedSegments => 'Tramos previstos (opcional)';
+
+  @override
+  String get activityBuilderRestBetween => 'Descanso entre tramos (segundos)';
+
+  @override
+  String get activityBuilderRestHelper => '90 es un minuto y medio';
+
+  @override
+  String get activityBuilderPlannedCycles => 'Ciclos previstos (opcional)';
+
+  @override
+  String get activityBuilderSegmentSingular => 'Un tramo se llama';
+
+  @override
+  String get activityBuilderSegmentPlural => 'Varios se llaman';
+
+  @override
+  String get activityBuilderWhatToNote => '¿Qué quieres anotar? (opcional)';
+
+  @override
+  String activityBuilderRemoveField(Object label) {
+    return 'Quitar $label';
+  }
+
+  @override
+  String get activityBuilderMaxFields => 'Máximo 12 campos';
+
+  @override
+  String get activityBuilderAddField => 'Añadir campo';
+
+  @override
+  String get activityBuilderSaveInActivities => 'Guardar en tus actividades';
+
+  @override
+  String get activityBuilderSaveInActivitiesHelp =>
+      'Para repetirla sin volver a crearla.';
+
+  @override
+  String get activityBuilderPrepare => 'Preparar actividad';
+
+  @override
+  String get activityBuilderNewField => 'Nuevo campo';
+
+  @override
+  String get activityBuilderFieldNameRequired =>
+      'Escribe un nombre de campo de hasta 80 caracteres.';
+
+  @override
+  String get activityBuilderFieldName => 'Nombre del campo';
+
+  @override
+  String get activityBuilderFieldType => 'Tipo';
+
+  @override
+  String get activityBuilderFieldUnit => 'Unidad (opcional)';
+
+  @override
+  String get activityBuilderOptions => 'Opciones';
+
+  @override
+  String get activityBuilderOptionsHelp => 'Separadas por comas';
+
+  @override
+  String get activityBuilderScaleMin => 'Mínimo';
+
+  @override
+  String get activityBuilderScaleMax => 'Máximo';
+
+  @override
+  String get activityBuilderScaleRange =>
+      'Escribe el mínimo y el máximo de la escala.';
+
+  @override
+  String get activityBuilderAggregate => 'Cómo cuenta';
+
+  @override
+  String get activityBuilderCountSingular => 'Se cuenta como (uno)';
+
+  @override
+  String get activityBuilderCountSingularHelp => 'Opcional, p. ej. libro';
+
+  @override
+  String get activityBuilderCountPlural => 'Se cuenta como (varios)';
+
+  @override
+  String get activityBuilderCountPluralHelp => 'Opcional, p. ej. libros';
+
+  @override
+  String get activityBuilderAdd => 'Añadir';
+
+  @override
+  String get aiPerReadError =>
+      'No se pudo leer la configuración por acompañante.';
+
+  @override
+  String get aiPerSaveError => 'No se pudo guardar el cambio.';
+
+  @override
+  String get aiPerTitle => 'Por acompañante';
+
+  @override
+  String get aiPerNoProvider =>
+      'Conecta primero un proveedor para poder elegir un modelo distinto en cada acompañante.';
+
+  @override
+  String get aiPerHelp =>
+      'Cada acompañante usa tu proveedor, o un modelo propio de ese mismo proveedor.';
+
+  @override
+  String get aiPerDefault => 'Por defecto';
+
+  @override
+  String aiPerDialogTitle(Object name) {
+    return 'IA de $name';
+  }
+
+  @override
+  String aiPerDialogHelp(Object service) {
+    return 'Usa $service con la clave de tu perfil. Solo cambia el modelo de este acompañante.';
+  }
+
+  @override
+  String get aiPerUseDefault => 'Usar el predeterminado';
+
+  @override
+  String get aiSetAndroidFileAccess =>
+      'Android no entregó acceso al archivo seleccionado.';
+
+  @override
+  String get aiSetGgufTitle => 'Modelo GGUF';
+
+  @override
+  String aiSetLocalContextHelp(Object context) {
+    return 'TrackIA recomienda $context para sus instrucciones, historial y datos. La recomendación es para las necesidades de la app, no para el límite de este GGUF. Si el modelo no soporta el tamaño elegido, puede fallar; tú decides si bajarlo.';
+  }
+
+  @override
+  String aiSetModelsCountChatGpt(int count) {
+    return 'Modelos disponibles para esta cuenta: $count. La prueba de conexión confirma el acceso al elegido.';
+  }
+
+  @override
+  String aiSetCatalogCountApi(int count) {
+    return '$count modelos obtenidos del proveedor. La prueba de conexión confirma si tu clave puede usar el elegido.';
+  }
+
+  @override
+  String get aiSetCatalogErrorChatGpt =>
+      'No se pudo obtener el catálogo de esta cuenta. Comprueba la conexión e inténtalo de nuevo.';
+
+  @override
+  String get aiSetCatalogErrorApi =>
+      'No se pudo obtener el catálogo. Puedes volver a intentarlo o indicar el modelo manualmente.';
+
+  @override
+  String get transferSheetReadError => 'No se pudo leer la hoja.';
+
+  @override
+  String get transferSheetTooLarge => 'La hoja supera 20 MB.';
+
+  @override
+  String get transferSheetLoadError =>
+      'No se pudo cargar la hoja. Vuelve a intentarlo.';
+
+  @override
+  String get transferSheetLoaded =>
+      'Hoja cargada. Pendiente de interpretación por la IA.';
+
+  @override
+  String get transferFileTooLarge => 'El archivo supera 20 MB.';
+
+  @override
+  String get transferSheetSelectedError =>
+      'No se pudo leer la hoja seleccionada.';
+
+  @override
+  String get transferFileReadError => 'No se pudo leer o compartir el archivo.';
+
+  @override
+  String get transferDefaultSheetName => 'Hoja cargada';
+
+  @override
+  String get transferShareSubject => 'Copia de seguridad TrackIA';
+
+  @override
+  String get transferShareText =>
+      'Guarda este archivo en Drive o en un lugar seguro.';
+
+  @override
+  String get transferRestoreTitle => '¿Restaurar esta copia?';
+
+  @override
+  String transferRestoreBody(int workouts, int routines, Object active) {
+    String _temp0 = intl.Intl.pluralLogic(
+      workouts,
+      locale: localeName,
+      other: '$workouts sesiones',
+      one: '1 sesión',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      routines,
+      locale: localeName,
+      other: '$routines rutinas',
+      one: '1 rutina',
+    );
+    return 'Contiene $_temp0 y $_temp1$active. Sustituirá todos los datos que hay ahora en este teléfono. Guarda antes una copia actual si quieres conservarlos.';
+  }
+
+  @override
+  String get transferRestoreActive => ', incluida una sesión en curso';
+
+  @override
+  String get transferRestoreAction => 'Restaurar';
+
+  @override
+  String get transferRestored =>
+      'Copia restaurada. Sesiones y rutinas actualizadas.';
+
+  @override
+  String get transferNoAccessSheet =>
+      'No se pudo leer esa hoja. En Google Sheets usa «Enviar una copia» como Excel o CSV y elige TrackIA.';
+
+  @override
+  String get transferHeadline => 'Tu historial, bajo tu control';
+
+  @override
+  String get transferIntro =>
+      'Guarda una copia fuera de este móvil para recuperarla o pasarla a otro teléfono.';
+
+  @override
+  String get transferBackupTitle => 'Copia de seguridad';
+
+  @override
+  String get transferBackupHelp =>
+      'Incluye historial, rutinas y sesión en curso.';
+
+  @override
+  String get transferSheetsTitle => 'Histórico de Google Sheets';
+
+  @override
+  String get transferSheetsHelpAndroid =>
+      'Carga tu hoja y pestaña con autorización de Google, o elige una copia Excel o CSV. Se conservan las celdas originales; la IA podrá interpretar tu formato cuando esté conectada.';
+
+  @override
+  String get transferSheetsHelpOther =>
+      'Carga una copia Excel o CSV. Se conservan las celdas originales, pendientes de interpretación por la IA.';
+
+  @override
+  String get transferImportSheets => 'Importar desde Google Sheets';
+
+  @override
+  String get transferChooseFileAndroid => 'Elegir archivo del móvil o Drive';
+
+  @override
+  String get transferChooseFileOther => 'Elegir copia XLSX o CSV';
+
+  @override
+  String transferWorkoutSubtitle(Object date, int exercises, int sets) {
+    return '$date · $exercises ejercicios · $sets series';
+  }
+
+  @override
+  String get transferNoColumnWorkout => 'Sin columna · Entrenamiento';
+
+  @override
+  String get transferChooseColumn => 'Elegir columna';
+
+  @override
+  String get transferCsvReviewError => 'No se pudo revisar el CSV.';
+
+  @override
+  String get transferImportSessionsTitle => '¿Importar estas sesiones?';
+
+  @override
+  String transferImportSessionsBody(int count, int sets, int errors) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sesiones',
+      one: '1 sesión',
+    );
+    return 'Se añadirán $_temp0 con $sets series. Filas omitidas por error: $errors.';
+  }
+
+  @override
+  String get transferImportAction => 'Importar';
+
+  @override
+  String get transferImportError => 'No se pudo importar.';
+
+  @override
+  String get transferImportSheetTitle => 'Importar hoja';
+
+  @override
+  String transferImportedSummary(int added, int duplicates) {
+    String _temp0 = intl.Intl.pluralLogic(
+      added,
+      locale: localeName,
+      other: '$added sesiones importadas',
+      one: '1 sesión importada',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      duplicates,
+      locale: localeName,
+      other: '$duplicates duplicadas omitidas',
+      one: '1 duplicada omitida',
+    );
+    return '$_temp0 · $_temp1.';
+  }
+
+  @override
+  String transferRowsFound(int count) {
+    return '$count filas encontradas';
+  }
+
+  @override
+  String get transferMapHelp =>
+      'Asocia las columnas de tu hoja. Una fila representa una serie.';
+
+  @override
+  String get transferDate => 'Fecha';
+
+  @override
+  String get transferSessionOptional => 'Sesión (opcional)';
+
+  @override
+  String get transferExercise => 'Ejercicio';
+
+  @override
+  String get transferWeightKg => 'Peso (kg)';
+
+  @override
+  String get transferReps => 'Repeticiones';
+
+  @override
+  String get transferReviewImport => 'Revisar importación';
+
+  @override
+  String transferPreviewSummary(
+    int newCount,
+    int duplicateCount,
+    int errorCount,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      newCount,
+      locale: localeName,
+      other: '$newCount sesiones nuevas',
+      one: '1 sesión nueva',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      duplicateCount,
+      locale: localeName,
+      other: '$duplicateCount duplicadas',
+      one: '1 duplicada',
+    );
+    String _temp2 = intl.Intl.pluralLogic(
+      errorCount,
+      locale: localeName,
+      other: '$errorCount filas con errores',
+      one: '1 fila con error',
+    );
+    return '$_temp0 · $_temp1 · $_temp2';
+  }
+
+  @override
+  String transferValidRows(int valid, int total) {
+    return '$valid series válidas de $total filas.';
+  }
+
+  @override
+  String get transferAllSessions => 'Todas las sesiones';
+
+  @override
+  String transferSeeSessions(int count) {
+    return 'Ver las $count sesiones';
+  }
+
+  @override
+  String get transferErrorRows => 'Filas con errores';
+
+  @override
+  String transferSeeErrors(int count) {
+    return 'Ver los $count errores';
+  }
+
+  @override
+  String get transferImportNew => 'Importar sesiones nuevas';
+
+  @override
+  String get transferCloseAction => 'Cerrar';
+
+  @override
+  String get chatAttachVoiceError =>
+      'No se pudo reconocer la voz. Comprueba el permiso de micrófono o escribe tu mensaje.';
+
+  @override
+  String get chatAttachVoiceUnavailable =>
+      'El reconocimiento de voz no está disponible. Revisa el permiso de micrófono y el servicio de voz del teléfono.';
+
+  @override
+  String get chatAttachDictationStart => 'No se pudo iniciar el dictado.';
+
+  @override
+  String get chatAttachCamera => 'Cámara';
+
+  @override
+  String get chatAttachPhotos => 'Fotos';
+
+  @override
+  String get chatAttachPdf => 'Documento PDF';
+
+  @override
+  String get chatAttachPdfHint => 'Necesita un modelo que admita documentos';
+
+  @override
+  String get chatAttachAudio => 'Archivo de audio';
+
+  @override
+  String get chatAttachAudioHint =>
+      'Requiere un modelo de Gemini que admita audio';
+
+  @override
+  String get chatAttachSpreadsheet => 'Hoja Excel o CSV';
+
+  @override
+  String get chatAttachSheet => 'Google Sheets / Drive';
+
+  @override
+  String get chatAttachNeedsAi =>
+      'Conecta la IA para enviar imágenes, documentos o audio. Puedes cargar una hoja sin IA.';
+
+  @override
+  String get chatAttachPhotoTooLarge => 'La foto supera 4 MB.';
+
+  @override
+  String get chatAttachPhotoFormat => 'Elige una foto JPG, PNG o WebP.';
+
+  @override
+  String get chatAttachPhotoEmpty =>
+      'La foto debe tener contenido y no superar 4 MB.';
+
+  @override
+  String get chatAttachAudioNeedsGemini =>
+      'Para enviar un archivo de audio configura un modelo de Gemini con audio. Puedes usar el micrófono del chat para dictar el mensaje.';
+
+  @override
+  String get chatAttachTooLarge => 'El adjunto supera 4 MB.';
+
+  @override
+  String get chatAttachUnreadable => 'No se pudo leer el adjunto.';
+
+  @override
+  String get chatAttachFormat => 'Formato de adjunto no compatible.';
+
+  @override
+  String get chatAttachInvalidPdf => 'El archivo no contiene un PDF válido.';
+
+  @override
+  String get chatAttachOpenFailed => 'No se pudo abrir el adjunto.';
+
+  @override
+  String get chatAttachRecoveredTooLarge =>
+      'La foto recuperada supera 4 MB. Elige una más pequeña.';
+
+  @override
+  String get chatMenuCompanionsError =>
+      'No se pudieron cargar los acompañantes.';
+
+  @override
+  String get chatMenuMore => 'Más opciones';
+
+  @override
+  String get chatMenuTraining => 'Rutinas e historial';
+
+  @override
+  String get chatMenuProgress => 'Progreso';
+
+  @override
+  String get chatMenuSheet => 'Hoja cargada';
+
+  @override
+  String get chatMenuRecover => 'Recuperar preparación';
+
+  @override
+  String get chatSendFocusTooLong => 'El registro supera 8000 caracteres.';
+
+  @override
+  String get chatSendSavedNoAi =>
+      'Registro guardado en el móvil. La IA no está disponible para interpretarlo.';
+
+  @override
+  String get chatSendSavedNoProvider =>
+      'Registro guardado en el móvil. Configura el proveedor para consultar al asistente.';
+
+  @override
+  String get chatSendAssistantError =>
+      'No se pudo consultar al asistente. Revisa el registro local.';
+
+  @override
+  String get chatSendQueueUnavailable =>
+      'La cola durable no está disponible. Conserva el texto y vuelve a abrir el chat.';
+
+  @override
+  String get chatSendTooLong => 'El mensaje supera 8000 caracteres.';
+
+  @override
+  String get chatSendConfigureProvider =>
+      'Configura el proveedor con el botón de ajustes para empezar.';
+
+  @override
+  String get chatSendSaveError =>
+      'No se pudo guardar el mensaje en el móvil. Conserva el texto y vuelve a intentarlo.';
+
+  @override
+  String get chatSendProposalIncomplete =>
+      'El modelo envió una propuesta incompleta. Pídele que prepare de nuevo el ejercicio para mostrar Iniciar.';
+
+  @override
+  String get chatSendAnswerSaveError =>
+      'La respuesta llegó, pero no se pudo guardar la conversación en el móvil.';
+
+  @override
+  String get chatSendFailed =>
+      'No se pudo completar la conversación. Puedes volver a intentarlo.';
+
+  @override
+  String get chatMsgOnlyLastEditable =>
+      'Solo se puede editar el último mensaje. Escribe una corrección como mensaje nuevo.';
+
+  @override
+  String get chatMsgPending => 'Pendiente de envío';
+
+  @override
+  String get chatMsgSending => 'Enviando';
+
+  @override
+  String get chatMsgAnswered => 'Respondido';
+
+  @override
+  String get chatMsgFailed => 'No aceptado; puedes reenviar';
+
+  @override
+  String get chatMsgUncertain =>
+      'Resultado incierto; reenvío bloqueado hasta revisar';
+
+  @override
+  String get chatMsgHistory => 'Historial';
+
+  @override
+  String get chatMsgResend => 'Reenviar';
+
+  @override
+  String get chatMsgAiNotReady => 'La IA no está lista.';
+
+  @override
+  String get chatMsgSendInProgress => 'Hay un envío en curso.';
+
+  @override
+  String get chatMsgChangedWhileEditing =>
+      'El mensaje cambió mientras lo editabas. Revisa el historial.';
+
+  @override
+  String get chatMsgSaveNotSent =>
+      'Edición guardada, pero no se pudo enviar ahora. Usa Reenviar cuando puedas.';
+
+  @override
+  String get chatMsgSavedOnly =>
+      'Edición guardada. Usa Reenviar para enviar esta versión.';
+
+  @override
+  String get chatMsgLengthError => 'Escribe un mensaje de 1 a 8000 caracteres.';
+
+  @override
+  String get chatMsgEditError =>
+      'No se pudo guardar la edición; el original se conserva.';
+
+  @override
+  String get chatMsgHistoryTitle => 'Historial de versiones';
+
+  @override
+  String chatMsgVersion(int n) {
+    return 'Versión $n';
+  }
+
+  @override
+  String chatMsgVersionCurrent(int n) {
+    return 'Versión $n · actual';
+  }
+
+  @override
+  String get chatMsgClose => 'Cerrar';
+
+  @override
+  String get chatMsgHistoryError => 'No se pudo abrir el historial.';
+
+  @override
+  String get chatMsgEditTitle => 'Editar mensaje';
+
+  @override
+  String get chatMsgEditLabel => 'Texto corregido';
+
+  @override
+  String get chatMsgEditHelper =>
+      'La versión original se conserva en el historial.';
+
+  @override
+  String chatMsgSendBlocked(Object reason) {
+    return 'No se puede enviar ahora: $reason';
+  }
+
+  @override
+  String get chatMsgSaveAndSend => 'Guardar y enviar';
+
+  @override
+  String get chatSheetReloadError => 'No se pudo recuperar la hoja cargada.';
+
+  @override
+  String get chatSheetAndroidOnly =>
+      'La conexión con Google Sheets está disponible en Android.';
+
+  @override
+  String get chatSheetSaveError =>
+      'No se pudo guardar la hoja en el móvil. La copia anterior se conserva.';
+
+  @override
+  String get chatSheetInterpretPending =>
+      'La respuesta llegó, pero la hoja sigue pendiente de interpretación en el móvil.';
+
+  @override
+  String get chatSheetRefreshError =>
+      'No se pudo actualizar la hoja. La copia anterior se conserva.';
+
+  @override
+  String get chatSheetRemoveError => 'No se pudo quitar la copia de la hoja.';
+
+  @override
+  String chatSheetDialogBody(
+    Object title,
+    int rows,
+    Object date,
+    Object status,
+  ) {
+    return '$title · $rows filas\nÚltima lectura: $date.\n\n$status';
+  }
+
+  @override
+  String get chatSheetStatusPending =>
+      'Pendiente de interpretación por la IA. No se han importado entrenamientos.';
+
+  @override
+  String get chatSheetStatusAnalyzed =>
+      'El asistente ha analizado esta copia; no se han importado entrenamientos.';
+
+  @override
+  String get chatSheetRemove => 'Quitar del contexto';
+
+  @override
+  String get chatSheetChange => 'Cambiar hoja';
+
+  @override
+  String get chatSheetRefresh => 'Actualizar hoja';
+
+  @override
+  String chatSheetLabel(Object title) {
+    return 'Hoja · $title';
+  }
+
+  @override
+  String chatProposalRepeated(int seconds) {
+    return 'Series / tramos · ${seconds}s de descanso';
+  }
+
+  @override
+  String chatProposalContinuous(int seconds) {
+    return 'Actividad continua · ${seconds}s de descanso';
+  }
+
+  @override
+  String chatSheetPendingInfo(Object name) {
+    return '«$name» cargada · pendiente de interpretación. Los datos originales se conservan.';
+  }
+
+  @override
+  String get chatGameFocusOpen =>
+      'Termina la actividad abierta en el otro acompañante antes de preparar esta.';
+
+  @override
+  String get chatGamePrepareError =>
+      'No se pudo preparar la actividad. Vuelve a intentarlo.';
+
+  @override
+  String chatGameGoalTitle(Object goal) {
+    return 'Meta propuesta: $goal';
+  }
+
+  @override
+  String chatGameAchievementTitle(Object title) {
+    return 'Logro propuesto: $title';
+  }
+
+  @override
+  String get chatGameCopyTitle => 'Textos de recordatorio propuestos';
+
+  @override
+  String get chatDeliveryQueueError =>
+      'No se pudo abrir la cola durable del chat. No se enviarán mensajes por un almacenamiento alternativo.';
+
+  @override
+  String get chatDeliveryRestoredPending =>
+      'Tu mensaje quedó guardado sin respuesta. Puedes volver a enviarlo.';
+
+  @override
+  String get chatDeliveryUncertain =>
+      'Hay un envío con resultado incierto. No se reenviará automáticamente; revisa el historial antes de decidir.';
+
+  @override
+  String get chatDeliveryBacklog =>
+      'Tienes mensajes guardados sin respuesta. Usa Reenviar cuando quieras; no se enviarán automáticamente.';
+
+  @override
+  String get chatDeliveryOtherChat =>
+      'El mensaje pertenece a otro chat y no se enviará aquí.';
+
+  @override
+  String get chatDeliveryNotSafe => 'Este mensaje no es seguro de reenviar.';
+
+  @override
+  String get chatDeliveryStateChanged =>
+      'El mensaje ya cambió de estado; no se hizo otro envío.';
+
+  @override
+  String get chatDeliveryUncertainSend =>
+      'El resultado del envío es incierto. No se reenviará automáticamente; comprueba si llegó una respuesta.';
+
+  @override
+  String get chatDeliveryFailed =>
+      'No se pudo completar la conversación. El mensaje permanece guardado; no se hará un reenvío automático.';
+
+  @override
+  String get chatArchiveIncompleteDirective =>
+      'El modelo pidió archivar con datos incompletos. El chat sigue abierto.';
+
+  @override
+  String get chatArchiveDoneAuto =>
+      'El asistente archivó el chat. Puedes consultarlo en Chats archivados.';
+
+  @override
+  String get chatArchiveDone =>
+      'Chat archivado. El contexto activo se ha liberado.';
+
+  @override
+  String get chatArchiveViewAction => 'Ver archivos';
+
+  @override
+  String get chatArchiveError =>
+      'No se pudo archivar. La conversación y los entrenamientos se conservan.';
+
+  @override
+  String get chatArchiveSyncInvalid =>
+      'La propuesta de envío no es válida. Usa Enviar a Google Sheets en el menú.';
+
+  @override
+  String get chatArchiveRecalled =>
+      'Archivo disponible para tu próximo mensaje al asistente.';
+
+  @override
+  String get chatArchiveReadError => 'No se pudo consultar el archivo.';
+
+  @override
+  String get chatDraftSaveError =>
+      'No se pudo guardar el borrador. Conserva el texto y vuelve a intentarlo.';
+
+  @override
+  String get chatLoadError => 'No se pudo recuperar la conversación anterior.';
+
+  @override
+  String get chatLoadSheetError =>
+      'No se pudo recuperar la hoja guardada. Vuelve a cargarla desde Google Sheets.';
+
+  @override
+  String get chatPersistTooLarge =>
+      'El chat supera 20 MB; no se pudo guardar completo.';
+
+  @override
+  String get creatorCreate => 'Crear';
+
+  @override
+  String get creatorCreateFailed =>
+      'No se pudo crear el acompañante. No se guardó nada.';
+
+  @override
+  String get creatorAssistedTitle => 'Crear con ayuda de la IA';
+
+  @override
+  String get creatorAiTitle => 'Con ayuda de la IA';
+
+  @override
+  String get creatorAiReadySubtitle =>
+      'Cuéntale qué quieres seguir y te propone un acompañante.';
+
+  @override
+  String get creatorAiNotReadySubtitle =>
+      'Necesitas conectar y verificar un proveedor de IA.';
+
+  @override
+  String get creatorOpenAiSettings => 'Abrir Ajustes de IA';
+
+  @override
+  String get creatorManualTitle => 'A mano';
+
+  @override
+  String get creatorManualSubtitle =>
+      'Elige nombre, icono, color, modo y aviso tú mismo.';
+
+  @override
+  String get creatorNewTitle => 'Nuevo acompañante';
+
+  @override
+  String get creatorEditProposalTitle => 'Editar propuesta';
+
+  @override
+  String get creatorNameLength =>
+      'Escribe un nombre de entre 1 y 40 caracteres.';
+
+  @override
+  String get creatorLevelReminderTitle => 'Solo recordatorio';
+
+  @override
+  String get creatorLevelReminderDetail => 'Te avisa y ya.';
+
+  @override
+  String get creatorLevelGoalsTitle => 'Metas y rachas';
+
+  @override
+  String get creatorLevelGoalsDetail =>
+      'Recomendado: metas y rachas, sin logros.';
+
+  @override
+  String get creatorLevelGameTitle => 'Juego completo';
+
+  @override
+  String get creatorLevelGameDetail => 'Metas, rachas y logros.';
+
+  @override
+  String creatorActivityLabel(Object name) {
+    return 'Qué anotas: $name';
+  }
+
+  @override
+  String get creatorRemoveActivity => 'Quitar actividad';
+
+  @override
+  String creatorGoalLabel(Object text) {
+    return 'Meta: $text';
+  }
+
+  @override
+  String get creatorRemoveGoal => 'Quitar meta';
+
+  @override
+  String get creatorRemind => 'Recordarme';
+
+  @override
+  String get creatorDecideOnStart => 'lo decides al empezar';
+
+  @override
+  String get creatorPunctualSuffix => ' · registro puntual';
+
+  @override
+  String get creatorNoGoal => 'sin meta';
+
+  @override
+  String get creatorNoReminder => 'sin aviso';
+
+  @override
+  String creatorReminderLabel(Object text) {
+    return 'Aviso: $text';
+  }
+
+  @override
+  String creatorLevelLabel(Object text) {
+    return 'Nivel: $text';
+  }
+
+  @override
+  String get creatorDiscard => 'Descartar';
+
+  @override
+  String get creatorNoAiConnected => 'No hay una IA conectada.';
+
+  @override
+  String get creatorConversationFailed =>
+      'No se pudo completar la conversación. Puedes volver a intentarlo.';
+
+  @override
+  String get creatorInputHint => 'Escribe aquí';
+
+  @override
+  String get creatorPromptHelper => 'Se usan cuando conectes un proveedor.';
+
+  @override
+  String get creatorLevelSection => 'Nivel';
+
+  @override
+  String get proposalIgnore => 'Ignorar';
+
+  @override
+  String get proposalAdd => 'Añadir';
+
+  @override
+  String get proposalUseTexts => 'Usar estos textos';
+
+  @override
+  String get proposalSuggestLater => 'Ahora no';
+
+  @override
+  String get proposalSuggestNever => 'No volver a sugerir';
+
+  @override
+  String get proposalLockedTitle =>
+      'Propuesta de la IA sobre datos fijados por ti';
+
+  @override
+  String get proposalApply => 'Aplicar';
+
+  @override
+  String proposalChangeLine(
+    Object label,
+    int current,
+    Object unit,
+    int proposed,
+  ) {
+    return '$label: $current $unit → $proposed $unit';
+  }
+
+  @override
+  String get proposalLockLabel => 'Fijado por ti. Toca para liberar';
+
+  @override
+  String get homeNewWorkoutTitle => 'Nuevo entrenamiento';
+
+  @override
+  String get homeSessionNameLabel => 'Nombre de la sesión';
+
+  @override
+  String get homeWorkout => 'Entrenamiento';
+
+  @override
+  String get homeAddExerciseTitle => 'Añadir ejercicio';
+
+  @override
+  String get homeExerciseNameLabel => 'Nombre del ejercicio';
+
+  @override
+  String get homeAdd => 'Añadir';
+
+  @override
+  String get homeBack => 'Volver';
+
+  @override
+  String get homeYourSession => 'Tu sesión';
+
+  @override
+  String get homeAssistantTooltip => 'Asistente TrackIA';
+
+  @override
+  String get homeReload => 'Recargar';
+
+  @override
+  String get homeLoadLog => 'Cargar bitácora';
+
+  @override
+  String get homeHeroTitle => 'Tu esfuerzo.\nTu progreso.';
+
+  @override
+  String get homeHeroSubtitle =>
+      'Una serie a la vez. Lleva el registro de lo que haces hoy.';
+
+  @override
+  String get homeNextSession => 'TU PRÓXIMA SESIÓN';
+
+  @override
+  String get homeInProgress => 'SESIÓN EN CURSO';
+
+  @override
+  String get homeReadyQuestion => '¿Vamos a entrenar?';
+
+  @override
+  String get homeAddExercisesHint =>
+      'Añade tus ejercicios y registra cada serie.';
+
+  @override
+  String homeActivitiesRecords(int activities, int records) {
+    String _temp0 = intl.Intl.pluralLogic(
+      activities,
+      locale: localeName,
+      other: '$activities actividades',
+      one: '1 actividad',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      records,
+      locale: localeName,
+      other: '$records registros',
+      one: '1 registro',
+    );
+    return '$_temp0 · $_temp1';
+  }
+
+  @override
+  String get homeStartWorkout => 'Empezar entrenamiento';
+
+  @override
+  String get homeContinueWorkout => 'Continuar entrenamiento';
+
+  @override
+  String get homeCompletedSessions => 'sesiones completas';
+
+  @override
+  String get homeRecords => 'registros';
+
+  @override
+  String get homeLastActivity => 'ÚLTIMA ACTIVIDAD';
+
+  @override
+  String get homeEmptyHistoryTitle => 'Aquí empieza tu historia';
+
+  @override
+  String get homeEmptyHistorySubtitle =>
+      'Tu primer entrenamiento aparecerá aquí cuando lo finalices.';
+
+  @override
+  String get homeSavedOffline => 'Guardado en este dispositivo · Sin conexión';
+
+  @override
+  String get homeJourneyTitle => 'Tu recorrido';
+
+  @override
+  String get homeEverySessionCounts => 'Cada sesión cuenta.';
+
+  @override
+  String get homeNoSessionsTitle => 'Todavía no hay sesiones';
+
+  @override
+  String get homeNoSessionsSubtitle =>
+      'Finaliza un entrenamiento y consulta aquí todos sus ejercicios y series.';
+
+  @override
+  String get homeStatusInProgress => 'EN CURSO';
+
+  @override
+  String get homeStatusCompleted => 'COMPLETADO';
+
+  @override
+  String homeFinishedAt(Object date) {
+    return 'Finalizó: $date';
+  }
+
+  @override
+  String homeFinishRecorded(Object date) {
+    return 'Cierre registrado: $date';
+  }
+
+  @override
+  String homeFinishRecordedByUser(Object date) {
+    return 'Cierre registrado: $date · hora elegida por ti';
+  }
+
+  @override
+  String get homeTimeKeptWarning =>
+      'Horario conservado con aviso. Puedes revisarlo más adelante.';
+
+  @override
+  String get homeTimeKeptWarningShort => 'Horario conservado con aviso.';
+
+  @override
+  String get homeActivities => 'actividades';
+
+  @override
+  String homeIntervalsRepeated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count series / tramos',
+      one: '1 serie / tramo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String homeIntervals(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count tramos',
+      one: '1 tramo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get homeNotStarted => 'Sin iniciar';
+
+  @override
+  String homeEndedAt(Object date) {
+    return 'Fin: $date';
+  }
+
+  @override
+  String homeDraft(Object draft) {
+    return 'Borrador: $draft';
+  }
+
+  @override
+  String get homeFinishWorkout => 'Finalizar entrenamiento';
+
+  @override
+  String get homeAddSetToFinish =>
+      'Registra al menos una serie para finalizar.';
+
+  @override
+  String get homeEachSetSaved => 'Cada serie se guarda al pulsar Guardar.';
+
+  @override
+  String get homeDiscardTitle => '¿Descartar sesión?';
+
+  @override
+  String get homeDiscardBody =>
+      'Se eliminarán esta sesión y todas sus series. Esta acción no se puede deshacer.';
+
+  @override
+  String get homeDiscard => 'Descartar';
+
+  @override
+  String get homeDiscardSession => 'Descartar sesión';
+
+  @override
+  String get homeSavedWellDone => 'Sesión guardada. Buen trabajo.';
+
+  @override
+  String get homeViewHistory => 'Ver historial';
+
+  @override
+  String homeDeleteExerciseTooltip(Object name) {
+    return 'Eliminar ejercicio $name';
+  }
+
+  @override
+  String get homeDeleteExerciseTitle => '¿Eliminar ejercicio?';
+
+  @override
+  String homeDeleteExerciseBody(Object name, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count series',
+      one: '1 serie',
+    );
+    return 'Se eliminará $name y sus $_temp0.';
+  }
+
+  @override
+  String get homeDelete => 'Eliminar';
+
+  @override
+  String homeTargetProgress(
+    int target,
+    Object repsMin,
+    Object repsMax,
+    int done,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      target,
+      locale: localeName,
+      other: '$target series',
+      one: '1 serie',
+    );
+    return 'Objetivo: $_temp0 de $repsMin–$repsMax reps · $done/$target registradas';
+  }
+
+  @override
+  String get homeNoPreviousSession => 'Sin sesión anterior registrada';
+
+  @override
+  String homeLastTime(Object date) {
+    return 'Última vez · $date';
+  }
+
+  @override
+  String get homeNoSetsYet => 'Todavía no has registrado series.';
+
+  @override
+  String get homeSetHeader => 'SERIE';
+
+  @override
+  String get homeKgHeader => 'KG';
+
+  @override
+  String get homeRepsHeader => 'REPS';
+
+  @override
+  String homeSetOptionsTooltip(int number) {
+    return 'Opciones de la serie $number';
+  }
+
+  @override
+  String homeSetDeleteBody(Object weight, int reps) {
+    String _temp0 = intl.Intl.pluralLogic(
+      reps,
+      locale: localeName,
+      other: '$reps repeticiones',
+      one: '1 repetición',
+    );
+    return '$weight kg × $_temp0.';
+  }
+
+  @override
+  String homeWeightReps(Object weight, int reps) {
+    return '$weight kg × $reps';
+  }
+
+  @override
+  String get homeEditSet => 'Editar serie';
+
+  @override
+  String get homeDeleteSet => 'Eliminar serie';
+
+  @override
+  String get homeAddSet => 'Añadir serie';
+
+  @override
+  String homeRest(int seconds) {
+    return 'Descansar ${seconds}s';
+  }
+
+  @override
+  String get homeFirstSetTitle => 'Prepara tu primera serie';
+
+  @override
+  String get homeFirstSetSubtitle =>
+      'Añade un ejercicio para empezar a registrar peso y repeticiones.';
+
+  @override
+  String get homeFinishSession => 'Finalizar entreno';
+
+  @override
+  String get homeTabToday => 'Hoy';
+
+  @override
+  String get homeTabRoutines => 'Rutinas';
+
+  @override
+  String get homeTabHistory => 'Historial';
+
+  @override
+  String get homeSessionStarted =>
+      'Entreno iniciado. Puedes abrir Entrenamiento para registrar.';
+
+  @override
+  String get homeSessionStartFailed => 'No se pudo iniciar el entreno.';
+
+  @override
+  String get homeActiveSessionChanged =>
+      'La sesión activa ha cambiado. Revísala.';
+
+  @override
+  String get homeSavedSheetPending =>
+      'Entreno guardado en el móvil. El envío a Google Sheets queda pendiente de confirmación.';
+
+  @override
+  String get homeSavedSheetNotUpdated =>
+      'Entreno guardado en el móvil. Google Sheets no se ha actualizado.';
+
+  @override
+  String get homeFinishFailed => 'No se pudo finalizar el entreno.';
+
+  @override
+  String get homeReviewFinishTitle => 'Revisar hora de finalización';
+
+  @override
+  String homeFinishIssuesBody(Object issues) {
+    return '$issues\n\n¿Quieres guardar la hora elegida tal cual? Los registros se conservarán para revisarlos después si lo deseas.';
+  }
+
+  @override
+  String get homeBackAndFix => 'Volver y corregir';
+
+  @override
+  String get homeSaveThatTime => 'Guardar esa hora';
+
+  @override
+  String get homeDate => 'Fecha';
+
+  @override
+  String get homeTime => 'Hora';
+
+  @override
+  String get homeStartSession => 'Iniciar entreno';
+
+  @override
+  String get homeOptionYes => 'Sí';
+
+  @override
+  String get homeOptionNo => 'No';
+
+  @override
+  String get homeBoolYes => 'sí';
+
+  @override
+  String get homeBoolNo => 'no';
+
+  @override
+  String get homeNoteOptional => 'Nota (opcional)';
+
+  @override
+  String homeNumberInvalid(Object label) {
+    return '$label: escribe un número.';
+  }
+
+  @override
+  String get homeNoteOrValueRequired => 'Anota algún valor o escribe una nota.';
+
+  @override
+  String get homeSessionFinished => 'Sesión terminada';
+
+  @override
+  String get homeSummaryEmpty => 'Sin novedades esta vez. Seguimos.';
+
+  @override
+  String get homeNewAchievement => 'Logro nuevo';
+
+  @override
+  String get homeDone => 'Listo';
+
+  @override
+  String get homeSuggestionSquat => 'Sentadilla';
+
+  @override
+  String get homeSuggestionBench => 'Press banca';
+
+  @override
+  String get homeSuggestionRow => 'Remo';
+
+  @override
+  String get homeNewSet => 'Nueva serie';
+
+  @override
+  String get homeWeightLabel => 'Peso (kg)';
+
+  @override
+  String get homeWeightHint => 'Ej. 20,5';
+
+  @override
+  String get homeRepsLabel => 'Repeticiones';
+
+  @override
+  String get homeRepsHint => 'Ej. 10';
+
+  @override
+  String get homeZeroWeightHint => 'Usa 0 kg si entrenas sin carga externa.';
+
+  @override
+  String get homeExercisesLabel => 'EJERCICIOS';
+
+  @override
+  String get homeDeleteSetTitle => '¿Eliminar serie?';
+
+  @override
+  String get accountsConnectError => 'No se pudo conectar con Google.';
+
+  @override
+  String get accountsSwitchError =>
+      'No se pudo cambiar de cuenta. Tus datos se conservan.';
+
+  @override
+  String get accountsDescription =>
+      'Cada cuenta tiene su conversación, configuración de IA, hoja y entrenamientos en este móvil. El histórico anterior permanece en el perfil local. Conectar no copia ni sube esos datos.';
+
+  @override
+  String get accountsConnectAnother => 'Conectar otra cuenta de Google';
+
+  @override
+  String get accountsActiveProfile => 'Perfil activo';
+
+  @override
+  String get accountsReconnectProfile => 'Volver a este perfil con Google';
+
+  @override
+  String get accountsDisconnect => 'Desconectar y volver al perfil local';
+
+  @override
+  String get accountsDisconnectNotice =>
+      'Desconectar conserva los datos de cada perfil en este móvil. No borra archivos de Google ni revoca el acceso desde tu cuenta de Google.';
+
+  @override
+  String get appearanceSaveError =>
+      'No se pudo guardar el tema. Vuelve a intentarlo.';
+
+  @override
+  String get appearanceIntro =>
+      'Elige cómo quieres ver TrackIA. La elección se guarda en este móvil.';
+
+  @override
+  String get appearanceSystemHint => 'Usar el tema del dispositivo';
+
+  @override
+  String get archiveSearchLabel => 'Buscar por título o resumen';
+
+  @override
+  String get archiveRecoverError =>
+      'No se pudo recuperar el chat. El archivo se conserva.';
+
+  @override
+  String get archiveEmpty => 'Todavía no hay chats archivados.';
+
+  @override
+  String archiveChatSubtitle(Object date, Object count) {
+    return '$date · $count mensajes';
+  }
+
+  @override
+  String get archiveAutomaticTag => 'archivado por el asistente';
+
+  @override
+  String get archiveContinuityTitle => 'Resumen de continuidad';
+
+  @override
+  String archiveReasonLine(Object reason) {
+    return 'Motivo del asistente: $reason';
+  }
+
+  @override
+  String get archiveConsultFromChat => 'Consultar desde el chat';
+
+  @override
+  String get archiveYou => 'Tú';
+
+  @override
+  String archiveAttachmentKept(Object name) {
+    return 'Adjunto conservado: $name';
+  }
+
+  @override
+  String get notifUnsupported =>
+      'Los avisos de descanso solo están disponibles en Android.';
+
+  @override
+  String get notifDndActive => 'No molestar está activo';
+
+  @override
+  String get notifDndTotalSilence =>
+      'Estás en «Silencio total»: Android bloquea los avisos, incluso como alarma.';
+
+  @override
+  String get notifDndAlarm =>
+      'Los avisos de descanso suenan como alarma. Los demás avisos no sonarían ni vibrarían.';
+
+  @override
+  String get notifDndPlain =>
+      'Ahora mismo los avisos de descanso no sonarían ni vibrarían.';
+
+  @override
+  String get notifEnabledTitle => 'Avisos de actividad y descanso';
+
+  @override
+  String get notifEnabledSubtitle =>
+      'Actividad lista, tramo en marcha, fin de tramo y fin de descanso.';
+
+  @override
+  String get notifAlarmStyleTitle => 'Tratar como alarma';
+
+  @override
+  String get notifAlarmStyleSubtitle =>
+      'El fin de descanso y de tramo suenan y vibran aunque No molestar esté en modo Prioridad.';
+
+  @override
+  String get notifChannelBlockedTitle => 'Android bloquea el canal de alarma';
+
+  @override
+  String get notifChannelBlockedSubtitle =>
+      'Actívalo en los ajustes del canal.';
+
+  @override
+  String get notifExactTitle => 'Permitir avisos puntuales';
+
+  @override
+  String get notifExactSubtitle =>
+      'Sin este permiso Android puede retrasar el aviso.';
+
+  @override
+  String get notifCheck => 'Comprobar';
+
+  @override
+  String get notifTest => 'Probar aviso';
+
+  @override
+  String get notifTestAlarm => 'Probar con No molestar activo';
+
+  @override
+  String get notifOpenDnd => 'Abrir ajustes de No molestar';
+
+  @override
+  String get notifSilenceNote =>
+      'En «Silencio total» Android bloquea todo, incluidas las alarmas. Ahí solo ayuda permitirlas en los ajustes de tu móvil.';
+
+  @override
+  String get progressLoadError => 'No se pudo calcular el progreso.';
+
+  @override
+  String get progressMonth1 => 'enero';
+
+  @override
+  String get progressMonth2 => 'febrero';
+
+  @override
+  String get progressMonth3 => 'marzo';
+
+  @override
+  String get progressMonth4 => 'abril';
+
+  @override
+  String get progressMonth5 => 'mayo';
+
+  @override
+  String get progressMonth6 => 'junio';
+
+  @override
+  String get progressMonth7 => 'julio';
+
+  @override
+  String get progressMonth8 => 'agosto';
+
+  @override
+  String get progressMonth9 => 'septiembre';
+
+  @override
+  String get progressMonth10 => 'octubre';
+
+  @override
+  String get progressMonth11 => 'noviembre';
+
+  @override
+  String get progressMonth12 => 'diciembre';
+
+  @override
+  String progressDayStatus(int day, Object month, Object status) {
+    return '$day de $month: $status';
+  }
+
+  @override
+  String get progressDayDone => 'cumplido';
+
+  @override
+  String get progressDayPending => 'pendiente';
+
+  @override
+  String get progressDayMissed => 'sin cumplir';
+
+  @override
+  String progressTitle(Object name) {
+    return 'Progreso · $name';
+  }
+
+  @override
+  String progressStreakCurrent(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: 'Racha actual: $n días',
+      one: 'Racha actual: 1 día',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String progressStreakBest(int best) {
+    return 'Mejor racha: $best';
+  }
+
+  @override
+  String progressFreeDays(int used, int total) {
+    return 'Días libres esta semana: $used/$total';
+  }
+
+  @override
+  String get progressGoalToday => 'Meta de hoy';
+
+  @override
+  String get progressGoalWeek => 'Meta de la semana';
+
+  @override
+  String progressGoalValues(Object value, Object target) {
+    return '$value de $target';
+  }
+
+  @override
+  String get progressLastFourWeeks => 'Últimas 4 semanas';
+
+  @override
+  String progressAchievementUnlocked(Object title) {
+    return '$title, desbloqueado';
+  }
+
+  @override
+  String progressAchievementLocked(Object title, int percent) {
+    return '$title, bloqueado, $percent % de progreso';
+  }
+
+  @override
+  String progressAchievementsTitle(int unlocked, int total) {
+    return 'Logros · $unlocked de $total';
+  }
+
+  @override
+  String get progressAchievementsEmptyPlay =>
+      'Tus logros aparecerán al terminar tu primera actividad.';
+
+  @override
+  String progressAchievementsEmptyEnable(Object place) {
+    return 'Activa el modo Juego y los logros en «$place».';
+  }
+
+  @override
+  String get routinesTitle => 'Tus rutinas';
+
+  @override
+  String get routinesSubtitle => 'Prepara una vez. Entrena a tu ritmo.';
+
+  @override
+  String get routinesCreate => 'Crear rutina';
+
+  @override
+  String get routinesEmptyTitle => 'Tu próxima sesión, preparada';
+
+  @override
+  String get routinesEmptyBody =>
+      'Crea, por ejemplo, «Pierna A» con tus ejercicios, series y rango de repeticiones.';
+
+  @override
+  String routinesOptionsTooltip(Object name) {
+    return 'Opciones de $name';
+  }
+
+  @override
+  String get routinesDeleteTitle => '¿Eliminar rutina?';
+
+  @override
+  String routinesDeleteBody(Object name) {
+    return 'Se eliminará «$name». Tus entrenamientos guardados y la sesión en curso se conservarán.';
+  }
+
+  @override
+  String get routinesEditMenu => 'Editar rutina';
+
+  @override
+  String get routinesDeleteMenu => 'Eliminar rutina';
+
+  @override
+  String get routinesDelete => 'Eliminar';
+
+  @override
+  String get routinesTrain => 'Entrenar';
+
+  @override
+  String get routinesContinueSession => 'Continuar sesión activa';
+
+  @override
+  String get routinesNeedExercise => 'Añade al menos un ejercicio.';
+
+  @override
+  String get routinesNameLabel => 'Nombre de la rutina';
+
+  @override
+  String get routinesNameHint => 'Ej. Pierna A';
+
+  @override
+  String get routinesEditorHelp =>
+      'Define tus objetivos. Las series se registrarán cuando entrenes.';
+
+  @override
+  String routinesMoveUp(int n) {
+    return 'Subir ejercicio $n';
+  }
+
+  @override
+  String routinesMoveDown(int n) {
+    return 'Bajar ejercicio $n';
+  }
+
+  @override
+  String routinesEditExercise(int n) {
+    return 'Editar ejercicio $n';
+  }
+
+  @override
+  String routinesRemoveExercise(int n) {
+    return 'Quitar ejercicio $n';
+  }
+
+  @override
+  String get routinesAddExercise => 'Añadir ejercicio a rutina';
+
+  @override
+  String get routinesSaving => 'Guardando…';
+
+  @override
+  String get routinesSave => 'Guardar rutina';
+
+  @override
+  String get routinesLeaveTitle => '¿Salir sin guardar?';
+
+  @override
+  String get routinesLeaveBody => 'Los cambios en esta rutina se perderán.';
+
+  @override
+  String get routinesKeepEditing => 'Seguir editando';
+
+  @override
+  String get routinesDiscard => 'Descartar cambios';
+
+  @override
+  String get routinesBack => 'Volver';
+
+  @override
+  String get routinesExerciseDialogTitle => 'Ejercicio de rutina';
+
+  @override
+  String get routinesEditTargetTitle => 'Editar objetivo';
+
+  @override
+  String get routinesExerciseLabel => 'Ejercicio';
+
+  @override
+  String get routinesExerciseHint => 'Ej. Sentadilla';
+
+  @override
+  String get routinesTargetSets => 'Series previstas';
+
+  @override
+  String get routinesRepsMin => 'Reps mín.';
+
+  @override
+  String get routinesRepsMax => 'Reps máx.';
+
+  @override
+  String get routinesRestSeconds => 'Descanso (segundos)';
+
+  @override
+  String get routinesSaveExercise => 'Guardar ejercicio';
+
+  @override
+  String get focusCounterSaveError =>
+      'No se pudo guardar el contador. Vuelve a intentarlo.';
+
+  @override
+  String get focusResultSaveError =>
+      'No se pudo guardar el resultado. Conserva el texto y vuelve a intentarlo.';
+
+  @override
+  String get focusSaveActivityError => 'No se pudo guardar en tus actividades.';
+
+  @override
+  String get focusRecordSaveError =>
+      'No se pudo guardar el registro. Vuelve a intentarlo.';
+
+  @override
+  String get focusReviewTimeTitle => 'Revisar hora';
+
+  @override
+  String get focusReviewTimeBody =>
+      'La hora elegida no coincide con los registros. ¿Guardar esa hora y conservarlos?';
+
+  @override
+  String get focusBack => 'Volver';
+
+  @override
+  String get focusSaveThatTime => 'Guardar esa hora';
+
+  @override
+  String get focusRunning => 'En marcha';
+
+  @override
+  String get focusReady => 'Listo';
+
+  @override
+  String get focusRest => 'Descanso';
+
+  @override
+  String focusRepeatedRest(Object progress, Object segments) {
+    return '$progress $segments · Descanso';
+  }
+
+  @override
+  String focusSegmentCount(Object segment, int count) {
+    return '$segment $count';
+  }
+
+  @override
+  String focusSegmentCountOfTarget(Object segment, int count, int target) {
+    return '$segment $count de $target';
+  }
+
+  @override
+  String get focusSegmentSerie => 'serie';
+
+  @override
+  String get focusSegmentTramo => 'tramo';
+
+  @override
+  String get focusSegmentSeries => 'series';
+
+  @override
+  String get focusSegmentTramos => 'tramos';
+
+  @override
+  String focusRemoveField(Object label) {
+    return 'Quitar $label';
+  }
+
+  @override
+  String focusAddField(Object label) {
+    return 'Añadir $label';
+  }
 }

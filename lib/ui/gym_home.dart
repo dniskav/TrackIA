@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../application/localization.dart';
 import '../application/workout_controller.dart';
 import '../domain/workout.dart';
 import 'routines.dart';
@@ -45,11 +46,11 @@ class _GymHomeState extends State<GymHome> {
   Future<void> _start() async {
     final name = await showDialog<String>(
       context: context,
-      builder: (_) => const NameDialog(
-        title: 'Nuevo entrenamiento',
-        label: 'Nombre de la sesión',
-        initial: 'Entrenamiento',
-        action: 'Empezar',
+      builder: (_) => NameDialog(
+        title: appText(context).homeNewWorkoutTitle,
+        label: appText(context).homeSessionNameLabel,
+        initial: appText(context).homeWorkout,
+        action: appText(context).start,
       ),
     );
     if (name == null || !mounted) return;
@@ -62,10 +63,10 @@ class _GymHomeState extends State<GymHome> {
   Future<void> _addExercise(Workout workout) async {
     final name = await showDialog<String>(
       context: context,
-      builder: (_) => const NameDialog(
-        title: 'Añadir ejercicio',
-        label: 'Nombre del ejercicio',
-        action: 'Añadir',
+      builder: (_) => NameDialog(
+        title: appText(context).homeAddExerciseTitle,
+        label: appText(context).homeExerciseNameLabel,
+        action: appText(context).homeAdd,
         suggestions: true,
       ),
     );
@@ -103,7 +104,7 @@ class _GymHomeState extends State<GymHome> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancelar'),
+              child: Text(appText(context).cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.pop(context, true),
@@ -133,7 +134,7 @@ class _GymHomeState extends State<GymHome> {
             leading: selected == null
                 ? null
                 : IconButton(
-                    tooltip: 'Volver',
+                    tooltip: appText(context).homeBack,
                     onPressed: () => setState(() => selectedId = null),
                     icon: const Icon(Icons.arrow_back_rounded),
                   ),
@@ -149,10 +150,10 @@ class _GymHomeState extends State<GymHome> {
                 ],
                 Text(
                   selected == null
-                      ? 'gymia'
+                      ? 'TrackIA'
                       : selected.isActive
-                      ? 'Tu sesión'
-                      : 'Entrenamiento',
+                      ? appText(context).homeYourSession
+                      : appText(context).homeWorkout,
                   style: const TextStyle(
                     fontWeight: FontWeight.w800,
                     letterSpacing: -0.5,
@@ -162,7 +163,7 @@ class _GymHomeState extends State<GymHome> {
             ),
             actions: [
               IconButton(
-                tooltip: 'Asistente TrackIA',
+                tooltip: appText(context).homeAssistantTooltip,
                 onPressed:
                     widget.onAssistant ??
                     () => Navigator.of(context).push(
@@ -180,7 +181,7 @@ class _GymHomeState extends State<GymHome> {
               ),
               if (selected == null)
                 IconButton(
-                  tooltip: 'Tus datos',
+                  tooltip: appText(context).yourData,
                   onPressed: () => Navigator.of(context).push(
                     MaterialPageRoute<void>(
                       builder: (_) => DataTransferScreen(controller: c),
@@ -214,7 +215,7 @@ class _GymHomeState extends State<GymHome> {
                             Expanded(child: Text(c.error!)),
                             TextButton(
                               onPressed: c.busy ? null : c.refresh,
-                              child: const Text('Recargar'),
+                              child: Text(appText(context).homeReload),
                             ),
                           ],
                         ),
@@ -234,7 +235,7 @@ class _GymHomeState extends State<GymHome> {
                               ? const CircularProgressIndicator()
                               : FilledButton(
                                   onPressed: c.refresh,
-                                  child: const Text('Cargar bitácora'),
+                                  child: Text(appText(context).homeLoadLog),
                                 ),
                         )
                       : AbsorbPointer(
@@ -272,18 +273,18 @@ class _GymHomeState extends State<GymHome> {
                   selectedIndex: tab,
                   onDestinationSelected: (value) => setState(() => tab = value),
                   backgroundColor: Theme.of(context).colorScheme.surface,
-                  destinations: const [
+                  destinations: [
                     NavigationDestination(
                       icon: Icon(Icons.grid_view_rounded),
-                      label: 'Hoy',
+                      label: appText(context).homeTabToday,
                     ),
                     NavigationDestination(
                       icon: Icon(Icons.view_list_rounded),
-                      label: 'Rutinas',
+                      label: appText(context).homeTabRoutines,
                     ),
                     NavigationDestination(
                       icon: Icon(Icons.history_rounded),
-                      label: 'Historial',
+                      label: appText(context).homeTabHistory,
                     ),
                   ],
                 )
@@ -311,8 +312,8 @@ class _GymHomeState extends State<GymHome> {
           ),
         ),
         const SizedBox(height: 14),
-        const Text(
-          'Tu esfuerzo.\nTu progreso.',
+        Text(
+          appText(context).homeHeroTitle,
           style: TextStyle(
             fontSize: 38,
             height: 1.08,
@@ -322,7 +323,7 @@ class _GymHomeState extends State<GymHome> {
         ),
         const SizedBox(height: 14),
         Text(
-          'Una serie a la vez. Lleva el registro de lo que haces hoy.',
+          appText(context).homeHeroSubtitle,
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurfaceVariant,
             fontSize: 16,
@@ -343,7 +344,9 @@ class _GymHomeState extends State<GymHome> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    active == null ? 'TU PRÓXIMA SESIÓN' : 'SESIÓN EN CURSO',
+                    active == null
+                        ? appText(context).homeNextSession
+                        : appText(context).homeInProgress,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onPrimary,
                       fontSize: 11,
@@ -359,7 +362,7 @@ class _GymHomeState extends State<GymHome> {
               ),
               const SizedBox(height: 20),
               Text(
-                active?.name ?? '¿Vamos a entrenar?',
+                active?.name ?? appText(context).homeReadyQuestion,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onPrimary,
                   fontSize: 27,
@@ -370,8 +373,11 @@ class _GymHomeState extends State<GymHome> {
               const SizedBox(height: 10),
               Text(
                 active == null
-                    ? 'Añade tus ejercicios y registra cada serie.'
-                    : '${_activitiesFor(active)} actividades · ${_recordsFor(active)} registros',
+                    ? appText(context).homeAddExercisesHint
+                    : appText(context).homeActivitiesRecords(
+                        _activitiesFor(active),
+                        _recordsFor(active),
+                      ),
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onPrimary,
                   height: 1.4,
@@ -395,8 +401,8 @@ class _GymHomeState extends State<GymHome> {
                   ),
                   label: Text(
                     active == null
-                        ? 'Empezar entrenamiento'
-                        : 'Continuar entrenamiento',
+                        ? appText(context).homeStartWorkout
+                        : appText(context).homeContinueWorkout,
                   ),
                 ),
               ),
@@ -409,7 +415,7 @@ class _GymHomeState extends State<GymHome> {
             Expanded(
               child: StatTile(
                 value: '${c.history.length}',
-                label: 'sesiones completas',
+                label: appText(context).homeCompletedSessions,
               ),
             ),
             const SizedBox(width: 12),
@@ -417,20 +423,19 @@ class _GymHomeState extends State<GymHome> {
               child: StatTile(
                 value:
                     '${c.history.fold<int>(0, (n, w) => n + _recordsFor(w))}',
-                label: 'registros',
+                label: appText(context).homeRecords,
               ),
             ),
           ],
         ),
         const SizedBox(height: 28),
-        const SectionLabel('ÚLTIMA ACTIVIDAD'),
+        SectionLabel(appText(context).homeLastActivity),
         const SizedBox(height: 12),
         if (c.history.isEmpty)
-          const EmptyPanel(
+          EmptyPanel(
             icon: Icons.show_chart_rounded,
-            title: 'Aquí empieza tu historia',
-            subtitle:
-                'Tu primer entrenamiento aparecerá aquí cuando lo finalices.',
+            title: appText(context).homeEmptyHistoryTitle,
+            subtitle: appText(context).homeEmptyHistorySubtitle,
           )
         else
           _workoutTile(c.history.first),
@@ -446,7 +451,7 @@ class _GymHomeState extends State<GymHome> {
             SizedBox(width: 8),
             Flexible(
               child: Text(
-                'Guardado en este dispositivo · Sin conexión',
+                appText(context).homeSavedOffline,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                   fontSize: 12,
@@ -462,8 +467,8 @@ class _GymHomeState extends State<GymHome> {
   Widget _history() => ListView(
     padding: const EdgeInsets.all(24),
     children: [
-      const Text(
-        'Tu recorrido',
+      Text(
+        appText(context).homeJourneyTitle,
         style: TextStyle(
           fontSize: 34,
           fontWeight: FontWeight.w800,
@@ -472,7 +477,7 @@ class _GymHomeState extends State<GymHome> {
       ),
       const SizedBox(height: 8),
       Text(
-        'Cada sesión cuenta.',
+        appText(context).homeEverySessionCounts,
         style: TextStyle(
           color: Theme.of(context).colorScheme.onSurfaceVariant,
           fontSize: 16,
@@ -480,11 +485,10 @@ class _GymHomeState extends State<GymHome> {
       ),
       const SizedBox(height: 24),
       if (c.history.isEmpty)
-        const EmptyPanel(
+        EmptyPanel(
           icon: Icons.history_rounded,
-          title: 'Todavía no hay sesiones',
-          subtitle:
-              'Finaliza un entrenamiento y consulta aquí todos sus ejercicios y series.',
+          title: appText(context).homeNoSessionsTitle,
+          subtitle: appText(context).homeNoSessionsSubtitle,
         ),
       for (final w in c.history) ...[
         _workoutTile(w),
@@ -552,7 +556,9 @@ class _GymHomeState extends State<GymHome> {
     padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
     children: [
       Text(
-        w.isActive ? 'EN CURSO' : 'COMPLETADO',
+        w.isActive
+            ? appText(context).homeStatusInProgress
+            : appText(context).homeStatusCompleted,
         style: TextStyle(
           color: Theme.of(context).colorScheme.primary,
           fontSize: 11,
@@ -578,21 +584,29 @@ class _GymHomeState extends State<GymHome> {
       if (w.finishedAt != null) ...[
         const SizedBox(height: 8),
         Text(
-          'Finalizó: ${DateFormat('d/M/yyyy HH:mm:ss').format(w.finishedAt!.toLocal())}',
+          appText(context).homeFinishedAt(
+            DateFormat('d/M/yyyy HH:mm:ss').format(w.finishedAt!.toLocal()),
+          ),
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
         ),
         if (w.finishedRecordedAt != null)
           Text(
-            'Cierre registrado: ${DateFormat('d/M/yyyy HH:mm:ss').format(w.finishedRecordedAt!.toLocal())}${w.finishTimeSource == FinishTimeSource.user ? ' · hora elegida por ti' : ''}',
+            w.finishTimeSource == FinishTimeSource.user
+                ? appText(context).homeFinishRecordedByUser(
+                    DateFormat('d/M/yyyy HH:mm:ss').format(w.finishedRecordedAt!.toLocal()),
+                  )
+                : appText(context).homeFinishRecorded(
+                    DateFormat('d/M/yyyy HH:mm:ss').format(w.finishedRecordedAt!.toLocal()),
+                  ),
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
         if (w.finishTimeIssues.isNotEmpty)
           Text(
-            'Horario conservado con aviso. Puedes revisarlo más adelante.',
+            appText(context).homeTimeKeptWarning,
             style: TextStyle(color: Theme.of(context).colorScheme.primary),
           ),
       ],
@@ -602,24 +616,23 @@ class _GymHomeState extends State<GymHome> {
           Expanded(
             child: StatTile(
               value: '${_activitiesFor(w)}',
-              label: 'actividades',
+              label: appText(context).homeActivities,
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: StatTile(value: '${_recordsFor(w)}', label: 'registros'),
+            child: StatTile(value: '${_recordsFor(w)}', label: appText(context).homeRecords),
           ),
         ],
       ),
       const SizedBox(height: 28),
-      const SectionLabel('EJERCICIOS'),
+      SectionLabel(appText(context).homeExercisesLabel),
       const SizedBox(height: 12),
       if (w.exercises.isEmpty)
-        const EmptyPanel(
+        EmptyPanel(
           icon: Icons.fitness_center_rounded,
-          title: 'Prepara tu primera serie',
-          subtitle:
-              'Añade un ejercicio para empezar a registrar peso y repeticiones.',
+          title: appText(context).homeFirstSetTitle,
+          subtitle: appText(context).homeFirstSetSubtitle,
         ),
       for (var i = 0; i < w.exercises.length; i++) ...[
         _exerciseCard(w.exercises[i], i + 1, w),
@@ -643,12 +656,20 @@ class _GymHomeState extends State<GymHome> {
                 ),
                 Text(
                   activity.intervals.isEmpty
-                      ? 'Sin iniciar'
-                      : '${activity.intervals.where((i) => i.endedAt != null).length} ${activity.definition.repeated ? 'series / tramos' : 'tramos'}',
+                      ? appText(context).homeNotStarted
+                      : activity.definition.repeated
+                      ? appText(context).homeIntervalsRepeated(
+                          activity.intervals.where((i) => i.endedAt != null).length,
+                        )
+                      : appText(context).homeIntervals(
+                          activity.intervals.where((i) => i.endedAt != null).length,
+                        ),
                 ),
                 if (activity.finishedAt != null)
                   Text(
-                    'Fin: ${DateFormat('d/M/yyyy HH:mm').format(activity.finishedAt!.toLocal())}',
+                    appText(context).homeEndedAt(
+                      DateFormat('d/M/yyyy HH:mm').format(activity.finishedAt!.toLocal()),
+                    ),
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
@@ -657,7 +678,7 @@ class _GymHomeState extends State<GymHome> {
                     .where((i) => i != 'not_started')
                     .isNotEmpty)
                   Text(
-                    'Horario conservado con aviso.',
+                    appText(context).homeTimeKeptWarningShort,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.primary,
                     ),
@@ -670,7 +691,7 @@ class _GymHomeState extends State<GymHome> {
                     child: SelectableText(message.text),
                   ),
                 if (activity.draft.isNotEmpty)
-                  Text('Borrador: ${activity.draft}'),
+                  Text(appText(context).homeDraft(activity.draft)),
               ],
             ),
           ),
@@ -682,7 +703,7 @@ class _GymHomeState extends State<GymHome> {
         OutlinedButton.icon(
           onPressed: () => _addExercise(w),
           icon: const Icon(Icons.add_rounded),
-          label: const Text('Añadir ejercicio'),
+          label: Text(appText(context).homeAddExerciseTitle),
         ),
         const SizedBox(height: 24),
         FilledButton.icon(
@@ -690,13 +711,13 @@ class _GymHomeState extends State<GymHome> {
               ? null
               : () => _finish(w),
           icon: const Icon(Icons.check_rounded),
-          label: const Text('Finalizar entrenamiento'),
+          label: Text(appText(context).homeFinishWorkout),
         ),
         const SizedBox(height: 8),
         Text(
           _recordsFor(w) == 0
-              ? 'Registra al menos una serie para finalizar.'
-              : 'Cada serie se guarda al pulsar Guardar.',
+              ? appText(context).homeAddSetToFinish
+              : appText(context).homeEachSetSaved,
           textAlign: TextAlign.center,
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -707,9 +728,9 @@ class _GymHomeState extends State<GymHome> {
         TextButton(
           onPressed: () async {
             if (!await _confirm(
-              '¿Descartar sesión?',
-              'Se eliminarán esta sesión y todas sus series. Esta acción no se puede deshacer.',
-              'Descartar',
+              appText(context).homeDiscardTitle,
+              appText(context).homeDiscardBody,
+              appText(context).homeDiscard,
             )) {
               return;
             }
@@ -717,7 +738,7 @@ class _GymHomeState extends State<GymHome> {
             if (ok && mounted) setState(() => selectedId = null);
           },
           child: Text(
-            'Descartar sesión',
+            appText(context).homeDiscardSession,
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
@@ -726,7 +747,7 @@ class _GymHomeState extends State<GymHome> {
       ] else ...[
         const SizedBox(height: 8),
         Text(
-          'Sesión guardada. Buen trabajo.',
+          appText(context).homeSavedWellDone,
           textAlign: TextAlign.center,
           style: TextStyle(
             color: Theme.of(context).colorScheme.primary,
@@ -739,7 +760,7 @@ class _GymHomeState extends State<GymHome> {
             selectedId = null;
             tab = 2;
           }),
-          child: const Text('Ver historial'),
+          child: Text(appText(context).homeViewHistory),
         ),
       ],
     ],
@@ -778,7 +799,7 @@ class _GymHomeState extends State<GymHome> {
               ),
               if (editable)
                 IconButton(
-                  tooltip: 'Eliminar ejercicio ${e.name}',
+                  tooltip: appText(context).homeDeleteExerciseTooltip(e.name),
                   icon: Icon(
                     Icons.delete_outline_rounded,
                     size: 20,
@@ -786,9 +807,9 @@ class _GymHomeState extends State<GymHome> {
                   ),
                   onPressed: () async {
                     if (await _confirm(
-                      '¿Eliminar ejercicio?',
-                      'Se eliminará ${e.name} y sus ${e.sets.length} series.',
-                      'Eliminar',
+                      appText(context).homeDeleteExerciseTitle,
+                      appText(context).homeDeleteExerciseBody(e.name, e.sets.length),
+                      appText(context).homeDelete,
                     )) {
                       await c.run(() => c.repository.deleteExercise(e.id));
                     }
@@ -800,7 +821,12 @@ class _GymHomeState extends State<GymHome> {
             Padding(
               padding: const EdgeInsets.only(top: 12),
               child: Text(
-                'Objetivo: ${e.targetSets} series de ${e.repsMin}–${e.repsMax} reps · ${e.sets.length}/${e.targetSets} registradas',
+                appText(context).homeTargetProgress(
+                  e.targetSets!,
+                  '${e.repsMin}',
+                  '${e.repsMax}',
+                  e.sets.length,
+                ),
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.primary,
                   fontSize: 13,
@@ -822,8 +848,10 @@ class _GymHomeState extends State<GymHome> {
                   children: [
                     Text(
                       previous == null
-                          ? 'Sin sesión anterior registrada'
-                          : 'Última vez · ${DateFormat("d MMM", "es").format(previous.date)}',
+                          ? appText(context).homeNoPreviousSession
+                          : appText(context).homeLastTime(
+                              DateFormat('d MMM', 'es').format(previous.date),
+                            ),
                       style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontSize: 12,
@@ -834,7 +862,7 @@ class _GymHomeState extends State<GymHome> {
                       Text(
                         previous.sets
                             .map(
-                              (s) => '${formatWeight(s.weight)} kg × ${s.reps}',
+                              (s) => appText(context).homeWeightReps(formatWeight(s.weight), s.reps),
                             )
                             .join('  /  '),
                         style: const TextStyle(fontSize: 13, height: 1.5),
@@ -848,7 +876,7 @@ class _GymHomeState extends State<GymHome> {
             Padding(
               padding: EdgeInsets.symmetric(vertical: 16),
               child: Text(
-                'Todavía no has registrado series.',
+                appText(context).homeNoSetsYet,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                   fontSize: 13,
@@ -862,7 +890,7 @@ class _GymHomeState extends State<GymHome> {
                 SizedBox(
                   width: 42,
                   child: Text(
-                    'SERIE',
+                    appText(context).homeSetHeader,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontSize: 10,
@@ -871,7 +899,7 @@ class _GymHomeState extends State<GymHome> {
                 ),
                 Expanded(
                   child: Text(
-                    'KG',
+                    appText(context).homeKgHeader,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontSize: 10,
@@ -880,7 +908,7 @@ class _GymHomeState extends State<GymHome> {
                 ),
                 Expanded(
                   child: Text(
-                    'REPS',
+                    appText(context).homeRepsHeader,
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontSize: 10,
@@ -922,28 +950,31 @@ class _GymHomeState extends State<GymHome> {
                   ),
                   if (editable)
                     PopupMenuButton<String>(
-                      tooltip: 'Opciones de la serie ${i + 1}',
+                      tooltip: appText(context).homeSetOptionsTooltip(i + 1),
                       onSelected: (action) async {
                         if (action == 'edit') {
                           await _set(e, e.sets[i]);
                         } else if (await _confirm(
-                          '¿Eliminar serie?',
-                          '${formatWeight(e.sets[i].weight)} kg × ${e.sets[i].reps} repeticiones.',
-                          'Eliminar',
+                          appText(context).homeDeleteSetTitle,
+                          appText(context).homeSetDeleteBody(
+                            formatWeight(e.sets[i].weight),
+                            e.sets[i].reps,
+                          ),
+                          appText(context).homeDelete,
                         )) {
                           await c.run(
                             () => c.repository.deleteSet(e.sets[i].id),
                           );
                         }
                       },
-                      itemBuilder: (_) => const [
+                      itemBuilder: (_) => [
                         PopupMenuItem(
                           value: 'edit',
-                          child: Text('Editar serie'),
+                          child: Text(appText(context).homeEditSet),
                         ),
                         PopupMenuItem(
                           value: 'delete',
-                          child: Text('Eliminar serie'),
+                          child: Text(appText(context).homeDeleteSet),
                         ),
                       ],
                     )
@@ -967,7 +998,7 @@ class _GymHomeState extends State<GymHome> {
               child: OutlinedButton.icon(
                 onPressed: () => _set(e),
                 icon: const Icon(Icons.add_rounded, size: 18),
-                label: const Text('Añadir serie'),
+                label: Text(appText(context).homeAddSet),
               ),
             ),
             TextButton.icon(
@@ -975,7 +1006,7 @@ class _GymHomeState extends State<GymHome> {
                 () => c.repository.startRest(workout.id, e.restSeconds),
               ),
               icon: const Icon(Icons.timer_outlined, size: 18),
-              label: Text('Descansar ${e.restSeconds}s'),
+              label: Text(appText(context).homeRest(e.restSeconds)),
             ),
           ],
         ],

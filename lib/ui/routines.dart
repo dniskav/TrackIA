@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../application/localization.dart';
 import '../application/workout_controller.dart';
 import '../domain/routine.dart';
 import '../domain/workout.dart';
@@ -24,9 +25,9 @@ class RoutineLibrary extends StatelessWidget {
   Widget build(BuildContext context) => ListView(
     padding: const EdgeInsets.all(24),
     children: [
-      const Text(
-        'Tus rutinas',
-        style: TextStyle(
+      Text(
+        appText(context).routinesTitle,
+        style: const TextStyle(
           fontSize: 34,
           fontWeight: FontWeight.w800,
           letterSpacing: -1,
@@ -34,7 +35,7 @@ class RoutineLibrary extends StatelessWidget {
       ),
       const SizedBox(height: 8),
       Text(
-        'Prepara una vez. Entrena a tu ritmo.',
+        appText(context).routinesSubtitle,
         style: TextStyle(
           color: Theme.of(context).colorScheme.onSurfaceVariant,
           fontSize: 16,
@@ -44,7 +45,7 @@ class RoutineLibrary extends StatelessWidget {
       FilledButton.icon(
         onPressed: () => _edit(context),
         icon: const Icon(Icons.add),
-        label: const Text('Crear rutina'),
+        label: Text(appText(context).routinesCreate),
       ),
       const SizedBox(height: 24),
       if (controller.routines.isEmpty)
@@ -62,14 +63,17 @@ class RoutineLibrary extends StatelessWidget {
                 color: Theme.of(context).colorScheme.primary,
                 size: 32,
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Text(
-                'Tu próxima sesión, preparada',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+                appText(context).routinesEmptyTitle,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
-                'Crea, por ejemplo, «Pierna A» con tus ejercicios, series y rango de repeticiones.',
+                appText(context).routinesEmptyBody,
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
                   height: 1.5,
@@ -102,7 +106,9 @@ class RoutineLibrary extends StatelessWidget {
                       ),
                     ),
                     PopupMenuButton<String>(
-                      tooltip: 'Opciones de ${routine.name}',
+                      tooltip: appText(
+                        context,
+                      ).routinesOptionsTooltip(routine.name),
                       onSelected: (value) async {
                         if (value == 'edit') {
                           _edit(context, routine);
@@ -110,23 +116,22 @@ class RoutineLibrary extends StatelessWidget {
                         }
                         final confirmed = await showDialog<bool>(
                           context: context,
-                          builder:
-                              (ctx) => AlertDialog(
-                                title: const Text('¿Eliminar rutina?'),
-                                content: Text(
-                                  'Se eliminará «${routine.name}». Tus entrenamientos guardados y la sesión en curso se conservarán.',
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(ctx, false),
-                                    child: const Text('Cancelar'),
-                                  ),
-                                  FilledButton(
-                                    onPressed: () => Navigator.pop(ctx, true),
-                                    child: const Text('Eliminar'),
-                                  ),
-                                ],
+                          builder: (ctx) => AlertDialog(
+                            title: Text(appText(context).routinesDeleteTitle),
+                            content: Text(
+                              appText(context).routinesDeleteBody(routine.name),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(ctx, false),
+                                child: Text(appText(context).cancel),
                               ),
+                              FilledButton(
+                                onPressed: () => Navigator.pop(ctx, true),
+                                child: Text(appText(context).routinesDelete),
+                              ),
+                            ],
+                          ),
                         );
                         if (confirmed == true) {
                           await controller.run(
@@ -135,17 +140,16 @@ class RoutineLibrary extends StatelessWidget {
                           );
                         }
                       },
-                      itemBuilder:
-                          (_) => const [
-                            PopupMenuItem(
-                              value: 'edit',
-                              child: Text('Editar rutina'),
-                            ),
-                            PopupMenuItem(
-                              value: 'delete',
-                              child: Text('Eliminar rutina'),
-                            ),
-                          ],
+                      itemBuilder: (_) => [
+                        PopupMenuItem(
+                          value: 'edit',
+                          child: Text(appText(context).routinesEditMenu),
+                        ),
+                        PopupMenuItem(
+                          value: 'delete',
+                          child: Text(appText(context).routinesDeleteMenu),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -167,8 +171,9 @@ class RoutineLibrary extends StatelessWidget {
                         Text(
                           routine.exercises[i].description,
                           style: TextStyle(
-                            color:
-                                Theme.of(context).colorScheme.onSurfaceVariant,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
                             fontSize: 12,
                           ),
                         ),
@@ -183,8 +188,8 @@ class RoutineLibrary extends StatelessWidget {
                     icon: const Icon(Icons.play_arrow_rounded),
                     label: Text(
                       controller.active == null
-                          ? 'Entrenar'
-                          : 'Continuar sesión activa',
+                          ? appText(context).routinesTrain
+                          : appText(context).routinesContinueSession,
                     ),
                   ),
                 ),
@@ -231,21 +236,20 @@ class _RoutineEditorState extends State<RoutineEditor> {
     }
     final discard = await showDialog<bool>(
       context: context,
-      builder:
-          (ctx) => AlertDialog(
-            title: const Text('¿Salir sin guardar?'),
-            content: const Text('Los cambios en esta rutina se perderán.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(ctx, false),
-                child: const Text('Seguir editando'),
-              ),
-              FilledButton(
-                onPressed: () => Navigator.pop(ctx, true),
-                child: const Text('Descartar cambios'),
-              ),
-            ],
+      builder: (ctx) => AlertDialog(
+        title: Text(appText(context).routinesLeaveTitle),
+        content: Text(appText(context).routinesLeaveBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(appText(context).routinesKeepEditing),
           ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(appText(context).routinesDiscard),
+          ),
+        ],
+      ),
     );
     if (discard == true && mounted) _exit();
   }
@@ -253,10 +257,9 @@ class _RoutineEditorState extends State<RoutineEditor> {
   Future<void> _exercise([int? index]) async {
     final result = await showDialog<RoutineExerciseDraft>(
       context: context,
-      builder:
-          (_) => RoutineExerciseDialog(
-            initial: index == null ? null : exercises[index],
-          ),
+      builder: (_) => RoutineExerciseDialog(
+        initial: index == null ? null : exercises[index],
+      ),
     );
     if (result != null && mounted) {
       setState(() {
@@ -275,7 +278,7 @@ class _RoutineEditorState extends State<RoutineEditor> {
     if (saving) return;
     if (!form.currentState!.validate()) return;
     if (exercises.isEmpty) {
-      setState(() => error = 'Añade al menos un ejercicio.');
+      setState(() => error = appText(context).routinesNeedExercise);
       return;
     }
     setState(() {
@@ -312,11 +315,15 @@ class _RoutineEditorState extends State<RoutineEditor> {
     child: Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          tooltip: 'Volver',
+          tooltip: appText(context).routinesBack,
           onPressed: saving ? null : _close,
           icon: const Icon(Icons.arrow_back),
         ),
-        title: Text(widget.routine == null ? 'Crear rutina' : 'Editar rutina'),
+        title: Text(
+          widget.routine == null
+              ? appText(context).routinesCreate
+              : appText(context).routinesEditMenu,
+        ),
       ),
       body: SafeArea(
         child: AbsorbPointer(
@@ -330,9 +337,9 @@ class _RoutineEditorState extends State<RoutineEditor> {
                   key: const Key('routine-name'),
                   controller: name,
                   maxLength: 80,
-                  decoration: const InputDecoration(
-                    labelText: 'Nombre de la rutina',
-                    hintText: 'Ej. Pierna A',
+                  decoration: InputDecoration(
+                    labelText: appText(context).routinesNameLabel,
+                    hintText: appText(context).routinesNameHint,
                   ),
                   textCapitalization: TextCapitalization.sentences,
                   onChanged: (_) => setState(() => dirty = true),
@@ -347,7 +354,7 @@ class _RoutineEditorState extends State<RoutineEditor> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Define tus objetivos. Las series se registrarán cuando entrenes.',
+                  appText(context).routinesEditorHelp,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                     height: 1.5,
@@ -378,10 +385,9 @@ class _RoutineEditorState extends State<RoutineEditor> {
                           Text(
                             exercises[i].description,
                             style: TextStyle(
-                              color:
-                                  Theme.of(
-                                    context,
-                                  ).colorScheme.onSurfaceVariant,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -389,30 +395,34 @@ class _RoutineEditorState extends State<RoutineEditor> {
                             spacing: 4,
                             children: [
                               IconButton(
-                                tooltip: 'Subir ejercicio ${i + 1}',
+                                tooltip: appText(context).routinesMoveUp(i + 1),
                                 onPressed: i == 0 ? null : () => _move(i, -1),
                                 icon: const Icon(Icons.arrow_upward),
                               ),
                               IconButton(
-                                tooltip: 'Bajar ejercicio ${i + 1}',
-                                onPressed:
-                                    i == exercises.length - 1
-                                        ? null
-                                        : () => _move(i, 1),
+                                tooltip: appText(
+                                  context,
+                                ).routinesMoveDown(i + 1),
+                                onPressed: i == exercises.length - 1
+                                    ? null
+                                    : () => _move(i, 1),
                                 icon: const Icon(Icons.arrow_downward),
                               ),
                               IconButton(
-                                tooltip: 'Editar ejercicio ${i + 1}',
+                                tooltip: appText(
+                                  context,
+                                ).routinesEditExercise(i + 1),
                                 onPressed: () => _exercise(i),
                                 icon: const Icon(Icons.edit_outlined),
                               ),
                               IconButton(
-                                tooltip: 'Quitar ejercicio ${i + 1}',
-                                onPressed:
-                                    () => setState(() {
-                                      exercises.removeAt(i);
-                                      dirty = true;
-                                    }),
+                                tooltip: appText(
+                                  context,
+                                ).routinesRemoveExercise(i + 1),
+                                onPressed: () => setState(() {
+                                  exercises.removeAt(i);
+                                  dirty = true;
+                                }),
                                 icon: const Icon(Icons.delete_outline),
                               ),
                             ],
@@ -424,7 +434,7 @@ class _RoutineEditorState extends State<RoutineEditor> {
                 OutlinedButton.icon(
                   onPressed: exercises.length >= 50 ? null : () => _exercise(),
                   icon: const Icon(Icons.add),
-                  label: const Text('Añadir ejercicio a rutina'),
+                  label: Text(appText(context).routinesAddExercise),
                 ),
                 const SizedBox(height: 20),
                 if (error != null)
@@ -440,7 +450,11 @@ class _RoutineEditorState extends State<RoutineEditor> {
                 FilledButton.icon(
                   onPressed: saving ? null : _save,
                   icon: const Icon(Icons.check),
-                  label: Text(saving ? 'Guardando…' : 'Guardar rutina'),
+                  label: Text(
+                    saving
+                        ? appText(context).routinesSaving
+                        : appText(context).routinesSave,
+                  ),
                 ),
                 const SizedBox(height: 24),
               ],
@@ -523,7 +537,9 @@ class _RoutineExerciseDialogState extends State<RoutineExerciseDialog> {
   @override
   Widget build(BuildContext context) => AlertDialog(
     title: Text(
-      widget.initial == null ? 'Ejercicio de rutina' : 'Editar objetivo',
+      widget.initial == null
+          ? appText(context).routinesExerciseDialogTitle
+          : appText(context).routinesEditTargetTitle,
     ),
     content: SizedBox(
       width: 360,
@@ -539,9 +555,9 @@ class _RoutineExerciseDialogState extends State<RoutineExerciseDialog> {
                 maxLength: 80,
                 textCapitalization: TextCapitalization.sentences,
                 textInputAction: TextInputAction.next,
-                decoration: const InputDecoration(
-                  labelText: 'Ejercicio',
-                  hintText: 'Ej. Sentadilla',
+                decoration: InputDecoration(
+                  labelText: appText(context).routinesExerciseLabel,
+                  hintText: appText(context).routinesExerciseHint,
                 ),
                 validator: (v) {
                   try {
@@ -553,24 +569,39 @@ class _RoutineExerciseDialogState extends State<RoutineExerciseDialog> {
                 },
               ),
               const SizedBox(height: 12),
-              number('target-sets', 'Series previstas', sets, parseTargetSets),
+              number(
+                'target-sets',
+                appText(context).routinesTargetSets,
+                sets,
+                parseTargetSets,
+              ),
               const SizedBox(height: 16),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: number('reps-min', 'Reps mín.', min, parseReps),
+                    child: number(
+                      'reps-min',
+                      appText(context).routinesRepsMin,
+                      min,
+                      parseReps,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: number('reps-max', 'Reps máx.', max, parseReps),
+                    child: number(
+                      'reps-max',
+                      appText(context).routinesRepsMax,
+                      max,
+                      parseReps,
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
               number(
                 'rest-seconds',
-                'Descanso (segundos)',
+                appText(context).routinesRestSeconds,
                 rest,
                 parseRestSeconds,
               ),
@@ -592,9 +623,12 @@ class _RoutineExerciseDialogState extends State<RoutineExerciseDialog> {
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('Cancelar'),
+        child: Text(appText(context).cancel),
       ),
-      FilledButton(onPressed: _submit, child: const Text('Guardar ejercicio')),
+      FilledButton(
+        onPressed: _submit,
+        child: Text(appText(context).routinesSaveExercise),
+      ),
     ],
   );
 }

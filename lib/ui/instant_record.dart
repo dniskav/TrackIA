@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../application/localization.dart';
 import '../domain/activity.dart';
 import '../domain/workout.dart';
 
@@ -65,7 +66,9 @@ class _InstantRecordSheetState extends State<InstantRecordSheet> {
             if (raw == null || raw.isEmpty) continue;
             final value = num.tryParse(raw.replaceAll(',', '.'));
             if (value == null || !value.isFinite) {
-              throw ValidationException('$label: escribe un número.');
+              throw ValidationException(
+                appText(context).homeNumberInvalid(label),
+              );
             }
             values[key] = value;
           case 'scale' || 'choice' || 'boolean':
@@ -77,7 +80,7 @@ class _InstantRecordSheetState extends State<InstantRecordSheet> {
       }
       final text = note.text.trim();
       if (values.isEmpty && text.isEmpty) {
-        throw const ValidationException('Anota algún valor o escribe una nota.');
+        throw ValidationException(appText(context).homeNoteOrValueRequired);
       }
       validateFieldValues(widget.definition, values);
       Navigator.pop(
@@ -97,6 +100,7 @@ class _InstantRecordSheetState extends State<InstantRecordSheet> {
             value is num
                 ? formatNumber(value)
                 : value is bool
+                // Se guarda como resultado y lo lee el asistente: no depende del idioma.
                 ? (value ? 'sí' : 'no')
                 : '$value';
         final unit = f['unit'] as String;
@@ -140,7 +144,7 @@ class _InstantRecordSheetState extends State<InstantRecordSheet> {
           for (final o in f['options'] as List) (o as Object, o as String, o),
         ]));
       case 'boolean':
-        return labelled(title, chips(key, [(true, 'Sí', 'yes'), (false, 'No', 'no')]));
+        return labelled(title, chips(key, [(true, appText(context).homeOptionYes, 'yes'), (false, appText(context).homeOptionNo, 'no')]));
       default:
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
@@ -194,7 +198,7 @@ class _InstantRecordSheetState extends State<InstantRecordSheet> {
               controller: note,
               maxLines: 2,
               maxLength: 500,
-              decoration: const InputDecoration(labelText: 'Nota (opcional)'),
+              decoration: InputDecoration(labelText: appText(context).homeNoteOptional),
             ),
             if (error != null)
               Padding(
@@ -210,7 +214,7 @@ class _InstantRecordSheetState extends State<InstantRecordSheet> {
               child: FilledButton(
                 key: const Key('record-submit'),
                 onPressed: submit,
-                child: const Text('Guardar'),
+                child: Text(appText(context).save),
               ),
             ),
           ],

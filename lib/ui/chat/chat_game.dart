@@ -10,7 +10,7 @@ extension _ChatGame on _AssistantChatScreenState {
       if (mounted) {
         update(
           () => error =
-              'Termina la actividad abierta en el otro acompañante antes de preparar esta.',
+              appText(context).chatGameFocusOpen,
         );
       }
       return;
@@ -38,7 +38,7 @@ extension _ChatGame on _AssistantChatScreenState {
         } else {
           error =
               widget.controller.error ??
-              'No se pudo preparar la actividad. Vuelve a intentarlo.';
+              appText(context).chatGamePrepareError;
         }
       });
     }
@@ -142,6 +142,7 @@ extension _ChatGame on _AssistantChatScreenState {
     if (service == null) return;
     const kinds = ['goal', 'achievement', 'reminder-copy'];
     if (!kinds.any((k) => mentionsBlock(answer, k))) return;
+    final l = appText(context);
     final settings = await service.progress.settings(companionId);
     if (!settings.game || !mounted) return;
     final labels = await fieldLabels(service);
@@ -157,7 +158,7 @@ extension _ChatGame on _AssistantChatScreenState {
         cards.add(
           GameProposalData(
             kind: 'goal',
-            title: 'Meta propuesta: ${goalText(goal.rule, labels)}',
+            title: l.chatGameGoalTitle(goalText(goal.rule, labels)),
             lines: const [],
             payload: goal,
           ),
@@ -172,7 +173,7 @@ extension _ChatGame on _AssistantChatScreenState {
         cards.add(
           GameProposalData(
             kind: 'achievement',
-            title: 'Logro propuesto: ${achievement.title}',
+            title: l.chatGameAchievementTitle(achievement.title),
             lines: [ruleText(achievement.rule, labels)],
             payload: achievement,
           ),
@@ -187,7 +188,7 @@ extension _ChatGame on _AssistantChatScreenState {
         cards.add(
           GameProposalData(
             kind: 'copy',
-            title: 'Textos de recordatorio propuestos',
+            title: l.chatGameCopyTitle,
             lines: await copyExamples(service, copy, labels),
             payload: copy,
           ),

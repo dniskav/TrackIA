@@ -590,5 +590,1076 @@
     "placeholders": {
       "version": {}
     }
+  },
+  "activityIdleOtherActive": "Another companion is active",
+  "activityIdleNoActivity": "No activity",
+  "activityIdleEndOther": "End the other activity to start here",
+  "activityIdleRegisterAnytime": "Log one whenever you like",
+  "activityNewActivity": "New activity",
+  "activityIdleRecord": "Log",
+  "activityRestLabel": "Rest",
+  "activityRestDone": "Rest finished",
+  "activityRestPaused": "Rest paused",
+  "activityRestPause": "Pause",
+  "activityRestContinue": "Continue",
+  "activityRestStart": "Start rest",
+  "activityRestRestart": "Restart rest",
+  "activityRestAdjust": "{seconds}s · Adjust",
+  "@activityRestAdjust": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "activityRestNotice": "Alert with this screen open; time keeps running when you leave.",
+  "activityRestDurationTitle": "Rest time",
+  "activityRestSecondsLabel": "Seconds",
+  "activityRestRangeHint": "Between 5 and 1800 seconds. When applied, the timer is ready to start.",
+  "activityRestApply": "Apply",
+  "activityDialogNameTitle": "Activity name",
+  "activityDialogSaveName": "Save name",
+  "activityDialogRestRange": "Between 0 and 1800",
+  "activityDialogWhatToDo": "What are you going to do?",
+  "activityDialogYourActivities": "Your activities",
+  "activityDialogInstantRecord": "One-off record",
+  "activityDialogYourActivity": "Your activity",
+  "activityDialogFromCurrentWorkout": "From the current workout",
+  "activityDialogSetsProgress": "{done}/{target} sets · {repsMin}–{repsMax} reps",
+  "@activityDialogSetsProgress": {
+    "placeholders": {
+      "done": {},
+      "target": {},
+      "repsMin": {},
+      "repsMax": {}
+    }
+  },
+  "activityDialogRepeat": "Repeat",
+  "activityDialogRoutineSets": "{routine} · {sets} sets",
+  "@activityDialogRoutineSets": {
+    "placeholders": {
+      "routine": {},
+      "sets": {
+        "type": "int"
+      }
+    }
+  },
+  "activityDialogEndTitle": "End activity",
+  "activityDialogDate": "Date",
+  "activityDialogTime": "Time",
+  "activityBuilderNameRequired": "Enter a name for the activity.",
+  "activityBuilderOnlyIntegers": "Enter whole numbers only.",
+  "activityBuilderRange": "{what} must be from {min} to {max}.",
+  "@activityBuilderRange": {
+    "placeholders": {
+      "what": {},
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "activityBuilderWhatDuration": "Duration",
+  "activityBuilderWhatRest": "Rest",
+  "activityBuilderWhatSegments": "Planned segments",
+  "activityBuilderWhatCycles": "Planned cycles",
+  "activityBuilderDurationRequired": "Enter the duration in minutes.",
+  "activityBuilderSegmentNamesPair": "Enter the singular and plural names of a segment, or leave both empty.",
+  "activityBuilderFromTemplate": "Start from a template",
+  "activityBuilderHowMeasured": "How is it measured?",
+  "activityBuilderInstantTitle": "One-off",
+  "activityBuilderInstantDetail": "A record without a timer",
+  "activityBuilderFreeTitle": "Open",
+  "activityBuilderFreeDetail": "Stopwatch, no countdown",
+  "activityBuilderTimedTitle": "Timed",
+  "activityBuilderTimedDetail": "Countdown of a fixed time",
+  "activityBuilderSegmentsTitle": "In segments",
+  "activityBuilderSegmentsDetail": "Several segments with rest",
+  "activityBuilderDuration": "Duration (minutes)",
+  "activityBuilderSegmentHelper": "Optional: for each segment",
+  "activityBuilderPlannedSegments": "Planned segments (optional)",
+  "activityBuilderRestBetween": "Rest between segments (seconds)",
+  "activityBuilderRestHelper": "90 is a minute and a half",
+  "activityBuilderPlannedCycles": "Planned cycles (optional)",
+  "activityBuilderSegmentSingular": "One segment is called",
+  "activityBuilderSegmentPlural": "Several are called",
+  "activityBuilderWhatToNote": "What do you want to note? (optional)",
+  "activityBuilderRemoveField": "Remove {label}",
+  "@activityBuilderRemoveField": {
+    "placeholders": {
+      "label": {}
+    }
+  },
+  "activityBuilderMaxFields": "Maximum 12 fields",
+  "activityBuilderAddField": "Add field",
+  "activityBuilderSaveInActivities": "Save to your activities",
+  "activityBuilderSaveInActivitiesHelp": "To repeat it without creating it again.",
+  "activityBuilderPrepare": "Prepare activity",
+  "activityBuilderNewField": "New field",
+  "activityBuilderFieldNameRequired": "Enter a field name of up to 80 characters.",
+  "activityBuilderFieldName": "Field name",
+  "activityBuilderFieldType": "Type",
+  "activityBuilderFieldUnit": "Unit (optional)",
+  "activityBuilderOptions": "Options",
+  "activityBuilderOptionsHelp": "Separated by commas",
+  "activityBuilderScaleMin": "Minimum",
+  "activityBuilderScaleMax": "Maximum",
+  "activityBuilderScaleRange": "Enter the minimum and maximum of the scale.",
+  "activityBuilderAggregate": "How it counts",
+  "activityBuilderCountSingular": "Counted as (one)",
+  "activityBuilderCountSingularHelp": "Optional, e.g. book",
+  "activityBuilderCountPlural": "Counted as (many)",
+  "activityBuilderCountPluralHelp": "Optional, e.g. books",
+  "activityBuilderAdd": "Add",
+  "aiPerReadError": "Could not read the per-companion settings.",
+  "aiPerSaveError": "Could not save the change.",
+  "aiPerTitle": "Per companion",
+  "aiPerNoProvider": "Connect a provider first to choose a different model for each companion.",
+  "aiPerHelp": "Each companion uses your provider, or its own model from that same provider.",
+  "aiPerDefault": "Default",
+  "aiPerDialogTitle": "AI for {name}",
+  "@aiPerDialogTitle": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "aiPerDialogHelp": "Uses {service} with your profile's key. It only changes this companion's model.",
+  "@aiPerDialogHelp": {
+    "placeholders": {
+      "service": {}
+    }
+  },
+  "aiPerUseDefault": "Use default",
+  "aiSetAndroidFileAccess": "Android did not provide access to the selected file.",
+  "aiSetGgufTitle": "GGUF model",
+  "aiSetLocalContextHelp": "TrackIA recommends {context} for its instructions, history and data. The recommendation covers the app's needs, not this GGUF's limit. If the model does not support the chosen size, it may fail; you decide whether to lower it.",
+  "@aiSetLocalContextHelp": {
+    "placeholders": {
+      "context": {}
+    }
+  },
+  "aiSetModelsCountChatGpt": "Models available for this account: {count}. The connection test confirms access to the one you pick.",
+  "@aiSetModelsCountChatGpt": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiSetCatalogCountApi": "{count} models fetched from the provider. The connection test confirms whether your key can use the one you pick.",
+  "@aiSetCatalogCountApi": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiSetCatalogErrorChatGpt": "Could not load the model list for this account. Check the connection and try again.",
+  "aiSetCatalogErrorApi": "Could not load the model list. You can try again or enter the model manually.",
+  "transferSheetReadError": "Could not read the sheet.",
+  "transferSheetTooLarge": "The sheet is larger than 20 MB.",
+  "transferSheetLoadError": "Could not load the sheet. Try again.",
+  "transferSheetLoaded": "Sheet loaded. Waiting for the AI to interpret it.",
+  "transferFileTooLarge": "The file is larger than 20 MB.",
+  "transferSheetSelectedError": "Could not read the selected sheet.",
+  "transferFileReadError": "Could not read or share the file.",
+  "transferDefaultSheetName": "Loaded sheet",
+  "transferShareSubject": "TrackIA backup",
+  "transferShareText": "Save this file to Drive or somewhere safe.",
+  "transferRestoreTitle": "Restore this backup?",
+  "transferRestoreBody": "It contains {workouts, plural, one{1 session} other{{workouts} sessions}} and {routines, plural, one{1 routine} other{{routines} routines}}{active}. It will replace all the data currently on this phone. Save a current backup first if you want to keep it.",
+  "@transferRestoreBody": {
+    "placeholders": {
+      "workouts": {
+        "type": "int"
+      },
+      "routines": {
+        "type": "int"
+      },
+      "active": {}
+    }
+  },
+  "transferRestoreActive": ", including a session in progress",
+  "transferRestoreAction": "Restore",
+  "transferRestored": "Backup restored. Sessions and routines updated.",
+  "transferNoAccessSheet": "Could not read that sheet. In Google Sheets, use “Send a copy” as Excel or CSV and choose TrackIA.",
+  "transferHeadline": "Your history, under your control",
+  "transferIntro": "Keep a copy off this phone so you can restore it or move it to another phone.",
+  "transferBackupTitle": "Backup",
+  "transferBackupHelp": "Includes history, routines and the session in progress.",
+  "transferSheetsTitle": "Google Sheets history",
+  "transferSheetsHelpAndroid": "Load your sheet and tab with Google's permission, or choose an Excel or CSV copy. The original cells are kept; the AI will be able to interpret your format once connected.",
+  "transferSheetsHelpOther": "Load an Excel or CSV copy. The original cells are kept, pending interpretation by the AI.",
+  "transferImportSheets": "Import from Google Sheets",
+  "transferChooseFileAndroid": "Choose a file from the phone or Drive",
+  "transferChooseFileOther": "Choose an XLSX or CSV copy",
+  "transferWorkoutSubtitle": "{date} · {exercises} exercises · {sets} sets",
+  "@transferWorkoutSubtitle": {
+    "placeholders": {
+      "date": {},
+      "exercises": {
+        "type": "int"
+      },
+      "sets": {
+        "type": "int"
+      }
+    }
+  },
+  "transferNoColumnWorkout": "No column · Workout",
+  "transferChooseColumn": "Choose column",
+  "transferCsvReviewError": "Could not check the CSV.",
+  "transferImportSessionsTitle": "Import these sessions?",
+  "transferImportSessionsBody": "{count, plural, one{1 session} other{{count} sessions}} will be added with {sets} sets. Rows skipped due to errors: {errors}.",
+  "@transferImportSessionsBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "sets": {
+        "type": "int"
+      },
+      "errors": {
+        "type": "int"
+      }
+    }
+  },
+  "transferImportAction": "Import",
+  "transferImportError": "Could not import.",
+  "transferImportSheetTitle": "Import sheet",
+  "transferImportedSummary": "{added, plural, one{1 session imported} other{{added} sessions imported}} · {duplicates, plural, one{1 duplicate skipped} other{{duplicates} duplicates skipped}}.",
+  "@transferImportedSummary": {
+    "placeholders": {
+      "added": {
+        "type": "int"
+      },
+      "duplicates": {
+        "type": "int"
+      }
+    }
+  },
+  "transferRowsFound": "{count} rows found",
+  "@transferRowsFound": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "transferMapHelp": "Match your sheet's columns. One row is one set.",
+  "transferDate": "Date",
+  "transferSessionOptional": "Session (optional)",
+  "transferExercise": "Exercise",
+  "transferWeightKg": "Weight (kg)",
+  "transferReps": "Reps",
+  "transferReviewImport": "Review import",
+  "transferPreviewSummary": "{newCount, plural, one{1 new session} other{{newCount} new sessions}} · {duplicateCount, plural, one{1 duplicate} other{{duplicateCount} duplicates}} · {errorCount, plural, one{1 row with an error} other{{errorCount} rows with errors}}",
+  "@transferPreviewSummary": {
+    "placeholders": {
+      "newCount": {
+        "type": "int"
+      },
+      "duplicateCount": {
+        "type": "int"
+      },
+      "errorCount": {
+        "type": "int"
+      }
+    }
+  },
+  "transferValidRows": "{valid} valid sets from {total} rows.",
+  "@transferValidRows": {
+    "placeholders": {
+      "valid": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "transferAllSessions": "All sessions",
+  "transferSeeSessions": "View all {count} sessions",
+  "@transferSeeSessions": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "transferErrorRows": "Rows with errors",
+  "transferSeeErrors": "View all {count} errors",
+  "@transferSeeErrors": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "transferImportNew": "Import new sessions",
+  "transferCloseAction": "Close",
+  "chatAttachVoiceError": "Couldn't recognize speech. Check the microphone permission or type your message.",
+  "chatAttachVoiceUnavailable": "Speech recognition isn't available. Check the microphone permission and the phone's speech service.",
+  "chatAttachDictationStart": "Couldn't start dictation.",
+  "chatAttachCamera": "Camera",
+  "chatAttachPhotos": "Photos",
+  "chatAttachPdf": "PDF document",
+  "chatAttachPdfHint": "Needs a model that supports documents",
+  "chatAttachAudio": "Audio file",
+  "chatAttachAudioHint": "Requires a Gemini model that supports audio",
+  "chatAttachSpreadsheet": "Excel or CSV sheet",
+  "chatAttachSheet": "Google Sheets / Drive",
+  "chatAttachNeedsAi": "Connect AI to send images, documents or audio. You can load a sheet without AI.",
+  "chatAttachPhotoTooLarge": "The photo is larger than 4 MB.",
+  "chatAttachPhotoFormat": "Choose a JPG, PNG or WebP photo.",
+  "chatAttachPhotoEmpty": "The photo must have content and be no larger than 4 MB.",
+  "chatAttachAudioNeedsGemini": "To send an audio file, set up a Gemini model with audio. You can use the chat microphone to dictate your message.",
+  "chatAttachTooLarge": "The attachment is larger than 4 MB.",
+  "chatAttachUnreadable": "Couldn't read the attachment.",
+  "chatAttachFormat": "Unsupported attachment format.",
+  "chatAttachInvalidPdf": "The file doesn't contain a valid PDF.",
+  "chatAttachOpenFailed": "Couldn't open the attachment.",
+  "chatAttachRecoveredTooLarge": "The recovered photo is larger than 4 MB. Choose a smaller one.",
+  "chatMenuCompanionsError": "Couldn't load the companions.",
+  "chatMenuMore": "More options",
+  "chatMenuTraining": "Routines and history",
+  "chatMenuProgress": "Progress",
+  "chatMenuSheet": "Loaded sheet",
+  "chatMenuRecover": "Recover preparation",
+  "chatSendFocusTooLong": "The entry is longer than 8000 characters.",
+  "chatSendSavedNoAi": "Entry saved on the phone. AI isn't available to interpret it.",
+  "chatSendSavedNoProvider": "Entry saved on the phone. Set up the provider to ask the assistant.",
+  "chatSendAssistantError": "Couldn't reach the assistant. Check the local record.",
+  "chatSendQueueUnavailable": "The durable queue isn't available. Keep your text and reopen the chat.",
+  "chatSendTooLong": "The message is longer than 8000 characters.",
+  "chatSendConfigureProvider": "Set up the provider with the settings button to start.",
+  "chatSendSaveError": "Couldn't save the message on the phone. Keep your text and try again.",
+  "chatSendProposalIncomplete": "The model sent an incomplete proposal. Ask it to prepare the exercise again so Start appears.",
+  "chatSendAnswerSaveError": "The reply arrived, but the conversation couldn't be saved on the phone.",
+  "chatSendFailed": "Couldn't complete the conversation. You can try again.",
+  "chatMsgOnlyLastEditable": "Only the last message can be edited. Write a correction as a new message.",
+  "chatMsgPending": "Waiting to send",
+  "chatMsgSending": "Sending",
+  "chatMsgAnswered": "Answered",
+  "chatMsgFailed": "Not accepted; you can resend",
+  "chatMsgUncertain": "Uncertain result; resending blocked until reviewed",
+  "chatMsgHistory": "History",
+  "chatMsgResend": "Resend",
+  "chatMsgAiNotReady": "AI isn't ready.",
+  "chatMsgSendInProgress": "A send is in progress.",
+  "chatMsgChangedWhileEditing": "The message changed while you were editing it. Check the history.",
+  "chatMsgSaveNotSent": "Edit saved, but it couldn't be sent now. Use Resend when you can.",
+  "chatMsgSavedOnly": "Edit saved. Use Resend to send this version.",
+  "chatMsgLengthError": "Write a message of 1 to 8000 characters.",
+  "chatMsgEditError": "Couldn't save the edit; the original is kept.",
+  "chatMsgHistoryTitle": "Version history",
+  "chatMsgVersion": "Version {n}",
+  "@chatMsgVersion": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "chatMsgVersionCurrent": "Version {n} · current",
+  "@chatMsgVersionCurrent": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "chatMsgClose": "Close",
+  "chatMsgHistoryError": "Couldn't open the history.",
+  "chatMsgEditTitle": "Edit message",
+  "chatMsgEditLabel": "Corrected text",
+  "chatMsgEditHelper": "The original version is kept in the history.",
+  "chatMsgSendBlocked": "Can't send right now: {reason}",
+  "@chatMsgSendBlocked": {
+    "placeholders": {
+      "reason": {}
+    }
+  },
+  "chatMsgSaveAndSend": "Save and send",
+  "chatSheetReloadError": "Couldn't recover the loaded sheet.",
+  "chatSheetAndroidOnly": "The Google Sheets connection is available on Android.",
+  "chatSheetSaveError": "Couldn't save the sheet on the phone. The previous copy is kept.",
+  "chatSheetInterpretPending": "The reply arrived, but the sheet is still waiting to be interpreted on the phone.",
+  "chatSheetRefreshError": "Couldn't update the sheet. The previous copy is kept.",
+  "chatSheetRemoveError": "Couldn't remove the sheet copy.",
+  "chatSheetDialogBody": "{title} · {rows} rows\nLast read: {date}.\n\n{status}",
+  "@chatSheetDialogBody": {
+    "placeholders": {
+      "title": {},
+      "rows": {
+        "type": "int"
+      },
+      "date": {},
+      "status": {}
+    }
+  },
+  "chatSheetStatusPending": "Waiting for AI interpretation. No workouts have been imported.",
+  "chatSheetStatusAnalyzed": "The assistant has analyzed this copy; no workouts have been imported.",
+  "chatSheetRemove": "Remove from context",
+  "chatSheetChange": "Change sheet",
+  "chatSheetRefresh": "Update sheet",
+  "chatSheetLabel": "Sheet · {title}",
+  "@chatSheetLabel": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "chatProposalRepeated": "Sets / intervals · {seconds}s rest",
+  "@chatProposalRepeated": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "chatProposalContinuous": "Continuous activity · {seconds}s rest",
+  "@chatProposalContinuous": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "chatSheetPendingInfo": "«{name}» loaded · waiting for interpretation. The original data is kept.",
+  "@chatSheetPendingInfo": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "chatGameFocusOpen": "Finish the activity open with the other companion before preparing this one.",
+  "chatGamePrepareError": "Couldn't prepare the activity. Try again.",
+  "chatGameGoalTitle": "Proposed goal: {goal}",
+  "@chatGameGoalTitle": {
+    "placeholders": {
+      "goal": {}
+    }
+  },
+  "chatGameAchievementTitle": "Proposed achievement: {title}",
+  "@chatGameAchievementTitle": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "chatGameCopyTitle": "Proposed reminder texts",
+  "chatDeliveryQueueError": "Couldn't open the chat's durable queue. Messages won't be sent through alternative storage.",
+  "chatDeliveryRestoredPending": "Your message was saved without a reply. You can send it again.",
+  "chatDeliveryUncertain": "A send has an uncertain result. It won't be resent automatically; check the history before deciding.",
+  "chatDeliveryBacklog": "You have saved messages without a reply. Use Resend when you want; they won't be sent automatically.",
+  "chatDeliveryOtherChat": "The message belongs to another chat and won't be sent here.",
+  "chatDeliveryNotSafe": "This message isn't safe to resend.",
+  "chatDeliveryStateChanged": "The message has already changed status; no other send was made.",
+  "chatDeliveryUncertainSend": "The send result is uncertain. It won't be resent automatically; check whether a reply arrived.",
+  "chatDeliveryFailed": "Couldn't complete the conversation. The message stays saved; it won't be resent automatically.",
+  "chatArchiveIncompleteDirective": "The model asked to archive with incomplete data. The chat stays open.",
+  "chatArchiveDoneAuto": "The assistant archived the chat. You can view it in Archived chats.",
+  "chatArchiveDone": "Chat archived. The active context has been cleared.",
+  "chatArchiveViewAction": "View archives",
+  "chatArchiveError": "Couldn't archive. The conversation and workouts are kept.",
+  "chatArchiveSyncInvalid": "The sending proposal isn't valid. Use Send to Google Sheets in the menu.",
+  "chatArchiveRecalled": "Archive available for your next message to the assistant.",
+  "chatArchiveReadError": "Couldn't open the archive.",
+  "chatDraftSaveError": "Couldn't save the draft. Keep your text and try again.",
+  "chatLoadError": "Couldn't recover the previous conversation.",
+  "chatLoadSheetError": "Couldn't recover the saved sheet. Load it again from Google Sheets.",
+  "chatPersistTooLarge": "The chat is over 20 MB; it couldn't be saved in full.",
+  "creatorCreate": "Create",
+  "creatorCreateFailed": "The companion couldn't be created. Nothing was saved.",
+  "creatorAssistedTitle": "Create with AI help",
+  "creatorAiTitle": "With AI help",
+  "creatorAiReadySubtitle": "Tell it what you want to keep up with and it will suggest a companion.",
+  "creatorAiNotReadySubtitle": "You need to connect and verify an AI provider.",
+  "creatorOpenAiSettings": "Open AI settings",
+  "creatorManualTitle": "By hand",
+  "creatorManualSubtitle": "Choose the name, icon, colour, mode and notice yourself.",
+  "creatorNewTitle": "New companion",
+  "creatorEditProposalTitle": "Edit proposal",
+  "creatorNameLength": "Enter a name of between 1 and 40 characters.",
+  "creatorLevelReminderTitle": "Reminder only",
+  "creatorLevelReminderDetail": "It just reminds you.",
+  "creatorLevelGoalsTitle": "Goals and streaks",
+  "creatorLevelGoalsDetail": "Recommended: goals and streaks, no achievements.",
+  "creatorLevelGameTitle": "Full game",
+  "creatorLevelGameDetail": "Goals, streaks and achievements.",
+  "creatorActivityLabel": "What you log: {name}",
+  "@creatorActivityLabel": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "creatorRemoveActivity": "Remove activity",
+  "creatorGoalLabel": "Goal: {text}",
+  "@creatorGoalLabel": {
+    "placeholders": {
+      "text": {}
+    }
+  },
+  "creatorRemoveGoal": "Remove goal",
+  "creatorRemind": "Remind me",
+  "creatorDecideOnStart": "you decide when you start",
+  "creatorPunctualSuffix": " · one-off entry",
+  "creatorNoGoal": "no goal",
+  "creatorNoReminder": "no notice",
+  "creatorReminderLabel": "Notice: {text}",
+  "@creatorReminderLabel": {
+    "placeholders": {
+      "text": {}
+    }
+  },
+  "creatorLevelLabel": "Level: {text}",
+  "@creatorLevelLabel": {
+    "placeholders": {
+      "text": {}
+    }
+  },
+  "creatorDiscard": "Discard",
+  "creatorNoAiConnected": "No AI is connected.",
+  "creatorConversationFailed": "The conversation couldn't be completed. You can try again.",
+  "creatorInputHint": "Type here",
+  "creatorPromptHelper": "They are used once you connect a provider.",
+  "creatorLevelSection": "Level",
+  "proposalIgnore": "Ignore",
+  "proposalAdd": "Add",
+  "proposalUseTexts": "Use these texts",
+  "proposalSuggestLater": "Not now",
+  "proposalSuggestNever": "Don't suggest again",
+  "proposalLockedTitle": "AI proposal about data you locked",
+  "proposalApply": "Apply",
+  "proposalChangeLine": "{label}: {current} {unit} → {proposed} {unit}",
+  "@proposalChangeLine": {
+    "placeholders": {
+      "label": {},
+      "current": {
+        "type": "int"
+      },
+      "unit": {},
+      "proposed": {
+        "type": "int"
+      }
+    }
+  },
+  "proposalLockLabel": "Locked by you. Tap to release",
+  "homeNewWorkoutTitle": "New workout",
+  "homeSessionNameLabel": "Session name",
+  "homeWorkout": "Workout",
+  "homeAddExerciseTitle": "Add exercise",
+  "homeExerciseNameLabel": "Exercise name",
+  "homeAdd": "Add",
+  "homeBack": "Back",
+  "homeYourSession": "Your session",
+  "homeAssistantTooltip": "TrackIA assistant",
+  "homeReload": "Reload",
+  "homeLoadLog": "Load log",
+  "homeHeroTitle": "Your effort.\nYour progress.",
+  "homeHeroSubtitle": "One set at a time. Keep track of what you do today.",
+  "homeNextSession": "YOUR NEXT SESSION",
+  "homeInProgress": "SESSION IN PROGRESS",
+  "homeReadyQuestion": "Ready to train?",
+  "homeAddExercisesHint": "Add your exercises and log every set.",
+  "homeActivitiesRecords": "{activities, plural, one{1 activity} other{{activities} activities}} · {records, plural, one{1 record} other{{records} records}}",
+  "@homeActivitiesRecords": {
+    "placeholders": {
+      "activities": {
+        "type": "int"
+      },
+      "records": {
+        "type": "int"
+      }
+    }
+  },
+  "homeStartWorkout": "Start workout",
+  "homeContinueWorkout": "Continue workout",
+  "homeCompletedSessions": "completed sessions",
+  "homeRecords": "records",
+  "homeLastActivity": "LAST ACTIVITY",
+  "homeEmptyHistoryTitle": "Your story starts here",
+  "homeEmptyHistorySubtitle": "Your first workout will appear here when you finish it.",
+  "homeSavedOffline": "Saved on this device · Offline",
+  "homeJourneyTitle": "Your journey",
+  "homeEverySessionCounts": "Every session counts.",
+  "homeNoSessionsTitle": "No sessions yet",
+  "homeNoSessionsSubtitle": "Finish a workout and check all its exercises and sets here.",
+  "homeStatusInProgress": "IN PROGRESS",
+  "homeStatusCompleted": "COMPLETED",
+  "homeFinishedAt": "Finished: {date}",
+  "@homeFinishedAt": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "homeFinishRecorded": "End recorded: {date}",
+  "@homeFinishRecorded": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "homeFinishRecordedByUser": "End recorded: {date} · time chosen by you",
+  "@homeFinishRecordedByUser": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "homeTimeKeptWarning": "Time kept with a warning. You can review it later.",
+  "homeTimeKeptWarningShort": "Time kept with a warning.",
+  "homeActivities": "activities",
+  "homeIntervalsRepeated": "{count, plural, one{1 set / segment} other{{count} sets / segments}}",
+  "@homeIntervalsRepeated": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeIntervals": "{count, plural, one{1 segment} other{{count} segments}}",
+  "@homeIntervals": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeNotStarted": "Not started",
+  "homeEndedAt": "End: {date}",
+  "@homeEndedAt": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "homeDraft": "Draft: {draft}",
+  "@homeDraft": {
+    "placeholders": {
+      "draft": {}
+    }
+  },
+  "homeFinishWorkout": "Finish workout",
+  "homeAddSetToFinish": "Log at least one set to finish.",
+  "homeEachSetSaved": "Each set is saved when you tap Save.",
+  "homeDiscardTitle": "Discard session?",
+  "homeDiscardBody": "This session and all its sets will be deleted. This action cannot be undone.",
+  "homeDiscard": "Discard",
+  "homeDiscardSession": "Discard session",
+  "homeSavedWellDone": "Session saved. Well done.",
+  "homeViewHistory": "View history",
+  "homeDeleteExerciseTooltip": "Delete exercise {name}",
+  "@homeDeleteExerciseTooltip": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "homeDeleteExerciseTitle": "Delete exercise?",
+  "homeDeleteExerciseBody": "{name} and its {count, plural, one{1 set} other{{count} sets}} will be deleted.",
+  "@homeDeleteExerciseBody": {
+    "placeholders": {
+      "name": {},
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "homeDelete": "Delete",
+  "homeTargetProgress": "Target: {target, plural, one{1 set} other{{target} sets}} of {repsMin}–{repsMax} reps · {done}/{target} logged",
+  "@homeTargetProgress": {
+    "placeholders": {
+      "target": {
+        "type": "int"
+      },
+      "repsMin": {},
+      "repsMax": {},
+      "done": {
+        "type": "int"
+      }
+    }
+  },
+  "homeNoPreviousSession": "No previous session recorded",
+  "homeLastTime": "Last time · {date}",
+  "@homeLastTime": {
+    "placeholders": {
+      "date": {}
+    }
+  },
+  "homeNoSetsYet": "You haven't logged any sets yet.",
+  "homeSetHeader": "SET",
+  "homeKgHeader": "KG",
+  "homeRepsHeader": "REPS",
+  "homeSetOptionsTooltip": "Set {number} options",
+  "@homeSetOptionsTooltip": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "homeSetDeleteBody": "{weight} kg × {reps, plural, one{1 rep} other{{reps} reps}}.",
+  "@homeSetDeleteBody": {
+    "placeholders": {
+      "weight": {},
+      "reps": {
+        "type": "int"
+      }
+    }
+  },
+  "homeWeightReps": "{weight} kg × {reps}",
+  "@homeWeightReps": {
+    "placeholders": {
+      "weight": {},
+      "reps": {
+        "type": "int"
+      }
+    }
+  },
+  "homeEditSet": "Edit set",
+  "homeDeleteSet": "Delete set",
+  "homeAddSet": "Add set",
+  "homeRest": "Rest {seconds}s",
+  "@homeRest": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "homeFirstSetTitle": "Get your first set ready",
+  "homeFirstSetSubtitle": "Add an exercise to start logging weight and reps.",
+  "homeFinishSession": "Finish session",
+  "homeTabToday": "Today",
+  "homeTabRoutines": "Routines",
+  "homeTabHistory": "History",
+  "homeSessionStarted": "Workout started. You can open Workout to log sets.",
+  "homeSessionStartFailed": "Could not start the workout.",
+  "homeActiveSessionChanged": "The active session has changed. Please review it.",
+  "homeSavedSheetPending": "Workout saved on the phone. Sending to Google Sheets is pending confirmation.",
+  "homeSavedSheetNotUpdated": "Workout saved on the phone. Google Sheets was not updated.",
+  "homeFinishFailed": "Could not finish the workout.",
+  "homeReviewFinishTitle": "Review end time",
+  "homeFinishIssuesBody": "{issues}\n\nDo you want to save the chosen time as it is? Records will be kept so you can review them later if you wish.",
+  "@homeFinishIssuesBody": {
+    "placeholders": {
+      "issues": {}
+    }
+  },
+  "homeBackAndFix": "Go back and fix",
+  "homeSaveThatTime": "Save that time",
+  "homeDate": "Date",
+  "homeTime": "Time",
+  "homeStartSession": "Start workout",
+  "homeOptionYes": "Yes",
+  "homeOptionNo": "No",
+  "homeBoolYes": "yes",
+  "homeBoolNo": "no",
+  "homeNoteOptional": "Note (optional)",
+  "homeNumberInvalid": "{label}: enter a number.",
+  "@homeNumberInvalid": {
+    "placeholders": {
+      "label": {}
+    }
+  },
+  "homeNoteOrValueRequired": "Enter a value or write a note.",
+  "homeSessionFinished": "Session finished",
+  "homeSummaryEmpty": "Nothing new this time. Keep going.",
+  "homeNewAchievement": "New achievement",
+  "homeDone": "Done",
+  "homeSuggestionSquat": "Squat",
+  "homeSuggestionBench": "Bench press",
+  "homeSuggestionRow": "Row",
+  "homeNewSet": "New set",
+  "homeWeightLabel": "Weight (kg)",
+  "homeWeightHint": "e.g. 20.5",
+  "homeRepsLabel": "Repetitions",
+  "homeRepsHint": "e.g. 10",
+  "homeZeroWeightHint": "Use 0 kg if you train without external load.",
+  "homeExercisesLabel": "EXERCISES",
+  "homeDeleteSetTitle": "Delete set?",
+  "accountsConnectError": "Could not connect to Google.",
+  "accountsSwitchError": "Could not switch accounts. Your data is kept.",
+  "accountsDescription": "Each account has its own conversation, AI settings, sheet and workouts on this phone. Previous history stays in the local profile. Connecting does not copy or upload that data.",
+  "accountsConnectAnother": "Connect another Google account",
+  "accountsActiveProfile": "Active profile",
+  "accountsReconnectProfile": "Switch back to this profile with Google",
+  "accountsDisconnect": "Disconnect and return to the local profile",
+  "accountsDisconnectNotice": "Disconnecting keeps each profile's data on this phone. It does not delete Google files or revoke access from your Google account.",
+  "appearanceSaveError": "Could not save the theme. Try again.",
+  "appearanceIntro": "Choose how you want to see TrackIA. Your choice is saved on this phone.",
+  "appearanceSystemHint": "Use the device theme",
+  "archiveSearchLabel": "Search by title or summary",
+  "archiveRecoverError": "Could not recover the chat. The archive is kept.",
+  "archiveEmpty": "There are no archived chats yet.",
+  "archiveChatSubtitle": "{date} · {count} messages",
+  "@archiveChatSubtitle": {
+    "placeholders": {
+      "date": {},
+      "count": {}
+    }
+  },
+  "archiveAutomaticTag": "archived by the assistant",
+  "archiveContinuityTitle": "Continuity summary",
+  "archiveReasonLine": "Assistant's reason: {reason}",
+  "@archiveReasonLine": {
+    "placeholders": {
+      "reason": {}
+    }
+  },
+  "archiveConsultFromChat": "Ask from chat",
+  "archiveYou": "You",
+  "archiveAttachmentKept": "Attachment kept: {name}",
+  "@archiveAttachmentKept": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "notifUnsupported": "Rest alerts are only available on Android.",
+  "notifDndActive": "Do not disturb is on",
+  "notifDndTotalSilence": "You are on «Total silence»: Android blocks alerts, even as alarms.",
+  "notifDndAlarm": "Rest alerts sound as alarms. Other alerts would not sound or vibrate.",
+  "notifDndPlain": "Right now rest alerts would not sound or vibrate.",
+  "notifEnabledTitle": "Activity and rest alerts",
+  "notifEnabledSubtitle": "Activity ready, segment running, segment end and rest end.",
+  "notifAlarmStyleTitle": "Treat as alarm",
+  "notifAlarmStyleSubtitle": "Rest and segment ends sound and vibrate even when Do not disturb is in Priority mode.",
+  "notifChannelBlockedTitle": "Android blocks the alarm channel",
+  "notifChannelBlockedSubtitle": "Turn it on in the channel settings.",
+  "notifExactTitle": "Allow exact alerts",
+  "notifExactSubtitle": "Without this permission Android may delay the alert.",
+  "notifCheck": "Check",
+  "notifTest": "Test alert",
+  "notifTestAlarm": "Test with Do not disturb on",
+  "notifOpenDnd": "Open Do not disturb settings",
+  "notifSilenceNote": "On «Total silence», Android blocks everything, including alarms. There, the only fix is allowing them in your phone's settings.",
+  "progressLoadError": "Could not calculate progress.",
+  "progressMonth1": "January",
+  "progressMonth2": "February",
+  "progressMonth3": "March",
+  "progressMonth4": "April",
+  "progressMonth5": "May",
+  "progressMonth6": "June",
+  "progressMonth7": "July",
+  "progressMonth8": "August",
+  "progressMonth9": "September",
+  "progressMonth10": "October",
+  "progressMonth11": "November",
+  "progressMonth12": "December",
+  "progressDayStatus": "{month} {day}: {status}",
+  "@progressDayStatus": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "month": {},
+      "status": {}
+    }
+  },
+  "progressDayDone": "done",
+  "progressDayPending": "pending",
+  "progressDayMissed": "missed",
+  "progressTitle": "Progress · {name}",
+  "@progressTitle": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "progressStreakCurrent": "{n, plural, one{Current streak: 1 day} other{Current streak: {n} days}}",
+  "@progressStreakCurrent": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "progressStreakBest": "Best streak: {best}",
+  "@progressStreakBest": {
+    "placeholders": {
+      "best": {
+        "type": "int"
+      }
+    }
+  },
+  "progressFreeDays": "Rest days this week: {used}/{total}",
+  "@progressFreeDays": {
+    "placeholders": {
+      "used": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "progressGoalToday": "Today's goal",
+  "progressGoalWeek": "This week's goal",
+  "progressGoalValues": "{value} of {target}",
+  "@progressGoalValues": {
+    "placeholders": {
+      "value": {},
+      "target": {}
+    }
+  },
+  "progressLastFourWeeks": "Last 4 weeks",
+  "progressAchievementUnlocked": "{title}, unlocked",
+  "@progressAchievementUnlocked": {
+    "placeholders": {
+      "title": {}
+    }
+  },
+  "progressAchievementLocked": "{title}, locked, {percent}% progress",
+  "@progressAchievementLocked": {
+    "placeholders": {
+      "title": {},
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "progressAchievementsTitle": "Achievements · {unlocked} of {total}",
+  "@progressAchievementsTitle": {
+    "placeholders": {
+      "unlocked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "progressAchievementsEmptyPlay": "Your achievements will appear when you finish your first activity.",
+  "progressAchievementsEmptyEnable": "Turn on Game mode and achievements in «{place}».",
+  "@progressAchievementsEmptyEnable": {
+    "placeholders": {
+      "place": {}
+    }
+  },
+  "routinesTitle": "Your routines",
+  "routinesSubtitle": "Set up once. Train at your pace.",
+  "routinesCreate": "Create routine",
+  "routinesEmptyTitle": "Your next session, ready",
+  "routinesEmptyBody": "For example, create «Leg A» with your exercises, sets and rep range.",
+  "routinesOptionsTooltip": "Options for {name}",
+  "@routinesOptionsTooltip": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "routinesDeleteTitle": "Delete routine?",
+  "routinesDeleteBody": "«{name}» will be deleted. Your saved workouts and the current session will be kept.",
+  "@routinesDeleteBody": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "routinesEditMenu": "Edit routine",
+  "routinesDeleteMenu": "Delete routine",
+  "routinesDelete": "Delete",
+  "routinesTrain": "Train",
+  "routinesContinueSession": "Continue active session",
+  "routinesNeedExercise": "Add at least one exercise.",
+  "routinesNameLabel": "Routine name",
+  "routinesNameHint": "E.g. Leg A",
+  "routinesEditorHelp": "Set your targets. Sets will be recorded when you train.",
+  "routinesMoveUp": "Move exercise {n} up",
+  "@routinesMoveUp": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "routinesMoveDown": "Move exercise {n} down",
+  "@routinesMoveDown": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "routinesEditExercise": "Edit exercise {n}",
+  "@routinesEditExercise": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "routinesRemoveExercise": "Remove exercise {n}",
+  "@routinesRemoveExercise": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "routinesAddExercise": "Add exercise to routine",
+  "routinesSaving": "Saving…",
+  "routinesSave": "Save routine",
+  "routinesLeaveTitle": "Leave without saving?",
+  "routinesLeaveBody": "Changes to this routine will be lost.",
+  "routinesKeepEditing": "Keep editing",
+  "routinesDiscard": "Discard changes",
+  "routinesBack": "Back",
+  "routinesExerciseDialogTitle": "Routine exercise",
+  "routinesEditTargetTitle": "Edit target",
+  "routinesExerciseLabel": "Exercise",
+  "routinesExerciseHint": "E.g. Squat",
+  "routinesTargetSets": "Planned sets",
+  "routinesRepsMin": "Min reps",
+  "routinesRepsMax": "Max reps",
+  "routinesRestSeconds": "Rest (seconds)",
+  "routinesSaveExercise": "Save exercise",
+  "focusCounterSaveError": "Could not save the counter. Try again.",
+  "focusResultSaveError": "Could not save the result. Keep the text and try again.",
+  "focusSaveActivityError": "Could not save to your activities.",
+  "focusRecordSaveError": "Could not save the record. Try again.",
+  "focusReviewTimeTitle": "Check time",
+  "focusReviewTimeBody": "The chosen time does not match the records. Save that time and keep them?",
+  "focusBack": "Back",
+  "focusSaveThatTime": "Save that time",
+  "focusRunning": "In progress",
+  "focusReady": "Ready",
+  "focusRest": "Rest",
+  "focusRepeatedRest": "{progress} {segments} · Rest",
+  "@focusRepeatedRest": {
+    "placeholders": {
+      "progress": {},
+      "segments": {}
+    }
+  },
+  "focusSegmentCount": "{segment} {count}",
+  "@focusSegmentCount": {
+    "placeholders": {
+      "segment": {},
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "focusSegmentCountOfTarget": "{segment} {count} of {target}",
+  "@focusSegmentCountOfTarget": {
+    "placeholders": {
+      "segment": {},
+      "count": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "focusSegmentSerie": "set",
+  "focusSegmentTramo": "segment",
+  "focusSegmentSeries": "sets",
+  "focusSegmentTramos": "segments",
+  "focusRemoveField": "Remove {label}",
+  "@focusRemoveField": {
+    "placeholders": {
+      "label": {}
+    }
+  },
+  "focusAddField": "Add {label}",
+  "@focusAddField": {
+    "placeholders": {
+      "label": {}
+    }
   }
 }

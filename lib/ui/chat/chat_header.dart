@@ -33,7 +33,7 @@ extension _ChatHeader on _AssistantChatScreenState {
       all = await CompanionStore(profileId: profileId).load();
     } catch (_) {
       if (mounted) {
-        update(() => error = 'No se pudieron cargar los acompañantes.');
+        update(() => error = appText(context).chatMenuCompanionsError);
       }
       return;
     }
@@ -95,7 +95,7 @@ extension _ChatHeader on _AssistantChatScreenState {
   /// Actions of this companion's chat. App-wide settings live in Ajustes.
   Widget chatMenu() => PopupMenuButton<String>(
     key: const Key('chat-menu'),
-    tooltip: 'Más opciones',
+    tooltip: appText(context).chatMenuMore,
     onSelected: onMenu,
     itemBuilder: (_) => [
       if (widget.onTraining != null)
@@ -103,7 +103,7 @@ extension _ChatHeader on _AssistantChatScreenState {
           'menu-training',
           'training',
           Icons.history,
-          'Rutinas e historial',
+          appText(context).chatMenuTraining,
           enabled: aiReady,
         ),
       if (widget.onProgress != null)
@@ -111,55 +111,55 @@ extension _ChatHeader on _AssistantChatScreenState {
           'menu-progress',
           'progress',
           Icons.emoji_events_outlined,
-          'Progreso',
+          appText(context).chatMenuProgress,
         ),
       if (widget.onCompanionSettings != null)
         menuItem(
           'menu-companion-settings',
           'companion-settings',
           Icons.tune,
-          'Modo y avisos',
+          appText(context).modeAndNotices,
         ),
       menuItem(
         'menu-sheet-sync',
         'sheet-sync',
         Icons.cloud_upload_outlined,
-        'Enviar a Google Sheets',
+        appText(context).chatSendToSheets,
         enabled: !busy && !voiceStarting,
       ),
       menuItem(
         'archive-chat',
         'archive',
         Icons.archive_outlined,
-        'Archivar chat',
+        appText(context).chatArchive,
         enabled: canArchive,
       ),
       menuItem(
         'menu-archives',
         'archives',
         Icons.inventory_2_outlined,
-        'Chats archivados',
+        appText(context).chatArchives,
         enabled: !busy,
       ),
       menuItem(
         'menu-sheet',
         'sheet',
         Icons.table_chart_outlined,
-        'Hoja cargada',
+        appText(context).chatMenuSheet,
       ),
       if (canCloseDay)
         menuItem(
           'menu-close-day',
           'close-day',
           Icons.flag_outlined,
-          'Finalizar día',
+          appText(context).activityFinishDay,
         ),
       if (!canRecord && recoverablePreparation != null)
         menuItem(
           'menu-recover',
           'recover',
           Icons.restore,
-          'Recuperar preparación',
+          appText(context).chatMenuRecover,
           detail: recoverablePreparation!.definition.name,
         ),
     ],

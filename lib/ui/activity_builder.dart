@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../application/localization.dart';
 import '../domain/activity.dart';
 import '../domain/workout.dart';
 
@@ -237,17 +238,17 @@ class _ActivityBuilderState extends State<ActivityBuilder> {
     if (text.isEmpty) return null;
     final value = int.tryParse(text);
     if (value == null) {
-      throw const ValidationException('Escribe solo números enteros.');
+      throw ValidationException(appText(context).activityBuilderOnlyIntegers);
     }
     if (value < min || value > max) {
-      throw ValidationException('$what va de $min a $max.');
+      throw ValidationException(appText(context).activityBuilderRange(what, min, max));
     }
     return value;
   }
 
   ActivityDefinition buildDefinition() {
     if (name.text.trim().isEmpty) {
-      throw const ValidationException('Escribe un nombre para la actividad.');
+      throw ValidationException(appText(context).activityBuilderNameRequired);
     }
     int? seconds;
     var restSeconds = 0;
@@ -257,23 +258,23 @@ class _ActivityBuilderState extends State<ActivityBuilder> {
       case Rhythm.instant || Rhythm.free:
         break;
       case Rhythm.timed:
-        final minutes = whole(duration, min: 1, max: 1440, what: 'La duración');
+        final minutes = whole(duration, min: 1, max: 1440, what: appText(context).activityBuilderWhatDuration);
         if (minutes == null) {
-          throw const ValidationException('Indica la duración en minutos.');
+          throw ValidationException(appText(context).activityBuilderDurationRequired);
         }
         seconds = minutes * 60;
       case Rhythm.segments:
-        final minutes = whole(duration, min: 1, max: 1440, what: 'La duración');
+        final minutes = whole(duration, min: 1, max: 1440, what: appText(context).activityBuilderWhatDuration);
         seconds = minutes == null ? null : minutes * 60;
         restSeconds =
-            whole(rest, min: 0, max: 1800, what: 'El descanso') ?? 90;
-        sets = whole(segments, min: 1, max: 100, what: 'Los tramos previstos');
-        cycleGoal = whole(cycles, min: 1, max: 100, what: 'Los ciclos previstos');
+            whole(rest, min: 0, max: 1800, what: appText(context).activityBuilderWhatRest) ?? 90;
+        sets = whole(segments, min: 1, max: 100, what: appText(context).activityBuilderWhatSegments);
+        cycleGoal = whole(cycles, min: 1, max: 100, what: appText(context).activityBuilderWhatCycles);
         one = singular.text.trim().isEmpty ? null : singular.text.trim();
         many = plural.text.trim().isEmpty ? null : plural.text.trim();
         if ((one == null) != (many == null)) {
-          throw const ValidationException(
-            'Indica singular y plural del tramo, o deja los dos vacíos.',
+          throw ValidationException(
+            appText(context).activityBuilderSegmentNamesPair,
           );
         }
     }
@@ -373,7 +374,7 @@ class _ActivityBuilderState extends State<ActivityBuilder> {
     final scheme = Theme.of(context).colorScheme;
     final instant = rhythm == Rhythm.instant;
     return Scaffold(
-      appBar: AppBar(title: const Text('Nueva actividad')),
+      appBar: AppBar(title: Text(appText(context).activityNewActivity)),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
@@ -381,9 +382,9 @@ class _ActivityBuilderState extends State<ActivityBuilder> {
             key: const Key('builder-name'),
             controller: name,
             maxLength: 80,
-            decoration: const InputDecoration(labelText: 'Nombre'),
+            decoration: InputDecoration(labelText: appText(context).companionName),
           ),
-          Text('Empezar desde una plantilla', style: Theme.of(context).textTheme.labelLarge),
+          Text(appText(context).activityBuilderFromTemplate, style: Theme.of(context).textTheme.labelLarge),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
@@ -398,20 +399,20 @@ class _ActivityBuilderState extends State<ActivityBuilder> {
             ],
           ),
           const SizedBox(height: 16),
-          Text('¿Cómo se mide?', style: Theme.of(context).textTheme.labelLarge),
+          Text(appText(context).activityBuilderHowMeasured, style: Theme.of(context).textTheme.labelLarge),
           const SizedBox(height: 8),
-          rhythmOption(Rhythm.instant, Icons.touch_app_outlined, 'Puntual', 'Un registro sin cronómetro'),
-          rhythmOption(Rhythm.free, Icons.play_arrow_outlined, 'Libre', 'Cronómetro, sin cuenta atrás'),
-          rhythmOption(Rhythm.timed, Icons.hourglass_top, 'Con duración', 'Cuenta atrás de un tiempo fijo'),
-          rhythmOption(Rhythm.segments, Icons.repeat, 'Por tramos', 'Varios tramos con descanso'),
+          rhythmOption(Rhythm.instant, Icons.touch_app_outlined, appText(context).activityBuilderInstantTitle, appText(context).activityBuilderInstantDetail),
+          rhythmOption(Rhythm.free, Icons.play_arrow_outlined, appText(context).activityBuilderFreeTitle, appText(context).activityBuilderFreeDetail),
+          rhythmOption(Rhythm.timed, Icons.hourglass_top, appText(context).activityBuilderTimedTitle, appText(context).activityBuilderTimedDetail),
+          rhythmOption(Rhythm.segments, Icons.repeat, appText(context).activityBuilderSegmentsTitle, appText(context).activityBuilderSegmentsDetail),
           if (rhythm == Rhythm.timed || rhythm == Rhythm.segments)
-            numberField('builder-duration', 'Duración (minutos)',
-                helper: rhythm == Rhythm.segments ? 'Opcional: de cada tramo' : null),
+            numberField('builder-duration', appText(context).activityBuilderDuration,
+                helper: rhythm == Rhythm.segments ? appText(context).activityBuilderSegmentHelper : null),
           if (rhythm == Rhythm.segments) ...[
-            numberField('builder-segments', 'Tramos previstos (opcional)'),
-            numberField('builder-rest', 'Descanso entre tramos (segundos)',
-                helper: '90 es un minuto y medio'),
-            numberField('builder-cycles', 'Ciclos previstos (opcional)'),
+            numberField('builder-segments', appText(context).activityBuilderPlannedSegments),
+            numberField('builder-rest', appText(context).activityBuilderRestBetween,
+                helper: appText(context).activityBuilderRestHelper),
+            numberField('builder-cycles', appText(context).activityBuilderPlannedCycles),
             Row(
               children: [
                 Expanded(
@@ -419,7 +420,7 @@ class _ActivityBuilderState extends State<ActivityBuilder> {
                     key: const Key('builder-segment-singular'),
                     controller: singular,
                     maxLength: 24,
-                    decoration: const InputDecoration(labelText: 'Un tramo se llama'),
+                    decoration: InputDecoration(labelText: appText(context).activityBuilderSegmentSingular),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -428,14 +429,14 @@ class _ActivityBuilderState extends State<ActivityBuilder> {
                     key: const Key('builder-segment-plural'),
                     controller: plural,
                     maxLength: 24,
-                    decoration: const InputDecoration(labelText: 'Varios se llaman'),
+                    decoration: InputDecoration(labelText: appText(context).activityBuilderSegmentPlural),
                   ),
                 ),
               ],
             ),
           ],
           const SizedBox(height: 8),
-          Text('¿Qué quieres anotar? (opcional)', style: Theme.of(context).textTheme.labelLarge),
+          Text(appText(context).activityBuilderWhatToNote, style: Theme.of(context).textTheme.labelLarge),
           for (final field in fields)
             Card(
               key: Key('field-${field['key']}'),
@@ -451,7 +452,7 @@ class _ActivityBuilderState extends State<ActivityBuilder> {
                 ),
                 trailing: IconButton(
                   key: Key('field-remove-${field['key']}'),
-                  tooltip: 'Quitar ${field['label']}',
+                  tooltip: appText(context).activityBuilderRemoveField(field['label'] as String),
                   icon: const Icon(Icons.close),
                   onPressed: () => setState(() => fields.remove(field)),
                 ),
@@ -464,15 +465,15 @@ class _ActivityBuilderState extends State<ActivityBuilder> {
               key: const Key('builder-add-field'),
               onPressed: fields.length >= 12 ? null : addField,
               icon: const Icon(Icons.add),
-              label: Text(fields.length >= 12 ? 'Máximo 12 campos' : 'Añadir campo'),
+              label: Text(fields.length >= 12 ? appText(context).activityBuilderMaxFields : appText(context).activityBuilderAddField),
             ),
           ),
           CheckboxListTile(
             key: const Key('builder-save'),
             contentPadding: EdgeInsets.zero,
             controlAffinity: ListTileControlAffinity.leading,
-            title: const Text('Guardar en tus actividades'),
-            subtitle: const Text('Para repetirla sin volver a crearla.'),
+            title: Text(appText(context).activityBuilderSaveInActivities),
+            subtitle: Text(appText(context).activityBuilderSaveInActivitiesHelp),
             value: save,
             onChanged: (value) => setState(() => save = value ?? true),
           ),
@@ -488,7 +489,7 @@ class _ActivityBuilderState extends State<ActivityBuilder> {
           FilledButton(
             key: const Key('builder-submit'),
             onPressed: submit,
-            child: Text(instant ? 'Guardar' : 'Preparar actividad'),
+            child: Text(instant ? appText(context).save : appText(context).activityBuilderPrepare),
           ),
         ],
       ),
@@ -527,7 +528,7 @@ class _FieldDialogState extends State<_FieldDialog> {
     try {
       final text = label.text.trim();
       if (text.isEmpty || text.length > 80) {
-        throw const ValidationException('Escribe un nombre de campo de hasta 80 caracteres.');
+        throw ValidationException(appText(context).activityBuilderFieldNameRequired);
       }
       final field = <String, Object>{
         'label': text,
@@ -547,7 +548,7 @@ class _FieldDialogState extends State<_FieldDialog> {
         final low = int.tryParse(min.text.trim());
         final high = int.tryParse(max.text.trim());
         if (low == null || high == null) {
-          throw const ValidationException('Escribe el mínimo y el máximo de la escala.');
+          throw ValidationException(appText(context).activityBuilderScaleRange);
         }
         field['min'] = low;
         field['max'] = high;
@@ -571,7 +572,7 @@ class _FieldDialogState extends State<_FieldDialog> {
   Widget build(BuildContext context) {
     final counts = aggregate == 'distinct' || aggregate == 'countTrue';
     return AlertDialog(
-      title: const Text('Nuevo campo'),
+      title: Text(appText(context).activityBuilderNewField),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -581,12 +582,12 @@ class _FieldDialogState extends State<_FieldDialog> {
               controller: label,
               autofocus: true,
               maxLength: 80,
-              decoration: const InputDecoration(labelText: 'Nombre del campo'),
+              decoration: InputDecoration(labelText: appText(context).activityBuilderFieldName),
             ),
             DropdownButtonFormField<String>(
               key: const Key('field-type'),
               initialValue: type,
-              decoration: const InputDecoration(labelText: 'Tipo'),
+              decoration: InputDecoration(labelText: appText(context).activityBuilderFieldType),
               items: [
                 for (final entry in ActivityBuilder._typeLabels.entries)
                   DropdownMenuItem(value: entry.key, child: Text(entry.value)),
@@ -601,15 +602,15 @@ class _FieldDialogState extends State<_FieldDialog> {
                 key: const Key('field-unit'),
                 controller: unit,
                 maxLength: 30,
-                decoration: const InputDecoration(labelText: 'Unidad (opcional)'),
+                decoration: InputDecoration(labelText: appText(context).activityBuilderFieldUnit),
               ),
             if (type == 'choice')
               TextField(
                 key: const Key('field-options'),
                 controller: options,
-                decoration: const InputDecoration(
-                  labelText: 'Opciones',
-                  helperText: 'Separadas por comas',
+                decoration: InputDecoration(
+                  labelText: appText(context).activityBuilderOptions,
+                  helperText: appText(context).activityBuilderOptionsHelp,
                 ),
               ),
             if (type == 'scale')
@@ -620,7 +621,7 @@ class _FieldDialogState extends State<_FieldDialog> {
                       key: const Key('field-min'),
                       controller: min,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(labelText: 'Mínimo'),
+                      decoration: InputDecoration(labelText: appText(context).activityBuilderScaleMin),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -629,7 +630,7 @@ class _FieldDialogState extends State<_FieldDialog> {
                       key: const Key('field-max'),
                       controller: max,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(labelText: 'Máximo'),
+                      decoration: InputDecoration(labelText: appText(context).activityBuilderScaleMax),
                     ),
                   ),
                 ],
@@ -639,7 +640,7 @@ class _FieldDialogState extends State<_FieldDialog> {
               child: DropdownButtonFormField<String>(
                 key: const Key('field-aggregate'),
                 initialValue: aggregate,
-                decoration: const InputDecoration(labelText: 'Cómo cuenta'),
+                decoration: InputDecoration(labelText: appText(context).activityBuilderAggregate),
                 items: [
                   for (final a in ActivityBuilder.aggregatesFor(type))
                     DropdownMenuItem(
@@ -655,13 +656,13 @@ class _FieldDialogState extends State<_FieldDialog> {
                 key: const Key('field-count-singular'),
                 controller: countOne,
                 maxLength: 40,
-                decoration: const InputDecoration(labelText: 'Se cuenta como (uno)', helperText: 'Opcional, p. ej. libro'),
+                decoration: InputDecoration(labelText: appText(context).activityBuilderCountSingular, helperText: appText(context).activityBuilderCountSingularHelp),
               ),
               TextField(
                 key: const Key('field-count-plural'),
                 controller: countMany,
                 maxLength: 40,
-                decoration: const InputDecoration(labelText: 'Se cuenta como (varios)', helperText: 'Opcional, p. ej. libros'),
+                decoration: InputDecoration(labelText: appText(context).activityBuilderCountPlural, helperText: appText(context).activityBuilderCountPluralHelp),
               ),
             ],
             if (error != null)
@@ -679,12 +680,12 @@ class _FieldDialogState extends State<_FieldDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancelar'),
+          child: Text(appText(context).cancel),
         ),
         FilledButton(
           key: const Key('field-submit'),
           onPressed: submit,
-          child: const Text('Añadir'),
+          child: Text(appText(context).activityBuilderAdd),
         ),
       ],
     );

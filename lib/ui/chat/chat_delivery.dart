@@ -4,6 +4,8 @@ part of '../assistant_chat.dart';
 /// `chat_send.dart` remains intact for chats without a [ChatStore].
 extension _ChatDelivery on _AssistantChatScreenState {
   Future<void> initializeMessageDelivery() async {
+    // Se llama desde initState (vía load): aquí aún no se puede leer la
+    // localización, así que el texto del error se resuelve después.
     try {
       final repository = widget.messageRevisionRepository;
       if (repository != null) {
@@ -20,8 +22,11 @@ extension _ChatDelivery on _AssistantChatScreenState {
       }
     } catch (_) {
       deliveryInitializationFailed = true;
-      error =
-          'No se pudo abrir la cola durable del chat. No se enviarán mensajes por un almacenamiento alternativo.';
+      Future<void>.microtask(() {
+        if (mounted) {
+          update(() => error = appText(context).chatDeliveryQueueError);
+        }
+      });
     }
   }
 
@@ -74,12 +79,13 @@ extension _ChatDelivery on _AssistantChatScreenState {
       input.text = pending!;
       attachment = messages.lastOrNull?.attachment;
       error =
-          'Tu mensaje quedó guardado sin respuesta. Puedes volver a enviarlo.';
+          appText(context).chatDeliveryRestoredPending;
     }
   }
 
   Future<void> restoreDurableDelivery(Map<String, dynamic> json) async {
     final repository = messageRevisions!;
+    final l = appText(context);
     // Only records written by this bridge are recovered. Historical payload
     // messages are not assigned synthetic delivery states.
     for (final message in messages.toList(growable: false)) {
@@ -140,8 +146,8 @@ extension _ChatDelivery on _AssistantChatScreenState {
     if (pending == null && !hasDeliveryBacklog) restoreComposerDraft(json);
     if (hasDeliveryBacklog) {
       error = deliveryStates.values.contains(MessageDelivery.uncertain)
-          ? 'Hay un envío con resultado incierto. No se reenviará automáticamente; revisa el historial antes de decidir.'
-          : 'Tienes mensajes guardados sin respuesta. Usa Reenviar cuando quieras; no se enviarán automáticamente.';
+          ? l.chatDeliveryUncertain
+          : l.chatDeliveryBacklog;
     }
   }
 
@@ -342,10 +348,11 @@ extension _ChatDelivery on _AssistantChatScreenState {
         : '';
     if (busy || listening || (retryBubble == null && text.isEmpty)) return;
     if (retryBubble == null && text.length > 8000) {
-      update(() => error = 'El mensaje supera 8000 caracteres.');
+      update(() => error = appText(context).chatSendTooLong);
       return;
     }
 
+    final l = appText(context);
     AiMessage? outgoing = retryBubble;
     MessageDeliveryItem? item;
     if (retryMessageId != null) {
@@ -353,12 +360,12 @@ extension _ChatDelivery on _AssistantChatScreenState {
       if (item == null || item.message.chatId != sessionId) {
         update(
           () =>
-              error = 'El mensaje pertenece a otro chat y no se enviará aquí.',
+              error = appText(context).chatDeliveryOtherChat,
         );
         return;
       }
       if (!MessageDeliveryPolicy.canRetry(item.message.delivery)) {
-        update(() => error = 'Este mensaje no es seguro de reenviar.');
+        update(() => error = appText(context).chatDeliveryNotSafe);
         return;
       }
     }
@@ -456,8 +463,8 @@ extension _ChatDelivery on _AssistantChatScreenState {
 
       final config = await aiStore.load();
       if (config == null) {
-        throw const ValidationException(
-          'Configura el proveedor con el botón de ajustes para empezar.',
+        throw ValidationException(
+          l.chatSendConfigureProvider,
         );
       }
       await refreshLiveSheet();
@@ -475,8 +482,8 @@ extension _ChatDelivery on _AssistantChatScreenState {
         }
         syncPendingFromDelivery();
         await persist();
-        throw const ValidationException(
-          'El mensaje ya cambió de estado; no se hizo otro envío.',
+        throw ValidationException(
+          l.chatDeliveryStateChanged,
         );
       }
       attemptStarted = true;
@@ -524,7 +531,7 @@ extension _ChatDelivery on _AssistantChatScreenState {
       } catch (_) {
         await failDurableAttempt(attempt, acceptanceKnown: false);
         error =
-            'El resultado del envío es incierto. No se reenviará automáticamente; comprueba si llegó una respuesta.';
+            l.chatDeliveryUncertainSend;
         if (media == null) availability.failed();
         return;
       }
@@ -582,7 +589,7 @@ extension _ChatDelivery on _AssistantChatScreenState {
         await failDurableAttempt(item!, acceptanceKnown: true);
       }
       error =
-          'No se pudo completar la conversación. El mensaje permanece guardado; no se hará un reenvío automático.';
+          l.chatDeliveryFailed;
     } finally {
       activeEffectOrigin = null;
       if (mounted) {
@@ -624,6 +631,7 @@ extension _ChatDelivery on _AssistantChatScreenState {
       await persistDetachedAnswer(attempt, answer, status);
       return;
     }
+    final l = appText(context);
     final exists = responseLinks.values.any(
       (link) =>
           link.messageId == attempt.message.id &&
@@ -646,7 +654,7 @@ extension _ChatDelivery on _AssistantChatScreenState {
       await persist();
     } catch (_) {
       error =
-          'La respuesta llegó, pero no se pudo guardar la conversación en el móvil.';
+          l.chatSendAnswerSaveError;
     }
   }
 

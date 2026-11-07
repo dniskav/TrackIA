@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../application/localization.dart';
 import '../domain/workout.dart';
 
 class SectionLabel extends StatelessWidget {
@@ -151,7 +152,11 @@ class _NameDialogState extends State<NameDialog> {
               Wrap(
                 spacing: 6,
                 children: [
-                  for (final name in ['Sentadilla', 'Press banca', 'Remo'])
+                  for (final name in [
+                    appText(context).homeSuggestionSquat,
+                    appText(context).homeSuggestionBench,
+                    appText(context).homeSuggestionRow,
+                  ])
                     ActionChip(
                       label: Text(name),
                       onPressed: () => text.text = name,
@@ -166,7 +171,7 @@ class _NameDialogState extends State<NameDialog> {
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('Cancelar'),
+        child: Text(appText(context).cancel),
       ),
       FilledButton(onPressed: submit, child: Text(widget.action)),
     ],
@@ -212,7 +217,11 @@ class _SetDialogState extends State<SetDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: Text(widget.existing == null ? 'Nueva serie' : 'Editar serie'),
+    title: Text(
+      widget.existing == null
+          ? appText(context).homeNewSet
+          : appText(context).homeEditSet,
+    ),
     content: SingleChildScrollView(
       child: Form(
         key: form,
@@ -228,9 +237,9 @@ class _SetDialogState extends State<SetDialog> {
                 decimal: true,
               ),
               textInputAction: TextInputAction.next,
-              decoration: const InputDecoration(
-                labelText: 'Peso (kg)',
-                hintText: 'Ej. 20,5',
+              decoration: InputDecoration(
+                labelText: appText(context).homeWeightLabel,
+                hintText: appText(context).homeWeightHint,
                 errorMaxLines: 3,
               ),
               validator: (v) {
@@ -248,9 +257,9 @@ class _SetDialogState extends State<SetDialog> {
               controller: reps,
               keyboardType: TextInputType.number,
               textInputAction: TextInputAction.done,
-              decoration: const InputDecoration(
-                labelText: 'Repeticiones',
-                hintText: 'Ej. 10',
+              decoration: InputDecoration(
+                labelText: appText(context).homeRepsLabel,
+                hintText: appText(context).homeRepsHint,
                 errorMaxLines: 3,
               ),
               onFieldSubmitted: (_) => submit(),
@@ -265,7 +274,7 @@ class _SetDialogState extends State<SetDialog> {
             ),
             const SizedBox(height: 14),
             Text(
-              'Usa 0 kg si entrenas sin carga externa.',
+              appText(context).homeZeroWeightHint,
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontSize: 12,
@@ -278,9 +287,9 @@ class _SetDialogState extends State<SetDialog> {
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('Cancelar'),
+        child: Text(appText(context).cancel),
       ),
-      FilledButton(onPressed: submit, child: const Text('Guardar')),
+      FilledButton(onPressed: submit, child: Text(appText(context).save)),
     ],
   );
 }

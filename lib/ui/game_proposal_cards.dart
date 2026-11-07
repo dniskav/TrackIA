@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../application/localization.dart';
+
 /// What a card of the chat asks the user to accept: a goal, an achievement or
 /// reminder texts the AI proposed (FR-036). Nothing is saved until «Añadir».
 class GameProposalData {
@@ -47,14 +49,16 @@ class GameProposalCard extends StatelessWidget {
               OutlinedButton(
                 key: Key('game-ignore-${data.kind}'),
                 onPressed: busy ? null : onIgnore,
-                child: const Text('Ignorar'),
+                child: Text(appText(context).proposalIgnore),
               ),
               const SizedBox(width: 12),
               FilledButton(
                 key: Key('game-add-${data.kind}'),
                 onPressed: busy ? null : onAdd,
                 child: Text(
-                  data.kind == 'copy' ? 'Usar estos textos' : 'Añadir',
+                  data.kind == 'copy'
+                      ? appText(context).proposalUseTexts
+                      : appText(context).proposalAdd,
                 ),
               ),
             ],
@@ -95,17 +99,17 @@ class GameSuggestionCard extends StatelessWidget {
               FilledButton(
                 key: const Key('suggest-activate'),
                 onPressed: onActivate,
-                child: const Text('Activar'),
+                child: Text(appText(context).activityEnableNotices),
               ),
               OutlinedButton(
                 key: const Key('suggest-later'),
                 onPressed: onLater,
-                child: const Text('Ahora no'),
+                child: Text(appText(context).proposalSuggestLater),
               ),
               TextButton(
                 key: const Key('suggest-never'),
                 onPressed: onNever,
-                child: const Text('No volver a sugerir'),
+                child: Text(appText(context).proposalSuggestNever),
               ),
             ],
           ),

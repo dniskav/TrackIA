@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../application/localization.dart';
 import '../data/chat_archive_store.dart';
 import '../data/ai_client.dart';
 import 'chat_message.dart';
@@ -29,23 +30,21 @@ class _ArchivedChatsScreenState extends State<ArchivedChatsScreen> {
       if (selected != null && mounted) Navigator.pop(context, selected);
     } catch (_) {
       if (mounted) {
-        setState(
-          () => error = 'No se pudo recuperar el chat. El archivo se conserva.',
-        );
+        setState(() => error = appText(context).archiveRecoverError);
       }
     }
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Chats archivados')),
+    appBar: AppBar(title: Text(appText(context).chatArchives)),
     body: Column(
       children: [
         Padding(
           padding: const EdgeInsets.all(16),
           child: TextField(
-            decoration: const InputDecoration(
-              labelText: 'Buscar por título o resumen',
+            decoration: InputDecoration(
+              labelText: appText(context).archiveSearchLabel,
             ),
             onChanged: (text) => setState(() => query = text.toLowerCase()),
           ),
@@ -55,7 +54,7 @@ class _ArchivedChatsScreenState extends State<ArchivedChatsScreen> {
           child: ListView(
             children: [
               if (widget.entries.isEmpty)
-                const ListTile(title: Text('Todavía no hay chats archivados.')),
+                ListTile(title: Text(appText(context).archiveEmpty)),
               for (final entry in widget.entries.reversed)
                 if ('${entry['title']} ${entry['summary']}'
                     .toLowerCase()
@@ -64,7 +63,7 @@ class _ArchivedChatsScreenState extends State<ArchivedChatsScreen> {
                     leading: const Icon(Icons.inventory_2_outlined),
                     title: Text(entry['title'] as String),
                     subtitle: Text(
-                      '${(entry['createdAt'] as String).substring(0, 10)} · ${entry['messageCount']} mensajes${entry['automatic'] == true ? ' · archivado por el asistente' : ''}',
+                      '${appText(context).archiveChatSubtitle((entry['createdAt'] as String).substring(0, 10), '${entry['messageCount']}')}${entry['automatic'] == true ? ' · ${appText(context).archiveAutomaticTag}' : ''}',
                     ),
                     onTap: () => open(entry),
                   ),
@@ -88,7 +87,7 @@ class _ArchiveDetail extends StatelessWidget {
         children: [
           if ((document['summary'] as String).isNotEmpty)
             ExpansionTile(
-              title: const Text('Resumen de continuidad'),
+              title: Text(appText(context).archiveContinuityTitle),
               children: [
                 ConstrainedBox(
                   constraints: BoxConstraints(
@@ -97,7 +96,9 @@ class _ArchiveDetail extends StatelessWidget {
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(16),
                     child: SelectableText(
-                      '${document['summary']}${document['automatic'] == true ? '\n\nMotivo del asistente: ${document['reason']}' : ''}',
+                      document['automatic'] == true
+                          ? '${document['summary']}\n\n${appText(context).archiveReasonLine('${document['reason']}')}'
+                          : '${document['summary']}',
                     ),
                   ),
                 ),
@@ -106,7 +107,7 @@ class _ArchiveDetail extends StatelessWidget {
           FilledButton.icon(
             onPressed: () => Navigator.pop(context, document['id'] as String),
             icon: const Icon(Icons.chat_outlined),
-            label: const Text('Consultar desde el chat'),
+            label: Text(appText(context).archiveConsultFromChat),
           ),
           Expanded(
             child: ListView.builder(
@@ -123,7 +124,9 @@ class _ArchiveDetail extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          message.role == 'user' ? 'Tú' : 'Asistente',
+                          message.role == 'user'
+                              ? appText(context).archiveYou
+                              : appText(context).assistant,
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                         ChatMessageBody(
@@ -132,7 +135,9 @@ class _ArchiveDetail extends StatelessWidget {
                         ),
                         if (message.attachment != null)
                           Text(
-                            'Adjunto conservado: ${message.attachment!.name}',
+                            appText(
+                              context,
+                            ).archiveAttachmentKept(message.attachment!.name),
                           ),
                       ],
                     ),

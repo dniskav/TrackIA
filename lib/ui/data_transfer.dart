@@ -31,13 +31,13 @@ Future<void> pickSheetForChat(
       if (file == null || !context.mounted) return;
       final bytes = file['bytes'];
       if (bytes is! Uint8List) {
-        throw const ValidationException('No se pudo leer la hoja.');
+        throw ValidationException(appText(context).transferSheetReadError);
       }
       await openImportDocument(
         context,
         controller,
         bytes,
-        name: file['name'] as String? ?? 'Hoja cargada',
+        name: file['name'] as String? ?? appText(context).transferDefaultSheetName,
         companionId: companionId,
       );
     } else {
@@ -49,7 +49,7 @@ Future<void> pickSheetForChat(
       if (result == null || !context.mounted) return;
       final file = result.files.single;
       if (file.size > 20 * 1024 * 1024) {
-        throw const ValidationException('La hoja supera 20 MB.');
+        throw ValidationException(appText(context).transferSheetTooLarge);
       }
       final bytes = file.bytes ?? await File(file.path!).readAsBytes();
       if (context.mounted) {
@@ -69,7 +69,7 @@ Future<void> pickSheetForChat(
           content: Text(
             e is ValidationException
                 ? e.message
-                : 'No se pudo cargar la hoja. Vuelve a intentarlo.',
+                : appText(context).transferSheetLoadError,
           ),
         ),
       );
@@ -91,7 +91,7 @@ Future<void> openImportDocument(
       context: context,
       builder:
           (context) => SimpleDialog(
-            title: const Text('Elige la pestaña con tus entrenamientos'),
+            title: Text(appText(context).sheetChooseTab),
             children: [
               for (final name in tabs.keys)
                 SimpleDialogOption(
@@ -125,9 +125,7 @@ Future<void> openImportDocument(
     ).save(sheet);
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Hoja cargada. Pendiente de interpretación por la IA.'),
-        ),
+        SnackBar(content: Text(appText(context).transferSheetLoaded)),
       );
     }
   }
@@ -157,6 +155,7 @@ class _DataTransferScreenState extends State<DataTransferScreen> {
   }
 
   Future<String?> pickText(List<String> extensions) async {
+    final strings = appText(context);
     final result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
       allowedExtensions: extensions,
@@ -165,7 +164,7 @@ class _DataTransferScreenState extends State<DataTransferScreen> {
     if (result == null) return null;
     final file = result.files.single;
     if (file.size > 20 * 1024 * 1024) {
-      throw const ValidationException('El archivo supera 20 MB.');
+      throw ValidationException(strings.transferFileTooLarge);
     }
     final bytes = file.bytes ?? await File(file.path!).readAsBytes();
     return utf8.decode(bytes);
@@ -179,9 +178,9 @@ class _DataTransferScreenState extends State<DataTransferScreen> {
     } on ValidationException catch (e) {
       message(e.message);
     } on PlatformException catch (e) {
-      message(e.message ?? 'No se pudo leer la hoja seleccionada.');
+      if (mounted) message(e.message ?? appText(context).transferSheetSelectedError);
     } catch (_) {
-      message('No se pudo leer o compartir el archivo.');
+      if (mounted) message(appText(context).transferFileReadError);
     } finally {
       if (mounted) setState(() => working = false);
     }
@@ -201,8 +200,8 @@ class _DataTransferScreenState extends State<DataTransferScreen> {
     final box = context.findRenderObject() as RenderBox?;
     await Share.shareXFiles(
       [XFile(file.path, mimeType: 'application/json')],
-      subject: 'Copia de seguridad TrackIA',
-      text: 'Guarda este archivo en Drive o en un lugar seguro.',
+      subject: appText(context).transferShareSubject,
+      text: appText(context).transferShareText,
       sharePositionOrigin:
           box == null ? null : box.localToGlobal(Offset.zero) & box.size,
     );
@@ -216,18 +215,18 @@ class _DataTransferScreenState extends State<DataTransferScreen> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('¿Restaurar esta copia?'),
+            title: Text(appText(context).transferRestoreTitle),
             content: Text(
-              'Contiene ${summary.workouts} ${summary.workouts == 1 ? 'sesión' : 'sesiones'} y ${summary.routines} ${summary.routines == 1 ? 'rutina' : 'rutinas'}${summary.active ? ', incluida una sesión en curso' : ''}. Sustituirá todos los datos que hay ahora en este teléfono. Guarda antes una copia actual si quieres conservarlos.',
+              appText(context).transferRestoreBody(summary.workouts, summary.routines, summary.active ? appText(context).transferRestoreActive : ''),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancelar'),
+                child: Text(appText(context).cancel),
               ),
               FilledButton(
                 onPressed: () => Navigator.pop(context, true),
-                child: const Text('Restaurar'),
+                child: Text(appText(context).transferRestoreAction),
               ),
             ],
           ),
@@ -236,7 +235,7 @@ class _DataTransferScreenState extends State<DataTransferScreen> {
     final ok = await widget.controller.run(
       () => store.restoreBackupJson(source),
     );
-    if (ok) message('Copia restaurada. Sesiones y rutinas actualizadas.');
+    if (ok && mounted) message(appText(context).transferRestored);
   });
 
   Future<void> importFile() => run(() async {
@@ -247,15 +246,13 @@ class _DataTransferScreenState extends State<DataTransferScreen> {
       if (file == null || !mounted) return;
       final bytes = file['bytes'];
       if (bytes is! Uint8List) {
-        throw const ValidationException(
-          'No se pudo leer la hoja seleccionada.',
-        );
+        throw ValidationException(appText(context).transferSheetSelectedError);
       }
       await openImportDocument(
         context,
         widget.controller,
         bytes,
-        name: file['name'] as String? ?? 'Hoja cargada',
+        name: file['name'] as String? ?? appText(context).transferDefaultSheetName,
         companionId: widget.companionId,
       );
       return;
@@ -267,12 +264,10 @@ class _DataTransferScreenState extends State<DataTransferScreen> {
     if (result == null || !mounted) return;
     final file = result.files.single;
     if (file.size > 20 * 1024 * 1024) {
-      throw const ValidationException('La hoja supera 20 MB.');
+      throw ValidationException(appText(context).transferSheetTooLarge);
     }
     if (file.bytes == null && file.path == null) {
-      throw const ValidationException(
-        'No se pudo leer esa hoja. En Google Sheets usa «Enviar una copia» como Excel o CSV y elige TrackIA.',
-      );
+      throw ValidationException(appText(context).transferNoAccessSheet);
     }
     final bytes = file.bytes ?? await File(file.path!).readAsBytes();
     if (!mounted) return;
@@ -303,7 +298,7 @@ class _DataTransferScreenState extends State<DataTransferScreen> {
           profileId: widget.controller.profileId,
           companionId: widget.companionId,
         ).save(sheet);
-        message('Hoja cargada. Pendiente de interpretación por la IA.');
+        if (mounted) message(appText(context).transferSheetLoaded);
       });
     }
   }
@@ -314,13 +309,10 @@ class _DataTransferScreenState extends State<DataTransferScreen> {
     body: ListView(
       padding: const EdgeInsets.all(24),
       children: [
-        const Text(
-          'Tu historial, bajo tu control',
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800),
-        ),
+        Text(appText(context).transferHeadline, style: TextStyle(fontSize: 28, fontWeight: FontWeight.w800)),
         const SizedBox(height: 10),
         Text(
-          'Guarda una copia fuera de este móvil para recuperarla o pasarla a otro teléfono.',
+          appText(context).transferIntro,
           style: TextStyle(
             color: Theme.of(context).colorScheme.onSurfaceVariant,
           ),
@@ -332,13 +324,10 @@ class _DataTransferScreenState extends State<DataTransferScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Copia de seguridad',
-                  style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
-                ),
+                Text(appText(context).transferBackupTitle, style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 Text(
-                  'Incluye historial, rutinas y sesión en curso.',
+                  appText(context).transferBackupHelp,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
@@ -366,15 +355,12 @@ class _DataTransferScreenState extends State<DataTransferScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Histórico de Google Sheets',
-                  style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
-                ),
+                Text(appText(context).transferSheetsTitle, style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 Text(
                   defaultTargetPlatform == TargetPlatform.android
-                      ? 'Carga tu hoja y pestaña con autorización de Google, o elige una copia Excel o CSV. Se conservan las celdas originales; la IA podrá interpretar tu formato cuando esté conectada.'
-                      : 'Carga una copia Excel o CSV. Se conservan las celdas originales, pendientes de interpretación por la IA.',
+                      ? appText(context).transferSheetsHelpAndroid
+                      : appText(context).transferSheetsHelpOther,
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
@@ -384,7 +370,7 @@ class _DataTransferScreenState extends State<DataTransferScreen> {
                   FilledButton.icon(
                     onPressed: working ? null : importGoogleSheets,
                     icon: const Icon(Icons.table_chart_outlined),
-                    label: const Text('Importar desde Google Sheets'),
+                    label: Text(appText(context).transferImportSheets),
                   ),
                   const SizedBox(height: 8),
                 ],
@@ -393,8 +379,8 @@ class _DataTransferScreenState extends State<DataTransferScreen> {
                   icon: const Icon(Icons.upload_file_rounded),
                   label: Text(
                     defaultTargetPlatform == TargetPlatform.android
-                        ? 'Elegir archivo del móvil o Drive'
-                        : 'Elegir copia XLSX o CSV',
+                        ? appText(context).transferChooseFileAndroid
+                        : appText(context).transferChooseFileOther,
                   ),
                 ),
               ],
@@ -434,7 +420,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
     child: ExpansionTile(
       title: Text(workout.name),
       subtitle: Text(
-        '${DateFormat('d/M/yyyy HH:mm').format(workout.date)} · ${workout.exercises.length} ejercicios · ${workout.setCount} series',
+        appText(context).transferWorkoutSubtitle(DateFormat('d/M/yyyy HH:mm').format(workout.date), workout.exercises.length, workout.setCount),
       ),
       trailing:
           existing.contains(importedFingerprint(workout))
@@ -473,7 +459,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Cerrar'),
+                child: Text(appText(context).transferCloseAction),
               ),
             ],
           ),
@@ -517,7 +503,9 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
         DropdownMenuItem(
           value: -1,
           child: Text(
-            optional ? 'Sin columna · Entrenamiento' : 'Elegir columna',
+            optional
+                ? appText(context).transferNoColumnWorkout
+                : appText(context).transferChooseColumn,
           ),
         ),
         for (var i = 0; i < widget.sheet.headers.length; i++)
@@ -555,7 +543,7 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
     } on ValidationException catch (e) {
       if (mounted) setState(() => error = e.message);
     } catch (_) {
-      if (mounted) setState(() => error = 'No se pudo revisar el CSV.');
+      if (mounted) setState(() => error = appText(context).transferCsvReviewError);
     } finally {
       if (mounted) setState(() => busy = false);
     }
@@ -572,18 +560,18 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('¿Importar estas sesiones?'),
+            title: Text(appText(context).transferImportSessionsTitle),
             content: Text(
-              'Se añadirán ${ready.length} ${ready.length == 1 ? 'sesión' : 'sesiones'} con ${ready.fold<int>(0, (n, w) => n + w.setCount)} series. Filas omitidas por error: ${preview!.errors.length}.',
+              appText(context).transferImportSessionsBody(ready.length, ready.fold<int>(0, (n, w) => n + w.setCount), preview!.errors.length),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancelar'),
+                child: Text(appText(context).cancel),
               ),
               FilledButton(
                 onPressed: () => Navigator.pop(context, true),
-                child: const Text('Importar'),
+                child: Text(appText(context).transferImportAction),
               ),
             ],
           ),
@@ -601,13 +589,13 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            '${summary!.added} ${summary!.added == 1 ? 'sesión importada' : 'sesiones importadas'} · ${summary!.duplicates} ${summary!.duplicates == 1 ? 'duplicada omitida' : 'duplicadas omitidas'}.',
+            appText(context).transferImportedSummary(summary!.added, summary!.duplicates),
           ),
         ),
       );
       Navigator.pop(context);
     } else {
-      setState(() => error = widget.controller.error ?? 'No se pudo importar.');
+      setState(() => error = widget.controller.error ?? appText(context).transferImportError);
     }
   }
 
@@ -620,36 +608,36 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
         0;
     final newCount = (preview?.workouts.length ?? 0) - duplicateCount;
     return Scaffold(
-      appBar: AppBar(title: const Text('Importar hoja')),
+      appBar: AppBar(title: Text(appText(context).transferImportSheetTitle)),
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
           Text(
-            '${widget.sheet.rows.length} filas encontradas',
+            appText(context).transferRowsFound(widget.sheet.rows.length),
             style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
-            'Asocia las columnas de tu hoja. Una fila representa una serie.',
+            appText(context).transferMapHelp,
             style: TextStyle(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: 24),
-          selector('Fecha', mapping.date, (v) => change(date: v)),
+          selector(appText(context).transferDate, mapping.date, (v) => change(date: v)),
           selector(
-            'Sesión (opcional)',
+            appText(context).transferSessionOptional,
             mapping.session ?? -1,
             (v) => change(session: v, sessionChanged: true),
             optional: true,
           ),
-          selector('Ejercicio', mapping.exercise, (v) => change(exercise: v)),
-          selector('Peso (kg)', mapping.weight, (v) => change(weight: v)),
-          selector('Repeticiones', mapping.reps, (v) => change(reps: v)),
+          selector(appText(context).transferExercise, mapping.exercise, (v) => change(exercise: v)),
+          selector(appText(context).transferWeightKg, mapping.weight, (v) => change(weight: v)),
+          selector(appText(context).transferReps, mapping.reps, (v) => change(reps: v)),
           const SizedBox(height: 8),
           FilledButton(
             onPressed: busy ? null : review,
-            child: const Text('Revisar importación'),
+            child: Text(appText(context).transferReviewImport),
           ),
           if (error != null)
             Padding(
@@ -667,12 +655,12 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
           if (preview != null) ...[
             const SizedBox(height: 28),
             Text(
-              '$newCount ${newCount == 1 ? 'sesión nueva' : 'sesiones nuevas'} · $duplicateCount ${duplicateCount == 1 ? 'duplicada' : 'duplicadas'} · ${preview!.errors.length} ${preview!.errors.length == 1 ? 'fila con error' : 'filas con errores'}',
+              appText(context).transferPreviewSummary(newCount, duplicateCount, preview!.errors.length),
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
-              '${preview!.validRows} series válidas de ${preview!.totalRows} filas.',
+              appText(context).transferValidRows(preview!.validRows, preview!.totalRows),
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
@@ -683,11 +671,11 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
               TextButton(
                 onPressed:
                     () => showAll(
-                      'Todas las sesiones',
+                      appText(context).transferAllSessions,
                       (i) => workoutTile(preview!.workouts[i]),
                       preview!.workouts.length,
                     ),
-                child: Text('Ver las ${preview!.workouts.length} sesiones'),
+                child: Text(appText(context).transferSeeSessions(preview!.workouts.length)),
               ),
             for (final issue in preview!.errors.take(15))
               Padding(
@@ -701,20 +689,20 @@ class _CsvImportScreenState extends State<CsvImportScreen> {
               TextButton(
                 onPressed:
                     () => showAll(
-                      'Filas con errores',
+                      appText(context).transferErrorRows,
                       (i) => Padding(
                         padding: const EdgeInsets.all(8),
                         child: Text(preview!.errors[i]),
                       ),
                       preview!.errors.length,
                     ),
-                child: Text('Ver los ${preview!.errors.length} errores'),
+                child: Text(appText(context).transferSeeErrors(preview!.errors.length)),
               ),
             const SizedBox(height: 20),
             FilledButton.icon(
               onPressed: busy || newCount == 0 ? null : import,
               icon: const Icon(Icons.check_rounded),
-              label: const Text('Importar sesiones nuevas'),
+              label: Text(appText(context).transferImportNew),
             ),
           ],
         ],

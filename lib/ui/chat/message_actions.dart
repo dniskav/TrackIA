@@ -1,7 +1,7 @@
 part of '../assistant_chat.dart';
 
-const _onlyLastEditable =
-    'Solo se puede editar el último mensaje. Escribe una corrección como mensaje nuevo.';
+String _onlyLastEditable(BuildContext context) =>
+    appText(context).chatMsgOnlyLastEditable;
 
 /// Accessible, ID-based actions for durable user messages.
 extension _MessageActions on _AssistantChatScreenState {
@@ -87,12 +87,12 @@ extension _MessageActions on _AssistantChatScreenState {
     }
     final state = deliveryStates[id] ?? MessageDelivery.pending;
     final label = switch (state) {
-      MessageDelivery.pending => 'Pendiente de envío',
-      MessageDelivery.sending => 'Enviando',
-      MessageDelivery.answered => 'Respondido',
-      MessageDelivery.failed => 'No aceptado; puedes reenviar',
+      MessageDelivery.pending => appText(context).chatMsgPending,
+      MessageDelivery.sending => appText(context).chatMsgSending,
+      MessageDelivery.answered => appText(context).chatMsgAnswered,
+      MessageDelivery.failed => appText(context).chatMsgFailed,
       MessageDelivery.uncertain =>
-        'Resultado incierto; reenvío bloqueado hasta revisar',
+        appText(context).chatMsgUncertain,
     };
     // Los detalles solo existen en mensajes del usuario (burbuja de acento).
     final muted = userBubbleTextColor.withValues(alpha: 0.8);
@@ -145,22 +145,22 @@ extension _MessageActions on _AssistantChatScreenState {
           action(
             Key('edit-message-$id'),
             Icons.edit_outlined,
-            isLast ? 'Editar' : _onlyLastEditable,
+            isLast ? appText(context).edit : _onlyLastEditable(context),
             isLast && !busy && state != MessageDelivery.sending
                 ? () => editDurableMessage(message)
                 : null,
-            whyDisabled: isLast ? null : _onlyLastEditable,
+            whyDisabled: isLast ? null : _onlyLastEditable(context),
           ),
           action(
             Key('history-message-$id'),
             Icons.history,
-            'Historial',
+            appText(context).chatMsgHistory,
             busy ? null : () => showDurableMessageHistory(id),
           ),
           action(
             Key('resend-message-$id'),
             Icons.refresh,
-            'Reenviar',
+            appText(context).chatMsgResend,
             !busy && aiReady && MessageDeliveryPolicy.canRetry(state)
                 ? () => send(retryMessageId: id)
                 : null,
@@ -176,18 +176,19 @@ extension _MessageActions on _AssistantChatScreenState {
     final id = outgoingMessageIds[message];
     if (repository == null || id == null) return;
     if (!identical(message, lastUserMessage)) {
-      update(() => error = _onlyLastEditable);
+      update(() => error = _onlyLastEditable(context));
       return;
     }
+    final l = appText(context);
     final item = await repository.loadItem(id);
     if (!mounted) return;
     if (item == null || item.message.chatId != sessionId) return;
     // El controller vive dentro del diálogo (_EditMessageDialog): se destruye
     // cuando su árbol se desmonta, no antes (evitaba '_dependents.isEmpty').
     final sendBlocker = !aiReady
-        ? 'La IA no está lista.'
+        ? appText(context).chatMsgAiNotReady
         : busy
-        ? 'Hay un envío en curso.'
+        ? appText(context).chatMsgSendInProgress
         : null;
     final result = await showDialog<_EditResult>(
       context: context,
@@ -202,8 +203,8 @@ extension _MessageActions on _AssistantChatScreenState {
     try {
       final latest = await repository.loadItem(id);
       if (latest == null || latest.revision.id != item.revision.id) {
-        throw const ValidationException(
-          'El mensaje cambió mientras lo editabas. Revisa el historial.',
+        throw ValidationException(
+          l.chatMsgChangedWhileEditing,
         );
       }
       final revision = MessageRevision(
@@ -246,17 +247,17 @@ extension _MessageActions on _AssistantChatScreenState {
       } else {
         update(
           () => error = result.send
-              ? 'Edición guardada, pero no se pudo enviar ahora. Usa Reenviar cuando puedas.'
-              : 'Edición guardada. Usa Reenviar para enviar esta versión.',
+              ? appText(context).chatMsgSaveNotSent
+              : appText(context).chatMsgSavedOnly,
         );
       }
     } on ValidationException catch (e) {
       update(() => error = e.message);
     } on ArgumentError {
-      update(() => error = 'Escribe un mensaje de 1 a 8000 caracteres.');
+      update(() => error = appText(context).chatMsgLengthError);
     } catch (_) {
       update(
-        () => error = 'No se pudo guardar la edición; el original se conserva.',
+        () => error = appText(context).chatMsgEditError,
       );
     }
   }
@@ -270,7 +271,7 @@ extension _MessageActions on _AssistantChatScreenState {
       await showDialog<void>(
         context: context,
         builder: (dialogContext) => AlertDialog(
-          title: const Text('Historial de versiones'),
+          title: Text(appText(context).chatMsgHistoryTitle),
           content: SizedBox(
             width: double.maxFinite,
             child: ListView(
@@ -284,7 +285,9 @@ extension _MessageActions on _AssistantChatScreenState {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Versión ${revision.revision}${revision.id == loaded.message.currentRevisionId ? ' · actual' : ''}',
+                          revision.id == loaded.message.currentRevisionId
+                              ? appText(context).chatMsgVersionCurrent(revision.revision)
+                              : appText(context).chatMsgVersion(revision.revision),
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                         SelectableText(revision.text),
@@ -297,13 +300,13 @@ extension _MessageActions on _AssistantChatScreenState {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Cerrar'),
+              child: Text(appText(context).chatMsgClose),
             ),
           ],
         ),
       );
     } catch (_) {
-      if (mounted) update(() => error = 'No se pudo abrir el historial.');
+      if (mounted) update(() => error = appText(context).chatMsgHistoryError);
     }
   }
 }
@@ -343,7 +346,7 @@ class _EditMessageDialogState extends State<_EditMessageDialog> {
   Widget build(BuildContext context) {
     final blocker = widget.sendBlocker;
     return AlertDialog(
-      title: const Text('Editar mensaje'),
+      title: Text(appText(context).chatMsgEditTitle),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -355,16 +358,16 @@ class _EditMessageDialogState extends State<_EditMessageDialog> {
             minLines: 3,
             maxLines: 8,
             maxLength: MessageRevision.maxTextLength,
-            decoration: const InputDecoration(
-              labelText: 'Texto corregido',
-              helperText: 'La versión original se conserva en el historial.',
+            decoration: InputDecoration(
+              labelText: appText(context).chatMsgEditLabel,
+              helperText: appText(context).chatMsgEditHelper,
             ),
           ),
           if (blocker != null)
             Padding(
               padding: const EdgeInsets.only(top: 8),
               child: Text(
-                'No se puede enviar ahora: $blocker',
+                appText(context).chatMsgSendBlocked(blocker),
                 key: const Key('edit-send-blocker'),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
@@ -375,17 +378,17 @@ class _EditMessageDialogState extends State<_EditMessageDialog> {
         TextButton(
           key: const Key('cancel-edit-message'),
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancelar'),
+          child: Text(appText(context).cancel),
         ),
         TextButton(
           key: const Key('save-edit-message'),
           onPressed: () => close(send: false),
-          child: const Text('Guardar'),
+          child: Text(appText(context).save),
         ),
         FilledButton(
           key: const Key('save-send-edit-message'),
           onPressed: blocker == null ? () => close(send: true) : null,
-          child: const Text('Guardar y enviar'),
+          child: Text(appText(context).chatMsgSaveAndSend),
         ),
       ],
     );

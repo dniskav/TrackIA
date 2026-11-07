@@ -90,7 +90,7 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
       });
     } catch (_) {
       if (mounted) {
-        setState(() => status = 'No se pudo leer la configuración guardada.');
+        setState(() => status = appText(context).aiConfigReadError);
       }
     } finally {
       if (mounted) setState(() => busy = false);
@@ -118,6 +118,7 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
       '${tokens >= 1024 ? (tokens / 1024).round().toString() : tokens}${tokens >= 1024 ? 'k' : ''} tokens';
 
   Future<void> pickLocalFile({required bool projector}) async {
+    final strings = appText(context);
     try {
       final selection = await FilePicker.platform.pickFiles(
         type: FileType.custom,
@@ -142,7 +143,7 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
       } else if (picked.path != null) {
         await File(picked.path!).copy(target.path);
       } else {
-        throw StateError('Android no entregó acceso al archivo seleccionado.');
+        throw StateError(strings.aiSetAndroidFileAccess);
       }
       if (!mounted) return;
       setState(() {
@@ -157,7 +158,7 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
       await refreshLocalMemory();
     } catch (error) {
       if (mounted) {
-        setState(() => status = 'No se pudo importar el archivo GGUF: $error');
+        setState(() => status = appText(context).aiModelImportError('$error'));
       }
     }
   }
@@ -239,28 +240,23 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
             contextLength: localContextLength,
           ),
         ),
-        bar('Disponible ahora', memory.availableBytes),
-        bar('Después de modelo y proyector', afterModel),
-        bar('Después + contexto seleccionado', projected),
+        bar(appText(context).aiMemoryAvailableNow, memory.availableBytes),
+        bar(appText(context).aiMemoryAfterModel, afterModel),
+        bar(appText(context).aiMemoryAfterContext, projected),
         Padding(
           padding: const EdgeInsets.only(top: 8),
           child: Text(
-            'El contexto de ${_contextLabel(localContextLength)} añadiría aproximadamente ${format(contextRange.minimum)}–${format(contextRange.maximum)} de RAM.',
+            appText(context).aiMemoryContextEstimate(_contextLabel(localContextLength), format(contextRange.minimum), format(contextRange.maximum)),
           ),
         ),
         if (shortfall > 0)
           Padding(
             padding: const EdgeInsets.only(top: 8),
             child: Text(
-              'La estimación supera lo disponible por ${format(shortfall)}.',
+              appText(context).aiMemoryShortfall(format(shortfall)),
             ),
           ),
-        const Padding(
-          padding: EdgeInsets.only(top: 8),
-          child: Text(
-            'Estimación orientativa de pesos y proyector; el contexto elegido añade consumo y puede variar según el modelo.',
-          ),
-        ),
+        Padding(padding: const EdgeInsets.only(top: 8), child: Text(appText(context).aiMemoryEstimateHelp)),
       ],
     );
   }
@@ -285,8 +281,8 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
         chatGptAccounts = accounts;
         chatGptClientId = account.clientId;
         status = account.canUsePlan
-            ? 'Cuenta conectada. Elige un modelo y prueba la conexión para usar el asistente.'
-            : 'Identidad conectada. Puedes autorizar por separado el uso de tu plan ChatGPT.';
+            ? appText(context).aiConnectedChooseModel
+            : appText(context).aiIdentityConnected;
       });
     });
     if (mounted && selectedChatGpt?.canUsePlan == true) await fetchModels();
@@ -306,8 +302,8 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
       invalidateCatalog();
       chatGptAccounts = accounts;
       status = revoked
-          ? 'Sesión ChatGPT desconectada.'
-          : 'Sesión desconectada en este móvil. No se confirmó la revocación remota; desconecta TrackIA también en los ajustes de ChatGPT.';
+          ? appText(context).aiChatGptDisconnected
+          : appText(context).aiChatGptRemoteRevocationUnconfirmed;
     });
   });
 
@@ -323,8 +319,10 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
       if (mounted) setState(() => status = e.message);
     } catch (error) {
       if (mounted) {
-        final details = service == AiService.local ? ': $error' : '';
-        setState(() => status = 'No se pudo completar la operación$details');
+        final details = service == AiService.local
+            ? appText(context).aiOperationDetails('$error')
+            : '';
+        setState(() => status = appText(context).aiOperationError(details));
       }
     } finally {
       if (mounted) setState(() => busy = false);
@@ -379,8 +377,8 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
           }
         }
         catalogStatus = service == AiService.chatgpt
-            ? 'Modelos disponibles para esta cuenta: ${result.length}. La prueba de conexión confirma el acceso al elegido.'
-            : '${result.length} modelos obtenidos del proveedor. La prueba de conexión confirma si tu clave puede usar el elegido.';
+            ? appText(context).aiSetModelsCountChatGpt(result.length)
+            : appText(context).aiSetCatalogCountApi(result.length);
       });
     } on ValidationException catch (e) {
       if (mounted && ticket == catalogRequest) {
@@ -393,8 +391,8 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
       if (mounted && ticket == catalogRequest) {
         setState(() {
           catalogStatus = service == AiService.chatgpt
-              ? 'No se pudo obtener el catálogo de esta cuenta. Comprueba la conexión e inténtalo de nuevo.'
-              : 'No se pudo obtener el catálogo. Puedes volver a intentarlo o indicar el modelo manualmente.';
+              ? appText(context).aiSetCatalogErrorChatGpt
+              : appText(context).aiSetCatalogErrorApi;
           manualModel = true;
         });
       }
@@ -427,9 +425,7 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
           style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 12),
-        const Text(
-          'Elige un proveedor en la nube o ejecuta un modelo local en este móvil. Los modelos locales pueden funcionar sin conexión; el rendimiento depende de la memoria y del modelo elegido.',
-        ),
+        Text(appText(context).aiProviderDescription),
         const SizedBox(height: 20),
         DropdownButtonFormField<AiService>(
           key: ValueKey('service-$service'),
@@ -470,29 +466,23 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Modelo GGUF',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
+                  Text(appText(context).aiSetGgufTitle, style: TextStyle(fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
                   Text(
                     localModelPath?.split(Platform.pathSeparator).last ??
-                        'No hay modelo importado.',
+                        appText(context).aiNoModelImported,
                   ),
                   OutlinedButton.icon(
                     onPressed: busy
                         ? null
                         : () => pickLocalFile(projector: false),
                     icon: const Icon(Icons.download),
-                    label: const Text('Seleccionar / importar modelo .gguf'),
+                    label: Text(appText(context).aiSelectImportGguf),
                   ),
                   const SizedBox(height: 12),
-                  const Text(
-                    'Contexto del modelo local',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
+                  Text(appText(context).aiLocalContextTitle, style: TextStyle(fontWeight: FontWeight.bold)),
                   Text(
-                    'TrackIA recomienda ${_contextLabel(LocalModelMemory.trackiaRecommendedContextLength)} para sus instrucciones, historial y datos. La recomendación es para las necesidades de la app, no para el límite de este GGUF. Si el modelo no soporta el tamaño elegido, puede fallar; tú decides si bajarlo.',
+                    appText(context).aiSetLocalContextHelp(_contextLabel(LocalModelMemory.trackiaRecommendedContextLength)),
                   ),
                   Slider(
                     key: const Key('local-context-slider'),
@@ -516,7 +506,7 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Seleccionado: ${_contextLabel(localContextLength)}',
+                        appText(context).aiContextSelected(_contextLabel(localContextLength)),
                       ),
                       if (localContextLength !=
                           LocalModelMemory.trackiaRecommendedContextLength)
@@ -527,28 +517,23 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
                                   localContextLength = LocalModelMemory
                                       .trackiaRecommendedContextLength;
                                 }),
-                          child: const Text('Usar recomendación'),
+                          child: Text(appText(context).aiUseRecommendation),
                         ),
                     ],
                   ),
                   const Divider(),
-                  const Text(
-                    'Proyector visual (opcional)',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const Text(
-                    'Añádelo para usar imágenes. MiniCPM‑V necesita el archivo mmproj GGUF correspondiente.',
-                  ),
+                  Text(appText(context).aiVisualProjector, style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text(appText(context).aiProjectorHelp),
                   Text(
                     localProjectorPath?.split(Platform.pathSeparator).last ??
-                        'Sin proyector visual.',
+                        appText(context).aiNoProjector,
                   ),
                   OutlinedButton.icon(
                     onPressed: busy
                         ? null
                         : () => pickLocalFile(projector: true),
                     icon: const Icon(Icons.image_search),
-                    label: const Text('Seleccionar proyector mmproj'),
+                    label: Text(appText(context).aiSelectProjector),
                   ),
                   if (localMemoryStatus != null && localMemory == null) ...[
                     const SizedBox(height: 8),
@@ -558,13 +543,11 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
                       localModelBytes != null &&
                       localProjectorBytes != null)
                     localMemoryComparison(),
-                  const Text(
-                    'La memoria disponible se informa aparte. La recomendación de 8192 tokens responde a lo que TrackIA necesita; el GGUF puede no soportarlo y tú puedes elegir otro tamaño.',
-                  ),
+                  Text(appText(context).aiMemoryHelp),
                   TextButton.icon(
                     onPressed: busy ? null : refreshLocalMemory,
                     icon: const Icon(Icons.memory),
-                    label: const Text('Volver a calcular memoria disponible'),
+                    label: Text(appText(context).aiRecalculateMemory),
                   ),
                 ],
               ),
@@ -579,23 +562,18 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
               onChanged: (_) => setState(invalidateCatalog),
               autocorrect: false,
               enableSuggestions: false,
-              decoration: const InputDecoration(
-                labelText: 'URL base de la API',
-                helperText: 'HTTPS, por ejemplo https://tu-proveedor.com/v1',
-              ),
+              decoration: InputDecoration(labelText: appText(context).aiApiBase, helperText: appText(context).aiHttpsExample),
             ),
             const SizedBox(height: 16),
           ],
           if (service == AiService.chatgpt) ...[
-            const Text(
-              'Usa tu plan si tu cuenta y espacio son elegibles. El uso consume sus límites compartidos. No da acceso a tus conversaciones de ChatGPT.',
-            ),
+            Text(appText(context).aiChatGptPlanHelp),
             if (chatGptAccounts.isNotEmpty)
               DropdownButtonFormField<String>(
                 key: ValueKey('chatgpt-account-$chatGptClientId'),
                 initialValue: chatGptClientId,
                 isExpanded: true,
-                decoration: const InputDecoration(labelText: 'Cuenta ChatGPT'),
+                decoration: InputDecoration(labelText: appText(context).aiChatGptAccount),
                 items: [
                   for (final account in chatGptAccounts)
                     DropdownMenuItem(
@@ -622,14 +600,14 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
             Text(
               selectedChatGpt?.connected == true
                   ? selectedChatGpt!.canUsePlan
-                        ? 'Conectada · permiso de uso del plan concedido'
-                        : 'Conectada · solo identidad'
-                  : 'ChatGPT sin conectar',
+                        ? appText(context).aiChatGptConnectedPlan
+                        : appText(context).aiChatGptConnectedIdentity
+                  : appText(context).aiChatGptNotConnected,
             ),
             OutlinedButton(
               key: const Key('chatgpt-connect'),
               onPressed: busy ? null : () => connectChatGpt(),
-              child: const Text('Continuar con ChatGPT'),
+              child: Text(appText(context).aiContinueChatGpt),
             ),
             if (selectedChatGpt?.connected == true)
               FilledButton(
@@ -637,30 +615,30 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
                 onPressed: busy ? null : () => connectChatGpt(usePlan: true),
                 child: Text(
                   selectedChatGpt!.canUsePlan
-                      ? 'Revisar permiso de uso del plan'
-                      : 'Autorizar uso de mi plan ChatGPT',
+                      ? appText(context).aiReviewPlanPermission
+                      : appText(context).aiAuthorizePlan,
                 ),
               ),
             if (chatGptAccounts.isNotEmpty)
               TextButton(
                 onPressed: busy ? null : () => connectChatGpt(newAccount: true),
-                child: const Text('Añadir otra cuenta o espacio'),
+                child: Text(appText(context).aiAddAccount),
               ),
             TextButton(
               onPressed: busy ? null : () => run(chatGpt.showUsage),
-              child: const Text('Ver uso y permisos en ChatGPT'),
+              child: Text(appText(context).aiViewUsagePermissions),
             ),
             if (selectedChatGpt?.connected == true)
               TextButton(
                 key: const Key('chatgpt-disconnect'),
                 onPressed: busy ? null : disconnectChatGpt,
-                child: const Text('Desconectar ChatGPT'),
+                child: Text(appText(context).aiDisconnectChatGpt),
               ),
             if (busy)
               TextButton(
                 key: const Key('chatgpt-cancel'),
                 onPressed: chatGpt.cancel,
-                child: const Text('Cancelar conexión'),
+                child: Text(appText(context).aiCancelConnection),
               ),
           ] else
             TextField(
@@ -673,9 +651,9 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
               autocorrect: false,
               enableSuggestions: false,
               decoration: InputDecoration(
-                labelText: 'Clave API',
+                labelText: appText(context).aiApiKey,
                 suffixIcon: IconButton(
-                  tooltip: reveal ? 'Ocultar clave' : 'Mostrar clave',
+                  tooltip: reveal ? appText(context).aiHideKey : appText(context).aiShowKey,
                   onPressed: () => setState(() => reveal = !reveal),
                   icon: Icon(reveal ? Icons.visibility_off : Icons.visibility),
                 ),
@@ -688,8 +666,8 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
             icon: const Icon(Icons.refresh),
             label: Text(
               loadingModels
-                  ? 'Consultando modelos…'
-                  : 'Obtener / actualizar modelos',
+                  ? appText(context).aiLoadingModels
+                  : appText(context).aiFetchModels,
             ),
           ),
           if (loadingModels) const LinearProgressIndicator(),
@@ -707,8 +685,8 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
                   ? config().modelId
                   : null,
               isExpanded: true,
-              decoration: const InputDecoration(labelText: 'Modelo'),
-              hint: const Text('Elige un modelo del catálogo'),
+              decoration: InputDecoration(labelText: appText(context).aiModelLabel),
+              hint: Text(appText(context).aiChooseCatalogModel),
               items: [
                 for (final m in models)
                   DropdownMenuItem(
@@ -738,7 +716,7 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: Text(
-                'Modelo actual: ${model.text}. Se conserva aunque no aparezca en el catálogo.',
+                appText(context).aiCurrentModelPreserved(model.text),
               ),
             ),
           if (service != AiService.chatgpt)
@@ -748,8 +726,8 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
                   : () => setState(() => manualModel = !manualModel),
               child: Text(
                 manualModel
-                    ? 'Ocultar identificador manual'
-                    : 'Introducir modelo manualmente',
+                    ? appText(context).aiHideManualId
+                    : appText(context).aiEnterManualModel,
               ),
             ),
           if (manualModel && service != AiService.chatgpt)
@@ -763,19 +741,15 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
               },
               autocorrect: false,
               enableSuggestions: false,
-              decoration: const InputDecoration(
-                labelText: 'Identificador del modelo',
-              ),
+              decoration: InputDecoration(labelText: appText(context).aiModelIdentifier),
             ),
           if (service == AiService.opencodeGo) ...[
             const SizedBox(height: 12),
-            const Text(
-              'Go está orientado a agentes de programación. Esta conexión se identifica como TrackIA; comprueba con tu proveedor si admite este uso. No se cambia automáticamente a Zen ni a otro servicio.',
-            ),
+            Text(appText(context).aiOpenCodeNotice),
           ],
           if (service != AiService.chatgpt)
             ExpansionTile(
-              title: const Text('Configuración de la API'),
+              title: Text(appText(context).aiApiSettings),
               children: [
                 if (service != AiService.custom)
                   TextField(
@@ -785,17 +759,13 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
                     onChanged: (_) => setState(invalidateCatalog),
                     autocorrect: false,
                     enableSuggestions: false,
-                    decoration: const InputDecoration(
-                      labelText: 'URL base HTTPS',
-                    ),
+                    decoration: InputDecoration(labelText: appText(context).aiHttpsBase),
                   ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<AiProtocol>(
                   key: ValueKey('protocol-$protocol'),
                   initialValue: protocol,
-                  decoration: const InputDecoration(
-                    labelText: 'Formato compatible con el modelo',
-                  ),
+                  decoration: InputDecoration(labelText: appText(context).aiProtocol),
                   items: [
                     for (final p in AiProtocol.values)
                       DropdownMenuItem(
@@ -829,13 +799,13 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
               : () => run(() async {
                   await store.save(config());
                   if (mounted) {
-                    setState(() => status = 'Configuración guardada.');
+                    setState(() => status = appText(context).aiConfigSaved);
                   }
                 }),
           child: Text(
             service == AiService.local
-                ? 'Guardar modelo local'
-                : 'Guardar proveedor',
+                ? appText(context).aiSaveLocalModel
+                : appText(context).aiSaveProvider,
           ),
         ),
         OutlinedButton(
@@ -858,15 +828,15 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
                   await store.save(tested);
                   await store.markVerified(tested);
                   if (mounted) {
-                    setState(() => status = 'El proveedor respondió:\n$answer');
+                    setState(() => status = appText(context).aiProviderResponded(answer));
                   }
                 }),
           child: Text(
             service == AiService.local
-                ? 'Probar modelo en este móvil'
+                ? appText(context).aiTestLocalModel
                 : service == AiService.chatgpt
-                ? 'Probar conexión · usa mi plan ChatGPT'
-                : 'Probar conexión · usa tu API',
+                ? appText(context).aiTestChatGpt
+                : appText(context).aiTestApi,
           ),
         ),
         if (service != AiService.chatgpt)
@@ -879,11 +849,11 @@ class _AiSettingsScreenState extends State<AiSettingsScreen> {
                     key.clear();
                     if (mounted) {
                       setState(
-                        () => status = 'Configuración y clave eliminadas.',
+                        () => status = appText(context).aiConfigDeleted,
                       );
                     }
                   }),
-            child: const Text('Eliminar configuración y clave'),
+            child: Text(appText(context).aiDeleteConfig),
           ),
         if (busy) const LinearProgressIndicator(),
         if (status != null)

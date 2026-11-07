@@ -2449,6 +2449,3264 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Versión {version}'**
   String appVersion(Object version);
+
+  /// No description provided for @activityIdleOtherActive.
+  ///
+  /// In es, this message translates to:
+  /// **'Otro acompañante activo'**
+  String get activityIdleOtherActive;
+
+  /// No description provided for @activityIdleNoActivity.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin actividad'**
+  String get activityIdleNoActivity;
+
+  /// No description provided for @activityIdleEndOther.
+  ///
+  /// In es, this message translates to:
+  /// **'Termina la otra actividad para iniciar aquí'**
+  String get activityIdleEndOther;
+
+  /// No description provided for @activityIdleRegisterAnytime.
+  ///
+  /// In es, this message translates to:
+  /// **'Registra una cuando quieras'**
+  String get activityIdleRegisterAnytime;
+
+  /// No description provided for @activityNewActivity.
+  ///
+  /// In es, this message translates to:
+  /// **'Nueva actividad'**
+  String get activityNewActivity;
+
+  /// No description provided for @activityIdleRecord.
+  ///
+  /// In es, this message translates to:
+  /// **'Registrar'**
+  String get activityIdleRecord;
+
+  /// No description provided for @activityRestLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Descanso'**
+  String get activityRestLabel;
+
+  /// No description provided for @activityRestDone.
+  ///
+  /// In es, this message translates to:
+  /// **'Descanso terminado'**
+  String get activityRestDone;
+
+  /// No description provided for @activityRestPaused.
+  ///
+  /// In es, this message translates to:
+  /// **'Descanso pausado'**
+  String get activityRestPaused;
+
+  /// No description provided for @activityRestPause.
+  ///
+  /// In es, this message translates to:
+  /// **'Pausar'**
+  String get activityRestPause;
+
+  /// No description provided for @activityRestContinue.
+  ///
+  /// In es, this message translates to:
+  /// **'Continuar'**
+  String get activityRestContinue;
+
+  /// No description provided for @activityRestStart.
+  ///
+  /// In es, this message translates to:
+  /// **'Iniciar descanso'**
+  String get activityRestStart;
+
+  /// No description provided for @activityRestRestart.
+  ///
+  /// In es, this message translates to:
+  /// **'Reiniciar descanso'**
+  String get activityRestRestart;
+
+  /// No description provided for @activityRestAdjust.
+  ///
+  /// In es, this message translates to:
+  /// **'{seconds}s · Ajustar'**
+  String activityRestAdjust(int seconds);
+
+  /// No description provided for @activityRestNotice.
+  ///
+  /// In es, this message translates to:
+  /// **'Aviso con esta pantalla abierta; el tiempo sigue al salir.'**
+  String get activityRestNotice;
+
+  /// No description provided for @activityRestDurationTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Tiempo de descanso'**
+  String get activityRestDurationTitle;
+
+  /// No description provided for @activityRestSecondsLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Segundos'**
+  String get activityRestSecondsLabel;
+
+  /// No description provided for @activityRestRangeHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Entre 5 y 1800 segundos. Al aplicar, el contador queda listo para empezar.'**
+  String get activityRestRangeHint;
+
+  /// No description provided for @activityRestApply.
+  ///
+  /// In es, this message translates to:
+  /// **'Aplicar'**
+  String get activityRestApply;
+
+  /// No description provided for @activityDialogNameTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre de la actividad'**
+  String get activityDialogNameTitle;
+
+  /// No description provided for @activityDialogSaveName.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardar nombre'**
+  String get activityDialogSaveName;
+
+  /// No description provided for @activityDialogRestRange.
+  ///
+  /// In es, this message translates to:
+  /// **'Entre 0 y 1800'**
+  String get activityDialogRestRange;
+
+  /// No description provided for @activityDialogWhatToDo.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Qué vas a hacer?'**
+  String get activityDialogWhatToDo;
+
+  /// No description provided for @activityDialogYourActivities.
+  ///
+  /// In es, this message translates to:
+  /// **'Tus actividades'**
+  String get activityDialogYourActivities;
+
+  /// No description provided for @activityDialogInstantRecord.
+  ///
+  /// In es, this message translates to:
+  /// **'Registro puntual'**
+  String get activityDialogInstantRecord;
+
+  /// No description provided for @activityDialogYourActivity.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu actividad'**
+  String get activityDialogYourActivity;
+
+  /// No description provided for @activityDialogFromCurrentWorkout.
+  ///
+  /// In es, this message translates to:
+  /// **'Del entrenamiento actual'**
+  String get activityDialogFromCurrentWorkout;
+
+  /// No description provided for @activityDialogSetsProgress.
+  ///
+  /// In es, this message translates to:
+  /// **'{done}/{target} series · {repsMin}–{repsMax} reps'**
+  String activityDialogSetsProgress(
+    Object done,
+    Object target,
+    Object repsMin,
+    Object repsMax,
+  );
+
+  /// No description provided for @activityDialogRepeat.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver a hacer'**
+  String get activityDialogRepeat;
+
+  /// No description provided for @activityDialogRoutineSets.
+  ///
+  /// In es, this message translates to:
+  /// **'{routine} · {sets} series'**
+  String activityDialogRoutineSets(Object routine, int sets);
+
+  /// No description provided for @activityDialogEndTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Terminar actividad'**
+  String get activityDialogEndTitle;
+
+  /// No description provided for @activityDialogDate.
+  ///
+  /// In es, this message translates to:
+  /// **'Fecha'**
+  String get activityDialogDate;
+
+  /// No description provided for @activityDialogTime.
+  ///
+  /// In es, this message translates to:
+  /// **'Hora'**
+  String get activityDialogTime;
+
+  /// No description provided for @activityBuilderNameRequired.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe un nombre para la actividad.'**
+  String get activityBuilderNameRequired;
+
+  /// No description provided for @activityBuilderOnlyIntegers.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe solo números enteros.'**
+  String get activityBuilderOnlyIntegers;
+
+  /// No description provided for @activityBuilderRange.
+  ///
+  /// In es, this message translates to:
+  /// **'{what} va de {min} a {max}.'**
+  String activityBuilderRange(Object what, int min, int max);
+
+  /// No description provided for @activityBuilderWhatDuration.
+  ///
+  /// In es, this message translates to:
+  /// **'La duración'**
+  String get activityBuilderWhatDuration;
+
+  /// No description provided for @activityBuilderWhatRest.
+  ///
+  /// In es, this message translates to:
+  /// **'El descanso'**
+  String get activityBuilderWhatRest;
+
+  /// No description provided for @activityBuilderWhatSegments.
+  ///
+  /// In es, this message translates to:
+  /// **'Los tramos previstos'**
+  String get activityBuilderWhatSegments;
+
+  /// No description provided for @activityBuilderWhatCycles.
+  ///
+  /// In es, this message translates to:
+  /// **'Los ciclos previstos'**
+  String get activityBuilderWhatCycles;
+
+  /// No description provided for @activityBuilderDurationRequired.
+  ///
+  /// In es, this message translates to:
+  /// **'Indica la duración en minutos.'**
+  String get activityBuilderDurationRequired;
+
+  /// No description provided for @activityBuilderSegmentNamesPair.
+  ///
+  /// In es, this message translates to:
+  /// **'Indica singular y plural del tramo, o deja los dos vacíos.'**
+  String get activityBuilderSegmentNamesPair;
+
+  /// No description provided for @activityBuilderFromTemplate.
+  ///
+  /// In es, this message translates to:
+  /// **'Empezar desde una plantilla'**
+  String get activityBuilderFromTemplate;
+
+  /// No description provided for @activityBuilderHowMeasured.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Cómo se mide?'**
+  String get activityBuilderHowMeasured;
+
+  /// No description provided for @activityBuilderInstantTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Puntual'**
+  String get activityBuilderInstantTitle;
+
+  /// No description provided for @activityBuilderInstantDetail.
+  ///
+  /// In es, this message translates to:
+  /// **'Un registro sin cronómetro'**
+  String get activityBuilderInstantDetail;
+
+  /// No description provided for @activityBuilderFreeTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Libre'**
+  String get activityBuilderFreeTitle;
+
+  /// No description provided for @activityBuilderFreeDetail.
+  ///
+  /// In es, this message translates to:
+  /// **'Cronómetro, sin cuenta atrás'**
+  String get activityBuilderFreeDetail;
+
+  /// No description provided for @activityBuilderTimedTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Con duración'**
+  String get activityBuilderTimedTitle;
+
+  /// No description provided for @activityBuilderTimedDetail.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuenta atrás de un tiempo fijo'**
+  String get activityBuilderTimedDetail;
+
+  /// No description provided for @activityBuilderSegmentsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Por tramos'**
+  String get activityBuilderSegmentsTitle;
+
+  /// No description provided for @activityBuilderSegmentsDetail.
+  ///
+  /// In es, this message translates to:
+  /// **'Varios tramos con descanso'**
+  String get activityBuilderSegmentsDetail;
+
+  /// No description provided for @activityBuilderDuration.
+  ///
+  /// In es, this message translates to:
+  /// **'Duración (minutos)'**
+  String get activityBuilderDuration;
+
+  /// No description provided for @activityBuilderSegmentHelper.
+  ///
+  /// In es, this message translates to:
+  /// **'Opcional: de cada tramo'**
+  String get activityBuilderSegmentHelper;
+
+  /// No description provided for @activityBuilderPlannedSegments.
+  ///
+  /// In es, this message translates to:
+  /// **'Tramos previstos (opcional)'**
+  String get activityBuilderPlannedSegments;
+
+  /// No description provided for @activityBuilderRestBetween.
+  ///
+  /// In es, this message translates to:
+  /// **'Descanso entre tramos (segundos)'**
+  String get activityBuilderRestBetween;
+
+  /// No description provided for @activityBuilderRestHelper.
+  ///
+  /// In es, this message translates to:
+  /// **'90 es un minuto y medio'**
+  String get activityBuilderRestHelper;
+
+  /// No description provided for @activityBuilderPlannedCycles.
+  ///
+  /// In es, this message translates to:
+  /// **'Ciclos previstos (opcional)'**
+  String get activityBuilderPlannedCycles;
+
+  /// No description provided for @activityBuilderSegmentSingular.
+  ///
+  /// In es, this message translates to:
+  /// **'Un tramo se llama'**
+  String get activityBuilderSegmentSingular;
+
+  /// No description provided for @activityBuilderSegmentPlural.
+  ///
+  /// In es, this message translates to:
+  /// **'Varios se llaman'**
+  String get activityBuilderSegmentPlural;
+
+  /// No description provided for @activityBuilderWhatToNote.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Qué quieres anotar? (opcional)'**
+  String get activityBuilderWhatToNote;
+
+  /// No description provided for @activityBuilderRemoveField.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar {label}'**
+  String activityBuilderRemoveField(Object label);
+
+  /// No description provided for @activityBuilderMaxFields.
+  ///
+  /// In es, this message translates to:
+  /// **'Máximo 12 campos'**
+  String get activityBuilderMaxFields;
+
+  /// No description provided for @activityBuilderAddField.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir campo'**
+  String get activityBuilderAddField;
+
+  /// No description provided for @activityBuilderSaveInActivities.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardar en tus actividades'**
+  String get activityBuilderSaveInActivities;
+
+  /// No description provided for @activityBuilderSaveInActivitiesHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Para repetirla sin volver a crearla.'**
+  String get activityBuilderSaveInActivitiesHelp;
+
+  /// No description provided for @activityBuilderPrepare.
+  ///
+  /// In es, this message translates to:
+  /// **'Preparar actividad'**
+  String get activityBuilderPrepare;
+
+  /// No description provided for @activityBuilderNewField.
+  ///
+  /// In es, this message translates to:
+  /// **'Nuevo campo'**
+  String get activityBuilderNewField;
+
+  /// No description provided for @activityBuilderFieldNameRequired.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe un nombre de campo de hasta 80 caracteres.'**
+  String get activityBuilderFieldNameRequired;
+
+  /// No description provided for @activityBuilderFieldName.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre del campo'**
+  String get activityBuilderFieldName;
+
+  /// No description provided for @activityBuilderFieldType.
+  ///
+  /// In es, this message translates to:
+  /// **'Tipo'**
+  String get activityBuilderFieldType;
+
+  /// No description provided for @activityBuilderFieldUnit.
+  ///
+  /// In es, this message translates to:
+  /// **'Unidad (opcional)'**
+  String get activityBuilderFieldUnit;
+
+  /// No description provided for @activityBuilderOptions.
+  ///
+  /// In es, this message translates to:
+  /// **'Opciones'**
+  String get activityBuilderOptions;
+
+  /// No description provided for @activityBuilderOptionsHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Separadas por comas'**
+  String get activityBuilderOptionsHelp;
+
+  /// No description provided for @activityBuilderScaleMin.
+  ///
+  /// In es, this message translates to:
+  /// **'Mínimo'**
+  String get activityBuilderScaleMin;
+
+  /// No description provided for @activityBuilderScaleMax.
+  ///
+  /// In es, this message translates to:
+  /// **'Máximo'**
+  String get activityBuilderScaleMax;
+
+  /// No description provided for @activityBuilderScaleRange.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe el mínimo y el máximo de la escala.'**
+  String get activityBuilderScaleRange;
+
+  /// No description provided for @activityBuilderAggregate.
+  ///
+  /// In es, this message translates to:
+  /// **'Cómo cuenta'**
+  String get activityBuilderAggregate;
+
+  /// No description provided for @activityBuilderCountSingular.
+  ///
+  /// In es, this message translates to:
+  /// **'Se cuenta como (uno)'**
+  String get activityBuilderCountSingular;
+
+  /// No description provided for @activityBuilderCountSingularHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Opcional, p. ej. libro'**
+  String get activityBuilderCountSingularHelp;
+
+  /// No description provided for @activityBuilderCountPlural.
+  ///
+  /// In es, this message translates to:
+  /// **'Se cuenta como (varios)'**
+  String get activityBuilderCountPlural;
+
+  /// No description provided for @activityBuilderCountPluralHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Opcional, p. ej. libros'**
+  String get activityBuilderCountPluralHelp;
+
+  /// No description provided for @activityBuilderAdd.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir'**
+  String get activityBuilderAdd;
+
+  /// No description provided for @aiPerReadError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo leer la configuración por acompañante.'**
+  String get aiPerReadError;
+
+  /// No description provided for @aiPerSaveError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo guardar el cambio.'**
+  String get aiPerSaveError;
+
+  /// No description provided for @aiPerTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Por acompañante'**
+  String get aiPerTitle;
+
+  /// No description provided for @aiPerNoProvider.
+  ///
+  /// In es, this message translates to:
+  /// **'Conecta primero un proveedor para poder elegir un modelo distinto en cada acompañante.'**
+  String get aiPerNoProvider;
+
+  /// No description provided for @aiPerHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Cada acompañante usa tu proveedor, o un modelo propio de ese mismo proveedor.'**
+  String get aiPerHelp;
+
+  /// No description provided for @aiPerDefault.
+  ///
+  /// In es, this message translates to:
+  /// **'Por defecto'**
+  String get aiPerDefault;
+
+  /// No description provided for @aiPerDialogTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'IA de {name}'**
+  String aiPerDialogTitle(Object name);
+
+  /// No description provided for @aiPerDialogHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Usa {service} con la clave de tu perfil. Solo cambia el modelo de este acompañante.'**
+  String aiPerDialogHelp(Object service);
+
+  /// No description provided for @aiPerUseDefault.
+  ///
+  /// In es, this message translates to:
+  /// **'Usar el predeterminado'**
+  String get aiPerUseDefault;
+
+  /// No description provided for @aiSetAndroidFileAccess.
+  ///
+  /// In es, this message translates to:
+  /// **'Android no entregó acceso al archivo seleccionado.'**
+  String get aiSetAndroidFileAccess;
+
+  /// No description provided for @aiSetGgufTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Modelo GGUF'**
+  String get aiSetGgufTitle;
+
+  /// No description provided for @aiSetLocalContextHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'TrackIA recomienda {context} para sus instrucciones, historial y datos. La recomendación es para las necesidades de la app, no para el límite de este GGUF. Si el modelo no soporta el tamaño elegido, puede fallar; tú decides si bajarlo.'**
+  String aiSetLocalContextHelp(Object context);
+
+  /// No description provided for @aiSetModelsCountChatGpt.
+  ///
+  /// In es, this message translates to:
+  /// **'Modelos disponibles para esta cuenta: {count}. La prueba de conexión confirma el acceso al elegido.'**
+  String aiSetModelsCountChatGpt(int count);
+
+  /// No description provided for @aiSetCatalogCountApi.
+  ///
+  /// In es, this message translates to:
+  /// **'{count} modelos obtenidos del proveedor. La prueba de conexión confirma si tu clave puede usar el elegido.'**
+  String aiSetCatalogCountApi(int count);
+
+  /// No description provided for @aiSetCatalogErrorChatGpt.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo obtener el catálogo de esta cuenta. Comprueba la conexión e inténtalo de nuevo.'**
+  String get aiSetCatalogErrorChatGpt;
+
+  /// No description provided for @aiSetCatalogErrorApi.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo obtener el catálogo. Puedes volver a intentarlo o indicar el modelo manualmente.'**
+  String get aiSetCatalogErrorApi;
+
+  /// No description provided for @transferSheetReadError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo leer la hoja.'**
+  String get transferSheetReadError;
+
+  /// No description provided for @transferSheetTooLarge.
+  ///
+  /// In es, this message translates to:
+  /// **'La hoja supera 20 MB.'**
+  String get transferSheetTooLarge;
+
+  /// No description provided for @transferSheetLoadError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo cargar la hoja. Vuelve a intentarlo.'**
+  String get transferSheetLoadError;
+
+  /// No description provided for @transferSheetLoaded.
+  ///
+  /// In es, this message translates to:
+  /// **'Hoja cargada. Pendiente de interpretación por la IA.'**
+  String get transferSheetLoaded;
+
+  /// No description provided for @transferFileTooLarge.
+  ///
+  /// In es, this message translates to:
+  /// **'El archivo supera 20 MB.'**
+  String get transferFileTooLarge;
+
+  /// No description provided for @transferSheetSelectedError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo leer la hoja seleccionada.'**
+  String get transferSheetSelectedError;
+
+  /// No description provided for @transferFileReadError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo leer o compartir el archivo.'**
+  String get transferFileReadError;
+
+  /// No description provided for @transferDefaultSheetName.
+  ///
+  /// In es, this message translates to:
+  /// **'Hoja cargada'**
+  String get transferDefaultSheetName;
+
+  /// No description provided for @transferShareSubject.
+  ///
+  /// In es, this message translates to:
+  /// **'Copia de seguridad TrackIA'**
+  String get transferShareSubject;
+
+  /// No description provided for @transferShareText.
+  ///
+  /// In es, this message translates to:
+  /// **'Guarda este archivo en Drive o en un lugar seguro.'**
+  String get transferShareText;
+
+  /// No description provided for @transferRestoreTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Restaurar esta copia?'**
+  String get transferRestoreTitle;
+
+  /// No description provided for @transferRestoreBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Contiene {workouts, plural, one{1 sesión} other{{workouts} sesiones}} y {routines, plural, one{1 rutina} other{{routines} rutinas}}{active}. Sustituirá todos los datos que hay ahora en este teléfono. Guarda antes una copia actual si quieres conservarlos.'**
+  String transferRestoreBody(int workouts, int routines, Object active);
+
+  /// No description provided for @transferRestoreActive.
+  ///
+  /// In es, this message translates to:
+  /// **', incluida una sesión en curso'**
+  String get transferRestoreActive;
+
+  /// No description provided for @transferRestoreAction.
+  ///
+  /// In es, this message translates to:
+  /// **'Restaurar'**
+  String get transferRestoreAction;
+
+  /// No description provided for @transferRestored.
+  ///
+  /// In es, this message translates to:
+  /// **'Copia restaurada. Sesiones y rutinas actualizadas.'**
+  String get transferRestored;
+
+  /// No description provided for @transferNoAccessSheet.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo leer esa hoja. En Google Sheets usa «Enviar una copia» como Excel o CSV y elige TrackIA.'**
+  String get transferNoAccessSheet;
+
+  /// No description provided for @transferHeadline.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu historial, bajo tu control'**
+  String get transferHeadline;
+
+  /// No description provided for @transferIntro.
+  ///
+  /// In es, this message translates to:
+  /// **'Guarda una copia fuera de este móvil para recuperarla o pasarla a otro teléfono.'**
+  String get transferIntro;
+
+  /// No description provided for @transferBackupTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Copia de seguridad'**
+  String get transferBackupTitle;
+
+  /// No description provided for @transferBackupHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Incluye historial, rutinas y sesión en curso.'**
+  String get transferBackupHelp;
+
+  /// No description provided for @transferSheetsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Histórico de Google Sheets'**
+  String get transferSheetsTitle;
+
+  /// No description provided for @transferSheetsHelpAndroid.
+  ///
+  /// In es, this message translates to:
+  /// **'Carga tu hoja y pestaña con autorización de Google, o elige una copia Excel o CSV. Se conservan las celdas originales; la IA podrá interpretar tu formato cuando esté conectada.'**
+  String get transferSheetsHelpAndroid;
+
+  /// No description provided for @transferSheetsHelpOther.
+  ///
+  /// In es, this message translates to:
+  /// **'Carga una copia Excel o CSV. Se conservan las celdas originales, pendientes de interpretación por la IA.'**
+  String get transferSheetsHelpOther;
+
+  /// No description provided for @transferImportSheets.
+  ///
+  /// In es, this message translates to:
+  /// **'Importar desde Google Sheets'**
+  String get transferImportSheets;
+
+  /// No description provided for @transferChooseFileAndroid.
+  ///
+  /// In es, this message translates to:
+  /// **'Elegir archivo del móvil o Drive'**
+  String get transferChooseFileAndroid;
+
+  /// No description provided for @transferChooseFileOther.
+  ///
+  /// In es, this message translates to:
+  /// **'Elegir copia XLSX o CSV'**
+  String get transferChooseFileOther;
+
+  /// No description provided for @transferWorkoutSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'{date} · {exercises} ejercicios · {sets} series'**
+  String transferWorkoutSubtitle(Object date, int exercises, int sets);
+
+  /// No description provided for @transferNoColumnWorkout.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin columna · Entrenamiento'**
+  String get transferNoColumnWorkout;
+
+  /// No description provided for @transferChooseColumn.
+  ///
+  /// In es, this message translates to:
+  /// **'Elegir columna'**
+  String get transferChooseColumn;
+
+  /// No description provided for @transferCsvReviewError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo revisar el CSV.'**
+  String get transferCsvReviewError;
+
+  /// No description provided for @transferImportSessionsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Importar estas sesiones?'**
+  String get transferImportSessionsTitle;
+
+  /// No description provided for @transferImportSessionsBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Se añadirán {count, plural, one{1 sesión} other{{count} sesiones}} con {sets} series. Filas omitidas por error: {errors}.'**
+  String transferImportSessionsBody(int count, int sets, int errors);
+
+  /// No description provided for @transferImportAction.
+  ///
+  /// In es, this message translates to:
+  /// **'Importar'**
+  String get transferImportAction;
+
+  /// No description provided for @transferImportError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo importar.'**
+  String get transferImportError;
+
+  /// No description provided for @transferImportSheetTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Importar hoja'**
+  String get transferImportSheetTitle;
+
+  /// No description provided for @transferImportedSummary.
+  ///
+  /// In es, this message translates to:
+  /// **'{added, plural, one{1 sesión importada} other{{added} sesiones importadas}} · {duplicates, plural, one{1 duplicada omitida} other{{duplicates} duplicadas omitidas}}.'**
+  String transferImportedSummary(int added, int duplicates);
+
+  /// No description provided for @transferRowsFound.
+  ///
+  /// In es, this message translates to:
+  /// **'{count} filas encontradas'**
+  String transferRowsFound(int count);
+
+  /// No description provided for @transferMapHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Asocia las columnas de tu hoja. Una fila representa una serie.'**
+  String get transferMapHelp;
+
+  /// No description provided for @transferDate.
+  ///
+  /// In es, this message translates to:
+  /// **'Fecha'**
+  String get transferDate;
+
+  /// No description provided for @transferSessionOptional.
+  ///
+  /// In es, this message translates to:
+  /// **'Sesión (opcional)'**
+  String get transferSessionOptional;
+
+  /// No description provided for @transferExercise.
+  ///
+  /// In es, this message translates to:
+  /// **'Ejercicio'**
+  String get transferExercise;
+
+  /// No description provided for @transferWeightKg.
+  ///
+  /// In es, this message translates to:
+  /// **'Peso (kg)'**
+  String get transferWeightKg;
+
+  /// No description provided for @transferReps.
+  ///
+  /// In es, this message translates to:
+  /// **'Repeticiones'**
+  String get transferReps;
+
+  /// No description provided for @transferReviewImport.
+  ///
+  /// In es, this message translates to:
+  /// **'Revisar importación'**
+  String get transferReviewImport;
+
+  /// No description provided for @transferPreviewSummary.
+  ///
+  /// In es, this message translates to:
+  /// **'{newCount, plural, one{1 sesión nueva} other{{newCount} sesiones nuevas}} · {duplicateCount, plural, one{1 duplicada} other{{duplicateCount} duplicadas}} · {errorCount, plural, one{1 fila con error} other{{errorCount} filas con errores}}'**
+  String transferPreviewSummary(
+    int newCount,
+    int duplicateCount,
+    int errorCount,
+  );
+
+  /// No description provided for @transferValidRows.
+  ///
+  /// In es, this message translates to:
+  /// **'{valid} series válidas de {total} filas.'**
+  String transferValidRows(int valid, int total);
+
+  /// No description provided for @transferAllSessions.
+  ///
+  /// In es, this message translates to:
+  /// **'Todas las sesiones'**
+  String get transferAllSessions;
+
+  /// No description provided for @transferSeeSessions.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver las {count} sesiones'**
+  String transferSeeSessions(int count);
+
+  /// No description provided for @transferErrorRows.
+  ///
+  /// In es, this message translates to:
+  /// **'Filas con errores'**
+  String get transferErrorRows;
+
+  /// No description provided for @transferSeeErrors.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver los {count} errores'**
+  String transferSeeErrors(int count);
+
+  /// No description provided for @transferImportNew.
+  ///
+  /// In es, this message translates to:
+  /// **'Importar sesiones nuevas'**
+  String get transferImportNew;
+
+  /// No description provided for @transferCloseAction.
+  ///
+  /// In es, this message translates to:
+  /// **'Cerrar'**
+  String get transferCloseAction;
+
+  /// No description provided for @chatAttachVoiceError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo reconocer la voz. Comprueba el permiso de micrófono o escribe tu mensaje.'**
+  String get chatAttachVoiceError;
+
+  /// No description provided for @chatAttachVoiceUnavailable.
+  ///
+  /// In es, this message translates to:
+  /// **'El reconocimiento de voz no está disponible. Revisa el permiso de micrófono y el servicio de voz del teléfono.'**
+  String get chatAttachVoiceUnavailable;
+
+  /// No description provided for @chatAttachDictationStart.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo iniciar el dictado.'**
+  String get chatAttachDictationStart;
+
+  /// No description provided for @chatAttachCamera.
+  ///
+  /// In es, this message translates to:
+  /// **'Cámara'**
+  String get chatAttachCamera;
+
+  /// No description provided for @chatAttachPhotos.
+  ///
+  /// In es, this message translates to:
+  /// **'Fotos'**
+  String get chatAttachPhotos;
+
+  /// No description provided for @chatAttachPdf.
+  ///
+  /// In es, this message translates to:
+  /// **'Documento PDF'**
+  String get chatAttachPdf;
+
+  /// No description provided for @chatAttachPdfHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Necesita un modelo que admita documentos'**
+  String get chatAttachPdfHint;
+
+  /// No description provided for @chatAttachAudio.
+  ///
+  /// In es, this message translates to:
+  /// **'Archivo de audio'**
+  String get chatAttachAudio;
+
+  /// No description provided for @chatAttachAudioHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Requiere un modelo de Gemini que admita audio'**
+  String get chatAttachAudioHint;
+
+  /// No description provided for @chatAttachSpreadsheet.
+  ///
+  /// In es, this message translates to:
+  /// **'Hoja Excel o CSV'**
+  String get chatAttachSpreadsheet;
+
+  /// No description provided for @chatAttachSheet.
+  ///
+  /// In es, this message translates to:
+  /// **'Google Sheets / Drive'**
+  String get chatAttachSheet;
+
+  /// No description provided for @chatAttachNeedsAi.
+  ///
+  /// In es, this message translates to:
+  /// **'Conecta la IA para enviar imágenes, documentos o audio. Puedes cargar una hoja sin IA.'**
+  String get chatAttachNeedsAi;
+
+  /// No description provided for @chatAttachPhotoTooLarge.
+  ///
+  /// In es, this message translates to:
+  /// **'La foto supera 4 MB.'**
+  String get chatAttachPhotoTooLarge;
+
+  /// No description provided for @chatAttachPhotoFormat.
+  ///
+  /// In es, this message translates to:
+  /// **'Elige una foto JPG, PNG o WebP.'**
+  String get chatAttachPhotoFormat;
+
+  /// No description provided for @chatAttachPhotoEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'La foto debe tener contenido y no superar 4 MB.'**
+  String get chatAttachPhotoEmpty;
+
+  /// No description provided for @chatAttachAudioNeedsGemini.
+  ///
+  /// In es, this message translates to:
+  /// **'Para enviar un archivo de audio configura un modelo de Gemini con audio. Puedes usar el micrófono del chat para dictar el mensaje.'**
+  String get chatAttachAudioNeedsGemini;
+
+  /// No description provided for @chatAttachTooLarge.
+  ///
+  /// In es, this message translates to:
+  /// **'El adjunto supera 4 MB.'**
+  String get chatAttachTooLarge;
+
+  /// No description provided for @chatAttachUnreadable.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo leer el adjunto.'**
+  String get chatAttachUnreadable;
+
+  /// No description provided for @chatAttachFormat.
+  ///
+  /// In es, this message translates to:
+  /// **'Formato de adjunto no compatible.'**
+  String get chatAttachFormat;
+
+  /// No description provided for @chatAttachInvalidPdf.
+  ///
+  /// In es, this message translates to:
+  /// **'El archivo no contiene un PDF válido.'**
+  String get chatAttachInvalidPdf;
+
+  /// No description provided for @chatAttachOpenFailed.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo abrir el adjunto.'**
+  String get chatAttachOpenFailed;
+
+  /// No description provided for @chatAttachRecoveredTooLarge.
+  ///
+  /// In es, this message translates to:
+  /// **'La foto recuperada supera 4 MB. Elige una más pequeña.'**
+  String get chatAttachRecoveredTooLarge;
+
+  /// No description provided for @chatMenuCompanionsError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudieron cargar los acompañantes.'**
+  String get chatMenuCompanionsError;
+
+  /// No description provided for @chatMenuMore.
+  ///
+  /// In es, this message translates to:
+  /// **'Más opciones'**
+  String get chatMenuMore;
+
+  /// No description provided for @chatMenuTraining.
+  ///
+  /// In es, this message translates to:
+  /// **'Rutinas e historial'**
+  String get chatMenuTraining;
+
+  /// No description provided for @chatMenuProgress.
+  ///
+  /// In es, this message translates to:
+  /// **'Progreso'**
+  String get chatMenuProgress;
+
+  /// No description provided for @chatMenuSheet.
+  ///
+  /// In es, this message translates to:
+  /// **'Hoja cargada'**
+  String get chatMenuSheet;
+
+  /// No description provided for @chatMenuRecover.
+  ///
+  /// In es, this message translates to:
+  /// **'Recuperar preparación'**
+  String get chatMenuRecover;
+
+  /// No description provided for @chatSendFocusTooLong.
+  ///
+  /// In es, this message translates to:
+  /// **'El registro supera 8000 caracteres.'**
+  String get chatSendFocusTooLong;
+
+  /// No description provided for @chatSendSavedNoAi.
+  ///
+  /// In es, this message translates to:
+  /// **'Registro guardado en el móvil. La IA no está disponible para interpretarlo.'**
+  String get chatSendSavedNoAi;
+
+  /// No description provided for @chatSendSavedNoProvider.
+  ///
+  /// In es, this message translates to:
+  /// **'Registro guardado en el móvil. Configura el proveedor para consultar al asistente.'**
+  String get chatSendSavedNoProvider;
+
+  /// No description provided for @chatSendAssistantError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo consultar al asistente. Revisa el registro local.'**
+  String get chatSendAssistantError;
+
+  /// No description provided for @chatSendQueueUnavailable.
+  ///
+  /// In es, this message translates to:
+  /// **'La cola durable no está disponible. Conserva el texto y vuelve a abrir el chat.'**
+  String get chatSendQueueUnavailable;
+
+  /// No description provided for @chatSendTooLong.
+  ///
+  /// In es, this message translates to:
+  /// **'El mensaje supera 8000 caracteres.'**
+  String get chatSendTooLong;
+
+  /// No description provided for @chatSendConfigureProvider.
+  ///
+  /// In es, this message translates to:
+  /// **'Configura el proveedor con el botón de ajustes para empezar.'**
+  String get chatSendConfigureProvider;
+
+  /// No description provided for @chatSendSaveError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo guardar el mensaje en el móvil. Conserva el texto y vuelve a intentarlo.'**
+  String get chatSendSaveError;
+
+  /// No description provided for @chatSendProposalIncomplete.
+  ///
+  /// In es, this message translates to:
+  /// **'El modelo envió una propuesta incompleta. Pídele que prepare de nuevo el ejercicio para mostrar Iniciar.'**
+  String get chatSendProposalIncomplete;
+
+  /// No description provided for @chatSendAnswerSaveError.
+  ///
+  /// In es, this message translates to:
+  /// **'La respuesta llegó, pero no se pudo guardar la conversación en el móvil.'**
+  String get chatSendAnswerSaveError;
+
+  /// No description provided for @chatSendFailed.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo completar la conversación. Puedes volver a intentarlo.'**
+  String get chatSendFailed;
+
+  /// No description provided for @chatMsgOnlyLastEditable.
+  ///
+  /// In es, this message translates to:
+  /// **'Solo se puede editar el último mensaje. Escribe una corrección como mensaje nuevo.'**
+  String get chatMsgOnlyLastEditable;
+
+  /// No description provided for @chatMsgPending.
+  ///
+  /// In es, this message translates to:
+  /// **'Pendiente de envío'**
+  String get chatMsgPending;
+
+  /// No description provided for @chatMsgSending.
+  ///
+  /// In es, this message translates to:
+  /// **'Enviando'**
+  String get chatMsgSending;
+
+  /// No description provided for @chatMsgAnswered.
+  ///
+  /// In es, this message translates to:
+  /// **'Respondido'**
+  String get chatMsgAnswered;
+
+  /// No description provided for @chatMsgFailed.
+  ///
+  /// In es, this message translates to:
+  /// **'No aceptado; puedes reenviar'**
+  String get chatMsgFailed;
+
+  /// No description provided for @chatMsgUncertain.
+  ///
+  /// In es, this message translates to:
+  /// **'Resultado incierto; reenvío bloqueado hasta revisar'**
+  String get chatMsgUncertain;
+
+  /// No description provided for @chatMsgHistory.
+  ///
+  /// In es, this message translates to:
+  /// **'Historial'**
+  String get chatMsgHistory;
+
+  /// No description provided for @chatMsgResend.
+  ///
+  /// In es, this message translates to:
+  /// **'Reenviar'**
+  String get chatMsgResend;
+
+  /// No description provided for @chatMsgAiNotReady.
+  ///
+  /// In es, this message translates to:
+  /// **'La IA no está lista.'**
+  String get chatMsgAiNotReady;
+
+  /// No description provided for @chatMsgSendInProgress.
+  ///
+  /// In es, this message translates to:
+  /// **'Hay un envío en curso.'**
+  String get chatMsgSendInProgress;
+
+  /// No description provided for @chatMsgChangedWhileEditing.
+  ///
+  /// In es, this message translates to:
+  /// **'El mensaje cambió mientras lo editabas. Revisa el historial.'**
+  String get chatMsgChangedWhileEditing;
+
+  /// No description provided for @chatMsgSaveNotSent.
+  ///
+  /// In es, this message translates to:
+  /// **'Edición guardada, pero no se pudo enviar ahora. Usa Reenviar cuando puedas.'**
+  String get chatMsgSaveNotSent;
+
+  /// No description provided for @chatMsgSavedOnly.
+  ///
+  /// In es, this message translates to:
+  /// **'Edición guardada. Usa Reenviar para enviar esta versión.'**
+  String get chatMsgSavedOnly;
+
+  /// No description provided for @chatMsgLengthError.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe un mensaje de 1 a 8000 caracteres.'**
+  String get chatMsgLengthError;
+
+  /// No description provided for @chatMsgEditError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo guardar la edición; el original se conserva.'**
+  String get chatMsgEditError;
+
+  /// No description provided for @chatMsgHistoryTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Historial de versiones'**
+  String get chatMsgHistoryTitle;
+
+  /// No description provided for @chatMsgVersion.
+  ///
+  /// In es, this message translates to:
+  /// **'Versión {n}'**
+  String chatMsgVersion(int n);
+
+  /// No description provided for @chatMsgVersionCurrent.
+  ///
+  /// In es, this message translates to:
+  /// **'Versión {n} · actual'**
+  String chatMsgVersionCurrent(int n);
+
+  /// No description provided for @chatMsgClose.
+  ///
+  /// In es, this message translates to:
+  /// **'Cerrar'**
+  String get chatMsgClose;
+
+  /// No description provided for @chatMsgHistoryError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo abrir el historial.'**
+  String get chatMsgHistoryError;
+
+  /// No description provided for @chatMsgEditTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar mensaje'**
+  String get chatMsgEditTitle;
+
+  /// No description provided for @chatMsgEditLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Texto corregido'**
+  String get chatMsgEditLabel;
+
+  /// No description provided for @chatMsgEditHelper.
+  ///
+  /// In es, this message translates to:
+  /// **'La versión original se conserva en el historial.'**
+  String get chatMsgEditHelper;
+
+  /// No description provided for @chatMsgSendBlocked.
+  ///
+  /// In es, this message translates to:
+  /// **'No se puede enviar ahora: {reason}'**
+  String chatMsgSendBlocked(Object reason);
+
+  /// No description provided for @chatMsgSaveAndSend.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardar y enviar'**
+  String get chatMsgSaveAndSend;
+
+  /// No description provided for @chatSheetReloadError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo recuperar la hoja cargada.'**
+  String get chatSheetReloadError;
+
+  /// No description provided for @chatSheetAndroidOnly.
+  ///
+  /// In es, this message translates to:
+  /// **'La conexión con Google Sheets está disponible en Android.'**
+  String get chatSheetAndroidOnly;
+
+  /// No description provided for @chatSheetSaveError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo guardar la hoja en el móvil. La copia anterior se conserva.'**
+  String get chatSheetSaveError;
+
+  /// No description provided for @chatSheetInterpretPending.
+  ///
+  /// In es, this message translates to:
+  /// **'La respuesta llegó, pero la hoja sigue pendiente de interpretación en el móvil.'**
+  String get chatSheetInterpretPending;
+
+  /// No description provided for @chatSheetRefreshError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo actualizar la hoja. La copia anterior se conserva.'**
+  String get chatSheetRefreshError;
+
+  /// No description provided for @chatSheetRemoveError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo quitar la copia de la hoja.'**
+  String get chatSheetRemoveError;
+
+  /// No description provided for @chatSheetDialogBody.
+  ///
+  /// In es, this message translates to:
+  /// **'{title} · {rows} filas\nÚltima lectura: {date}.\n\n{status}'**
+  String chatSheetDialogBody(
+    Object title,
+    int rows,
+    Object date,
+    Object status,
+  );
+
+  /// No description provided for @chatSheetStatusPending.
+  ///
+  /// In es, this message translates to:
+  /// **'Pendiente de interpretación por la IA. No se han importado entrenamientos.'**
+  String get chatSheetStatusPending;
+
+  /// No description provided for @chatSheetStatusAnalyzed.
+  ///
+  /// In es, this message translates to:
+  /// **'El asistente ha analizado esta copia; no se han importado entrenamientos.'**
+  String get chatSheetStatusAnalyzed;
+
+  /// No description provided for @chatSheetRemove.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar del contexto'**
+  String get chatSheetRemove;
+
+  /// No description provided for @chatSheetChange.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar hoja'**
+  String get chatSheetChange;
+
+  /// No description provided for @chatSheetRefresh.
+  ///
+  /// In es, this message translates to:
+  /// **'Actualizar hoja'**
+  String get chatSheetRefresh;
+
+  /// No description provided for @chatSheetLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Hoja · {title}'**
+  String chatSheetLabel(Object title);
+
+  /// No description provided for @chatProposalRepeated.
+  ///
+  /// In es, this message translates to:
+  /// **'Series / tramos · {seconds}s de descanso'**
+  String chatProposalRepeated(int seconds);
+
+  /// No description provided for @chatProposalContinuous.
+  ///
+  /// In es, this message translates to:
+  /// **'Actividad continua · {seconds}s de descanso'**
+  String chatProposalContinuous(int seconds);
+
+  /// No description provided for @chatSheetPendingInfo.
+  ///
+  /// In es, this message translates to:
+  /// **'«{name}» cargada · pendiente de interpretación. Los datos originales se conservan.'**
+  String chatSheetPendingInfo(Object name);
+
+  /// No description provided for @chatGameFocusOpen.
+  ///
+  /// In es, this message translates to:
+  /// **'Termina la actividad abierta en el otro acompañante antes de preparar esta.'**
+  String get chatGameFocusOpen;
+
+  /// No description provided for @chatGamePrepareError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo preparar la actividad. Vuelve a intentarlo.'**
+  String get chatGamePrepareError;
+
+  /// No description provided for @chatGameGoalTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Meta propuesta: {goal}'**
+  String chatGameGoalTitle(Object goal);
+
+  /// No description provided for @chatGameAchievementTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Logro propuesto: {title}'**
+  String chatGameAchievementTitle(Object title);
+
+  /// No description provided for @chatGameCopyTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Textos de recordatorio propuestos'**
+  String get chatGameCopyTitle;
+
+  /// No description provided for @chatDeliveryQueueError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo abrir la cola durable del chat. No se enviarán mensajes por un almacenamiento alternativo.'**
+  String get chatDeliveryQueueError;
+
+  /// No description provided for @chatDeliveryRestoredPending.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu mensaje quedó guardado sin respuesta. Puedes volver a enviarlo.'**
+  String get chatDeliveryRestoredPending;
+
+  /// No description provided for @chatDeliveryUncertain.
+  ///
+  /// In es, this message translates to:
+  /// **'Hay un envío con resultado incierto. No se reenviará automáticamente; revisa el historial antes de decidir.'**
+  String get chatDeliveryUncertain;
+
+  /// No description provided for @chatDeliveryBacklog.
+  ///
+  /// In es, this message translates to:
+  /// **'Tienes mensajes guardados sin respuesta. Usa Reenviar cuando quieras; no se enviarán automáticamente.'**
+  String get chatDeliveryBacklog;
+
+  /// No description provided for @chatDeliveryOtherChat.
+  ///
+  /// In es, this message translates to:
+  /// **'El mensaje pertenece a otro chat y no se enviará aquí.'**
+  String get chatDeliveryOtherChat;
+
+  /// No description provided for @chatDeliveryNotSafe.
+  ///
+  /// In es, this message translates to:
+  /// **'Este mensaje no es seguro de reenviar.'**
+  String get chatDeliveryNotSafe;
+
+  /// No description provided for @chatDeliveryStateChanged.
+  ///
+  /// In es, this message translates to:
+  /// **'El mensaje ya cambió de estado; no se hizo otro envío.'**
+  String get chatDeliveryStateChanged;
+
+  /// No description provided for @chatDeliveryUncertainSend.
+  ///
+  /// In es, this message translates to:
+  /// **'El resultado del envío es incierto. No se reenviará automáticamente; comprueba si llegó una respuesta.'**
+  String get chatDeliveryUncertainSend;
+
+  /// No description provided for @chatDeliveryFailed.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo completar la conversación. El mensaje permanece guardado; no se hará un reenvío automático.'**
+  String get chatDeliveryFailed;
+
+  /// No description provided for @chatArchiveIncompleteDirective.
+  ///
+  /// In es, this message translates to:
+  /// **'El modelo pidió archivar con datos incompletos. El chat sigue abierto.'**
+  String get chatArchiveIncompleteDirective;
+
+  /// No description provided for @chatArchiveDoneAuto.
+  ///
+  /// In es, this message translates to:
+  /// **'El asistente archivó el chat. Puedes consultarlo en Chats archivados.'**
+  String get chatArchiveDoneAuto;
+
+  /// No description provided for @chatArchiveDone.
+  ///
+  /// In es, this message translates to:
+  /// **'Chat archivado. El contexto activo se ha liberado.'**
+  String get chatArchiveDone;
+
+  /// No description provided for @chatArchiveViewAction.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver archivos'**
+  String get chatArchiveViewAction;
+
+  /// No description provided for @chatArchiveError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo archivar. La conversación y los entrenamientos se conservan.'**
+  String get chatArchiveError;
+
+  /// No description provided for @chatArchiveSyncInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'La propuesta de envío no es válida. Usa Enviar a Google Sheets en el menú.'**
+  String get chatArchiveSyncInvalid;
+
+  /// No description provided for @chatArchiveRecalled.
+  ///
+  /// In es, this message translates to:
+  /// **'Archivo disponible para tu próximo mensaje al asistente.'**
+  String get chatArchiveRecalled;
+
+  /// No description provided for @chatArchiveReadError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo consultar el archivo.'**
+  String get chatArchiveReadError;
+
+  /// No description provided for @chatDraftSaveError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo guardar el borrador. Conserva el texto y vuelve a intentarlo.'**
+  String get chatDraftSaveError;
+
+  /// No description provided for @chatLoadError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo recuperar la conversación anterior.'**
+  String get chatLoadError;
+
+  /// No description provided for @chatLoadSheetError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo recuperar la hoja guardada. Vuelve a cargarla desde Google Sheets.'**
+  String get chatLoadSheetError;
+
+  /// No description provided for @chatPersistTooLarge.
+  ///
+  /// In es, this message translates to:
+  /// **'El chat supera 20 MB; no se pudo guardar completo.'**
+  String get chatPersistTooLarge;
+
+  /// No description provided for @creatorCreate.
+  ///
+  /// In es, this message translates to:
+  /// **'Crear'**
+  String get creatorCreate;
+
+  /// No description provided for @creatorCreateFailed.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo crear el acompañante. No se guardó nada.'**
+  String get creatorCreateFailed;
+
+  /// No description provided for @creatorAssistedTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Crear con ayuda de la IA'**
+  String get creatorAssistedTitle;
+
+  /// No description provided for @creatorAiTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Con ayuda de la IA'**
+  String get creatorAiTitle;
+
+  /// No description provided for @creatorAiReadySubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuéntale qué quieres seguir y te propone un acompañante.'**
+  String get creatorAiReadySubtitle;
+
+  /// No description provided for @creatorAiNotReadySubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Necesitas conectar y verificar un proveedor de IA.'**
+  String get creatorAiNotReadySubtitle;
+
+  /// No description provided for @creatorOpenAiSettings.
+  ///
+  /// In es, this message translates to:
+  /// **'Abrir Ajustes de IA'**
+  String get creatorOpenAiSettings;
+
+  /// No description provided for @creatorManualTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'A mano'**
+  String get creatorManualTitle;
+
+  /// No description provided for @creatorManualSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Elige nombre, icono, color, modo y aviso tú mismo.'**
+  String get creatorManualSubtitle;
+
+  /// No description provided for @creatorNewTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Nuevo acompañante'**
+  String get creatorNewTitle;
+
+  /// No description provided for @creatorEditProposalTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar propuesta'**
+  String get creatorEditProposalTitle;
+
+  /// No description provided for @creatorNameLength.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe un nombre de entre 1 y 40 caracteres.'**
+  String get creatorNameLength;
+
+  /// No description provided for @creatorLevelReminderTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Solo recordatorio'**
+  String get creatorLevelReminderTitle;
+
+  /// No description provided for @creatorLevelReminderDetail.
+  ///
+  /// In es, this message translates to:
+  /// **'Te avisa y ya.'**
+  String get creatorLevelReminderDetail;
+
+  /// No description provided for @creatorLevelGoalsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Metas y rachas'**
+  String get creatorLevelGoalsTitle;
+
+  /// No description provided for @creatorLevelGoalsDetail.
+  ///
+  /// In es, this message translates to:
+  /// **'Recomendado: metas y rachas, sin logros.'**
+  String get creatorLevelGoalsDetail;
+
+  /// No description provided for @creatorLevelGameTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Juego completo'**
+  String get creatorLevelGameTitle;
+
+  /// No description provided for @creatorLevelGameDetail.
+  ///
+  /// In es, this message translates to:
+  /// **'Metas, rachas y logros.'**
+  String get creatorLevelGameDetail;
+
+  /// No description provided for @creatorActivityLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Qué anotas: {name}'**
+  String creatorActivityLabel(Object name);
+
+  /// No description provided for @creatorRemoveActivity.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar actividad'**
+  String get creatorRemoveActivity;
+
+  /// No description provided for @creatorGoalLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Meta: {text}'**
+  String creatorGoalLabel(Object text);
+
+  /// No description provided for @creatorRemoveGoal.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar meta'**
+  String get creatorRemoveGoal;
+
+  /// No description provided for @creatorRemind.
+  ///
+  /// In es, this message translates to:
+  /// **'Recordarme'**
+  String get creatorRemind;
+
+  /// No description provided for @creatorDecideOnStart.
+  ///
+  /// In es, this message translates to:
+  /// **'lo decides al empezar'**
+  String get creatorDecideOnStart;
+
+  /// No description provided for @creatorPunctualSuffix.
+  ///
+  /// In es, this message translates to:
+  /// **' · registro puntual'**
+  String get creatorPunctualSuffix;
+
+  /// No description provided for @creatorNoGoal.
+  ///
+  /// In es, this message translates to:
+  /// **'sin meta'**
+  String get creatorNoGoal;
+
+  /// No description provided for @creatorNoReminder.
+  ///
+  /// In es, this message translates to:
+  /// **'sin aviso'**
+  String get creatorNoReminder;
+
+  /// No description provided for @creatorReminderLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Aviso: {text}'**
+  String creatorReminderLabel(Object text);
+
+  /// No description provided for @creatorLevelLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Nivel: {text}'**
+  String creatorLevelLabel(Object text);
+
+  /// No description provided for @creatorDiscard.
+  ///
+  /// In es, this message translates to:
+  /// **'Descartar'**
+  String get creatorDiscard;
+
+  /// No description provided for @creatorNoAiConnected.
+  ///
+  /// In es, this message translates to:
+  /// **'No hay una IA conectada.'**
+  String get creatorNoAiConnected;
+
+  /// No description provided for @creatorConversationFailed.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo completar la conversación. Puedes volver a intentarlo.'**
+  String get creatorConversationFailed;
+
+  /// No description provided for @creatorInputHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe aquí'**
+  String get creatorInputHint;
+
+  /// No description provided for @creatorPromptHelper.
+  ///
+  /// In es, this message translates to:
+  /// **'Se usan cuando conectes un proveedor.'**
+  String get creatorPromptHelper;
+
+  /// No description provided for @creatorLevelSection.
+  ///
+  /// In es, this message translates to:
+  /// **'Nivel'**
+  String get creatorLevelSection;
+
+  /// No description provided for @proposalIgnore.
+  ///
+  /// In es, this message translates to:
+  /// **'Ignorar'**
+  String get proposalIgnore;
+
+  /// No description provided for @proposalAdd.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir'**
+  String get proposalAdd;
+
+  /// No description provided for @proposalUseTexts.
+  ///
+  /// In es, this message translates to:
+  /// **'Usar estos textos'**
+  String get proposalUseTexts;
+
+  /// No description provided for @proposalSuggestLater.
+  ///
+  /// In es, this message translates to:
+  /// **'Ahora no'**
+  String get proposalSuggestLater;
+
+  /// No description provided for @proposalSuggestNever.
+  ///
+  /// In es, this message translates to:
+  /// **'No volver a sugerir'**
+  String get proposalSuggestNever;
+
+  /// No description provided for @proposalLockedTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Propuesta de la IA sobre datos fijados por ti'**
+  String get proposalLockedTitle;
+
+  /// No description provided for @proposalApply.
+  ///
+  /// In es, this message translates to:
+  /// **'Aplicar'**
+  String get proposalApply;
+
+  /// No description provided for @proposalChangeLine.
+  ///
+  /// In es, this message translates to:
+  /// **'{label}: {current} {unit} → {proposed} {unit}'**
+  String proposalChangeLine(
+    Object label,
+    int current,
+    Object unit,
+    int proposed,
+  );
+
+  /// No description provided for @proposalLockLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Fijado por ti. Toca para liberar'**
+  String get proposalLockLabel;
+
+  /// No description provided for @homeNewWorkoutTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Nuevo entrenamiento'**
+  String get homeNewWorkoutTitle;
+
+  /// No description provided for @homeSessionNameLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre de la sesión'**
+  String get homeSessionNameLabel;
+
+  /// No description provided for @homeWorkout.
+  ///
+  /// In es, this message translates to:
+  /// **'Entrenamiento'**
+  String get homeWorkout;
+
+  /// No description provided for @homeAddExerciseTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir ejercicio'**
+  String get homeAddExerciseTitle;
+
+  /// No description provided for @homeExerciseNameLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre del ejercicio'**
+  String get homeExerciseNameLabel;
+
+  /// No description provided for @homeAdd.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir'**
+  String get homeAdd;
+
+  /// No description provided for @homeBack.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver'**
+  String get homeBack;
+
+  /// No description provided for @homeYourSession.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu sesión'**
+  String get homeYourSession;
+
+  /// No description provided for @homeAssistantTooltip.
+  ///
+  /// In es, this message translates to:
+  /// **'Asistente TrackIA'**
+  String get homeAssistantTooltip;
+
+  /// No description provided for @homeReload.
+  ///
+  /// In es, this message translates to:
+  /// **'Recargar'**
+  String get homeReload;
+
+  /// No description provided for @homeLoadLog.
+  ///
+  /// In es, this message translates to:
+  /// **'Cargar bitácora'**
+  String get homeLoadLog;
+
+  /// No description provided for @homeHeroTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu esfuerzo.\nTu progreso.'**
+  String get homeHeroTitle;
+
+  /// No description provided for @homeHeroSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Una serie a la vez. Lleva el registro de lo que haces hoy.'**
+  String get homeHeroSubtitle;
+
+  /// No description provided for @homeNextSession.
+  ///
+  /// In es, this message translates to:
+  /// **'TU PRÓXIMA SESIÓN'**
+  String get homeNextSession;
+
+  /// No description provided for @homeInProgress.
+  ///
+  /// In es, this message translates to:
+  /// **'SESIÓN EN CURSO'**
+  String get homeInProgress;
+
+  /// No description provided for @homeReadyQuestion.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Vamos a entrenar?'**
+  String get homeReadyQuestion;
+
+  /// No description provided for @homeAddExercisesHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Añade tus ejercicios y registra cada serie.'**
+  String get homeAddExercisesHint;
+
+  /// No description provided for @homeActivitiesRecords.
+  ///
+  /// In es, this message translates to:
+  /// **'{activities, plural, one{1 actividad} other{{activities} actividades}} · {records, plural, one{1 registro} other{{records} registros}}'**
+  String homeActivitiesRecords(int activities, int records);
+
+  /// No description provided for @homeStartWorkout.
+  ///
+  /// In es, this message translates to:
+  /// **'Empezar entrenamiento'**
+  String get homeStartWorkout;
+
+  /// No description provided for @homeContinueWorkout.
+  ///
+  /// In es, this message translates to:
+  /// **'Continuar entrenamiento'**
+  String get homeContinueWorkout;
+
+  /// No description provided for @homeCompletedSessions.
+  ///
+  /// In es, this message translates to:
+  /// **'sesiones completas'**
+  String get homeCompletedSessions;
+
+  /// No description provided for @homeRecords.
+  ///
+  /// In es, this message translates to:
+  /// **'registros'**
+  String get homeRecords;
+
+  /// No description provided for @homeLastActivity.
+  ///
+  /// In es, this message translates to:
+  /// **'ÚLTIMA ACTIVIDAD'**
+  String get homeLastActivity;
+
+  /// No description provided for @homeEmptyHistoryTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Aquí empieza tu historia'**
+  String get homeEmptyHistoryTitle;
+
+  /// No description provided for @homeEmptyHistorySubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu primer entrenamiento aparecerá aquí cuando lo finalices.'**
+  String get homeEmptyHistorySubtitle;
+
+  /// No description provided for @homeSavedOffline.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardado en este dispositivo · Sin conexión'**
+  String get homeSavedOffline;
+
+  /// No description provided for @homeJourneyTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu recorrido'**
+  String get homeJourneyTitle;
+
+  /// No description provided for @homeEverySessionCounts.
+  ///
+  /// In es, this message translates to:
+  /// **'Cada sesión cuenta.'**
+  String get homeEverySessionCounts;
+
+  /// No description provided for @homeNoSessionsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no hay sesiones'**
+  String get homeNoSessionsTitle;
+
+  /// No description provided for @homeNoSessionsSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Finaliza un entrenamiento y consulta aquí todos sus ejercicios y series.'**
+  String get homeNoSessionsSubtitle;
+
+  /// No description provided for @homeStatusInProgress.
+  ///
+  /// In es, this message translates to:
+  /// **'EN CURSO'**
+  String get homeStatusInProgress;
+
+  /// No description provided for @homeStatusCompleted.
+  ///
+  /// In es, this message translates to:
+  /// **'COMPLETADO'**
+  String get homeStatusCompleted;
+
+  /// No description provided for @homeFinishedAt.
+  ///
+  /// In es, this message translates to:
+  /// **'Finalizó: {date}'**
+  String homeFinishedAt(Object date);
+
+  /// No description provided for @homeFinishRecorded.
+  ///
+  /// In es, this message translates to:
+  /// **'Cierre registrado: {date}'**
+  String homeFinishRecorded(Object date);
+
+  /// No description provided for @homeFinishRecordedByUser.
+  ///
+  /// In es, this message translates to:
+  /// **'Cierre registrado: {date} · hora elegida por ti'**
+  String homeFinishRecordedByUser(Object date);
+
+  /// No description provided for @homeTimeKeptWarning.
+  ///
+  /// In es, this message translates to:
+  /// **'Horario conservado con aviso. Puedes revisarlo más adelante.'**
+  String get homeTimeKeptWarning;
+
+  /// No description provided for @homeTimeKeptWarningShort.
+  ///
+  /// In es, this message translates to:
+  /// **'Horario conservado con aviso.'**
+  String get homeTimeKeptWarningShort;
+
+  /// No description provided for @homeActivities.
+  ///
+  /// In es, this message translates to:
+  /// **'actividades'**
+  String get homeActivities;
+
+  /// No description provided for @homeIntervalsRepeated.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, one{1 serie / tramo} other{{count} series / tramos}}'**
+  String homeIntervalsRepeated(int count);
+
+  /// No description provided for @homeIntervals.
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, one{1 tramo} other{{count} tramos}}'**
+  String homeIntervals(int count);
+
+  /// No description provided for @homeNotStarted.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin iniciar'**
+  String get homeNotStarted;
+
+  /// No description provided for @homeEndedAt.
+  ///
+  /// In es, this message translates to:
+  /// **'Fin: {date}'**
+  String homeEndedAt(Object date);
+
+  /// No description provided for @homeDraft.
+  ///
+  /// In es, this message translates to:
+  /// **'Borrador: {draft}'**
+  String homeDraft(Object draft);
+
+  /// No description provided for @homeFinishWorkout.
+  ///
+  /// In es, this message translates to:
+  /// **'Finalizar entrenamiento'**
+  String get homeFinishWorkout;
+
+  /// No description provided for @homeAddSetToFinish.
+  ///
+  /// In es, this message translates to:
+  /// **'Registra al menos una serie para finalizar.'**
+  String get homeAddSetToFinish;
+
+  /// No description provided for @homeEachSetSaved.
+  ///
+  /// In es, this message translates to:
+  /// **'Cada serie se guarda al pulsar Guardar.'**
+  String get homeEachSetSaved;
+
+  /// No description provided for @homeDiscardTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Descartar sesión?'**
+  String get homeDiscardTitle;
+
+  /// No description provided for @homeDiscardBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Se eliminarán esta sesión y todas sus series. Esta acción no se puede deshacer.'**
+  String get homeDiscardBody;
+
+  /// No description provided for @homeDiscard.
+  ///
+  /// In es, this message translates to:
+  /// **'Descartar'**
+  String get homeDiscard;
+
+  /// No description provided for @homeDiscardSession.
+  ///
+  /// In es, this message translates to:
+  /// **'Descartar sesión'**
+  String get homeDiscardSession;
+
+  /// No description provided for @homeSavedWellDone.
+  ///
+  /// In es, this message translates to:
+  /// **'Sesión guardada. Buen trabajo.'**
+  String get homeSavedWellDone;
+
+  /// No description provided for @homeViewHistory.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver historial'**
+  String get homeViewHistory;
+
+  /// No description provided for @homeDeleteExerciseTooltip.
+  ///
+  /// In es, this message translates to:
+  /// **'Eliminar ejercicio {name}'**
+  String homeDeleteExerciseTooltip(Object name);
+
+  /// No description provided for @homeDeleteExerciseTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Eliminar ejercicio?'**
+  String get homeDeleteExerciseTitle;
+
+  /// No description provided for @homeDeleteExerciseBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Se eliminará {name} y sus {count, plural, one{1 serie} other{{count} series}}.'**
+  String homeDeleteExerciseBody(Object name, int count);
+
+  /// No description provided for @homeDelete.
+  ///
+  /// In es, this message translates to:
+  /// **'Eliminar'**
+  String get homeDelete;
+
+  /// No description provided for @homeTargetProgress.
+  ///
+  /// In es, this message translates to:
+  /// **'Objetivo: {target, plural, one{1 serie} other{{target} series}} de {repsMin}–{repsMax} reps · {done}/{target} registradas'**
+  String homeTargetProgress(
+    int target,
+    Object repsMin,
+    Object repsMax,
+    int done,
+  );
+
+  /// No description provided for @homeNoPreviousSession.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin sesión anterior registrada'**
+  String get homeNoPreviousSession;
+
+  /// No description provided for @homeLastTime.
+  ///
+  /// In es, this message translates to:
+  /// **'Última vez · {date}'**
+  String homeLastTime(Object date);
+
+  /// No description provided for @homeNoSetsYet.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no has registrado series.'**
+  String get homeNoSetsYet;
+
+  /// No description provided for @homeSetHeader.
+  ///
+  /// In es, this message translates to:
+  /// **'SERIE'**
+  String get homeSetHeader;
+
+  /// No description provided for @homeKgHeader.
+  ///
+  /// In es, this message translates to:
+  /// **'KG'**
+  String get homeKgHeader;
+
+  /// No description provided for @homeRepsHeader.
+  ///
+  /// In es, this message translates to:
+  /// **'REPS'**
+  String get homeRepsHeader;
+
+  /// No description provided for @homeSetOptionsTooltip.
+  ///
+  /// In es, this message translates to:
+  /// **'Opciones de la serie {number}'**
+  String homeSetOptionsTooltip(int number);
+
+  /// No description provided for @homeSetDeleteBody.
+  ///
+  /// In es, this message translates to:
+  /// **'{weight} kg × {reps, plural, one{1 repetición} other{{reps} repeticiones}}.'**
+  String homeSetDeleteBody(Object weight, int reps);
+
+  /// No description provided for @homeWeightReps.
+  ///
+  /// In es, this message translates to:
+  /// **'{weight} kg × {reps}'**
+  String homeWeightReps(Object weight, int reps);
+
+  /// No description provided for @homeEditSet.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar serie'**
+  String get homeEditSet;
+
+  /// No description provided for @homeDeleteSet.
+  ///
+  /// In es, this message translates to:
+  /// **'Eliminar serie'**
+  String get homeDeleteSet;
+
+  /// No description provided for @homeAddSet.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir serie'**
+  String get homeAddSet;
+
+  /// No description provided for @homeRest.
+  ///
+  /// In es, this message translates to:
+  /// **'Descansar {seconds}s'**
+  String homeRest(int seconds);
+
+  /// No description provided for @homeFirstSetTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Prepara tu primera serie'**
+  String get homeFirstSetTitle;
+
+  /// No description provided for @homeFirstSetSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Añade un ejercicio para empezar a registrar peso y repeticiones.'**
+  String get homeFirstSetSubtitle;
+
+  /// No description provided for @homeFinishSession.
+  ///
+  /// In es, this message translates to:
+  /// **'Finalizar entreno'**
+  String get homeFinishSession;
+
+  /// No description provided for @homeTabToday.
+  ///
+  /// In es, this message translates to:
+  /// **'Hoy'**
+  String get homeTabToday;
+
+  /// No description provided for @homeTabRoutines.
+  ///
+  /// In es, this message translates to:
+  /// **'Rutinas'**
+  String get homeTabRoutines;
+
+  /// No description provided for @homeTabHistory.
+  ///
+  /// In es, this message translates to:
+  /// **'Historial'**
+  String get homeTabHistory;
+
+  /// No description provided for @homeSessionStarted.
+  ///
+  /// In es, this message translates to:
+  /// **'Entreno iniciado. Puedes abrir Entrenamiento para registrar.'**
+  String get homeSessionStarted;
+
+  /// No description provided for @homeSessionStartFailed.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo iniciar el entreno.'**
+  String get homeSessionStartFailed;
+
+  /// No description provided for @homeActiveSessionChanged.
+  ///
+  /// In es, this message translates to:
+  /// **'La sesión activa ha cambiado. Revísala.'**
+  String get homeActiveSessionChanged;
+
+  /// No description provided for @homeSavedSheetPending.
+  ///
+  /// In es, this message translates to:
+  /// **'Entreno guardado en el móvil. El envío a Google Sheets queda pendiente de confirmación.'**
+  String get homeSavedSheetPending;
+
+  /// No description provided for @homeSavedSheetNotUpdated.
+  ///
+  /// In es, this message translates to:
+  /// **'Entreno guardado en el móvil. Google Sheets no se ha actualizado.'**
+  String get homeSavedSheetNotUpdated;
+
+  /// No description provided for @homeFinishFailed.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo finalizar el entreno.'**
+  String get homeFinishFailed;
+
+  /// No description provided for @homeReviewFinishTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Revisar hora de finalización'**
+  String get homeReviewFinishTitle;
+
+  /// No description provided for @homeFinishIssuesBody.
+  ///
+  /// In es, this message translates to:
+  /// **'{issues}\n\n¿Quieres guardar la hora elegida tal cual? Los registros se conservarán para revisarlos después si lo deseas.'**
+  String homeFinishIssuesBody(Object issues);
+
+  /// No description provided for @homeBackAndFix.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver y corregir'**
+  String get homeBackAndFix;
+
+  /// No description provided for @homeSaveThatTime.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardar esa hora'**
+  String get homeSaveThatTime;
+
+  /// No description provided for @homeDate.
+  ///
+  /// In es, this message translates to:
+  /// **'Fecha'**
+  String get homeDate;
+
+  /// No description provided for @homeTime.
+  ///
+  /// In es, this message translates to:
+  /// **'Hora'**
+  String get homeTime;
+
+  /// No description provided for @homeStartSession.
+  ///
+  /// In es, this message translates to:
+  /// **'Iniciar entreno'**
+  String get homeStartSession;
+
+  /// No description provided for @homeOptionYes.
+  ///
+  /// In es, this message translates to:
+  /// **'Sí'**
+  String get homeOptionYes;
+
+  /// No description provided for @homeOptionNo.
+  ///
+  /// In es, this message translates to:
+  /// **'No'**
+  String get homeOptionNo;
+
+  /// No description provided for @homeBoolYes.
+  ///
+  /// In es, this message translates to:
+  /// **'sí'**
+  String get homeBoolYes;
+
+  /// No description provided for @homeBoolNo.
+  ///
+  /// In es, this message translates to:
+  /// **'no'**
+  String get homeBoolNo;
+
+  /// No description provided for @homeNoteOptional.
+  ///
+  /// In es, this message translates to:
+  /// **'Nota (opcional)'**
+  String get homeNoteOptional;
+
+  /// No description provided for @homeNumberInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'{label}: escribe un número.'**
+  String homeNumberInvalid(Object label);
+
+  /// No description provided for @homeNoteOrValueRequired.
+  ///
+  /// In es, this message translates to:
+  /// **'Anota algún valor o escribe una nota.'**
+  String get homeNoteOrValueRequired;
+
+  /// No description provided for @homeSessionFinished.
+  ///
+  /// In es, this message translates to:
+  /// **'Sesión terminada'**
+  String get homeSessionFinished;
+
+  /// No description provided for @homeSummaryEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin novedades esta vez. Seguimos.'**
+  String get homeSummaryEmpty;
+
+  /// No description provided for @homeNewAchievement.
+  ///
+  /// In es, this message translates to:
+  /// **'Logro nuevo'**
+  String get homeNewAchievement;
+
+  /// No description provided for @homeDone.
+  ///
+  /// In es, this message translates to:
+  /// **'Listo'**
+  String get homeDone;
+
+  /// No description provided for @homeSuggestionSquat.
+  ///
+  /// In es, this message translates to:
+  /// **'Sentadilla'**
+  String get homeSuggestionSquat;
+
+  /// No description provided for @homeSuggestionBench.
+  ///
+  /// In es, this message translates to:
+  /// **'Press banca'**
+  String get homeSuggestionBench;
+
+  /// No description provided for @homeSuggestionRow.
+  ///
+  /// In es, this message translates to:
+  /// **'Remo'**
+  String get homeSuggestionRow;
+
+  /// No description provided for @homeNewSet.
+  ///
+  /// In es, this message translates to:
+  /// **'Nueva serie'**
+  String get homeNewSet;
+
+  /// No description provided for @homeWeightLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Peso (kg)'**
+  String get homeWeightLabel;
+
+  /// No description provided for @homeWeightHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Ej. 20,5'**
+  String get homeWeightHint;
+
+  /// No description provided for @homeRepsLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Repeticiones'**
+  String get homeRepsLabel;
+
+  /// No description provided for @homeRepsHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Ej. 10'**
+  String get homeRepsHint;
+
+  /// No description provided for @homeZeroWeightHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Usa 0 kg si entrenas sin carga externa.'**
+  String get homeZeroWeightHint;
+
+  /// No description provided for @homeExercisesLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'EJERCICIOS'**
+  String get homeExercisesLabel;
+
+  /// No description provided for @homeDeleteSetTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Eliminar serie?'**
+  String get homeDeleteSetTitle;
+
+  /// No description provided for @accountsConnectError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo conectar con Google.'**
+  String get accountsConnectError;
+
+  /// No description provided for @accountsSwitchError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo cambiar de cuenta. Tus datos se conservan.'**
+  String get accountsSwitchError;
+
+  /// No description provided for @accountsDescription.
+  ///
+  /// In es, this message translates to:
+  /// **'Cada cuenta tiene su conversación, configuración de IA, hoja y entrenamientos en este móvil. El histórico anterior permanece en el perfil local. Conectar no copia ni sube esos datos.'**
+  String get accountsDescription;
+
+  /// No description provided for @accountsConnectAnother.
+  ///
+  /// In es, this message translates to:
+  /// **'Conectar otra cuenta de Google'**
+  String get accountsConnectAnother;
+
+  /// No description provided for @accountsActiveProfile.
+  ///
+  /// In es, this message translates to:
+  /// **'Perfil activo'**
+  String get accountsActiveProfile;
+
+  /// No description provided for @accountsReconnectProfile.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver a este perfil con Google'**
+  String get accountsReconnectProfile;
+
+  /// No description provided for @accountsDisconnect.
+  ///
+  /// In es, this message translates to:
+  /// **'Desconectar y volver al perfil local'**
+  String get accountsDisconnect;
+
+  /// No description provided for @accountsDisconnectNotice.
+  ///
+  /// In es, this message translates to:
+  /// **'Desconectar conserva los datos de cada perfil en este móvil. No borra archivos de Google ni revoca el acceso desde tu cuenta de Google.'**
+  String get accountsDisconnectNotice;
+
+  /// No description provided for @appearanceSaveError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo guardar el tema. Vuelve a intentarlo.'**
+  String get appearanceSaveError;
+
+  /// No description provided for @appearanceIntro.
+  ///
+  /// In es, this message translates to:
+  /// **'Elige cómo quieres ver TrackIA. La elección se guarda en este móvil.'**
+  String get appearanceIntro;
+
+  /// No description provided for @appearanceSystemHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Usar el tema del dispositivo'**
+  String get appearanceSystemHint;
+
+  /// No description provided for @archiveSearchLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Buscar por título o resumen'**
+  String get archiveSearchLabel;
+
+  /// No description provided for @archiveRecoverError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo recuperar el chat. El archivo se conserva.'**
+  String get archiveRecoverError;
+
+  /// No description provided for @archiveEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no hay chats archivados.'**
+  String get archiveEmpty;
+
+  /// No description provided for @archiveChatSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'{date} · {count} mensajes'**
+  String archiveChatSubtitle(Object date, Object count);
+
+  /// No description provided for @archiveAutomaticTag.
+  ///
+  /// In es, this message translates to:
+  /// **'archivado por el asistente'**
+  String get archiveAutomaticTag;
+
+  /// No description provided for @archiveContinuityTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Resumen de continuidad'**
+  String get archiveContinuityTitle;
+
+  /// No description provided for @archiveReasonLine.
+  ///
+  /// In es, this message translates to:
+  /// **'Motivo del asistente: {reason}'**
+  String archiveReasonLine(Object reason);
+
+  /// No description provided for @archiveConsultFromChat.
+  ///
+  /// In es, this message translates to:
+  /// **'Consultar desde el chat'**
+  String get archiveConsultFromChat;
+
+  /// No description provided for @archiveYou.
+  ///
+  /// In es, this message translates to:
+  /// **'Tú'**
+  String get archiveYou;
+
+  /// No description provided for @archiveAttachmentKept.
+  ///
+  /// In es, this message translates to:
+  /// **'Adjunto conservado: {name}'**
+  String archiveAttachmentKept(Object name);
+
+  /// No description provided for @notifUnsupported.
+  ///
+  /// In es, this message translates to:
+  /// **'Los avisos de descanso solo están disponibles en Android.'**
+  String get notifUnsupported;
+
+  /// No description provided for @notifDndActive.
+  ///
+  /// In es, this message translates to:
+  /// **'No molestar está activo'**
+  String get notifDndActive;
+
+  /// No description provided for @notifDndTotalSilence.
+  ///
+  /// In es, this message translates to:
+  /// **'Estás en «Silencio total»: Android bloquea los avisos, incluso como alarma.'**
+  String get notifDndTotalSilence;
+
+  /// No description provided for @notifDndAlarm.
+  ///
+  /// In es, this message translates to:
+  /// **'Los avisos de descanso suenan como alarma. Los demás avisos no sonarían ni vibrarían.'**
+  String get notifDndAlarm;
+
+  /// No description provided for @notifDndPlain.
+  ///
+  /// In es, this message translates to:
+  /// **'Ahora mismo los avisos de descanso no sonarían ni vibrarían.'**
+  String get notifDndPlain;
+
+  /// No description provided for @notifEnabledTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Avisos de actividad y descanso'**
+  String get notifEnabledTitle;
+
+  /// No description provided for @notifEnabledSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Actividad lista, tramo en marcha, fin de tramo y fin de descanso.'**
+  String get notifEnabledSubtitle;
+
+  /// No description provided for @notifAlarmStyleTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Tratar como alarma'**
+  String get notifAlarmStyleTitle;
+
+  /// No description provided for @notifAlarmStyleSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'El fin de descanso y de tramo suenan y vibran aunque No molestar esté en modo Prioridad.'**
+  String get notifAlarmStyleSubtitle;
+
+  /// No description provided for @notifChannelBlockedTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Android bloquea el canal de alarma'**
+  String get notifChannelBlockedTitle;
+
+  /// No description provided for @notifChannelBlockedSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Actívalo en los ajustes del canal.'**
+  String get notifChannelBlockedSubtitle;
+
+  /// No description provided for @notifExactTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Permitir avisos puntuales'**
+  String get notifExactTitle;
+
+  /// No description provided for @notifExactSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin este permiso Android puede retrasar el aviso.'**
+  String get notifExactSubtitle;
+
+  /// No description provided for @notifCheck.
+  ///
+  /// In es, this message translates to:
+  /// **'Comprobar'**
+  String get notifCheck;
+
+  /// No description provided for @notifTest.
+  ///
+  /// In es, this message translates to:
+  /// **'Probar aviso'**
+  String get notifTest;
+
+  /// No description provided for @notifTestAlarm.
+  ///
+  /// In es, this message translates to:
+  /// **'Probar con No molestar activo'**
+  String get notifTestAlarm;
+
+  /// No description provided for @notifOpenDnd.
+  ///
+  /// In es, this message translates to:
+  /// **'Abrir ajustes de No molestar'**
+  String get notifOpenDnd;
+
+  /// No description provided for @notifSilenceNote.
+  ///
+  /// In es, this message translates to:
+  /// **'En «Silencio total» Android bloquea todo, incluidas las alarmas. Ahí solo ayuda permitirlas en los ajustes de tu móvil.'**
+  String get notifSilenceNote;
+
+  /// No description provided for @progressLoadError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo calcular el progreso.'**
+  String get progressLoadError;
+
+  /// No description provided for @progressMonth1.
+  ///
+  /// In es, this message translates to:
+  /// **'enero'**
+  String get progressMonth1;
+
+  /// No description provided for @progressMonth2.
+  ///
+  /// In es, this message translates to:
+  /// **'febrero'**
+  String get progressMonth2;
+
+  /// No description provided for @progressMonth3.
+  ///
+  /// In es, this message translates to:
+  /// **'marzo'**
+  String get progressMonth3;
+
+  /// No description provided for @progressMonth4.
+  ///
+  /// In es, this message translates to:
+  /// **'abril'**
+  String get progressMonth4;
+
+  /// No description provided for @progressMonth5.
+  ///
+  /// In es, this message translates to:
+  /// **'mayo'**
+  String get progressMonth5;
+
+  /// No description provided for @progressMonth6.
+  ///
+  /// In es, this message translates to:
+  /// **'junio'**
+  String get progressMonth6;
+
+  /// No description provided for @progressMonth7.
+  ///
+  /// In es, this message translates to:
+  /// **'julio'**
+  String get progressMonth7;
+
+  /// No description provided for @progressMonth8.
+  ///
+  /// In es, this message translates to:
+  /// **'agosto'**
+  String get progressMonth8;
+
+  /// No description provided for @progressMonth9.
+  ///
+  /// In es, this message translates to:
+  /// **'septiembre'**
+  String get progressMonth9;
+
+  /// No description provided for @progressMonth10.
+  ///
+  /// In es, this message translates to:
+  /// **'octubre'**
+  String get progressMonth10;
+
+  /// No description provided for @progressMonth11.
+  ///
+  /// In es, this message translates to:
+  /// **'noviembre'**
+  String get progressMonth11;
+
+  /// No description provided for @progressMonth12.
+  ///
+  /// In es, this message translates to:
+  /// **'diciembre'**
+  String get progressMonth12;
+
+  /// No description provided for @progressDayStatus.
+  ///
+  /// In es, this message translates to:
+  /// **'{day} de {month}: {status}'**
+  String progressDayStatus(int day, Object month, Object status);
+
+  /// No description provided for @progressDayDone.
+  ///
+  /// In es, this message translates to:
+  /// **'cumplido'**
+  String get progressDayDone;
+
+  /// No description provided for @progressDayPending.
+  ///
+  /// In es, this message translates to:
+  /// **'pendiente'**
+  String get progressDayPending;
+
+  /// No description provided for @progressDayMissed.
+  ///
+  /// In es, this message translates to:
+  /// **'sin cumplir'**
+  String get progressDayMissed;
+
+  /// No description provided for @progressTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Progreso · {name}'**
+  String progressTitle(Object name);
+
+  /// No description provided for @progressStreakCurrent.
+  ///
+  /// In es, this message translates to:
+  /// **'{n, plural, one{Racha actual: 1 día} other{Racha actual: {n} días}}'**
+  String progressStreakCurrent(int n);
+
+  /// No description provided for @progressStreakBest.
+  ///
+  /// In es, this message translates to:
+  /// **'Mejor racha: {best}'**
+  String progressStreakBest(int best);
+
+  /// No description provided for @progressFreeDays.
+  ///
+  /// In es, this message translates to:
+  /// **'Días libres esta semana: {used}/{total}'**
+  String progressFreeDays(int used, int total);
+
+  /// No description provided for @progressGoalToday.
+  ///
+  /// In es, this message translates to:
+  /// **'Meta de hoy'**
+  String get progressGoalToday;
+
+  /// No description provided for @progressGoalWeek.
+  ///
+  /// In es, this message translates to:
+  /// **'Meta de la semana'**
+  String get progressGoalWeek;
+
+  /// No description provided for @progressGoalValues.
+  ///
+  /// In es, this message translates to:
+  /// **'{value} de {target}'**
+  String progressGoalValues(Object value, Object target);
+
+  /// No description provided for @progressLastFourWeeks.
+  ///
+  /// In es, this message translates to:
+  /// **'Últimas 4 semanas'**
+  String get progressLastFourWeeks;
+
+  /// No description provided for @progressAchievementUnlocked.
+  ///
+  /// In es, this message translates to:
+  /// **'{title}, desbloqueado'**
+  String progressAchievementUnlocked(Object title);
+
+  /// No description provided for @progressAchievementLocked.
+  ///
+  /// In es, this message translates to:
+  /// **'{title}, bloqueado, {percent} % de progreso'**
+  String progressAchievementLocked(Object title, int percent);
+
+  /// No description provided for @progressAchievementsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Logros · {unlocked} de {total}'**
+  String progressAchievementsTitle(int unlocked, int total);
+
+  /// No description provided for @progressAchievementsEmptyPlay.
+  ///
+  /// In es, this message translates to:
+  /// **'Tus logros aparecerán al terminar tu primera actividad.'**
+  String get progressAchievementsEmptyPlay;
+
+  /// No description provided for @progressAchievementsEmptyEnable.
+  ///
+  /// In es, this message translates to:
+  /// **'Activa el modo Juego y los logros en «{place}».'**
+  String progressAchievementsEmptyEnable(Object place);
+
+  /// No description provided for @routinesTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Tus rutinas'**
+  String get routinesTitle;
+
+  /// No description provided for @routinesSubtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Prepara una vez. Entrena a tu ritmo.'**
+  String get routinesSubtitle;
+
+  /// No description provided for @routinesCreate.
+  ///
+  /// In es, this message translates to:
+  /// **'Crear rutina'**
+  String get routinesCreate;
+
+  /// No description provided for @routinesEmptyTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu próxima sesión, preparada'**
+  String get routinesEmptyTitle;
+
+  /// No description provided for @routinesEmptyBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Crea, por ejemplo, «Pierna A» con tus ejercicios, series y rango de repeticiones.'**
+  String get routinesEmptyBody;
+
+  /// No description provided for @routinesOptionsTooltip.
+  ///
+  /// In es, this message translates to:
+  /// **'Opciones de {name}'**
+  String routinesOptionsTooltip(Object name);
+
+  /// No description provided for @routinesDeleteTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Eliminar rutina?'**
+  String get routinesDeleteTitle;
+
+  /// No description provided for @routinesDeleteBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Se eliminará «{name}». Tus entrenamientos guardados y la sesión en curso se conservarán.'**
+  String routinesDeleteBody(Object name);
+
+  /// No description provided for @routinesEditMenu.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar rutina'**
+  String get routinesEditMenu;
+
+  /// No description provided for @routinesDeleteMenu.
+  ///
+  /// In es, this message translates to:
+  /// **'Eliminar rutina'**
+  String get routinesDeleteMenu;
+
+  /// No description provided for @routinesDelete.
+  ///
+  /// In es, this message translates to:
+  /// **'Eliminar'**
+  String get routinesDelete;
+
+  /// No description provided for @routinesTrain.
+  ///
+  /// In es, this message translates to:
+  /// **'Entrenar'**
+  String get routinesTrain;
+
+  /// No description provided for @routinesContinueSession.
+  ///
+  /// In es, this message translates to:
+  /// **'Continuar sesión activa'**
+  String get routinesContinueSession;
+
+  /// No description provided for @routinesNeedExercise.
+  ///
+  /// In es, this message translates to:
+  /// **'Añade al menos un ejercicio.'**
+  String get routinesNeedExercise;
+
+  /// No description provided for @routinesNameLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre de la rutina'**
+  String get routinesNameLabel;
+
+  /// No description provided for @routinesNameHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Ej. Pierna A'**
+  String get routinesNameHint;
+
+  /// No description provided for @routinesEditorHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Define tus objetivos. Las series se registrarán cuando entrenes.'**
+  String get routinesEditorHelp;
+
+  /// No description provided for @routinesMoveUp.
+  ///
+  /// In es, this message translates to:
+  /// **'Subir ejercicio {n}'**
+  String routinesMoveUp(int n);
+
+  /// No description provided for @routinesMoveDown.
+  ///
+  /// In es, this message translates to:
+  /// **'Bajar ejercicio {n}'**
+  String routinesMoveDown(int n);
+
+  /// No description provided for @routinesEditExercise.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar ejercicio {n}'**
+  String routinesEditExercise(int n);
+
+  /// No description provided for @routinesRemoveExercise.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar ejercicio {n}'**
+  String routinesRemoveExercise(int n);
+
+  /// No description provided for @routinesAddExercise.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir ejercicio a rutina'**
+  String get routinesAddExercise;
+
+  /// No description provided for @routinesSaving.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardando…'**
+  String get routinesSaving;
+
+  /// No description provided for @routinesSave.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardar rutina'**
+  String get routinesSave;
+
+  /// No description provided for @routinesLeaveTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Salir sin guardar?'**
+  String get routinesLeaveTitle;
+
+  /// No description provided for @routinesLeaveBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Los cambios en esta rutina se perderán.'**
+  String get routinesLeaveBody;
+
+  /// No description provided for @routinesKeepEditing.
+  ///
+  /// In es, this message translates to:
+  /// **'Seguir editando'**
+  String get routinesKeepEditing;
+
+  /// No description provided for @routinesDiscard.
+  ///
+  /// In es, this message translates to:
+  /// **'Descartar cambios'**
+  String get routinesDiscard;
+
+  /// No description provided for @routinesBack.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver'**
+  String get routinesBack;
+
+  /// No description provided for @routinesExerciseDialogTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Ejercicio de rutina'**
+  String get routinesExerciseDialogTitle;
+
+  /// No description provided for @routinesEditTargetTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Editar objetivo'**
+  String get routinesEditTargetTitle;
+
+  /// No description provided for @routinesExerciseLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Ejercicio'**
+  String get routinesExerciseLabel;
+
+  /// No description provided for @routinesExerciseHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Ej. Sentadilla'**
+  String get routinesExerciseHint;
+
+  /// No description provided for @routinesTargetSets.
+  ///
+  /// In es, this message translates to:
+  /// **'Series previstas'**
+  String get routinesTargetSets;
+
+  /// No description provided for @routinesRepsMin.
+  ///
+  /// In es, this message translates to:
+  /// **'Reps mín.'**
+  String get routinesRepsMin;
+
+  /// No description provided for @routinesRepsMax.
+  ///
+  /// In es, this message translates to:
+  /// **'Reps máx.'**
+  String get routinesRepsMax;
+
+  /// No description provided for @routinesRestSeconds.
+  ///
+  /// In es, this message translates to:
+  /// **'Descanso (segundos)'**
+  String get routinesRestSeconds;
+
+  /// No description provided for @routinesSaveExercise.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardar ejercicio'**
+  String get routinesSaveExercise;
+
+  /// No description provided for @focusCounterSaveError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo guardar el contador. Vuelve a intentarlo.'**
+  String get focusCounterSaveError;
+
+  /// No description provided for @focusResultSaveError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo guardar el resultado. Conserva el texto y vuelve a intentarlo.'**
+  String get focusResultSaveError;
+
+  /// No description provided for @focusSaveActivityError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo guardar en tus actividades.'**
+  String get focusSaveActivityError;
+
+  /// No description provided for @focusRecordSaveError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo guardar el registro. Vuelve a intentarlo.'**
+  String get focusRecordSaveError;
+
+  /// No description provided for @focusReviewTimeTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Revisar hora'**
+  String get focusReviewTimeTitle;
+
+  /// No description provided for @focusReviewTimeBody.
+  ///
+  /// In es, this message translates to:
+  /// **'La hora elegida no coincide con los registros. ¿Guardar esa hora y conservarlos?'**
+  String get focusReviewTimeBody;
+
+  /// No description provided for @focusBack.
+  ///
+  /// In es, this message translates to:
+  /// **'Volver'**
+  String get focusBack;
+
+  /// No description provided for @focusSaveThatTime.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardar esa hora'**
+  String get focusSaveThatTime;
+
+  /// No description provided for @focusRunning.
+  ///
+  /// In es, this message translates to:
+  /// **'En marcha'**
+  String get focusRunning;
+
+  /// No description provided for @focusReady.
+  ///
+  /// In es, this message translates to:
+  /// **'Listo'**
+  String get focusReady;
+
+  /// No description provided for @focusRest.
+  ///
+  /// In es, this message translates to:
+  /// **'Descanso'**
+  String get focusRest;
+
+  /// No description provided for @focusRepeatedRest.
+  ///
+  /// In es, this message translates to:
+  /// **'{progress} {segments} · Descanso'**
+  String focusRepeatedRest(Object progress, Object segments);
+
+  /// No description provided for @focusSegmentCount.
+  ///
+  /// In es, this message translates to:
+  /// **'{segment} {count}'**
+  String focusSegmentCount(Object segment, int count);
+
+  /// No description provided for @focusSegmentCountOfTarget.
+  ///
+  /// In es, this message translates to:
+  /// **'{segment} {count} de {target}'**
+  String focusSegmentCountOfTarget(Object segment, int count, int target);
+
+  /// No description provided for @focusSegmentSerie.
+  ///
+  /// In es, this message translates to:
+  /// **'serie'**
+  String get focusSegmentSerie;
+
+  /// No description provided for @focusSegmentTramo.
+  ///
+  /// In es, this message translates to:
+  /// **'tramo'**
+  String get focusSegmentTramo;
+
+  /// No description provided for @focusSegmentSeries.
+  ///
+  /// In es, this message translates to:
+  /// **'series'**
+  String get focusSegmentSeries;
+
+  /// No description provided for @focusSegmentTramos.
+  ///
+  /// In es, this message translates to:
+  /// **'tramos'**
+  String get focusSegmentTramos;
+
+  /// No description provided for @focusRemoveField.
+  ///
+  /// In es, this message translates to:
+  /// **'Quitar {label}'**
+  String focusRemoveField(Object label);
+
+  /// No description provided for @focusAddField.
+  ///
+  /// In es, this message translates to:
+  /// **'Añadir {label}'**
+  String focusAddField(Object label);
 }
 
 class _AppLocalizationsDelegate

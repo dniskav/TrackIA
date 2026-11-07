@@ -183,7 +183,7 @@ extension _ChatSheet on _AssistantChatScreenState {
       if (mounted) update(() => sheetContext = saved);
     } catch (_) {
       if (mounted) {
-        update(() => error = 'No se pudo recuperar la hoja cargada.');
+        update(() => error = appText(context).chatSheetReloadError);
       }
     }
   }
@@ -199,7 +199,7 @@ extension _ChatSheet on _AssistantChatScreenState {
     if (defaultTargetPlatform != TargetPlatform.android) {
       update(
         () =>
-            error = 'La conexión con Google Sheets está disponible en Android.',
+            error = appText(context).chatSheetAndroidOnly,
       );
       return;
     }
@@ -235,7 +235,7 @@ extension _ChatSheet on _AssistantChatScreenState {
       if (mounted) {
         update(
           () => error =
-              'No se pudo guardar la hoja en el móvil. La copia anterior se conserva.',
+              appText(context).chatSheetSaveError,
         );
       }
     } finally {
@@ -263,7 +263,7 @@ extension _ChatSheet on _AssistantChatScreenState {
       if (mounted) {
         update(
           () => error =
-              'La respuesta llegó, pero la hoja sigue pendiente de interpretación en el móvil.',
+              appText(context).chatSheetInterpretPending,
         );
       }
     }
@@ -306,7 +306,7 @@ extension _ChatSheet on _AssistantChatScreenState {
         update(
           () => error =
               e.message ??
-              'No se pudo actualizar la hoja. La copia anterior se conserva.',
+              appText(context).chatSheetRefreshError,
         );
       }
     } on ValidationException catch (e) {
@@ -315,7 +315,7 @@ extension _ChatSheet on _AssistantChatScreenState {
       if (mounted) {
         update(
           () => error =
-              'No se pudo actualizar la hoja. La copia anterior se conserva.',
+              appText(context).chatSheetRefreshError,
         );
       }
     } finally {
@@ -337,21 +337,28 @@ extension _ChatSheet on _AssistantChatScreenState {
       builder: (context) => AlertDialog(
         title: Text(sheet.name),
         content: Text(
-          '${sheet.title} · ${sheet.rows.length} filas\nÚltima lectura: ${DateFormat('d/M/yyyy HH:mm').format(sheet.loadedAt.toLocal())}.\n\n${sheet.interpretationPending ? 'Pendiente de interpretación por la IA. No se han importado entrenamientos.' : 'El asistente ha analizado esta copia; no se han importado entrenamientos.'}',
+          appText(context).chatSheetDialogBody(
+            sheet.title,
+            sheet.rows.length,
+            DateFormat('d/M/yyyy HH:mm').format(sheet.loadedAt.toLocal()),
+            sheet.interpretationPending
+                ? appText(context).chatSheetStatusPending
+                : appText(context).chatSheetStatusAnalyzed,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, 'remove'),
-            child: const Text('Quitar del contexto'),
+            child: Text(appText(context).chatSheetRemove),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, 'change'),
-            child: const Text('Cambiar hoja'),
+            child: Text(appText(context).chatSheetChange),
           ),
           if (sheet.source == 'google')
             FilledButton(
               onPressed: () => Navigator.pop(context, 'refresh'),
-              child: const Text('Actualizar hoja'),
+              child: Text(appText(context).chatSheetRefresh),
             ),
         ],
       ),
@@ -365,7 +372,7 @@ extension _ChatSheet on _AssistantChatScreenState {
         if (mounted) update(() => sheetContext = null);
       } catch (_) {
         if (mounted) {
-          update(() => error = 'No se pudo quitar la copia de la hoja.');
+          update(() => error = appText(context).chatSheetRemoveError);
         }
       }
     }

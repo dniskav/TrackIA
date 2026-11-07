@@ -18,14 +18,14 @@ extension _ActivityIdleBar on _ActivityFocusControlsState {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          blockedByOther ? 'Otro acompañante activo' : 'Sin actividad',
+          blockedByOther ? appText(context).activityIdleOtherActive : appText(context).activityIdleNoActivity,
           style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
         ),
         if (!compact)
           Text(
             blockedByOther
-                ? 'Termina la otra actividad para iniciar aquí'
-                : 'Registra una cuando quieras',
+                ? appText(context).activityIdleEndOther
+                : appText(context).activityIdleRegisterAnytime,
             style: TextStyle(fontSize: 12, color: scheme.onSurfaceVariant),
           ),
       ],
@@ -34,7 +34,7 @@ extension _ActivityIdleBar on _ActivityFocusControlsState {
       key: const Key('new-activity'),
       onPressed: enabled ? choose : null,
       icon: const Icon(Icons.add),
-      label: const Text('Nueva actividad'),
+      label: Text(appText(context).activityNewActivity),
       style: OutlinedButton.styleFrom(minimumSize: const Size(0, 44)),
     );
     // Closing the day or resting adds buttons; they wrap instead of overflowing
@@ -47,7 +47,7 @@ extension _ActivityIdleBar on _ActivityFocusControlsState {
           key: const Key('record-instant'),
           onPressed: enabled ? startInstantRecord : null,
           icon: const Icon(Icons.edit_note),
-          label: const Text('Registrar'),
+          label: Text(appText(context).activityIdleRecord),
           style: OutlinedButton.styleFrom(minimumSize: const Size(0, 44)),
         ),
     ];
