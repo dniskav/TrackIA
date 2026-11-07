@@ -4,14 +4,17 @@ import '../data/ai_client.dart';
 import '../data/ai_settings_store.dart';
 import '../application/reminder_scheduler.dart';
 import '../data/companion_memory_repository.dart';
+import '../data/activity_template_repository.dart';
 import '../data/companion_store.dart';
 import '../data/memory_google_drive.dart';
 import '../data/progress_repository.dart';
 import '../domain/companion.dart';
+import '../domain/companion_package.dart';
 import '../domain/progress.dart';
 import '../domain/reminder.dart';
 import '../domain/workout.dart';
 import 'companion_memory.dart';
+import 'companion_share.dart';
 
 /// «Modo y avisos» of one companion: reminder or game, and the habit reminder
 /// itself (days, window, last call, tone and minimum). FR-026, FR-027.
@@ -28,6 +31,7 @@ class CompanionSettingsScreen extends StatefulWidget {
     this.memory,
     this.memoryTransport,
     this.memoryAccountId,
+    this.templates,
   });
 
   final ProgressRepository progress;
@@ -44,6 +48,9 @@ class CompanionSettingsScreen extends StatefulWidget {
   final CompanionMemoryRepository? memory;
   final MemoryCloudTransport? memoryTransport;
   final String? memoryAccountId;
+
+  /// Saved activities of this companion, exported by «Compartir acompañante».
+  final ActivityTemplateRepository? templates;
 
   @override
   State<CompanionSettingsScreen> createState() =>
@@ -189,6 +196,22 @@ class _CompanionSettingsScreenState extends State<CompanionSettingsScreen> {
         });
       }
     }
+  }
+
+  Future<void> shareCompanion() async {
+    final saved =
+        await widget.templates?.list(companionId: widget.companion.id) ??
+        const <ActivityTemplate>[];
+    if (!mounted) return;
+    await shareCompanionPackage(
+      context,
+      companion: widget.companion,
+      mode: settings.mode,
+      templates: [
+        for (final t in saved)
+          PackageTemplate(activity: t.definition, instant: t.instant),
+      ],
+    );
   }
 
   static String _plain(double v) =>
@@ -736,6 +759,14 @@ class _CompanionSettingsScreenState extends State<CompanionSettingsScreen> {
                     ),
                   ),
                 ],
+                const Divider(height: 32),
+                ListTile(
+                  key: const Key('share-companion'),
+                  leading: const Icon(Icons.ios_share_rounded),
+                  title: Text(l.packageShareRow),
+                  subtitle: Text(l.packageShareRowHelp),
+                  onTap: saving ? null : shareCompanion,
+                ),
                 if (error != null)
                   Padding(
                     padding: const EdgeInsets.only(top: 12),

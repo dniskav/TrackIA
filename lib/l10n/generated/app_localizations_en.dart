@@ -3754,4 +3754,181 @@ class AppLocalizationsEn extends AppLocalizations {
   String agreementRevisionLabel(int n) {
     return 'Revision $n';
   }
+
+  @override
+  String get packageShareRow => 'Share companion';
+
+  @override
+  String get packageShareRowHelp =>
+      'Creates a .trackia file with this companion\'s setup, without your data.';
+
+  @override
+  String get packageShareTitle => 'Share this companion?';
+
+  @override
+  String get packageShareIncludes =>
+      'Shared: name, icon, color, description, style instructions, mode, activity templates and reminder texts.';
+
+  @override
+  String get packageShareExcludes =>
+      'Not shared: AI keys, chats, memory, Google sheet, accounts or your data.';
+
+  @override
+  String get packageShareReceiverNote =>
+      'The person who receives it can import it and review it before using it.';
+
+  @override
+  String get packageShareTemplatesLimited =>
+      'Only the first 5 activity templates are included.';
+
+  @override
+  String get packageShareConfirm => 'Share';
+
+  @override
+  String get packageShareInstructionsTooLong =>
+      'The instructions exceed the 4000 characters allowed for sharing. Shorten them and try again. Nothing was shared.';
+
+  @override
+  String get packageShareInvalid =>
+      'This companion has data that cannot be shared. Nothing was shared.';
+
+  @override
+  String get packageShareWriteError =>
+      'The file could not be prepared for sharing. Nothing was shared.';
+
+  @override
+  String get packageImportTitle => 'Import companion';
+
+  @override
+  String get packageImportIntro =>
+      'Choose a .trackia file or paste the text you were sent. You will see a preview before anything is saved.';
+
+  @override
+  String get packageImportPickFile => 'Choose file';
+
+  @override
+  String get packageImportPasteLabel => 'Companion text';
+
+  @override
+  String get packageImportPreviewButton => 'Show preview';
+
+  @override
+  String get packageImportFileError => 'The file could not be read.';
+
+  @override
+  String get packageImportExternalNotice =>
+      'This content comes from outside: review it before saving it.';
+
+  @override
+  String get packageImportModeNote =>
+      'It will be saved in «reminder» mode, with no permissions or connections. You can change that later.';
+
+  @override
+  String get packageImportActivityTitle => 'Activity it would bring';
+
+  @override
+  String packageImportActivityFields(Object fields) {
+    return 'Fields: $fields';
+  }
+
+  @override
+  String get packageImportRemindersTitle => 'Reminder texts';
+
+  @override
+  String get packageImportReminderWindowStart => 'When the window starts';
+
+  @override
+  String get packageImportReminderLastCall => 'Last call';
+
+  @override
+  String get packageImportReminderInactive => 'No activity';
+
+  @override
+  String get packageImportWarningsTitle => 'Warnings';
+
+  @override
+  String packageImportWarningAppBlocksRemoved(int count) {
+    return 'Internal app blocks were removed from the content. Count: $count';
+  }
+
+  @override
+  String packageImportWarningModeReset(Object mode) {
+    return 'The package asked for «$mode» mode; it starts as «reminder» and you can change it later.';
+  }
+
+  @override
+  String packageImportWarningExtraTemplates(int count) {
+    return 'Other activities in the package are not applied. Count: $count';
+  }
+
+  @override
+  String get packageImportWarningSuspicious =>
+      'The instructions seem to try to change the assistant\'s rules. Read them carefully or delete them.';
+
+  @override
+  String get packageImportWarningInstructionsEmpty =>
+      'No text was left in the instructions after removing the internal blocks.';
+
+  @override
+  String get packageImportSave => 'Save companion';
+
+  @override
+  String get packageImportSaveFailed => 'The companion could not be saved.';
+
+  @override
+  String packageImportProblemField(Object field) {
+    return 'Field: $field';
+  }
+
+  @override
+  String get packageImportProblemEmpty =>
+      'Nothing to import: the text or file is empty.';
+
+  @override
+  String get packageImportProblemTooLarge =>
+      'The content is too large to be a companion.';
+
+  @override
+  String get packageImportProblemBadEncoding =>
+      'The text is damaged or incomplete: it is not in a valid format.';
+
+  @override
+  String get packageImportProblemBadCompression =>
+      'The content is damaged and could not be decompressed.';
+
+  @override
+  String get packageImportProblemTooLargeExpanded =>
+      'The content is too large once opened and was rejected for safety.';
+
+  @override
+  String get packageImportProblemMalformed =>
+      'The content could not be read: it is not a valid companion.';
+
+  @override
+  String get packageImportProblemNotAPackage =>
+      'This is not a TrackIA companion.';
+
+  @override
+  String get packageImportProblemUnsupportedVersion =>
+      'This companion is from a newer version. Update TrackIA to import it.';
+
+  @override
+  String get packageImportProblemChecksumMismatch =>
+      'The content changed or was damaged: the integrity check failed.';
+
+  @override
+  String get packageImportProblemForbiddenField =>
+      'The content includes data that must never travel (keys, chats, memory…). It was not imported.';
+
+  @override
+  String get packageImportProblemUnknownField =>
+      'The content includes a field this version does not accept. It was not imported.';
+
+  @override
+  String get packageImportProblemMissingField =>
+      'A required field is missing from the content.';
+
+  @override
+  String get packageImportProblemInvalidField =>
+      'A field in the content is not valid or exceeds its limit.';
 }

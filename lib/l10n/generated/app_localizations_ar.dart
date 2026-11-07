@@ -3680,4 +3680,177 @@ class AppLocalizationsAr extends AppLocalizations {
   String agreementRevisionLabel(int n) {
     return 'المراجعة $n';
   }
+
+  @override
+  String get packageShareRow => 'مشاركة المرافق';
+
+  @override
+  String get packageShareRowHelp =>
+      'ينشئ ملف .trackia بإعدادات هذا المرافق، دون بياناتك.';
+
+  @override
+  String get packageShareTitle => 'مشاركة هذا المرافق؟';
+
+  @override
+  String get packageShareIncludes =>
+      'تتم مشاركة: الاسم والأيقونة واللون والوصف وتعليمات الأسلوب والوضع وقوالب النشاط ونصوص التذكيرات.';
+
+  @override
+  String get packageShareExcludes =>
+      'لا تتم مشاركة: مفاتيح الذكاء الاصطناعي والمحادثات والذاكرة وورقة Google والحسابات وبياناتك.';
+
+  @override
+  String get packageShareReceiverNote =>
+      'يمكن لمن يستلمه استيراده ومراجعته قبل استخدامه.';
+
+  @override
+  String get packageShareTemplatesLimited => 'تُضمَّن أول 5 قوالب نشاط فقط.';
+
+  @override
+  String get packageShareConfirm => 'مشاركة';
+
+  @override
+  String get packageShareInstructionsTooLong =>
+      'تتجاوز التعليمات الحد المسموح به للمشاركة وهو 4000 حرف. اختصرها وحاول مرة أخرى. لم تتم مشاركة أي شيء.';
+
+  @override
+  String get packageShareInvalid =>
+      'يحتوي هذا المرافق على بيانات لا يمكن مشاركتها. لم تتم مشاركة أي شيء.';
+
+  @override
+  String get packageShareWriteError =>
+      'تعذّر تجهيز الملف للمشاركة. لم تتم مشاركة أي شيء.';
+
+  @override
+  String get packageImportTitle => 'استيراد مرافق';
+
+  @override
+  String get packageImportIntro =>
+      'اختر ملف .trackia أو الصق النص الذي شُورك معك. ستظهر معاينة قبل حفظ أي شيء.';
+
+  @override
+  String get packageImportPickFile => 'اختيار ملف';
+
+  @override
+  String get packageImportPasteLabel => 'نص المرافق';
+
+  @override
+  String get packageImportPreviewButton => 'عرض المعاينة';
+
+  @override
+  String get packageImportFileError => 'تعذّرت قراءة الملف.';
+
+  @override
+  String get packageImportExternalNotice =>
+      'هذا المحتوى قادم من الخارج: راجعه قبل حفظه.';
+
+  @override
+  String get packageImportModeNote =>
+      'سيُحفظ بوضع «تذكير» دون أذونات أو اتصالات. يمكنك تغيير ذلك لاحقًا.';
+
+  @override
+  String get packageImportActivityTitle => 'النشاط الذي سيأتي معه';
+
+  @override
+  String packageImportActivityFields(Object fields) {
+    return 'الحقول: $fields';
+  }
+
+  @override
+  String get packageImportRemindersTitle => 'نصوص التنبيهات';
+
+  @override
+  String get packageImportReminderWindowStart => 'عند بدء الفترة';
+
+  @override
+  String get packageImportReminderLastCall => 'التذكير الأخير';
+
+  @override
+  String get packageImportReminderInactive => 'بلا نشاط';
+
+  @override
+  String get packageImportWarningsTitle => 'تحذيرات';
+
+  @override
+  String packageImportWarningAppBlocksRemoved(int count) {
+    return 'أُزيلت كتل داخلية للتطبيق من المحتوى. العدد: $count';
+  }
+
+  @override
+  String packageImportWarningModeReset(Object mode) {
+    return 'طلبت الحزمة وضع «$mode»؛ سيبدأ بوضع «تذكير» ويمكنك تغييره لاحقًا.';
+  }
+
+  @override
+  String packageImportWarningExtraTemplates(int count) {
+    return 'لا تُطبَّق أنشطة أخرى في الحزمة. العدد: $count';
+  }
+
+  @override
+  String get packageImportWarningSuspicious =>
+      'يبدو أن التعليمات تحاول تغيير قواعد المساعد. اقرأها بعناية أو احذفها.';
+
+  @override
+  String get packageImportWarningInstructionsEmpty =>
+      'لم يتبقَّ نص في التعليمات بعد إزالة الكتل الداخلية.';
+
+  @override
+  String get packageImportSave => 'حفظ المرافق';
+
+  @override
+  String get packageImportSaveFailed => 'تعذّر حفظ المرافق.';
+
+  @override
+  String packageImportProblemField(Object field) {
+    return 'الحقل: $field';
+  }
+
+  @override
+  String get packageImportProblemEmpty =>
+      'لا شيء للاستيراد: النص أو الملف فارغ.';
+
+  @override
+  String get packageImportProblemTooLarge => 'المحتوى كبير جدًا ليكون مرافقًا.';
+
+  @override
+  String get packageImportProblemBadEncoding =>
+      'النص تالف أو ناقص: ليس بتنسيق صالح.';
+
+  @override
+  String get packageImportProblemBadCompression =>
+      'المحتوى تالف وتعذّر فك ضغطه.';
+
+  @override
+  String get packageImportProblemTooLargeExpanded =>
+      'المحتوى كبير جدًا بعد فتحه وتم رفضه للأمان.';
+
+  @override
+  String get packageImportProblemMalformed =>
+      'تعذّرت قراءة المحتوى: ليس مرافقًا صالحًا.';
+
+  @override
+  String get packageImportProblemNotAPackage => 'هذا ليس مرافقًا من TrackIA.';
+
+  @override
+  String get packageImportProblemUnsupportedVersion =>
+      'هذا المرافق من إصدار أحدث. حدّث TrackIA لاستيراده.';
+
+  @override
+  String get packageImportProblemChecksumMismatch =>
+      'تغيّر المحتوى أو تلف: فشل فحص السلامة.';
+
+  @override
+  String get packageImportProblemForbiddenField =>
+      'يتضمن المحتوى بيانات يجب ألا تُنقل أبدًا (مفاتيح، محادثات، ذاكرة…). لم يُستورد.';
+
+  @override
+  String get packageImportProblemUnknownField =>
+      'يتضمن المحتوى حقلًا لا يقبله هذا الإصدار. لم يُستورد.';
+
+  @override
+  String get packageImportProblemMissingField => 'ينقص المحتوى حقل مطلوب.';
+
+  @override
+  String get packageImportProblemInvalidField =>
+      'حقل في المحتوى غير صالح أو يتجاوز حدّه.';
 }

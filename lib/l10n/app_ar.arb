@@ -1948,5 +1948,81 @@
         "type": "int"
       }
     }
-  }
+  },
+  "packageShareRow": "مشاركة المرافق",
+  "packageShareRowHelp": "ينشئ ملف .trackia بإعدادات هذا المرافق، دون بياناتك.",
+  "packageShareTitle": "مشاركة هذا المرافق؟",
+  "packageShareIncludes": "تتم مشاركة: الاسم والأيقونة واللون والوصف وتعليمات الأسلوب والوضع وقوالب النشاط ونصوص التذكيرات.",
+  "packageShareExcludes": "لا تتم مشاركة: مفاتيح الذكاء الاصطناعي والمحادثات والذاكرة وورقة Google والحسابات وبياناتك.",
+  "packageShareReceiverNote": "يمكن لمن يستلمه استيراده ومراجعته قبل استخدامه.",
+  "packageShareTemplatesLimited": "تُضمَّن أول 5 قوالب نشاط فقط.",
+  "packageShareConfirm": "مشاركة",
+  "packageShareInstructionsTooLong": "تتجاوز التعليمات الحد المسموح به للمشاركة وهو 4000 حرف. اختصرها وحاول مرة أخرى. لم تتم مشاركة أي شيء.",
+  "packageShareInvalid": "يحتوي هذا المرافق على بيانات لا يمكن مشاركتها. لم تتم مشاركة أي شيء.",
+  "packageShareWriteError": "تعذّر تجهيز الملف للمشاركة. لم تتم مشاركة أي شيء.",
+  "packageImportTitle": "استيراد مرافق",
+  "packageImportIntro": "اختر ملف .trackia أو الصق النص الذي شُورك معك. ستظهر معاينة قبل حفظ أي شيء.",
+  "packageImportPickFile": "اختيار ملف",
+  "packageImportPasteLabel": "نص المرافق",
+  "packageImportPreviewButton": "عرض المعاينة",
+  "packageImportFileError": "تعذّرت قراءة الملف.",
+  "packageImportExternalNotice": "هذا المحتوى قادم من الخارج: راجعه قبل حفظه.",
+  "packageImportModeNote": "سيُحفظ بوضع «تذكير» دون أذونات أو اتصالات. يمكنك تغيير ذلك لاحقًا.",
+  "packageImportActivityTitle": "النشاط الذي سيأتي معه",
+  "packageImportActivityFields": "الحقول: {fields}",
+  "@packageImportActivityFields": {
+    "placeholders": {
+      "fields": {}
+    }
+  },
+  "packageImportRemindersTitle": "نصوص التنبيهات",
+  "packageImportReminderWindowStart": "عند بدء الفترة",
+  "packageImportReminderLastCall": "التذكير الأخير",
+  "packageImportReminderInactive": "بلا نشاط",
+  "packageImportWarningsTitle": "تحذيرات",
+  "packageImportWarningAppBlocksRemoved": "أُزيلت كتل داخلية للتطبيق من المحتوى. العدد: {count}",
+  "@packageImportWarningAppBlocksRemoved": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "packageImportWarningModeReset": "طلبت الحزمة وضع «{mode}»؛ سيبدأ بوضع «تذكير» ويمكنك تغييره لاحقًا.",
+  "@packageImportWarningModeReset": {
+    "placeholders": {
+      "mode": {}
+    }
+  },
+  "packageImportWarningExtraTemplates": "لا تُطبَّق أنشطة أخرى في الحزمة. العدد: {count}",
+  "@packageImportWarningExtraTemplates": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "packageImportWarningSuspicious": "يبدو أن التعليمات تحاول تغيير قواعد المساعد. اقرأها بعناية أو احذفها.",
+  "packageImportWarningInstructionsEmpty": "لم يتبقَّ نص في التعليمات بعد إزالة الكتل الداخلية.",
+  "packageImportSave": "حفظ المرافق",
+  "packageImportSaveFailed": "تعذّر حفظ المرافق.",
+  "packageImportProblemField": "الحقل: {field}",
+  "@packageImportProblemField": {
+    "placeholders": {
+      "field": {}
+    }
+  },
+  "packageImportProblemEmpty": "لا شيء للاستيراد: النص أو الملف فارغ.",
+  "packageImportProblemTooLarge": "المحتوى كبير جدًا ليكون مرافقًا.",
+  "packageImportProblemBadEncoding": "النص تالف أو ناقص: ليس بتنسيق صالح.",
+  "packageImportProblemBadCompression": "المحتوى تالف وتعذّر فك ضغطه.",
+  "packageImportProblemTooLargeExpanded": "المحتوى كبير جدًا بعد فتحه وتم رفضه للأمان.",
+  "packageImportProblemMalformed": "تعذّرت قراءة المحتوى: ليس مرافقًا صالحًا.",
+  "packageImportProblemNotAPackage": "هذا ليس مرافقًا من TrackIA.",
+  "packageImportProblemUnsupportedVersion": "هذا المرافق من إصدار أحدث. حدّث TrackIA لاستيراده.",
+  "packageImportProblemChecksumMismatch": "تغيّر المحتوى أو تلف: فشل فحص السلامة.",
+  "packageImportProblemForbiddenField": "يتضمن المحتوى بيانات يجب ألا تُنقل أبدًا (مفاتيح، محادثات، ذاكرة…). لم يُستورد.",
+  "packageImportProblemUnknownField": "يتضمن المحتوى حقلًا لا يقبله هذا الإصدار. لم يُستورد.",
+  "packageImportProblemMissingField": "ينقص المحتوى حقل مطلوب.",
+  "packageImportProblemInvalidField": "حقل في المحتوى غير صالح أو يتجاوز حدّه."
 }

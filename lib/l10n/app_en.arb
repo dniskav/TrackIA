@@ -1948,5 +1948,81 @@
         "type": "int"
       }
     }
-  }
+  },
+  "packageShareRow": "Share companion",
+  "packageShareRowHelp": "Creates a .trackia file with this companion's setup, without your data.",
+  "packageShareTitle": "Share this companion?",
+  "packageShareIncludes": "Shared: name, icon, color, description, style instructions, mode, activity templates and reminder texts.",
+  "packageShareExcludes": "Not shared: AI keys, chats, memory, Google sheet, accounts or your data.",
+  "packageShareReceiverNote": "The person who receives it can import it and review it before using it.",
+  "packageShareTemplatesLimited": "Only the first 5 activity templates are included.",
+  "packageShareConfirm": "Share",
+  "packageShareInstructionsTooLong": "The instructions exceed the 4000 characters allowed for sharing. Shorten them and try again. Nothing was shared.",
+  "packageShareInvalid": "This companion has data that cannot be shared. Nothing was shared.",
+  "packageShareWriteError": "The file could not be prepared for sharing. Nothing was shared.",
+  "packageImportTitle": "Import companion",
+  "packageImportIntro": "Choose a .trackia file or paste the text you were sent. You will see a preview before anything is saved.",
+  "packageImportPickFile": "Choose file",
+  "packageImportPasteLabel": "Companion text",
+  "packageImportPreviewButton": "Show preview",
+  "packageImportFileError": "The file could not be read.",
+  "packageImportExternalNotice": "This content comes from outside: review it before saving it.",
+  "packageImportModeNote": "It will be saved in «reminder» mode, with no permissions or connections. You can change that later.",
+  "packageImportActivityTitle": "Activity it would bring",
+  "packageImportActivityFields": "Fields: {fields}",
+  "@packageImportActivityFields": {
+    "placeholders": {
+      "fields": {}
+    }
+  },
+  "packageImportRemindersTitle": "Reminder texts",
+  "packageImportReminderWindowStart": "When the window starts",
+  "packageImportReminderLastCall": "Last call",
+  "packageImportReminderInactive": "No activity",
+  "packageImportWarningsTitle": "Warnings",
+  "packageImportWarningAppBlocksRemoved": "Internal app blocks were removed from the content. Count: {count}",
+  "@packageImportWarningAppBlocksRemoved": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "packageImportWarningModeReset": "The package asked for «{mode}» mode; it starts as «reminder» and you can change it later.",
+  "@packageImportWarningModeReset": {
+    "placeholders": {
+      "mode": {}
+    }
+  },
+  "packageImportWarningExtraTemplates": "Other activities in the package are not applied. Count: {count}",
+  "@packageImportWarningExtraTemplates": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "packageImportWarningSuspicious": "The instructions seem to try to change the assistant's rules. Read them carefully or delete them.",
+  "packageImportWarningInstructionsEmpty": "No text was left in the instructions after removing the internal blocks.",
+  "packageImportSave": "Save companion",
+  "packageImportSaveFailed": "The companion could not be saved.",
+  "packageImportProblemField": "Field: {field}",
+  "@packageImportProblemField": {
+    "placeholders": {
+      "field": {}
+    }
+  },
+  "packageImportProblemEmpty": "Nothing to import: the text or file is empty.",
+  "packageImportProblemTooLarge": "The content is too large to be a companion.",
+  "packageImportProblemBadEncoding": "The text is damaged or incomplete: it is not in a valid format.",
+  "packageImportProblemBadCompression": "The content is damaged and could not be decompressed.",
+  "packageImportProblemTooLargeExpanded": "The content is too large once opened and was rejected for safety.",
+  "packageImportProblemMalformed": "The content could not be read: it is not a valid companion.",
+  "packageImportProblemNotAPackage": "This is not a TrackIA companion.",
+  "packageImportProblemUnsupportedVersion": "This companion is from a newer version. Update TrackIA to import it.",
+  "packageImportProblemChecksumMismatch": "The content changed or was damaged: the integrity check failed.",
+  "packageImportProblemForbiddenField": "The content includes data that must never travel (keys, chats, memory…). It was not imported.",
+  "packageImportProblemUnknownField": "The content includes a field this version does not accept. It was not imported.",
+  "packageImportProblemMissingField": "A required field is missing from the content.",
+  "packageImportProblemInvalidField": "A field in the content is not valid or exceeds its limit."
 }

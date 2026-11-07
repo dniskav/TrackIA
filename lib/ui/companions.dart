@@ -1,4 +1,6 @@
 import 'companion_creator.dart';
+import 'companion_import.dart';
+import '../application/companion_creation.dart';
 import '../data/ai_client.dart';
 import '../data/activity_template_repository.dart';
 import 'dart:async';
@@ -114,6 +116,30 @@ class _CompanionDashboardState extends State<CompanionDashboard>
               aiStore: AiSettingsStore(profileId: widget.profileId),
               client: widget.aiClient,
               onOpenAiSettings: connectAi,
+            ),
+      ),
+    );
+    if (made == null) return;
+    widget.onRemindersChanged?.call();
+    await refresh();
+  }
+
+  /// «Importar acompañante» (`.trackia` o texto pegado): vista previa y
+  /// confirmación antes de guardar nada.
+  Future<void> importCompanion() async {
+    final progress = widget.progress;
+    if (progress == null) return;
+    final made = await Navigator.of(context).push<Companion>(
+      MaterialPageRoute(
+        builder:
+            (_) => CompanionImportScreen(
+              store: store,
+              creation: CompanionCreation(
+                store: store,
+                progress: progress,
+                templates: widget.templates,
+              ),
+              takenIds: companions.map((c) => c.id),
             ),
       ),
     );
@@ -374,6 +400,13 @@ class _CompanionDashboardState extends State<CompanionDashboard>
         ],
       ),
       actions: [
+        if (widget.progress != null)
+          IconButton(
+            key: const Key('import-companion'),
+            tooltip: appText(context).packageImportTitle,
+            onPressed: importCompanion,
+            icon: const Icon(Icons.file_download_outlined),
+          ),
         if (widget.onSettings != null)
           IconButton(
             key: const Key('dashboard-settings'),

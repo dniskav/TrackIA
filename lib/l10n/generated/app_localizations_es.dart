@@ -3775,4 +3775,181 @@ class AppLocalizationsEs extends AppLocalizations {
   String agreementRevisionLabel(int n) {
     return 'Revisión $n';
   }
+
+  @override
+  String get packageShareRow => 'Compartir acompañante';
+
+  @override
+  String get packageShareRowHelp =>
+      'Crea un archivo .trackia con la configuración de este acompañante, sin tus datos.';
+
+  @override
+  String get packageShareTitle => '¿Compartir este acompañante?';
+
+  @override
+  String get packageShareIncludes =>
+      'Se comparte: nombre, icono, color, descripción, instrucciones de estilo, modo, plantillas de actividad y textos de avisos.';
+
+  @override
+  String get packageShareExcludes =>
+      'No se comparte: claves de IA, chats, memoria, hoja de Google, cuentas ni tus datos.';
+
+  @override
+  String get packageShareReceiverNote =>
+      'Quien lo reciba podrá importarlo y revisarlo antes de usarlo.';
+
+  @override
+  String get packageShareTemplatesLimited =>
+      'Solo se incluyen las 5 primeras plantillas de actividad.';
+
+  @override
+  String get packageShareConfirm => 'Compartir';
+
+  @override
+  String get packageShareInstructionsTooLong =>
+      'Las instrucciones superan los 4000 caracteres que admite compartir. Acórtalas e inténtalo de nuevo. No se ha compartido nada.';
+
+  @override
+  String get packageShareInvalid =>
+      'Este acompañante tiene datos que no se pueden compartir. No se ha compartido nada.';
+
+  @override
+  String get packageShareWriteError =>
+      'No se pudo preparar el archivo para compartir. No se ha compartido nada.';
+
+  @override
+  String get packageImportTitle => 'Importar acompañante';
+
+  @override
+  String get packageImportIntro =>
+      'Elige un archivo .trackia o pega el texto que te compartieron. Se mostrará una vista previa antes de guardar nada.';
+
+  @override
+  String get packageImportPickFile => 'Elegir archivo';
+
+  @override
+  String get packageImportPasteLabel => 'Texto del acompañante';
+
+  @override
+  String get packageImportPreviewButton => 'Ver vista previa';
+
+  @override
+  String get packageImportFileError => 'No se pudo leer el archivo.';
+
+  @override
+  String get packageImportExternalNotice =>
+      'Este contenido viene de fuera: revísalo antes de guardarlo.';
+
+  @override
+  String get packageImportModeNote =>
+      'Se guardará en modo «recordatorio», sin permisos ni conexiones. Podrás cambiarlo después.';
+
+  @override
+  String get packageImportActivityTitle => 'Actividad que traería';
+
+  @override
+  String packageImportActivityFields(Object fields) {
+    return 'Campos: $fields';
+  }
+
+  @override
+  String get packageImportRemindersTitle => 'Textos de avisos';
+
+  @override
+  String get packageImportReminderWindowStart => 'Al empezar la ventana';
+
+  @override
+  String get packageImportReminderLastCall => 'Última llamada';
+
+  @override
+  String get packageImportReminderInactive => 'Sin actividad';
+
+  @override
+  String get packageImportWarningsTitle => 'Advertencias';
+
+  @override
+  String packageImportWarningAppBlocksRemoved(int count) {
+    return 'Se quitaron bloques internos de la aplicación del contenido. Cantidad: $count';
+  }
+
+  @override
+  String packageImportWarningModeReset(Object mode) {
+    return 'El paquete pedía el modo «$mode»; empieza en «recordatorio» y puedes cambiarlo después.';
+  }
+
+  @override
+  String packageImportWarningExtraTemplates(int count) {
+    return 'Otras actividades del paquete no se aplican. Cantidad: $count';
+  }
+
+  @override
+  String get packageImportWarningSuspicious =>
+      'Las instrucciones parecen intentar cambiar las reglas del asistente. Léelas con atención o bórralas.';
+
+  @override
+  String get packageImportWarningInstructionsEmpty =>
+      'No quedó texto en las instrucciones tras quitar los bloques internos.';
+
+  @override
+  String get packageImportSave => 'Guardar acompañante';
+
+  @override
+  String get packageImportSaveFailed => 'No se pudo guardar el acompañante.';
+
+  @override
+  String packageImportProblemField(Object field) {
+    return 'Campo: $field';
+  }
+
+  @override
+  String get packageImportProblemEmpty =>
+      'No hay nada que importar: el texto o el archivo está vacío.';
+
+  @override
+  String get packageImportProblemTooLarge =>
+      'El contenido es demasiado grande para ser un acompañante.';
+
+  @override
+  String get packageImportProblemBadEncoding =>
+      'El texto está dañado o incompleto: no tiene un formato válido.';
+
+  @override
+  String get packageImportProblemBadCompression =>
+      'El contenido está dañado y no se pudo descomprimir.';
+
+  @override
+  String get packageImportProblemTooLargeExpanded =>
+      'El contenido ocupa demasiado al abrirlo y se rechazó por seguridad.';
+
+  @override
+  String get packageImportProblemMalformed =>
+      'El contenido no se pudo leer: no es un acompañante válido.';
+
+  @override
+  String get packageImportProblemNotAPackage =>
+      'Esto no es un acompañante de TrackIA.';
+
+  @override
+  String get packageImportProblemUnsupportedVersion =>
+      'Este acompañante es de una versión más nueva. Actualiza TrackIA para importarlo.';
+
+  @override
+  String get packageImportProblemChecksumMismatch =>
+      'El contenido cambió o se dañó: la comprobación de integridad falló.';
+
+  @override
+  String get packageImportProblemForbiddenField =>
+      'El contenido incluye un dato que nunca debe viajar (claves, chats, memoria…). No se importó.';
+
+  @override
+  String get packageImportProblemUnknownField =>
+      'El contenido incluye un campo que esta versión no admite. No se importó.';
+
+  @override
+  String get packageImportProblemMissingField =>
+      'Falta un campo obligatorio en el contenido.';
+
+  @override
+  String get packageImportProblemInvalidField =>
+      'Un campo del contenido no es válido o supera su límite.';
 }

@@ -1948,5 +1948,81 @@
         "type": "int"
       }
     }
-  }
+  },
+  "packageShareRow": "Compartir acompañante",
+  "packageShareRowHelp": "Crea un archivo .trackia con la configuración de este acompañante, sin tus datos.",
+  "packageShareTitle": "¿Compartir este acompañante?",
+  "packageShareIncludes": "Se comparte: nombre, icono, color, descripción, instrucciones de estilo, modo, plantillas de actividad y textos de avisos.",
+  "packageShareExcludes": "No se comparte: claves de IA, chats, memoria, hoja de Google, cuentas ni tus datos.",
+  "packageShareReceiverNote": "Quien lo reciba podrá importarlo y revisarlo antes de usarlo.",
+  "packageShareTemplatesLimited": "Solo se incluyen las 5 primeras plantillas de actividad.",
+  "packageShareConfirm": "Compartir",
+  "packageShareInstructionsTooLong": "Las instrucciones superan los 4000 caracteres que admite compartir. Acórtalas e inténtalo de nuevo. No se ha compartido nada.",
+  "packageShareInvalid": "Este acompañante tiene datos que no se pueden compartir. No se ha compartido nada.",
+  "packageShareWriteError": "No se pudo preparar el archivo para compartir. No se ha compartido nada.",
+  "packageImportTitle": "Importar acompañante",
+  "packageImportIntro": "Elige un archivo .trackia o pega el texto que te compartieron. Se mostrará una vista previa antes de guardar nada.",
+  "packageImportPickFile": "Elegir archivo",
+  "packageImportPasteLabel": "Texto del acompañante",
+  "packageImportPreviewButton": "Ver vista previa",
+  "packageImportFileError": "No se pudo leer el archivo.",
+  "packageImportExternalNotice": "Este contenido viene de fuera: revísalo antes de guardarlo.",
+  "packageImportModeNote": "Se guardará en modo «recordatorio», sin permisos ni conexiones. Podrás cambiarlo después.",
+  "packageImportActivityTitle": "Actividad que traería",
+  "packageImportActivityFields": "Campos: {fields}",
+  "@packageImportActivityFields": {
+    "placeholders": {
+      "fields": {}
+    }
+  },
+  "packageImportRemindersTitle": "Textos de avisos",
+  "packageImportReminderWindowStart": "Al empezar la ventana",
+  "packageImportReminderLastCall": "Última llamada",
+  "packageImportReminderInactive": "Sin actividad",
+  "packageImportWarningsTitle": "Advertencias",
+  "packageImportWarningAppBlocksRemoved": "Se quitaron bloques internos de la aplicación del contenido. Cantidad: {count}",
+  "@packageImportWarningAppBlocksRemoved": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "packageImportWarningModeReset": "El paquete pedía el modo «{mode}»; empieza en «recordatorio» y puedes cambiarlo después.",
+  "@packageImportWarningModeReset": {
+    "placeholders": {
+      "mode": {}
+    }
+  },
+  "packageImportWarningExtraTemplates": "Otras actividades del paquete no se aplican. Cantidad: {count}",
+  "@packageImportWarningExtraTemplates": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "packageImportWarningSuspicious": "Las instrucciones parecen intentar cambiar las reglas del asistente. Léelas con atención o bórralas.",
+  "packageImportWarningInstructionsEmpty": "No quedó texto en las instrucciones tras quitar los bloques internos.",
+  "packageImportSave": "Guardar acompañante",
+  "packageImportSaveFailed": "No se pudo guardar el acompañante.",
+  "packageImportProblemField": "Campo: {field}",
+  "@packageImportProblemField": {
+    "placeholders": {
+      "field": {}
+    }
+  },
+  "packageImportProblemEmpty": "No hay nada que importar: el texto o el archivo está vacío.",
+  "packageImportProblemTooLarge": "El contenido es demasiado grande para ser un acompañante.",
+  "packageImportProblemBadEncoding": "El texto está dañado o incompleto: no tiene un formato válido.",
+  "packageImportProblemBadCompression": "El contenido está dañado y no se pudo descomprimir.",
+  "packageImportProblemTooLargeExpanded": "El contenido ocupa demasiado al abrirlo y se rechazó por seguridad.",
+  "packageImportProblemMalformed": "El contenido no se pudo leer: no es un acompañante válido.",
+  "packageImportProblemNotAPackage": "Esto no es un acompañante de TrackIA.",
+  "packageImportProblemUnsupportedVersion": "Este acompañante es de una versión más nueva. Actualiza TrackIA para importarlo.",
+  "packageImportProblemChecksumMismatch": "El contenido cambió o se dañó: la comprobación de integridad falló.",
+  "packageImportProblemForbiddenField": "El contenido incluye un dato que nunca debe viajar (claves, chats, memoria…). No se importó.",
+  "packageImportProblemUnknownField": "El contenido incluye un campo que esta versión no admite. No se importó.",
+  "packageImportProblemMissingField": "Falta un campo obligatorio en el contenido.",
+  "packageImportProblemInvalidField": "Un campo del contenido no es válido o supera su límite."
 }

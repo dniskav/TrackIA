@@ -129,6 +129,7 @@ class _TrackiaRootState extends State<GymRoot> {
           // Sin adaptador de Google Drive (T030) las acciones de nube salen
           // deshabilitadas; la memoria local ya se puede consultar y editar.
           memory: widget.controller.companionMemory,
+          templates: widget.controller.templates,
         ),
       ),
     );

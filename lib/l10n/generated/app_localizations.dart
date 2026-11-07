@@ -6523,6 +6523,288 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Revisión {n}'**
   String agreementRevisionLabel(int n);
+
+  /// No description provided for @packageShareRow.
+  ///
+  /// In es, this message translates to:
+  /// **'Compartir acompañante'**
+  String get packageShareRow;
+
+  /// No description provided for @packageShareRowHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Crea un archivo .trackia con la configuración de este acompañante, sin tus datos.'**
+  String get packageShareRowHelp;
+
+  /// No description provided for @packageShareTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Compartir este acompañante?'**
+  String get packageShareTitle;
+
+  /// No description provided for @packageShareIncludes.
+  ///
+  /// In es, this message translates to:
+  /// **'Se comparte: nombre, icono, color, descripción, instrucciones de estilo, modo, plantillas de actividad y textos de avisos.'**
+  String get packageShareIncludes;
+
+  /// No description provided for @packageShareExcludes.
+  ///
+  /// In es, this message translates to:
+  /// **'No se comparte: claves de IA, chats, memoria, hoja de Google, cuentas ni tus datos.'**
+  String get packageShareExcludes;
+
+  /// No description provided for @packageShareReceiverNote.
+  ///
+  /// In es, this message translates to:
+  /// **'Quien lo reciba podrá importarlo y revisarlo antes de usarlo.'**
+  String get packageShareReceiverNote;
+
+  /// No description provided for @packageShareTemplatesLimited.
+  ///
+  /// In es, this message translates to:
+  /// **'Solo se incluyen las 5 primeras plantillas de actividad.'**
+  String get packageShareTemplatesLimited;
+
+  /// No description provided for @packageShareConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'Compartir'**
+  String get packageShareConfirm;
+
+  /// No description provided for @packageShareInstructionsTooLong.
+  ///
+  /// In es, this message translates to:
+  /// **'Las instrucciones superan los 4000 caracteres que admite compartir. Acórtalas e inténtalo de nuevo. No se ha compartido nada.'**
+  String get packageShareInstructionsTooLong;
+
+  /// No description provided for @packageShareInvalid.
+  ///
+  /// In es, this message translates to:
+  /// **'Este acompañante tiene datos que no se pueden compartir. No se ha compartido nada.'**
+  String get packageShareInvalid;
+
+  /// No description provided for @packageShareWriteError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo preparar el archivo para compartir. No se ha compartido nada.'**
+  String get packageShareWriteError;
+
+  /// No description provided for @packageImportTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Importar acompañante'**
+  String get packageImportTitle;
+
+  /// No description provided for @packageImportIntro.
+  ///
+  /// In es, this message translates to:
+  /// **'Elige un archivo .trackia o pega el texto que te compartieron. Se mostrará una vista previa antes de guardar nada.'**
+  String get packageImportIntro;
+
+  /// No description provided for @packageImportPickFile.
+  ///
+  /// In es, this message translates to:
+  /// **'Elegir archivo'**
+  String get packageImportPickFile;
+
+  /// No description provided for @packageImportPasteLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Texto del acompañante'**
+  String get packageImportPasteLabel;
+
+  /// No description provided for @packageImportPreviewButton.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver vista previa'**
+  String get packageImportPreviewButton;
+
+  /// No description provided for @packageImportFileError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo leer el archivo.'**
+  String get packageImportFileError;
+
+  /// No description provided for @packageImportExternalNotice.
+  ///
+  /// In es, this message translates to:
+  /// **'Este contenido viene de fuera: revísalo antes de guardarlo.'**
+  String get packageImportExternalNotice;
+
+  /// No description provided for @packageImportModeNote.
+  ///
+  /// In es, this message translates to:
+  /// **'Se guardará en modo «recordatorio», sin permisos ni conexiones. Podrás cambiarlo después.'**
+  String get packageImportModeNote;
+
+  /// No description provided for @packageImportActivityTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Actividad que traería'**
+  String get packageImportActivityTitle;
+
+  /// No description provided for @packageImportActivityFields.
+  ///
+  /// In es, this message translates to:
+  /// **'Campos: {fields}'**
+  String packageImportActivityFields(Object fields);
+
+  /// No description provided for @packageImportRemindersTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Textos de avisos'**
+  String get packageImportRemindersTitle;
+
+  /// No description provided for @packageImportReminderWindowStart.
+  ///
+  /// In es, this message translates to:
+  /// **'Al empezar la ventana'**
+  String get packageImportReminderWindowStart;
+
+  /// No description provided for @packageImportReminderLastCall.
+  ///
+  /// In es, this message translates to:
+  /// **'Última llamada'**
+  String get packageImportReminderLastCall;
+
+  /// No description provided for @packageImportReminderInactive.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin actividad'**
+  String get packageImportReminderInactive;
+
+  /// No description provided for @packageImportWarningsTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Advertencias'**
+  String get packageImportWarningsTitle;
+
+  /// No description provided for @packageImportWarningAppBlocksRemoved.
+  ///
+  /// In es, this message translates to:
+  /// **'Se quitaron bloques internos de la aplicación del contenido. Cantidad: {count}'**
+  String packageImportWarningAppBlocksRemoved(int count);
+
+  /// No description provided for @packageImportWarningModeReset.
+  ///
+  /// In es, this message translates to:
+  /// **'El paquete pedía el modo «{mode}»; empieza en «recordatorio» y puedes cambiarlo después.'**
+  String packageImportWarningModeReset(Object mode);
+
+  /// No description provided for @packageImportWarningExtraTemplates.
+  ///
+  /// In es, this message translates to:
+  /// **'Otras actividades del paquete no se aplican. Cantidad: {count}'**
+  String packageImportWarningExtraTemplates(int count);
+
+  /// No description provided for @packageImportWarningSuspicious.
+  ///
+  /// In es, this message translates to:
+  /// **'Las instrucciones parecen intentar cambiar las reglas del asistente. Léelas con atención o bórralas.'**
+  String get packageImportWarningSuspicious;
+
+  /// No description provided for @packageImportWarningInstructionsEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'No quedó texto en las instrucciones tras quitar los bloques internos.'**
+  String get packageImportWarningInstructionsEmpty;
+
+  /// No description provided for @packageImportSave.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardar acompañante'**
+  String get packageImportSave;
+
+  /// No description provided for @packageImportSaveFailed.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo guardar el acompañante.'**
+  String get packageImportSaveFailed;
+
+  /// No description provided for @packageImportProblemField.
+  ///
+  /// In es, this message translates to:
+  /// **'Campo: {field}'**
+  String packageImportProblemField(Object field);
+
+  /// No description provided for @packageImportProblemEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'No hay nada que importar: el texto o el archivo está vacío.'**
+  String get packageImportProblemEmpty;
+
+  /// No description provided for @packageImportProblemTooLarge.
+  ///
+  /// In es, this message translates to:
+  /// **'El contenido es demasiado grande para ser un acompañante.'**
+  String get packageImportProblemTooLarge;
+
+  /// No description provided for @packageImportProblemBadEncoding.
+  ///
+  /// In es, this message translates to:
+  /// **'El texto está dañado o incompleto: no tiene un formato válido.'**
+  String get packageImportProblemBadEncoding;
+
+  /// No description provided for @packageImportProblemBadCompression.
+  ///
+  /// In es, this message translates to:
+  /// **'El contenido está dañado y no se pudo descomprimir.'**
+  String get packageImportProblemBadCompression;
+
+  /// No description provided for @packageImportProblemTooLargeExpanded.
+  ///
+  /// In es, this message translates to:
+  /// **'El contenido ocupa demasiado al abrirlo y se rechazó por seguridad.'**
+  String get packageImportProblemTooLargeExpanded;
+
+  /// No description provided for @packageImportProblemMalformed.
+  ///
+  /// In es, this message translates to:
+  /// **'El contenido no se pudo leer: no es un acompañante válido.'**
+  String get packageImportProblemMalformed;
+
+  /// No description provided for @packageImportProblemNotAPackage.
+  ///
+  /// In es, this message translates to:
+  /// **'Esto no es un acompañante de TrackIA.'**
+  String get packageImportProblemNotAPackage;
+
+  /// No description provided for @packageImportProblemUnsupportedVersion.
+  ///
+  /// In es, this message translates to:
+  /// **'Este acompañante es de una versión más nueva. Actualiza TrackIA para importarlo.'**
+  String get packageImportProblemUnsupportedVersion;
+
+  /// No description provided for @packageImportProblemChecksumMismatch.
+  ///
+  /// In es, this message translates to:
+  /// **'El contenido cambió o se dañó: la comprobación de integridad falló.'**
+  String get packageImportProblemChecksumMismatch;
+
+  /// No description provided for @packageImportProblemForbiddenField.
+  ///
+  /// In es, this message translates to:
+  /// **'El contenido incluye un dato que nunca debe viajar (claves, chats, memoria…). No se importó.'**
+  String get packageImportProblemForbiddenField;
+
+  /// No description provided for @packageImportProblemUnknownField.
+  ///
+  /// In es, this message translates to:
+  /// **'El contenido incluye un campo que esta versión no admite. No se importó.'**
+  String get packageImportProblemUnknownField;
+
+  /// No description provided for @packageImportProblemMissingField.
+  ///
+  /// In es, this message translates to:
+  /// **'Falta un campo obligatorio en el contenido.'**
+  String get packageImportProblemMissingField;
+
+  /// No description provided for @packageImportProblemInvalidField.
+  ///
+  /// In es, this message translates to:
+  /// **'Un campo del contenido no es válido o supera su límite.'**
+  String get packageImportProblemInvalidField;
 }
 
 class _AppLocalizationsDelegate
