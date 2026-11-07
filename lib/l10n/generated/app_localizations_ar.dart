@@ -3853,4 +3853,116 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get packageImportProblemInvalidField =>
       'حقل في المحتوى غير صالح أو يتجاوز حدّه.';
+
+  @override
+  String get importedTrustWarning => 'هذا المرافق مستورد: أكّد قبل أن يتصرف.';
+
+  @override
+  String get importedTrustConfirm => 'تأكيد';
+
+  @override
+  String get importedTrustSheetTitle => 'تعديل جدول Google Sheets الخاص بك؟';
+
+  @override
+  String importedTrustSheetTarget(String sheet, String tab) {
+    return 'الجدول: $sheet · علامة التبويب: $tab';
+  }
+
+  @override
+  String importedTrustCellLine(String cell, String before, String after) {
+    return '$cell: «$before» ← «$after»';
+  }
+
+  @override
+  String get importedTrustEmptyValue => '(فارغة)';
+
+  @override
+  String get importedTrustCancelledSheet =>
+      'تم إلغاء الإجراء: لم يتم تعديل جدول Google Sheets.';
+
+  @override
+  String get importedTrustActivityTitle => 'تجهيز هذا النشاط؟';
+
+  @override
+  String importedTrustActivityRest(int seconds) {
+    return 'الراحة: $seconds ث';
+  }
+
+  @override
+  String importedTrustActivityDuration(int seconds) {
+    return 'مدة النشاط: $seconds ث';
+  }
+
+  @override
+  String importedTrustActivityTargetSets(int count) {
+    return 'المجموعات المستهدفة: $count';
+  }
+
+  @override
+  String importedTrustActivityFields(String fields) {
+    return 'الحقول: $fields';
+  }
+
+  @override
+  String importedTrustCancelledActivity(String name) {
+    return 'تم إلغاء الإجراء: لم يتم تجهيز النشاط «$name».';
+  }
+
+  @override
+  String get importedTrustLabel => 'مستورد';
+
+  @override
+  String get importedTrustSwitch => 'الوثوق بهذا المرافق';
+
+  @override
+  String get importedTrustSwitchHelp =>
+      'حتى تثق به، سيطلب التأكيد قبل تعديل جدولك أو تجهيز الأنشطة.';
+
+  @override
+  String get importedTrustDialogTitle => 'الوثوق بهذا المرافق؟';
+
+  @override
+  String get importedTrustDialogBody =>
+      'سيتوقف عن طلب التأكيد قبل تعديل جدولك أو تجهيز الأنشطة. افعل ذلك فقط إذا كنت تثق بمن شاركه معك.';
+
+  @override
+  String get importedTrustDialogConfirm => 'وثوق';
+
+  @override
+  String get importedTrustSaveError => 'تعذر حفظ التغيير. حاول مرة أخرى.';
+
+  @override
+  String get packageQrTitle => 'رمز QR للرفيق';
+
+  @override
+  String get packageQrNote => 'سيرى من يمسحه معاينة قبل حفظ أي شيء.';
+
+  @override
+  String get packageQrShareFile => 'مشاركة الملف';
+
+  @override
+  String get packageQrClose => 'إغلاق';
+
+  @override
+  String get packageQrTooLarge => 'حجمه كبير جدًا لرمز QR: تتم مشاركته كملف.';
+
+  @override
+  String get packageScanTitle => 'مسح مرافق';
+
+  @override
+  String get packageScanHint => 'وجّه الكاميرا نحو رمز QR الخاص بالمرافق.';
+
+  @override
+  String get packageScanTorch => 'المصباح';
+
+  @override
+  String get packageScanPermissionDenied =>
+      'لم يتم منح إذن الكاميرا. يمكنك استيراد المرافق من ملف أو بلصق النص.';
+
+  @override
+  String get packageScanCameraError =>
+      'تعذّر استخدام الكاميرا. يمكنك استيراد المرافق من ملف أو بلصق النص.';
+
+  @override
+  String get packageScanUseFile => 'الاستيراد من ملف أو نص';
 }

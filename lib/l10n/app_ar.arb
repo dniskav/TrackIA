@@ -2024,5 +2024,94 @@
   "packageImportProblemForbiddenField": "يتضمن المحتوى بيانات يجب ألا تُنقل أبدًا (مفاتيح، محادثات، ذاكرة…). لم يُستورد.",
   "packageImportProblemUnknownField": "يتضمن المحتوى حقلًا لا يقبله هذا الإصدار. لم يُستورد.",
   "packageImportProblemMissingField": "ينقص المحتوى حقل مطلوب.",
-  "packageImportProblemInvalidField": "حقل في المحتوى غير صالح أو يتجاوز حدّه."
+  "packageImportProblemInvalidField": "حقل في المحتوى غير صالح أو يتجاوز حدّه.",
+  "importedTrustWarning": "هذا المرافق مستورد: أكّد قبل أن يتصرف.",
+  "importedTrustConfirm": "تأكيد",
+  "importedTrustSheetTitle": "تعديل جدول Google Sheets الخاص بك؟",
+  "importedTrustSheetTarget": "الجدول: {sheet} · علامة التبويب: {tab}",
+  "@importedTrustSheetTarget": {
+    "placeholders": {
+      "sheet": {
+        "type": "String"
+      },
+      "tab": {
+        "type": "String"
+      }
+    }
+  },
+  "importedTrustCellLine": "{cell}: «{before}» ← «{after}»",
+  "@importedTrustCellLine": {
+    "placeholders": {
+      "cell": {
+        "type": "String"
+      },
+      "before": {
+        "type": "String"
+      },
+      "after": {
+        "type": "String"
+      }
+    }
+  },
+  "importedTrustEmptyValue": "(فارغة)",
+  "importedTrustCancelledSheet": "تم إلغاء الإجراء: لم يتم تعديل جدول Google Sheets.",
+  "importedTrustActivityTitle": "تجهيز هذا النشاط؟",
+  "importedTrustActivityRest": "الراحة: {seconds} ث",
+  "@importedTrustActivityRest": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "importedTrustActivityDuration": "مدة النشاط: {seconds} ث",
+  "@importedTrustActivityDuration": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "importedTrustActivityTargetSets": "المجموعات المستهدفة: {count}",
+  "@importedTrustActivityTargetSets": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importedTrustActivityFields": "الحقول: {fields}",
+  "@importedTrustActivityFields": {
+    "placeholders": {
+      "fields": {
+        "type": "String"
+      }
+    }
+  },
+  "importedTrustCancelledActivity": "تم إلغاء الإجراء: لم يتم تجهيز النشاط «{name}».",
+  "@importedTrustCancelledActivity": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "importedTrustLabel": "مستورد",
+  "importedTrustSwitch": "الوثوق بهذا المرافق",
+  "importedTrustSwitchHelp": "حتى تثق به، سيطلب التأكيد قبل تعديل جدولك أو تجهيز الأنشطة.",
+  "importedTrustDialogTitle": "الوثوق بهذا المرافق؟",
+  "importedTrustDialogBody": "سيتوقف عن طلب التأكيد قبل تعديل جدولك أو تجهيز الأنشطة. افعل ذلك فقط إذا كنت تثق بمن شاركه معك.",
+  "importedTrustDialogConfirm": "وثوق",
+  "importedTrustSaveError": "تعذر حفظ التغيير. حاول مرة أخرى.",
+  "packageQrTitle": "رمز QR للرفيق",
+  "packageQrNote": "سيرى من يمسحه معاينة قبل حفظ أي شيء.",
+  "packageQrShareFile": "مشاركة الملف",
+  "packageQrClose": "إغلاق",
+  "packageQrTooLarge": "حجمه كبير جدًا لرمز QR: تتم مشاركته كملف.",
+  "packageScanTitle": "مسح مرافق",
+  "packageScanHint": "وجّه الكاميرا نحو رمز QR الخاص بالمرافق.",
+  "packageScanTorch": "المصباح",
+  "packageScanPermissionDenied": "لم يتم منح إذن الكاميرا. يمكنك استيراد المرافق من ملف أو بلصق النص.",
+  "packageScanCameraError": "تعذّر استخدام الكاميرا. يمكنك استيراد المرافق من ملف أو بلصق النص.",
+  "packageScanUseFile": "الاستيراد من ملف أو نص"
 }

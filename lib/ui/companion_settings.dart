@@ -91,6 +91,7 @@ class _CompanionSettingsScreenState extends State<CompanionSettingsScreen> {
   bool useMinimum = false;
   String minimumMetric = 'sessions';
   final minimumValue = TextEditingController(text: '1');
+  late String origin = widget.companion.origin;
   late final personality = TextEditingController(text: widget.companion.prompt);
 
   // Goal (game mode)
@@ -198,6 +199,35 @@ class _CompanionSettingsScreenState extends State<CompanionSettingsScreen> {
     }
   }
 
+  Future<void> trustCompanion() async {
+    final l = appText(context);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (dialog) => AlertDialog(
+        title: Text(l.importedTrustDialogTitle),
+        content: Text(l.importedTrustDialogBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialog, false),
+            child: Text(l.cancel),
+          ),
+          FilledButton(
+            key: const Key('trust-companion-confirm'),
+            onPressed: () => Navigator.pop(dialog, true),
+            child: Text(l.importedTrustDialogConfirm),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !mounted) return;
+    try {
+      await widget.store.upsert(widget.companion.copyWith(origin: 'user'));
+      if (mounted) setState(() => origin = 'user');
+    } catch (_) {
+      if (mounted) setState(() => error = l.importedTrustSaveError);
+    }
+  }
+
   Future<void> shareCompanion() async {
     final saved =
         await widget.templates?.list(companionId: widget.companion.id) ??
@@ -291,7 +321,7 @@ class _CompanionSettingsScreenState extends State<CompanionSettingsScreen> {
       await widget.progress.saveSettings(settings);
       // CompanionStore is profile scoped; changing the prompt only replaces
       // this companion's existing instructions and leaves its other data intact.
-      await widget.store.upsert(widget.companion.copyWith(prompt: personality.text));
+      await widget.store.upsert(widget.companion.copyWith(prompt: personality.text, origin: origin));
       // Leaving game mode keeps the goal for when the user comes back.
       if (settings.game) {
         if (settings.goalsEnabled && useGoal) {
@@ -757,6 +787,17 @@ class _CompanionSettingsScreenState extends State<CompanionSettingsScreen> {
                         ),
                       ),
                     ),
+                  ),
+                ],
+                if (origin == 'imported') ...[
+                  const Divider(height: 32),
+                  SwitchListTile(
+                    key: const Key('trust-companion'),
+                    secondary: const Icon(Icons.verified_user_outlined),
+                    title: Text(l.importedTrustSwitch),
+                    subtitle: Text('${l.importedTrustLabel}. ${l.importedTrustSwitchHelp}'),
+                    value: false,
+                    onChanged: (_) => trustCompanion(),
                   ),
                 ],
                 const Divider(height: 32),

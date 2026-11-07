@@ -1,7 +1,7 @@
 name: trackia
 description: Bitácora de entrenamiento local para Android e iOS.
 publish_to: none
-version: 0.3.34+37
+version: 0.3.35+38
 environment:
   sdk: '>=3.10.0 <4.0.0'
   flutter: '>=3.44.0'

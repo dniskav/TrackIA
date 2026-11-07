@@ -164,6 +164,7 @@ class CompanionCreation {
       prompt: draft.prompt,
       icon: draft.icon,
       color: draft.color,
+      origin: draft.origin == 'external' ? 'imported' : 'user',
     );
     try {
       debugStep?.call('companion');

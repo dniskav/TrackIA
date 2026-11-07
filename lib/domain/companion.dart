@@ -12,6 +12,7 @@ class Companion {
     String? icon,
     String? color,
     ReminderTemplates? reminderCopy,
+    this.origin = 'user',
   }) : id = validTrackiaId(id),
        name = validName(name),
        description = description.trim(),
@@ -19,6 +20,9 @@ class Companion {
        icon = _validChoice(icon ?? _defaultIcon(id), iconIds, 'icono'),
        color = _validChoice(color ?? _defaultColor(id), colorIds, 'color'),
        reminderCopy = _validCopy(reminderCopy) {
+    if (origin != 'user' && origin != 'imported') {
+      throw const FormatException('El origen del acompañante no es válido.');
+    }
     if (this.prompt.length > 8000) {
       throw const FormatException(
         'Las instrucciones no pueden superar los 8000 caracteres.',
@@ -90,6 +94,12 @@ class Companion {
   /// default one (`trackia-reminder-copy`). Null when it has none.
   final ReminderTemplates? reminderCopy;
 
+  /// `user` (own, default) or `imported` (came in a package with third-party
+  /// instructions; its actions ask for confirmation).
+  final String origin;
+
+  bool get isImported => origin == 'imported';
+
   static ReminderTemplates? _validCopy(ReminderTemplates? copy) {
     if (copy == null) return null;
     final all = [...copy.windowStart, ...copy.lastCall, ...copy.inactive];
@@ -110,6 +120,7 @@ class Companion {
     String? icon,
     String? color,
     Object? reminderCopy = _keep,
+    String? origin,
   }) => Companion(
     id: id,
     name: name ?? this.name,
@@ -120,6 +131,7 @@ class Companion {
     reminderCopy: identical(reminderCopy, _keep)
         ? this.reminderCopy
         : reminderCopy as ReminderTemplates?,
+    origin: origin ?? this.origin,
   );
 
   static const _keep = Object();
@@ -132,6 +144,7 @@ class Companion {
     'icon': icon,
     'color': color,
     if (reminderCopy != null) 'reminderCopy': reminderCopy!.toJson(),
+    if (origin == 'imported') 'origin': origin,
   };
 
   factory Companion.fromJson(Map<String, dynamic> json) => Companion(
@@ -146,6 +159,7 @@ class Companion {
             Map<String, dynamic>.from(json['reminderCopy'] as Map),
           )
         : null,
+    origin: json['origin'] == 'imported' ? 'imported' : 'user',
   );
 
   static Companion custom({required String name, required String prompt}) =>

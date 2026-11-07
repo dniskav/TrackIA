@@ -1,5 +1,6 @@
 import 'companion_creator.dart';
 import 'companion_import.dart';
+import 'companion_scan.dart';
 import '../application/companion_creation.dart';
 import '../data/ai_client.dart';
 import '../data/activity_template_repository.dart';
@@ -142,6 +143,25 @@ class _CompanionDashboardState extends State<CompanionDashboard>
               takenIds: companions.map((c) => c.id),
             ),
       ),
+    );
+    if (made == null) return;
+    widget.onRemindersChanged?.call();
+    await refresh();
+  }
+
+  /// «Escanear acompañante»: the camera opens only after tapping the button.
+  Future<void> scanCompanion() async {
+    final progress = widget.progress;
+    if (progress == null) return;
+    final made = await scanAndImportCompanion(
+      context,
+      store: store,
+      creation: CompanionCreation(
+        store: store,
+        progress: progress,
+        templates: widget.templates,
+      ),
+      takenIds: companions.map((c) => c.id),
     );
     if (made == null) return;
     widget.onRemindersChanged?.call();
@@ -406,6 +426,13 @@ class _CompanionDashboardState extends State<CompanionDashboard>
             tooltip: appText(context).packageImportTitle,
             onPressed: importCompanion,
             icon: const Icon(Icons.file_download_outlined),
+          ),
+        if (widget.progress != null)
+          IconButton(
+            key: const Key('scan-companion'),
+            tooltip: appText(context).packageScanTitle,
+            onPressed: scanCompanion,
+            icon: const Icon(Icons.qr_code_scanner),
           ),
         if (widget.onSettings != null)
           IconButton(

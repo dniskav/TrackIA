@@ -6805,6 +6805,192 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Un campo del contenido no es válido o supera su límite.'**
   String get packageImportProblemInvalidField;
+
+  /// No description provided for @importedTrustWarning.
+  ///
+  /// In es, this message translates to:
+  /// **'Este acompañante es importado: confirma antes de que actúe.'**
+  String get importedTrustWarning;
+
+  /// No description provided for @importedTrustConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'Confirmar'**
+  String get importedTrustConfirm;
+
+  /// No description provided for @importedTrustSheetTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Editar tu hoja de Google Sheets?'**
+  String get importedTrustSheetTitle;
+
+  /// No description provided for @importedTrustSheetTarget.
+  ///
+  /// In es, this message translates to:
+  /// **'Hoja: {sheet} · Pestaña: {tab}'**
+  String importedTrustSheetTarget(String sheet, String tab);
+
+  /// No description provided for @importedTrustCellLine.
+  ///
+  /// In es, this message translates to:
+  /// **'{cell}: «{before}» → «{after}»'**
+  String importedTrustCellLine(String cell, String before, String after);
+
+  /// No description provided for @importedTrustEmptyValue.
+  ///
+  /// In es, this message translates to:
+  /// **'(vacía)'**
+  String get importedTrustEmptyValue;
+
+  /// No description provided for @importedTrustCancelledSheet.
+  ///
+  /// In es, this message translates to:
+  /// **'Acción cancelada: no se editó la hoja de Google Sheets.'**
+  String get importedTrustCancelledSheet;
+
+  /// No description provided for @importedTrustActivityTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Preparar esta actividad?'**
+  String get importedTrustActivityTitle;
+
+  /// No description provided for @importedTrustActivityRest.
+  ///
+  /// In es, this message translates to:
+  /// **'Descanso: {seconds} s'**
+  String importedTrustActivityRest(int seconds);
+
+  /// No description provided for @importedTrustActivityDuration.
+  ///
+  /// In es, this message translates to:
+  /// **'Duración de la actividad: {seconds} s'**
+  String importedTrustActivityDuration(int seconds);
+
+  /// No description provided for @importedTrustActivityTargetSets.
+  ///
+  /// In es, this message translates to:
+  /// **'Series objetivo: {count}'**
+  String importedTrustActivityTargetSets(int count);
+
+  /// No description provided for @importedTrustActivityFields.
+  ///
+  /// In es, this message translates to:
+  /// **'Campos: {fields}'**
+  String importedTrustActivityFields(String fields);
+
+  /// No description provided for @importedTrustCancelledActivity.
+  ///
+  /// In es, this message translates to:
+  /// **'Acción cancelada: no se preparó la actividad «{name}».'**
+  String importedTrustCancelledActivity(String name);
+
+  /// No description provided for @importedTrustLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Importado'**
+  String get importedTrustLabel;
+
+  /// No description provided for @importedTrustSwitch.
+  ///
+  /// In es, this message translates to:
+  /// **'Confiar en este acompañante'**
+  String get importedTrustSwitch;
+
+  /// No description provided for @importedTrustSwitchHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Mientras no confíes en él, pedirá confirmación antes de editar tu hoja o preparar actividades.'**
+  String get importedTrustSwitchHelp;
+
+  /// No description provided for @importedTrustDialogTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Confiar en este acompañante?'**
+  String get importedTrustDialogTitle;
+
+  /// No description provided for @importedTrustDialogBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Dejará de pedir confirmación antes de editar tu hoja o preparar actividades. Hazlo solo si confías en quien te lo compartió.'**
+  String get importedTrustDialogBody;
+
+  /// No description provided for @importedTrustDialogConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'Confiar'**
+  String get importedTrustDialogConfirm;
+
+  /// No description provided for @importedTrustSaveError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo guardar el cambio. Inténtalo de nuevo.'**
+  String get importedTrustSaveError;
+
+  /// No description provided for @packageQrTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Código QR del acompañante'**
+  String get packageQrTitle;
+
+  /// No description provided for @packageQrNote.
+  ///
+  /// In es, this message translates to:
+  /// **'Quien lo escanee verá una vista previa antes de guardar nada.'**
+  String get packageQrNote;
+
+  /// No description provided for @packageQrShareFile.
+  ///
+  /// In es, this message translates to:
+  /// **'Compartir archivo'**
+  String get packageQrShareFile;
+
+  /// No description provided for @packageQrClose.
+  ///
+  /// In es, this message translates to:
+  /// **'Cerrar'**
+  String get packageQrClose;
+
+  /// No description provided for @packageQrTooLarge.
+  ///
+  /// In es, this message translates to:
+  /// **'Es demasiado grande para un QR: se comparte como archivo.'**
+  String get packageQrTooLarge;
+
+  /// No description provided for @packageScanTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Escanear acompañante'**
+  String get packageScanTitle;
+
+  /// No description provided for @packageScanHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Apunta la cámara al código QR del acompañante.'**
+  String get packageScanHint;
+
+  /// No description provided for @packageScanTorch.
+  ///
+  /// In es, this message translates to:
+  /// **'Linterna'**
+  String get packageScanTorch;
+
+  /// No description provided for @packageScanPermissionDenied.
+  ///
+  /// In es, this message translates to:
+  /// **'No hay permiso para usar la cámara. Puedes importar el acompañante desde un archivo o pegando el texto.'**
+  String get packageScanPermissionDenied;
+
+  /// No description provided for @packageScanCameraError.
+  ///
+  /// In es, this message translates to:
+  /// **'No se pudo usar la cámara. Puedes importar el acompañante desde un archivo o pegando el texto.'**
+  String get packageScanCameraError;
+
+  /// No description provided for @packageScanUseFile.
+  ///
+  /// In es, this message translates to:
+  /// **'Importar desde archivo o texto'**
+  String get packageScanUseFile;
 }
 
 class _AppLocalizationsDelegate

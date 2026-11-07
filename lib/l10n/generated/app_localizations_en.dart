@@ -3931,4 +3931,120 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get packageImportProblemInvalidField =>
       'A field in the content is not valid or exceeds its limit.';
+
+  @override
+  String get importedTrustWarning =>
+      'This companion is imported: confirm before it acts.';
+
+  @override
+  String get importedTrustConfirm => 'Confirm';
+
+  @override
+  String get importedTrustSheetTitle => 'Edit your Google Sheet?';
+
+  @override
+  String importedTrustSheetTarget(String sheet, String tab) {
+    return 'Sheet: $sheet · Tab: $tab';
+  }
+
+  @override
+  String importedTrustCellLine(String cell, String before, String after) {
+    return '$cell: “$before” → “$after”';
+  }
+
+  @override
+  String get importedTrustEmptyValue => '(empty)';
+
+  @override
+  String get importedTrustCancelledSheet =>
+      'Action cancelled: the Google Sheet was not edited.';
+
+  @override
+  String get importedTrustActivityTitle => 'Prepare this activity?';
+
+  @override
+  String importedTrustActivityRest(int seconds) {
+    return 'Rest: $seconds s';
+  }
+
+  @override
+  String importedTrustActivityDuration(int seconds) {
+    return 'Activity duration: $seconds s';
+  }
+
+  @override
+  String importedTrustActivityTargetSets(int count) {
+    return 'Target sets: $count';
+  }
+
+  @override
+  String importedTrustActivityFields(String fields) {
+    return 'Fields: $fields';
+  }
+
+  @override
+  String importedTrustCancelledActivity(String name) {
+    return 'Action cancelled: the activity “$name” was not prepared.';
+  }
+
+  @override
+  String get importedTrustLabel => 'Imported';
+
+  @override
+  String get importedTrustSwitch => 'Trust this companion';
+
+  @override
+  String get importedTrustSwitchHelp =>
+      'Until you trust it, it asks for confirmation before editing your sheet or preparing activities.';
+
+  @override
+  String get importedTrustDialogTitle => 'Trust this companion?';
+
+  @override
+  String get importedTrustDialogBody =>
+      'It will stop asking for confirmation before editing your sheet or preparing activities. Do it only if you trust whoever shared it.';
+
+  @override
+  String get importedTrustDialogConfirm => 'Trust';
+
+  @override
+  String get importedTrustSaveError =>
+      'The change could not be saved. Try again.';
+
+  @override
+  String get packageQrTitle => 'Companion QR code';
+
+  @override
+  String get packageQrNote =>
+      'Whoever scans it will see a preview before saving anything.';
+
+  @override
+  String get packageQrShareFile => 'Share file';
+
+  @override
+  String get packageQrClose => 'Close';
+
+  @override
+  String get packageQrTooLarge =>
+      'It is too large for a QR code: it is shared as a file.';
+
+  @override
+  String get packageScanTitle => 'Scan companion';
+
+  @override
+  String get packageScanHint => 'Point the camera at the companion\'s QR code.';
+
+  @override
+  String get packageScanTorch => 'Flashlight';
+
+  @override
+  String get packageScanPermissionDenied =>
+      'Camera permission was not granted. You can import the companion from a file or by pasting the text.';
+
+  @override
+  String get packageScanCameraError =>
+      'The camera could not be used. You can import the companion from a file or by pasting the text.';
+
+  @override
+  String get packageScanUseFile => 'Import from file or text';
 }

@@ -570,7 +570,7 @@ extension _ChatDelivery on _AssistantChatScreenState {
             revisionId: attempt.revision.id,
           );
           if (widget.focusMode && proposal != null && !canRecord && aiReady) {
-            await acceptProposal();
+            await acceptProposal(automatic: true);
           }
           await handleCompletedActions(
             answer,

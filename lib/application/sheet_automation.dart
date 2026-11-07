@@ -123,7 +123,15 @@ class SheetAutomation {
 
   /// Applies an explicit chat edit to the already-bound sheet. Cell addresses
   /// and displayed old values are checked against a new Google snapshot.
-  Future<String> directEdit(String answer, String operationKey) async {
+  ///
+  /// With [confirm] (imported companions) the user sees every cell, its old
+  /// and its new value before anything is written; a refusal throws
+  /// [SheetEditCancelled] and the sheet is not touched.
+  Future<String> directEdit(
+    String answer,
+    String operationKey, {
+    Future<bool> Function(SheetEditPreview preview)? confirm,
+  }) async {
     if (busy) {
       throw const ValidationException('Hay otra operación de Google en curso.');
     }
@@ -145,6 +153,28 @@ class SheetAutomation {
         fence: 'sheet-edit',
         requireExpected: true,
       );
+      if (confirm != null) {
+        final rows = snapshot['rows'] as List;
+        final ok = await confirm(
+          SheetEditPreview(
+            sheetName: sheet.name,
+            tab: sheet.title,
+            cells: [
+              for (final cell in plan.writes)
+                (
+                  cell: cell.address,
+                  before:
+                      cell.row < rows.length &&
+                              cell.column < (rows[cell.row] as List).length
+                          ? (rows[cell.row] as List)[cell.column].toString()
+                          : '',
+                  after: cell.value.toString(),
+                ),
+            ],
+          ),
+        );
+        if (!ok) throw const SheetEditCancelled();
+      }
       final live = await service.connection();
       if (live == null ||
           live['subject'] != config['subject'] ||
@@ -472,4 +502,20 @@ class SheetAutomation {
     }
     await saveJobs(list);
   }
+}
+
+/// What an imported companion's sheet edit is about to change.
+class SheetEditPreview {
+  const SheetEditPreview({
+    required this.sheetName,
+    required this.tab,
+    required this.cells,
+  });
+  final String sheetName, tab;
+  final List<({String cell, String before, String after})> cells;
+}
+
+/// The user declined a sheet edit; nothing was written.
+class SheetEditCancelled implements Exception {
+  const SheetEditCancelled();
 }

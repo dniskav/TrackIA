@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../application/localization.dart';
@@ -44,6 +45,9 @@ String companionPackageFileName(String name) {
 /// Builds the package of [companion] and, after the person confirms, shares it
 /// as a `.trackia` file. Nothing is shared when the package cannot be built,
 /// when the person cancels, or when the file cannot be written.
+///
+/// When the text fits in a QR code, a dialog shows it and offers to share the
+/// file instead; otherwise the file is shared right away.
 ///
 /// [templates] beyond the package limit are not included; the confirmation
 /// says so. [share] and [temporaryDirectory] exist so tests can replace the
@@ -124,19 +128,81 @@ Future<void> shareCompanionPackage(
   );
   if (confirmed != true || !context.mounted) return;
 
-  try {
-    final folder = await (temporaryDirectory?.call() ?? getTemporaryDirectory());
-    final name = companionPackageFileName(companion.name);
-    final file = File(p.join(folder.path, name));
-    await file.writeAsString(text, encoding: utf8, flush: true);
-    await (share ?? _systemShare)(
-      [XFile(file.path, mimeType: 'application/octet-stream', name: name)],
-      subject: companion.name,
-      sharePositionOrigin: origin,
-    );
-  } catch (_) {
-    messenger.showSnackBar(
-      SnackBar(content: Text(l.packageShareWriteError)),
-    );
+  Future<void> shareFile() async {
+    try {
+      final folder = await (temporaryDirectory?.call() ?? getTemporaryDirectory());
+      final name = companionPackageFileName(companion.name);
+      final file = File(p.join(folder.path, name));
+      await file.writeAsString(text, encoding: utf8, flush: true);
+      await (share ?? _systemShare)(
+        [XFile(file.path, mimeType: 'application/octet-stream', name: name)],
+        subject: companion.name,
+        sharePositionOrigin: origin,
+      );
+    } catch (_) {
+      messenger.showSnackBar(
+        SnackBar(content: Text(l.packageShareWriteError)),
+      );
+    }
   }
+
+  if (!CompanionPackage.fitsInQr(text)) {
+    messenger.showSnackBar(SnackBar(content: Text(l.packageQrTooLarge)));
+    await shareFile();
+    return;
+  }
+
+  // Leaves room for the dialog's margins and padding.
+  final qrSide =
+      (MediaQuery.sizeOf(context).shortestSide - 120).clamp(200.0, 320.0).toDouble();
+  final shareAsFile = await showDialog<bool>(
+    context: context,
+    builder:
+        (context) => AlertDialog(
+          title: Text(l.packageQrTitle),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // White even in dark themes: the code needs a light quiet zone.
+                // The explicit SizedBox keeps the dialog's intrinsic-size pass
+                // away from the QR's LayoutBuilder.
+                ColoredBox(
+                  color: Colors.white,
+                  child: RepaintBoundary(
+                    key: const Key('share-qr-boundary'),
+                    child: SizedBox.square(
+                      dimension: qrSide,
+                      child: QrImageView(
+                        key: const Key('share-qr'),
+                        data: text,
+                        version: QrVersions.auto,
+                        errorCorrectionLevel: QrErrorCorrectLevel.L,
+                        size: qrSide,
+                        backgroundColor: Colors.white,
+                        padding: const EdgeInsets.all(12),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(l.packageQrNote, textAlign: TextAlign.center),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              key: const Key('share-qr-close'),
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(l.packageQrClose),
+            ),
+            FilledButton(
+              key: const Key('share-qr-file'),
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(l.packageQrShareFile),
+            ),
+          ],
+        ),
+  );
+  if (shareAsFile == true) await shareFile();
 }

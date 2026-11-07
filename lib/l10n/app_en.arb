@@ -2024,5 +2024,94 @@
   "packageImportProblemForbiddenField": "The content includes data that must never travel (keys, chats, memory…). It was not imported.",
   "packageImportProblemUnknownField": "The content includes a field this version does not accept. It was not imported.",
   "packageImportProblemMissingField": "A required field is missing from the content.",
-  "packageImportProblemInvalidField": "A field in the content is not valid or exceeds its limit."
+  "packageImportProblemInvalidField": "A field in the content is not valid or exceeds its limit.",
+  "importedTrustWarning": "This companion is imported: confirm before it acts.",
+  "importedTrustConfirm": "Confirm",
+  "importedTrustSheetTitle": "Edit your Google Sheet?",
+  "importedTrustSheetTarget": "Sheet: {sheet} · Tab: {tab}",
+  "@importedTrustSheetTarget": {
+    "placeholders": {
+      "sheet": {
+        "type": "String"
+      },
+      "tab": {
+        "type": "String"
+      }
+    }
+  },
+  "importedTrustCellLine": "{cell}: “{before}” → “{after}”",
+  "@importedTrustCellLine": {
+    "placeholders": {
+      "cell": {
+        "type": "String"
+      },
+      "before": {
+        "type": "String"
+      },
+      "after": {
+        "type": "String"
+      }
+    }
+  },
+  "importedTrustEmptyValue": "(empty)",
+  "importedTrustCancelledSheet": "Action cancelled: the Google Sheet was not edited.",
+  "importedTrustActivityTitle": "Prepare this activity?",
+  "importedTrustActivityRest": "Rest: {seconds} s",
+  "@importedTrustActivityRest": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "importedTrustActivityDuration": "Activity duration: {seconds} s",
+  "@importedTrustActivityDuration": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "importedTrustActivityTargetSets": "Target sets: {count}",
+  "@importedTrustActivityTargetSets": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importedTrustActivityFields": "Fields: {fields}",
+  "@importedTrustActivityFields": {
+    "placeholders": {
+      "fields": {
+        "type": "String"
+      }
+    }
+  },
+  "importedTrustCancelledActivity": "Action cancelled: the activity “{name}” was not prepared.",
+  "@importedTrustCancelledActivity": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "importedTrustLabel": "Imported",
+  "importedTrustSwitch": "Trust this companion",
+  "importedTrustSwitchHelp": "Until you trust it, it asks for confirmation before editing your sheet or preparing activities.",
+  "importedTrustDialogTitle": "Trust this companion?",
+  "importedTrustDialogBody": "It will stop asking for confirmation before editing your sheet or preparing activities. Do it only if you trust whoever shared it.",
+  "importedTrustDialogConfirm": "Trust",
+  "importedTrustSaveError": "The change could not be saved. Try again.",
+  "packageQrTitle": "Companion QR code",
+  "packageQrNote": "Whoever scans it will see a preview before saving anything.",
+  "packageQrShareFile": "Share file",
+  "packageQrClose": "Close",
+  "packageQrTooLarge": "It is too large for a QR code: it is shared as a file.",
+  "packageScanTitle": "Scan companion",
+  "packageScanHint": "Point the camera at the companion's QR code.",
+  "packageScanTorch": "Flashlight",
+  "packageScanPermissionDenied": "Camera permission was not granted. You can import the companion from a file or by pasting the text.",
+  "packageScanCameraError": "The camera could not be used. You can import the companion from a file or by pasting the text.",
+  "packageScanUseFile": "Import from file or text"
 }

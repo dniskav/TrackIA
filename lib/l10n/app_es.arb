@@ -2024,5 +2024,94 @@
   "packageImportProblemForbiddenField": "El contenido incluye un dato que nunca debe viajar (claves, chats, memoria…). No se importó.",
   "packageImportProblemUnknownField": "El contenido incluye un campo que esta versión no admite. No se importó.",
   "packageImportProblemMissingField": "Falta un campo obligatorio en el contenido.",
-  "packageImportProblemInvalidField": "Un campo del contenido no es válido o supera su límite."
+  "packageImportProblemInvalidField": "Un campo del contenido no es válido o supera su límite.",
+  "importedTrustWarning": "Este acompañante es importado: confirma antes de que actúe.",
+  "importedTrustConfirm": "Confirmar",
+  "importedTrustSheetTitle": "¿Editar tu hoja de Google Sheets?",
+  "importedTrustSheetTarget": "Hoja: {sheet} · Pestaña: {tab}",
+  "@importedTrustSheetTarget": {
+    "placeholders": {
+      "sheet": {
+        "type": "String"
+      },
+      "tab": {
+        "type": "String"
+      }
+    }
+  },
+  "importedTrustCellLine": "{cell}: «{before}» → «{after}»",
+  "@importedTrustCellLine": {
+    "placeholders": {
+      "cell": {
+        "type": "String"
+      },
+      "before": {
+        "type": "String"
+      },
+      "after": {
+        "type": "String"
+      }
+    }
+  },
+  "importedTrustEmptyValue": "(vacía)",
+  "importedTrustCancelledSheet": "Acción cancelada: no se editó la hoja de Google Sheets.",
+  "importedTrustActivityTitle": "¿Preparar esta actividad?",
+  "importedTrustActivityRest": "Descanso: {seconds} s",
+  "@importedTrustActivityRest": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "importedTrustActivityDuration": "Duración de la actividad: {seconds} s",
+  "@importedTrustActivityDuration": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "importedTrustActivityTargetSets": "Series objetivo: {count}",
+  "@importedTrustActivityTargetSets": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "importedTrustActivityFields": "Campos: {fields}",
+  "@importedTrustActivityFields": {
+    "placeholders": {
+      "fields": {
+        "type": "String"
+      }
+    }
+  },
+  "importedTrustCancelledActivity": "Acción cancelada: no se preparó la actividad «{name}».",
+  "@importedTrustCancelledActivity": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "importedTrustLabel": "Importado",
+  "importedTrustSwitch": "Confiar en este acompañante",
+  "importedTrustSwitchHelp": "Mientras no confíes en él, pedirá confirmación antes de editar tu hoja o preparar actividades.",
+  "importedTrustDialogTitle": "¿Confiar en este acompañante?",
+  "importedTrustDialogBody": "Dejará de pedir confirmación antes de editar tu hoja o preparar actividades. Hazlo solo si confías en quien te lo compartió.",
+  "importedTrustDialogConfirm": "Confiar",
+  "importedTrustSaveError": "No se pudo guardar el cambio. Inténtalo de nuevo.",
+  "packageQrTitle": "Código QR del acompañante",
+  "packageQrNote": "Quien lo escanee verá una vista previa antes de guardar nada.",
+  "packageQrShareFile": "Compartir archivo",
+  "packageQrClose": "Cerrar",
+  "packageQrTooLarge": "Es demasiado grande para un QR: se comparte como archivo.",
+  "packageScanTitle": "Escanear acompañante",
+  "packageScanHint": "Apunta la cámara al código QR del acompañante.",
+  "packageScanTorch": "Linterna",
+  "packageScanPermissionDenied": "No hay permiso para usar la cámara. Puedes importar el acompañante desde un archivo o pegando el texto.",
+  "packageScanCameraError": "No se pudo usar la cámara. Puedes importar el acompañante desde un archivo o pegando el texto.",
+  "packageScanUseFile": "Importar desde archivo o texto"
 }

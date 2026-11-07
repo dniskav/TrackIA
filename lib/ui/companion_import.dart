@@ -23,6 +23,7 @@ class CompanionImportScreen extends StatefulWidget {
     required this.creation,
     this.takenIds = const [],
     this.pickFile,
+    this.initialText,
   });
 
   final CompanionStore store;
@@ -33,6 +34,10 @@ class CompanionImportScreen extends StatefulWidget {
 
   /// Injectable for tests: returns the bytes of the chosen file, or null.
   final Future<List<int>?> Function()? pickFile;
+
+  /// Text already obtained (for example from a scanned QR code): it fills the
+  /// field and the preview is shown on opening.
+  final String? initialText;
 
   @override
   State<CompanionImportScreen> createState() => _CompanionImportScreenState();
@@ -49,6 +54,16 @@ class _CompanionImportScreenState extends State<CompanionImportScreen> {
   CompanionPackageException? problem;
   String? message;
   bool busy = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final text = widget.initialText;
+    if (text != null) {
+      paste.text = text;
+      showPreview();
+    }
+  }
 
   @override
   void dispose() {

@@ -2,10 +2,86 @@ part of '../assistant_chat.dart';
 
 /// Game mode in the chat: progress state, trackia-* cards and proposals.
 extension _ChatGame on _AssistantChatScreenState {
-  Future<void> acceptProposal() async {
+  /// One decision point: an imported companion carries third-party
+  /// instructions, so its actions need an explicit confirmation (T063).
+  bool get requiresActionConfirmation => widget.companion?.isImported == true;
+
+  /// Dialog shared by the confirmations of imported companions.
+  Future<bool> confirmImportedAction({
+    required String title,
+    required List<String> lines,
+  }) async {
+    final l = appText(context);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (dialog) => AlertDialog(
+        key: const Key('imported-action-dialog'),
+        title: Text(title),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(l.importedTrustWarning),
+              const SizedBox(height: 12),
+              for (final line in lines) Text(line),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            key: const Key('imported-action-cancel'),
+            onPressed: () => Navigator.pop(dialog, false),
+            child: Text(l.cancel),
+          ),
+          FilledButton(
+            key: const Key('imported-action-confirm'),
+            onPressed: () => Navigator.pop(dialog, true),
+            child: Text(l.importedTrustConfirm),
+          ),
+        ],
+      ),
+    );
+    return ok == true;
+  }
+
+  /// Leaves a neutral `event` line in the chat for a declined action.
+  Future<void> recordCancelledAction(String text) => activityEdited(text);
+
+  /// [automatic] is the accept that follows the model's answer without a tap;
+  /// the card button is already an explicit user action.
+  Future<void> acceptProposal({bool automatic = false}) async {
     if (!aiReady) return;
     final selected = proposal;
     if (selected == null) return;
+    if (automatic && requiresActionConfirmation) {
+      final l = appText(context);
+      final ok = await confirmImportedAction(
+        title: l.importedTrustActivityTitle,
+        lines: [
+          selected.name,
+          l.importedTrustActivityRest(selected.restSeconds),
+          if (selected.activitySeconds != null)
+            l.importedTrustActivityDuration(selected.activitySeconds!),
+          if (selected.targetSets != null)
+            l.importedTrustActivityTargetSets(selected.targetSets!),
+          if (selected.fields.isNotEmpty)
+            l.importedTrustActivityFields(
+              selected.fields.map((f) => f['label']).join(' · '),
+            ),
+        ],
+      );
+      if (!ok) {
+        if (mounted) update(() => proposal = null);
+        if (mounted) {
+          await recordCancelledAction(
+            appText(context).importedTrustCancelledActivity(selected.name),
+          );
+        }
+        return;
+      }
+      if (!mounted) return;
+    }
     if (widget.controller.focus != null) {
       if (mounted) {
         update(

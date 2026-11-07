@@ -326,7 +326,7 @@ extension _ChatSend on _AssistantChatScreenState {
         if (mounted && retry == null) input.clear();
         if (includeAttachment) attachment = null;
         if (widget.focusMode && proposal != null && !canRecord && aiReady) {
-          await acceptProposal();
+          await acceptProposal(automatic: true);
         }
         if (mounted) {
           await handleCompletedActions(

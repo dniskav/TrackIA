@@ -111,6 +111,26 @@ extension _ChatSheet on _AssistantChatScreenState {
       );
       return;
     }
+    // Un acompañante importado trae instrucciones de terceros: antes de
+    // tocar la hoja se confirma celda por celda (T063).
+    final confirm = requiresActionConfirmation
+        ? (SheetEditPreview preview) async {
+            if (!mounted) return false;
+            final l = appText(context);
+            return confirmImportedAction(
+              title: l.importedTrustSheetTitle,
+              lines: [
+                l.importedTrustSheetTarget(preview.sheetName, preview.tab),
+                for (final c in preview.cells)
+                  l.importedTrustCellLine(
+                    c.cell,
+                    c.before.isEmpty ? l.importedTrustEmptyValue : c.before,
+                    c.after,
+                  ),
+              ],
+            );
+          }
+        : null;
     // Mientras Google no confirme, el resultado es incierto (también si la app
     // se cierra a mitad); solo la confirmación lo convierte en hecho.
     await recordEffect(
@@ -123,6 +143,7 @@ extension _ChatSheet on _AssistantChatScreenState {
       final receipt = await sheets.directEdit(
         answer,
         '$sessionId:${messages.length}:${latestUser.text}',
+        confirm: confirm,
       );
       await recordEffect(
         'sheet-edit',
@@ -132,6 +153,10 @@ extension _ChatSheet on _AssistantChatScreenState {
       if (!mounted) return;
       await saveSheetReply(receipt);
       await reloadSheet();
+    } on SheetEditCancelled {
+      await settleEffect('sheet-edit', editKey, EffectStatus.failed);
+      if (!mounted) return;
+      await recordCancelledAction(appText(context).importedTrustCancelledSheet);
     } catch (e) {
       await saveSheetReply(
         'No se pudo confirmar la edición en Google Sheets. ${sheetError(e)} Comprueba la hoja antes de reintentar.',

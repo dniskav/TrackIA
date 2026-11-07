@@ -45,6 +45,7 @@ void main() {
     WidgetTester tester, {
     Iterable<String> taken = const [],
     Future<List<int>?> Function()? pickFile,
+    String? initialText,
   }) async {
     tester.view.physicalSize = const Size(800, 4000);
     tester.view.devicePixelRatio = 1;
@@ -67,6 +68,7 @@ void main() {
                     ),
                     takenIds: taken,
                     pickFile: pickFile,
+                    initialText: initialText,
                   ),
                 ),
               );
@@ -124,6 +126,23 @@ void main() {
     // El paquete declaraba «goals»: se avisa y queda en recordatorio.
     expect(find.byKey(const Key('import-warning-modeReset')), findsOneWidget);
     expect(find.byKey(const Key('import-mode-note')), findsOneWidget);
+    expect(await saved(tester), isEmpty);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('initialText: la vista previa sale directa', (tester) async {
+    await open(tester, initialText: typicalPackage().encode());
+    expect(find.byKey(const Key('import-external-notice')), findsOneWidget);
+    final name = tester.widget<TextField>(find.byKey(const Key('import-name')));
+    expect(name.controller!.text, 'Lectura');
+    expect(await saved(tester), isEmpty);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('initialText inválido: error y nada guardado', (tester) async {
+    await open(tester, initialText: 'no es un paquete');
+    expect(find.byKey(const Key('import-error')), findsOneWidget);
+    expect(find.byKey(const Key('import-save')), findsNothing);
     expect(await saved(tester), isEmpty);
     expect(tester.takeException(), isNull);
   });
