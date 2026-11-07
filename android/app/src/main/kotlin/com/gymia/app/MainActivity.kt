@@ -55,7 +55,7 @@ class MainActivity : FlutterActivity() {
                 var count: Int
                 while (it.read(buffer).also { count = it } != -1) {
                     if (output.size() + count > 20 * 1024 * 1024) {
-                        throw IllegalArgumentException("La hoja supera 20 MB.")
+                        throw IllegalArgumentException(getString(R.string.err_sheet_over_20mb))
                     }
                     output.write(buffer, 0, count)
                 }
@@ -68,13 +68,13 @@ class MainActivity : FlutterActivity() {
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 "text/csv", "application/csv", "text/comma-separated-values"
             ).firstOrNull { it in available }
-                ?: throw IllegalArgumentException("Para leer esta hoja nativa, usa «Importar desde Google Sheets» en Tus datos y autoriza tu cuenta.")
+                ?: throw IllegalArgumentException(getString(R.string.err_native_sheet_use_import))
             val descriptor = contentResolver.openTypedAssetFileDescriptor(uri, format, null)
-                ?: throw IllegalArgumentException("Drive no pudo descargar la hoja. Comprueba tu conexión y vuelve a intentarlo.")
+                ?: throw IllegalArgumentException(getString(R.string.err_drive_download))
             descriptor.use { read(it.createInputStream()) }
         } else {
             read(contentResolver.openInputStream(uri)
-                ?: throw IllegalArgumentException("No se pudo abrir la hoja seleccionada."))
+                ?: throw IllegalArgumentException(getString(R.string.err_open_selected_sheet)))
         }
         var name = "hoja"
         contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use { cursor ->
@@ -90,7 +90,7 @@ class MainActivity : FlutterActivity() {
                 val sheet = readSheet(uri)
                 runOnUiThread { result.success(sheet) }
             } catch (e: Exception) {
-                runOnUiThread { result.error("IMPORT_FAILED", e.message ?: "No se pudo leer la hoja. Comprueba tu conexión y vuelve a intentarlo.", null) }
+                runOnUiThread { result.error("IMPORT_FAILED", e.message ?: getString(R.string.err_read_sheet), null) }
             }
         }.start()
     }
@@ -135,7 +135,7 @@ class MainActivity : FlutterActivity() {
                     }
                 } catch (_: Exception) {
                     // Authorization URLs may contain an ID-token hint: never log them.
-                    result.error("CHATGPT_BROWSER", "No se pudo abrir el navegador.", null)
+                    result.error("CHATGPT_BROWSER", getString(R.string.err_open_browser), null)
                 }
             }
         restNotificationChannel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "com.gymia.app/rest-notifications")
@@ -147,7 +147,7 @@ class MainActivity : FlutterActivity() {
                         "enable" -> {
                             val enabled = call.argument<Boolean>("enabled") == true
                             if (enabled && !RestNotifications.runtimePermissionGranted(this)) {
-                                if (notificationPermissionResult != null) { result.error("BUSY", "Ya hay una solicitud de permiso en curso.", null) }
+                                if (notificationPermissionResult != null) { result.error("BUSY", getString(R.string.err_permission_request_busy), null) }
                                 else {
                                     notificationPermissionResult = result
                                     requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 8402)
@@ -179,7 +179,7 @@ class MainActivity : FlutterActivity() {
                         "openChannelSettings" -> {
                             val manager = getSystemService(android.app.NotificationManager::class.java)
                             val channel = when (call.argument<String>("channel")) {
-                                "alarm" -> { RestNotifications.ensureAlarmChannel(manager); RestNotifications.alarmChannelId }
+                                "alarm" -> { RestNotifications.ensureAlarmChannel(this, manager); RestNotifications.alarmChannelId }
                                 "reminders" -> "trackia_reminders_v1"
                                 else -> "gymia_rest"
                             }
@@ -212,7 +212,7 @@ class MainActivity : FlutterActivity() {
                         }
                         else -> result.notImplemented()
                     }
-                } catch (e: Exception) { result.error("REST_NOTIFICATION", "No se pudo configurar el aviso de descanso.", null) }
+                } catch (e: Exception) { result.error("REST_NOTIFICATION", getString(R.string.err_rest_notification), null) }
             }
         googleSheets = GoogleSheetsBridge(this)
         captureReminderOpen(intent)
@@ -235,7 +235,7 @@ class MainActivity : FlutterActivity() {
                         else -> result.notImplemented()
                     }
                 } catch (error: Exception) {
-                    result.error("REMINDERS_FAILED", "No se pudieron programar los recordatorios.", null)
+                    result.error("REMINDERS_FAILED", getString(R.string.err_reminders_schedule), null)
                 }
             }
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "com.gymia.app/google-sheets")
@@ -245,7 +245,7 @@ class MainActivity : FlutterActivity() {
         importChannel!!.setMethodCallHandler { call, result ->
             if (call.method == "pickSheet") {
                 if (pickerResult != null) {
-                    result.error("IMPORT_BUSY", "Ya hay una selección de hoja en curso.", null)
+                    result.error("IMPORT_BUSY", getString(R.string.err_sheet_pick_busy), null)
                     return@setMethodCallHandler
                 }
                 pickerResult = result
@@ -257,7 +257,7 @@ class MainActivity : FlutterActivity() {
                     }, pickSheetRequest)
                 } catch (e: Exception) {
                     pickerResult = null
-                    result.error("IMPORT_FAILED", "No se pudo abrir el selector de hojas.", null)
+                    result.error("IMPORT_FAILED", getString(R.string.err_open_sheet_picker), null)
                 }
                 return@setMethodCallHandler
             }
@@ -274,10 +274,10 @@ class MainActivity : FlutterActivity() {
             try {
                 val uri = shared.getParcelableExtra<Uri>(Intent.EXTRA_STREAM)
                     ?: shared.clipData?.getItemAt(0)?.uri
-                    ?: throw IllegalArgumentException("En Google Sheets elige «Enviar una copia», no «Copiar enlace».")
+                    ?: throw IllegalArgumentException(getString(R.string.err_sheets_send_copy))
                 deliverSheet(uri, result)
             } catch (e: Exception) {
-                result.error("IMPORT_FAILED", e.message ?: "No se pudo leer la hoja compartida.", null)
+                result.error("IMPORT_FAILED", e.message ?: getString(R.string.err_read_shared_sheet), null)
             }
         }
     }
@@ -294,7 +294,7 @@ class MainActivity : FlutterActivity() {
         }
         val uri = data?.data
         if (uri == null) {
-            result.error("IMPORT_FAILED", "No se recibió la hoja seleccionada.", null)
+            result.error("IMPORT_FAILED", getString(R.string.err_sheet_not_received), null)
             return
         }
         deliverSheet(uri, result)

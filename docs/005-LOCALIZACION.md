@@ -64,3 +64,12 @@ El objetivo establecido es `system|es|en|ar` y catálogos es/en/ar (T041). No ha
 8. Repasar superficies no enumeradas por las tareas de migración inicial (rutinas, ajustes generales, historial/archivos, apariencia, notificaciones, progreso y widgets reutilizables) y todos los errores dinámicos. Mantener sin traducir nombres/valores de datos, texto del usuario, contenido de modelo, títulos/celdas de Sheets, correos, nombres de proveedor/modelo e identificadores.
 
 Este documento es un mapa de trabajo, no un catálogo final de claves. T045 debe actualizarlo con las rutas y claves reales después de T041–T044.
+
+## Recursos nativos Android (hecho)
+
+- Textos nativos en `android/app/src/main/res/values/strings.xml` (español, valor por defecto, idéntico al literal anterior), `values-en/` y `values-ar/`. Kotlin usa `getString(R.string.x)` y `%1$s`/`%1$d` para parámetros; no hay `plurals` (etiquetas invariables).
+- Cubre: canales (nombre y descripción), títulos/cuerpos y acciones (Iniciar/Cerrar/Parar) de `RestNotifications.kt`, nombres por defecto («Actividad», «Entrenamiento»), errores de `MainActivity.kt` y `GoogleSheetsBridge.kt`, y la etiqueta del intent-filter «Importar en TrackIA» del manifiesto. El nombre de la app (`TrackIA`) no se traduce.
+- **Idioma: el del SISTEMA** (resolución de recursos de Android), no el ajuste interno de idioma de la app. Si el usuario fuerza otro idioma en la app, las notificaciones y errores nativos siguen el del sistema.
+- IDs de canal sin cambios (`gymia_rest`, `trackia_timer_alarm_v1`, `trackia_reminders_v1`). Cada `createNotificationChannel` con un ID existente actualiza nombre y descripción, así que se refrescan al volver a crearse el canal (en cada aviso o al abrir sus ajustes).
+- `gymia_rest` conserva dos nombres heredados: «Actividad y descanso» (`channel_rest_name`) y «Descanso de entrenamiento» (`channel_rest_test_name`, solo en la notificación de prueba). Convendría unificarlos.
+- Pendiente: las frases de recordatorio (`templates` del snapshot JSON) y `companionName` las genera Dart (`lib/domain/reminder.dart`); localizarlas allí. `SheetsWriter.kt` (errores `GOOGLE_SYNC`) no tiene `Context` y su test JVM fija el flujo; sigue en español. No existe módulo Wear.

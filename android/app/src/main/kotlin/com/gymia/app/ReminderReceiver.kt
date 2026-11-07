@@ -225,10 +225,10 @@ object Reminders {
         }.toMap()
     }
 
-    private fun ensureChannel(manager: NotificationManager) {
+    private fun ensureChannel(context: Context, manager: NotificationManager) {
         if (Build.VERSION.SDK_INT < 26) return
-        manager.createNotificationChannel(NotificationChannel(channelId, "Recordatorios", NotificationManager.IMPORTANCE_DEFAULT).apply {
-            description = "Te recuerda tus actividades en la franja que elegiste. Respeta No molestar."
+        manager.createNotificationChannel(NotificationChannel(channelId, context.getString(R.string.channel_reminders_name), NotificationManager.IMPORTANCE_DEFAULT).apply {
+            description = context.getString(R.string.channel_reminders_description)
         })
     }
 
@@ -257,7 +257,7 @@ object Reminders {
         if (!RestNotifications.runtimePermissionGranted(context)) return
         val manager = context.getSystemService(NotificationManager::class.java)
         if (Build.VERSION.SDK_INT >= 24 && !manager.areNotificationsEnabled()) return
-        ensureChannel(manager)
+        ensureChannel(context, manager)
         if (Build.VERSION.SDK_INT >= 26 && manager.getNotificationChannel(channelId)?.importance == NotificationManager.IMPORTANCE_NONE) return
 
         val id = entry.getString("id")

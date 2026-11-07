@@ -22,6 +22,12 @@ import android.os.Build
 import android.os.SystemClock
 import java.util.UUID
 
+/*
+ * User-visible texts live in res/values (es default), values-en and values-ar: strings.xml. They follow the
+ * SYSTEM language (the Android resource locale), not the in-app language setting.
+ * Channel IDs never change; names/descriptions are refreshed because every
+ * createNotificationChannel call with an existing ID updates them.
+ */
 object RestNotifications {
     private const val channelId = "gymia_rest"
     const val alarmChannelId = "trackia_timer_alarm_v1"
@@ -80,12 +86,12 @@ object RestNotifications {
     }
     fun alarmStyle(context: Context): Boolean = preferences(context).getBoolean("alarmStyle", true)
     /** Alarm-usage channel: Android lets alarms through Do Not Disturb priority mode. */
-    fun ensureAlarmChannel(manager: NotificationManager) {
+    fun ensureAlarmChannel(context: Context, manager: NotificationManager) {
         if (Build.VERSION.SDK_INT < 26) return
         val sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
             ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        manager.createNotificationChannel(NotificationChannel(alarmChannelId, "Fin de descanso y tramo", NotificationManager.IMPORTANCE_HIGH).apply {
-            description = "Suena como una alarma cuando termina un descanso o un tramo con duración."
+        manager.createNotificationChannel(NotificationChannel(alarmChannelId, context.getString(R.string.channel_alarm_name), NotificationManager.IMPORTANCE_HIGH).apply {
+            description = context.getString(R.string.channel_alarm_description)
             enableVibration(true)
             vibrationPattern = longArrayOf(0, 400, 200, 400)
             setSound(sound, AudioAttributes.Builder()
@@ -99,7 +105,7 @@ object RestNotifications {
         val alarm = alarmStyle(context)
         val builder: Notification.Builder
         if (Build.VERSION.SDK_INT >= 26) {
-            if (alarm) ensureAlarmChannel(manager)
+            if (alarm) ensureAlarmChannel(context, manager)
             val id = if (alarm) alarmChannelId else channelId
             if (manager.getNotificationChannel(id)?.importance == NotificationManager.IMPORTANCE_NONE) return null
             builder = Notification.Builder(context, id)
@@ -136,8 +142,8 @@ object RestNotifications {
         val open = PendingIntent.getActivity(context, testAlarmRequestId, Intent(context, MainActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         manager.notify(testAlarmRequestId, builder.setSmallIcon(R.drawable.ic_trackia)
             .setLargeIcon(brandIcon()).setColor(brandTeal)
-            .setContentTitle("Prueba del aviso de descanso")
-            .setContentText(if (alarmStyle(context)) "Suena como una alarma." else "Aviso normal.")
+            .setContentTitle(context.getString(R.string.notif_timer_test_title))
+            .setContentText(if (alarmStyle(context)) context.getString(R.string.notif_timer_test_alarm) else context.getString(R.string.notif_timer_test_normal))
             .setContentIntent(open).setAutoCancel(true).setTimeoutAfter(15000)
             .setVisibility(Notification.VISIBILITY_PRIVATE)
             .setDefaults(Notification.DEFAULT_ALL).build())
@@ -180,9 +186,9 @@ object RestNotifications {
         if (!permitted(context)) return false
         val manager = context.getSystemService(NotificationManager::class.java)
         if (Build.VERSION.SDK_INT >= 26) {
-            manager.createNotificationChannel(NotificationChannel(channelId, "Actividad y descanso", NotificationManager.IMPORTANCE_HIGH).apply {
+            manager.createNotificationChannel(NotificationChannel(channelId, context.getString(R.string.channel_rest_name), NotificationManager.IMPORTANCE_HIGH).apply {
                 enableVibration(true)
-                description = "Avisa al preparar una actividad y cuando termina el descanso."
+                description = context.getString(R.string.channel_rest_description)
             })
         }
         val builder = timerBuilder(context, manager) ?: return false
@@ -201,11 +207,11 @@ object RestNotifications {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         manager.notify(requestId, builder.setSmallIcon(R.drawable.ic_trackia)
             .setLargeIcon(brandIcon()).setColor(brandTeal)
-            .setContentTitle("Descanso terminado")
-            .setContentText("$name · puedes comenzar cuando quieras")
+            .setContentTitle(context.getString(R.string.notif_rest_done_title))
+            .setContentText(context.getString(R.string.notif_rest_done_body, name))
             .setContentIntent(open).setAutoCancel(true)
-            .addAction(R.drawable.ic_trackia, "Iniciar", start)
-            .addAction(R.drawable.ic_trackia, "Cerrar", close)
+            .addAction(R.drawable.ic_trackia, context.getString(R.string.action_start), start)
+            .addAction(R.drawable.ic_trackia, context.getString(R.string.action_close), close)
             .setVisibility(Notification.VISIBILITY_PRIVATE)
             .setDefaults(Notification.DEFAULT_ALL).build())
         return true
@@ -218,7 +224,7 @@ object RestNotifications {
         }
         val manager = context.getSystemService(NotificationManager::class.java)
         if (Build.VERSION.SDK_INT >= 26) {
-            manager.createNotificationChannel(NotificationChannel(channelId, "Actividad y descanso", NotificationManager.IMPORTANCE_HIGH))
+            manager.createNotificationChannel(NotificationChannel(channelId, context.getString(R.string.channel_rest_name), NotificationManager.IMPORTANCE_HIGH))
             if (manager.getNotificationChannel(channelId)?.importance == NotificationManager.IMPORTANCE_NONE) return false
         }
         val nonce = UUID.randomUUID().toString()
@@ -238,10 +244,10 @@ object RestNotifications {
         val builder = if (Build.VERSION.SDK_INT >= 26) Notification.Builder(context, channelId) else Notification.Builder(context)
         manager.notify(preparedRequestId, builder.setSmallIcon(R.drawable.ic_trackia)
             .setLargeIcon(brandIcon()).setColor(brandTeal)
-            .setContentTitle("Actividad lista").setContentText("$name · inicia cuando quieras")
+            .setContentTitle(context.getString(R.string.notif_prepared_title)).setContentText(context.getString(R.string.notif_prepared_body, name))
             .setContentIntent(open).setAutoCancel(true)
-            .addAction(R.drawable.ic_trackia, "Iniciar", start)
-            .addAction(R.drawable.ic_trackia, "Cerrar", close)
+            .addAction(R.drawable.ic_trackia, context.getString(R.string.action_start), start)
+            .addAction(R.drawable.ic_trackia, context.getString(R.string.action_close), close)
             .setVisibility(Notification.VISIBILITY_PRIVATE).setDefaults(Notification.DEFAULT_ALL).build())
         return true
     }
@@ -255,7 +261,7 @@ object RestNotifications {
         cancel(context)
         val manager = context.getSystemService(NotificationManager::class.java)
         if (Build.VERSION.SDK_INT >= 26) {
-            manager.createNotificationChannel(NotificationChannel(channelId, "Actividad y descanso", NotificationManager.IMPORTANCE_HIGH))
+            manager.createNotificationChannel(NotificationChannel(channelId, context.getString(R.string.channel_rest_name), NotificationManager.IMPORTANCE_HIGH))
             if (manager.getNotificationChannel(channelId)?.importance == NotificationManager.IMPORTANCE_NONE) return false
         }
         val nonce = UUID.randomUUID().toString()
@@ -270,8 +276,8 @@ object RestNotifications {
         val builder = if (Build.VERSION.SDK_INT >= 26) Notification.Builder(context, channelId) else Notification.Builder(context)
         manager.notify(runningRequestId, builder.setSmallIcon(R.drawable.ic_trackia)
             .setLargeIcon(brandIcon()).setColor(brandTeal)
-            .setContentTitle("Actividad en curso").setContentText(name)
-            .setContentIntent(open).addAction(R.drawable.ic_trackia, "Parar", stop)
+            .setContentTitle(context.getString(R.string.notif_running_title)).setContentText(name)
+            .setContentIntent(open).addAction(R.drawable.ic_trackia, context.getString(R.string.action_stop), stop)
             .setVisibility(Notification.VISIBILITY_PRIVATE).setOnlyAlertOnce(true).build())
         scheduleActivityAlarm(context, id, end, name, profileId)
         return true
@@ -316,10 +322,10 @@ object RestNotifications {
         val builder = timerBuilder(context, manager) ?: return false
         manager.notify(runningRequestId, builder.setSmallIcon(R.drawable.ic_trackia)
             .setLargeIcon(brandIcon()).setColor(brandTeal)
-            .setContentTitle("Tramo terminado").setContentText("$name · tiempo cumplido")
+            .setContentTitle(context.getString(R.string.notif_segment_done_title)).setContentText(context.getString(R.string.notif_segment_done_body, name))
             .setContentIntent(open).setAutoCancel(true)
-            .addAction(R.drawable.ic_trackia, "Parar", stop)
-            .addAction(R.drawable.ic_trackia, "Cerrar", close)
+            .addAction(R.drawable.ic_trackia, context.getString(R.string.action_stop), stop)
+            .addAction(R.drawable.ic_trackia, context.getString(R.string.action_close), close)
             .setVisibility(Notification.VISIBILITY_PRIVATE).setDefaults(Notification.DEFAULT_ALL).build())
         prefs.edit().putString("lastDeliveredId", id).putLong("lastDeliveredEnd", end).apply()
         return true
@@ -369,8 +375,8 @@ object RestNotifications {
         if (Build.VERSION.SDK_INT >= 26) builder.setTimeoutAfter(10000)
         manager.notify(resultRequestId, builder.setSmallIcon(R.drawable.ic_trackia)
             .setLargeIcon(brandIcon()).setColor(brandTeal)
-            .setContentTitle("No se pudo completar la acción")
-            .setContentText("Abre TrackIA y revisa la actividad actual.")
+            .setContentTitle(context.getString(R.string.notif_action_failed_title))
+            .setContentText(context.getString(R.string.notif_action_failed_body))
             .setContentIntent(open).setAutoCancel(true).setOnlyAlertOnce(true)
             .setVisibility(Notification.VISIBILITY_PRIVATE).build())
         return true
@@ -410,9 +416,9 @@ object RestNotifications {
         if (!preferences(context).getBoolean("enabled", false) || !permitted(context)) return false
         val manager = context.getSystemService(NotificationManager::class.java)
         if (Build.VERSION.SDK_INT >= 26) {
-            manager.createNotificationChannel(NotificationChannel(channelId, "Descanso de entrenamiento", NotificationManager.IMPORTANCE_HIGH).apply {
+            manager.createNotificationChannel(NotificationChannel(channelId, context.getString(R.string.channel_rest_test_name), NotificationManager.IMPORTANCE_HIGH).apply {
                 enableVibration(true)
-                description = "Avisa cuando termina el descanso que configuraste."
+                description = context.getString(R.string.channel_rest_test_description)
             })
             if (manager.getNotificationChannel(channelId)?.importance == NotificationManager.IMPORTANCE_NONE) return false
         }
@@ -420,8 +426,8 @@ object RestNotifications {
         val builder = if (Build.VERSION.SDK_INT >= 26) Notification.Builder(context, channelId) else Notification.Builder(context)
         manager.notify(testRequestId, builder.setSmallIcon(R.drawable.ic_trackia)
             .setLargeIcon(brandIcon()).setColor(brandTeal)
-            .setContentTitle("Prueba de notificaciones")
-            .setContentText("TrackIA puede avisarte en este móvil.")
+            .setContentTitle(context.getString(R.string.notif_test_title))
+            .setContentText(context.getString(R.string.notif_test_body))
             .setContentIntent(open).setAutoCancel(true)
             .setVisibility(Notification.VISIBILITY_PRIVATE)
             .setDefaults(Notification.DEFAULT_ALL).build())
@@ -440,14 +446,14 @@ class RestAlarmReceiver : BroadcastReceiver() {
         val end = intent.getLongExtra("end", 0)
         if (intent.getStringExtra("kind") == "activity") {
             if (System.currentTimeMillis() >= end) {
-                RestNotifications.notifyActivityFinished(context, intent.getStringExtra("name") ?: "Actividad", id, end)
+                RestNotifications.notifyActivityFinished(context, intent.getStringExtra("name") ?: context.getString(R.string.default_activity_name), id, end)
             }
             return
         }
         if (!preferences.getBoolean("enabled", false) || preferences.getString("id", null) != id || preferences.getLong("end", 0) != end) return
         if (System.currentTimeMillis() < end) return
         preferences.edit().remove("id").remove("end").apply()
-        if (RestNotifications.notify(context, intent.getStringExtra("name") ?: "Entrenamiento", id, end,
+        if (RestNotifications.notify(context, intent.getStringExtra("name") ?: context.getString(R.string.default_workout_name), id, end,
                 preferences.getString("profileId", "local") ?: "local")) {
             preferences.edit().putString("lastDeliveredId", id).putLong("lastDeliveredEnd", end).apply()
         }

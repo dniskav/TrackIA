@@ -53,14 +53,14 @@ class GoogleSheetsBridge(private val activity: Activity) {
                 val token = accessToken
                 val expected = call.argument<String>("expectedSubject")
                 if (expected == null || expected != subject) {
-                    result.error("GOOGLE_ACCOUNT_MISMATCH", "La cuenta no corresponde al acceso actual.", null)
+                    result.error("GOOGLE_ACCOUNT_MISMATCH", activity.getString(R.string.g_account_mismatch_access), null)
                 } else if (token == null) {
                     result.success(null)
                 } else {
                     accessToken = null
                     Identity.getAuthorizationClient(activity).clearToken(ClearTokenRequest.builder().setToken(token).build())
                         .addOnSuccessListener { result.success(null) }
-                        .addOnFailureListener { result.error("GOOGLE_AUTH_REQUIRED", "No se pudo renovar el acceso a Google.", null) }
+                        .addOnFailureListener { result.error("GOOGLE_AUTH_REQUIRED", activity.getString(R.string.g_renew_failed), null) }
                 }
             }
             "connectIdentity", "authorize", "authorizeWrite" -> {
@@ -72,7 +72,7 @@ class GoogleSheetsBridge(private val activity: Activity) {
                 identityOnly = call.method == "connectIdentity"
                 expectedSubject = call.argument<String>("expectedSubject")
                 if (!identityOnly && expectedSubject.isNullOrBlank()) {
-                    result.error("GOOGLE_PROFILE_REQUIRED", "Conecta tu cuenta desde Cuenta y datos antes de cargar una hoja.", null)
+                    result.error("GOOGLE_PROFILE_REQUIRED", activity.getString(R.string.g_profile_required), null)
                     return
                 }
                 writeAuthorized = false
@@ -87,7 +87,7 @@ class GoogleSheetsBridge(private val activity: Activity) {
                 if (!identityOnly) {
                     val email = call.argument<String>("email")
                     if (email.isNullOrBlank()) {
-                        finishError("GOOGLE_PROFILE_REQUIRED", "No se recibió la cuenta del perfil.")
+                        finishError("GOOGLE_PROFILE_REQUIRED", activity.getString(R.string.g_profile_account_missing))
                         return
                     }
                     requestAuthorization(Account(email, "com.google"))
@@ -100,7 +100,7 @@ class GoogleSheetsBridge(private val activity: Activity) {
                         .build()
                     activity.startActivityForResult(AccountPicker.newChooseAccountIntent(options), accountRequest)
                 } catch (_: Exception) {
-                    finishError("GOOGLE_UNAVAILABLE", "No se pudo abrir Google. Comprueba que los servicios de Google Play estén disponibles.")
+                    finishError("GOOGLE_UNAVAILABLE", activity.getString(R.string.g_unavailable))
                 }
             }
             "list" -> execute(call, result) { token ->
@@ -134,7 +134,7 @@ class GoogleSheetsBridge(private val activity: Activity) {
             "read" -> execute(call, result) { token ->
                 val id = sheetId(call)
                 val title = call.argument<String>("title")?.takeIf { it.isNotEmpty() }
-                    ?: throw GoogleFailure("GOOGLE_INPUT", "Elige una pestaña de la hoja.")
+                    ?: throw GoogleFailure("GOOGLE_INPUT", activity.getString(R.string.g_choose_tab))
                 // Quote A1 titles, including spaces, apostrophes and names resembling cell references.
                 val range = Uri.encode("'" + title.replace("'", "''") + "'")
                 val json = request(token, "https://sheets.googleapis.com/v4/spreadsheets/$id/values/$range",
@@ -146,7 +146,7 @@ class GoogleSheetsBridge(private val activity: Activity) {
                 }
             }
             "syncSnapshot", "syncStatus", "writeWorkout", "createSpreadsheet", "probeWrite" -> execute(call, result) { token ->
-                if (!writeAuthorized) throw GoogleFailure("GOOGLE_WRITE_REQUIRED", "Autoriza la escritura en Google antes de enviar el progreso.")
+                if (!writeAuthorized) throw GoogleFailure("GOOGLE_WRITE_REQUIRED", activity.getString(R.string.g_write_required))
                 val writer = SheetsWriter { endpoint, params, body -> request(token, endpoint, params, body) }
                 writer.handle(call.method, JSONObject(call.arguments as Map<*, *>))
             }
@@ -159,12 +159,12 @@ class GoogleSheetsBridge(private val activity: Activity) {
         if (authorizationResult == null) return true
         if (requestCode == accountRequest) {
             if (resultCode != Activity.RESULT_OK) {
-                finishError("GOOGLE_CANCELLED", "Google no completó la selección de cuenta. Puedes volver a conectar sin salir de esta pantalla.")
+                finishError("GOOGLE_CANCELLED", activity.getString(R.string.g_account_selection_incomplete))
                 return true
             }
             val email = data?.getStringExtra("authAccount")
             if (email.isNullOrBlank()) {
-                finishError("GOOGLE_ACCOUNT", "No se recibió la cuenta de Google seleccionada.")
+                finishError("GOOGLE_ACCOUNT", activity.getString(R.string.g_account_not_received))
                 return true
             }
             requestAuthorization(Account(email, "com.google"))
@@ -172,7 +172,7 @@ class GoogleSheetsBridge(private val activity: Activity) {
             // A non-OK result can carry Google's actual error. Parse it before
             // treating the flow as cancelled instead of silently hiding it.
             if (data == null) {
-                finishError("GOOGLE_CANCELLED", "Google no completó la autorización. Vuelve a conectar y acepta los permisos solicitados.")
+                finishError("GOOGLE_CANCELLED", activity.getString(R.string.g_authorization_incomplete))
                 return true
             }
             try {
@@ -196,7 +196,7 @@ class GoogleSheetsBridge(private val activity: Activity) {
         if (authorizationResult == null) return
         if (result.hasResolution()) {
             if (!interactive) {
-                finishError("GOOGLE_RECONNECT_REQUIRED", "Google necesita que vuelvas a conectar la cuenta porque el permiso no está disponible. Los datos locales se conservan.")
+                finishError("GOOGLE_RECONNECT_REQUIRED", activity.getString(R.string.g_reconnect_required))
                 return
             }
             try {
@@ -205,7 +205,7 @@ class GoogleSheetsBridge(private val activity: Activity) {
             return
         }
         if (!result.grantedScopes.containsAll(requestedScopes.map { it.scopeUri }) || result.accessToken.isNullOrBlank()) {
-            finishError("GOOGLE_PERMISSION", "Google no concedió los permisos solicitados. Puedes volver a intentarlo.")
+            finishError("GOOGLE_PERMISSION", activity.getString(R.string.g_permissions_denied))
             return
         }
         val token = result.accessToken!!
@@ -221,10 +221,10 @@ class GoogleSheetsBridge(private val activity: Activity) {
                 val email = identity.optString("email")
                 if (!id.matches(Regex("[A-Za-z0-9_-]{1,128}")) ||
                     !email.contains("@") || !identity.optBoolean("email_verified")) {
-                    throw GoogleFailure("GOOGLE_IDENTITY", "Google no devolvió una identidad verificada.")
+                    throw GoogleFailure("GOOGLE_IDENTITY", activity.getString(R.string.g_identity_unverified))
                 }
                 if (expected != null && id != expected) {
-                    throw GoogleFailure("GOOGLE_ACCOUNT_MISMATCH", "La cuenta seleccionada no corresponde a este perfil. No se cargó ninguna hoja.")
+                    throw GoogleFailure("GOOGLE_ACCOUNT_MISMATCH", activity.getString(R.string.g_account_not_this_profile))
                 }
                 activity.runOnUiThread {
                     if (generation == epoch && authorizationResult != null) {
@@ -239,7 +239,7 @@ class GoogleSheetsBridge(private val activity: Activity) {
                 activity.runOnUiThread {
                     if (generation == epoch) {
                         if (e is GoogleFailure) finishError(e.code, e.message)
-                        else finishError("GOOGLE_IDENTITY", "No se pudo verificar tu identidad con Google. Comprueba la conexión.")
+                        else finishError("GOOGLE_IDENTITY", activity.getString(R.string.g_identity_check_failed))
                     }
                 }
             }
@@ -249,11 +249,11 @@ class GoogleSheetsBridge(private val activity: Activity) {
     private fun authorizationError(error: Exception) {
         val code = (error as? ApiException)?.statusCode
         finishError("GOOGLE_AUTH", if (code == 10) {
-            "Google no reconoce la configuración de GymIA. Falta registrar esta versión de la app en el proyecto de Google."
+            activity.getString(R.string.g_config_unknown)
         } else if (code == 16) {
-            "Google no completó la autorización (código 16). Puedes volver a conectar y aceptar los permisos solicitados sin salir de esta pantalla."
+            activity.getString(R.string.g_authorization_code16)
         } else {
-            "No se pudo autorizar Google${code?.let { " (código $it)" }.orEmpty()}. Comprueba tu conexión y que tu cuenta esté habilitada para las pruebas de GymIA."
+            if (code != null) activity.getString(R.string.g_authorize_failed_code, code) else activity.getString(R.string.g_authorize_failed)
         })
     }
 
@@ -265,18 +265,18 @@ class GoogleSheetsBridge(private val activity: Activity) {
 
     private fun sheetId(call: MethodCall): String = call.argument<String>("id")
         ?.takeIf { it.matches(Regex("[A-Za-z0-9_-]+")) }
-        ?: throw GoogleFailure("GOOGLE_INPUT", "La hoja seleccionada no es válida.")
+        ?: throw GoogleFailure("GOOGLE_INPUT", activity.getString(R.string.g_sheet_invalid))
 
     private fun execute(call: MethodCall, result: MethodChannel.Result, action: (String) -> Any) {
         val expected = call.argument<String>("expectedSubject")
         if (expected == null || expected != subject) {
-            result.error("GOOGLE_ACCOUNT_MISMATCH", "La lectura no corresponde a la cuenta autorizada. Vuelve a conectar desde tu perfil.", null)
+            result.error("GOOGLE_ACCOUNT_MISMATCH", activity.getString(R.string.g_read_account_mismatch), null)
             return
         }
         val epoch = generation
         val token = accessToken
         if (token == null) {
-            result.error("GOOGLE_AUTH_REQUIRED", "Vuelve a conectar tu cuenta de Google para cargar la hoja.", null)
+            result.error("GOOGLE_AUTH_REQUIRED", activity.getString(R.string.g_reconnect_to_load), null)
             return
         }
         Thread {
@@ -284,14 +284,14 @@ class GoogleSheetsBridge(private val activity: Activity) {
                 val value = action(token)
                 activity.runOnUiThread {
                     if (epoch == generation && expected == subject) result.success(value)
-                    else result.error("GOOGLE_ACCOUNT_CHANGED", "La cuenta cambió durante la lectura. No se aplicó el resultado.", null)
+                    else result.error("GOOGLE_ACCOUNT_CHANGED", activity.getString(R.string.g_account_changed), null)
                 }
             } catch (e: SheetsWriteFailure) {
                 activity.runOnUiThread { result.error(e.code, e.message, null) }
             } catch (e: GoogleFailure) {
                 activity.runOnUiThread { result.error(e.code, e.message, null) }
             } catch (_: Exception) {
-                activity.runOnUiThread { result.error("GOOGLE_NETWORK", "No se pudo confirmar la operación con Google. El progreso local se conserva. Al reintentar se comprobará el recibo del envío.", null) }
+                activity.runOnUiThread { result.error("GOOGLE_NETWORK", activity.getString(R.string.g_network_unconfirmed), null) }
             }
         }.start()
     }
@@ -315,11 +315,11 @@ class GoogleSheetsBridge(private val activity: Activity) {
             val status = connection.responseCode
             if (status !in 200..299) {
                 throw when (status) {
-                    401 -> GoogleFailure("GOOGLE_AUTH_REQUIRED", "La autorización de Google ha caducado. Vuelve a conectar tu cuenta.")
-                    403 -> GoogleFailure("GOOGLE_FORBIDDEN", "Google no permite esta operación. Comprueba los permisos de la hoja y que las API de Drive y Sheets estén activadas para GymIA.")
-                    404 -> GoogleFailure("GOOGLE_NOT_FOUND", "La hoja ya no está disponible para esta cuenta.")
-                    429 -> GoogleFailure("GOOGLE_RATE_LIMIT", "Google ha recibido demasiadas solicitudes. Espera un momento y vuelve a intentarlo.")
-                    else -> GoogleFailure("GOOGLE_SERVER", "Google no pudo completar la operación (código $status). Vuelve a intentarlo.")
+                    401 -> GoogleFailure("GOOGLE_AUTH_REQUIRED", activity.getString(R.string.g_http_401))
+                    403 -> GoogleFailure("GOOGLE_FORBIDDEN", activity.getString(R.string.g_http_403))
+                    404 -> GoogleFailure("GOOGLE_NOT_FOUND", activity.getString(R.string.g_http_404))
+                    429 -> GoogleFailure("GOOGLE_RATE_LIMIT", activity.getString(R.string.g_http_429))
+                    else -> GoogleFailure("GOOGLE_SERVER", activity.getString(R.string.g_http_other, status))
                 }
             }
             val output = ByteArrayOutputStream()
@@ -328,7 +328,7 @@ class GoogleSheetsBridge(private val activity: Activity) {
                 var count: Int
                 while (input.read(buffer).also { count = it } != -1) {
                     if (output.size() + count > 20 * 1024 * 1024) {
-                        throw GoogleFailure("GOOGLE_TOO_LARGE", "La pestaña supera 20 MB. Elige una pestaña más pequeña.")
+                        throw GoogleFailure("GOOGLE_TOO_LARGE", activity.getString(R.string.g_tab_over_20mb))
                     }
                     output.write(buffer, 0, count)
                 }
