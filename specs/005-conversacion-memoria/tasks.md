@@ -147,6 +147,22 @@
 - [x] T050 [US7] Añadir a `docs/005-IOS-PLAN.md` criterios de aceptación, plan de regresión, alternativas TestFlight/App Store, cuenta y firma requeridas, y decisión de distribución aún pendiente; no declarar funcional sin evidencia.
   - Evidencia: `docs/005-IOS-PLAN.md` incluye criterios y alternativas de distribución sin afirmar compilación o publicación.
 
+## Fase 9b — US8: compartir acompañantes por QR o archivo (P3)
+
+**Prueba independiente**: exportar un acompañante e importarlo en un perfil limpio (quickstart 9, por crear en T064). Depende de T033–T034 (personalidad y creador) y de T041 (catálogos). La vía por archivo no necesita cámara ni dependencias nuevas; QR y escáner sí.
+
+- [ ] T054 [US8] Contrato en `contracts/contratos.md` y `data-model.md` (ya esbozado): fijar campos permitidos y prohibidos, límites, compresión, `checksum` y versión; crear fixtures sintéticos sin datos personales en `test/fixtures/`.
+- [ ] T055 [US8] Escribir primero `test/companion_package_test.dart`: ida y vuelta, campos prohibidos que nunca salen (claves, chats, memoria, hoja, cuentas, identificadores locales), versión desconocida y `checksum` roto rechazados, tamaños en el límite y por encima, bloques `trackia-*` retirados, Unicode y texto RTL.
+- [ ] T056 [US8] Implementar `lib/domain/companion_package.dart` (codificar y decodificar, gzip y base64url, `checksum`, validación reutilizando `lib/application/companion_creation.dart` y `lib/domain/companion.dart`); ejecutar T055.
+- [ ] T057 [US8] Importación segura en `lib/application/companion_package_import.dart`: devuelve un borrador editable sin aplicar nada, con identidad nueva, sin permisos ni conexiones y marca de origen externo; probar que un paquete hostil no aplica ni autoriza nada.
+- [ ] T058 [US8] Exportar en `lib/ui/companion_settings.dart`: acción «Compartir acompañante» con QR si cabe y archivo `.trackia` con `share_plus` (ya instalado); si no cabe, solo archivo y aviso. Añadir la dependencia de generación de QR justificándola; prueba de widget.
+- [ ] T059 [US8] Importar por archivo o texto pegado: pantalla de vista previa completa y editable con aviso «contenido externo» y confirmar o cancelar; enlazar el filtro de archivos ya existente (`importReady` en `lib/ui/app.dart` y `MainActivity.kt`) para `.trackia`; prueba de widget.
+- [ ] T060 [US8] Escáner de cámara (dependencia nueva, justificar): pedir el permiso solo al pulsar «Escanear», con alternativa por archivo si se deniega; sin llamadas ni descargas; prueba con lector simulado y recorrido en emulador.
+- [ ] T061 [US8] Textos en es, en y ar (claves `package…`), con etiquetas invariables en vez de plurales; extender `test/localization_test.dart` y comprobar RTL.
+- [ ] T062 [US8] Prueba de integración en `integration_test/companion_package_android_test.dart`: exportar y importar en un perfil limpio sin duplicar identidades ni arrastrar datos prohibidos.
+- [ ] T063 [US8] Seguridad: casos hostiles en la matriz (instrucciones que piden ignorar reglas o ejecutar acciones, bloques de la aplicación, paquetes enormes, `checksum` roto, versión futura); registrar resultados en `docs/005-QA.md`.
+- [ ] T064 [US8] Documentar en `docs/005-COMPARTIR.md`, añadir el recorrido 9 a `quickstart.md`, y actualizar `docs/005-MATRIZ.md`, `docs/005-ACEPTACION.md` y `specs/README.md` con FR-016–FR-019 y SC-007.
+
 ## Fase 10 — Cierre
 
 - [x] T051 Ejecutar `./scripts/flutter-local.sh analyze`, `./scripts/flutter-local.sh test` y pruebas de integración nuevas por archivo; registrar resultados y fallos en `docs/005-QA.md`, sin ocultar bloqueos externos.
@@ -158,13 +174,13 @@
 
 ## Dependencias y estrategia
 
-T001–T005 → US1 y US2; US3 puede ejecutarse tras T001–T002; US4/US5 tras T005; US6 después de los textos finales; US7 tras T001 y en paralelo con historias de producto. T051–T053 cierran todas las historias. MVP: US1 completo; siguiente incremento US2. Las tareas independientes T020 y T048 pueden prepararse en paralelo con US1 si no se comparten archivos; no hay obligación de usar agentes. Ejecutar las pruebas de cada fase antes de pasar a la siguiente y actualizar la evidencia.
+T001–T005 → US1 y US2; US3 puede ejecutarse tras T001–T002; US4/US5 tras T005; US6 después de los textos finales; US7 tras T001 y en paralelo con historias de producto. US8 tras T033–T034 y T041; T056 antes de T057–T060. T051–T053 cierran las historias US1–US7 y T064 la US8. MVP: US1 completo; siguiente incremento US2. Las tareas independientes T020 y T048 pueden prepararse en paralelo con US1 si no se comparten archivos; no hay obligación de usar agentes. Ejecutar las pruebas de cada fase antes de pasar a la siguiente y actualizar la evidencia.
 
 ## Resumen de estado (2026-11-07, cierre del día)
 
 Casillas [x] tras contrastar con el código y ejecutar sus pruebas (ver evidencia en cada tarea y `docs/005-QA.md`).
 
 - Hechas (46): T001–T029, T031–T038, T040, T041, T046–T052. Con reservas: T021, T022 y T034 solo con transporte/cliente simulado; T026 sin conexión al chat; T027 y T031 con transporte falso y sin Drive real; T037 con persistencia (T036) pero sin avisos por acuerdo; T013/T014 solo con mensajes durables; T052 deja 14 requisitos en parcial.
-- Abiertas (7): T030 (adaptador real de Drive y OAuth: bloqueo externo), T039 (prueba de integración de acuerdos con avisos), T042–T044 (localización: parcial avanzado, ver sus notas), T045 (parcial: RTL, fuente grande y fechas probados solo en bienvenida y ayuda) y T053 (recorridos preparados en `docs/005-ACEPTACION.md`, sin ejecutar).
+- Abiertas (18): T054–T064 (US8, compartir acompañantes por QR o archivo, añadida el 2026-11-07, sin empezar), T030 (adaptador real de Drive y OAuth: bloqueo externo), T039 (prueba de integración de acuerdos con avisos), T042–T044 (localización: parcial avanzado, ver sus notas), T045 (parcial: RTL, fuente grande y fechas probados solo en bienvenida y ayuda) y T053 (recorridos preparados en `docs/005-ACEPTACION.md`, sin ejecutar).
 - Validación real aún no hecha: Google OAuth/Drive, IA real, Android antiguo e interrupción de proceso (T004), iOS, revisión humana del árabe y aplicar la migración v8 a la base real del teléfono.
 - Antes de instalar en el teléfono real: conservar el APK actual (mismo número de versión permite volver atrás) y comprobar que se genera la copia `.pre-trackia-v8.sqlite`.

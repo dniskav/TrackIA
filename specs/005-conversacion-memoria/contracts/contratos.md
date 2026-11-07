@@ -19,3 +19,6 @@ La IA propone campos opcionales; el usuario acepta antes de crear o modificar. E
 ## Sheets e idiomas
 
 Conexión → cuenta → selección de hoja → pestaña → previsualización → confirmar o cancelar; conservar destino anterior hasta confirmación. Las operaciones siguen las comprobaciones y permisos existentes. Idioma de interfaz `system|es|en|ar`; guardar preferencia, usar dirección RTL en árabe y no alterar texto de usuario. Prompts piden responder en idioma elegido sin imponer traducción al contenido original.
+
+## Paquete de acompañante (US8)
+Formato `trackia-companion/1`: JSON UTF-8 con `format`, `name`, `icon`, `color`, `description`, `instructions`, `mode`, `templates` (plantillas de actividad), `reminders` (avisos por defecto) y `checksum`. Se comprime (gzip) y se codifica en base64url para el QR; el archivo `.trackia` lleva el mismo contenido. Campos prohibidos: claves de IA, chats, memoria, hoja de Google, cuentas, identificadores locales y datos de uso. Límites: tamaño máximo del paquete y de cada campo; versión desconocida o `checksum` roto se rechazan. Al importar: borrador editable, identidad nueva, sin permisos ni conexiones, bloques `trackia-*`/`gymia-*` retirados de las instrucciones y marca de origen externo. Un QR admite unos 2–3 KB: si no cabe se ofrece solo el archivo.

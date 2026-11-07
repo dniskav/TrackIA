@@ -11,3 +11,6 @@ Todos los IDs son opacos, estables y no contienen datos personales. Todo dato nu
 - **Personality**: texto libre hasta 4000 caracteres por acompañante; sugerencias son texto editable. No cambia permisos.
 - **SupportAgreement**: ID y ámbito, objetivo no vacío hasta 2000 caracteres, unidad y meta opcionales, duración y aviso opcionales, `status=active|paused|completed`; eventos manuales identificados y fechados. Valores cuantitativos finitos y no negativos; sin medidas obligatorias. Cambios se versionan; eventos históricos no cambian.
 - **LocalePreference**: `system|es|en|ar`, persistida por dispositivo; no traduce datos del usuario. La UI respeta dirección de locale y aísla texto mixto.
+
+## Paquete de acompañante (US8)
+Entrada externa, no confiable y de solo lectura: no se persiste como tal. Al importarlo se convierte en un `Companion` nuevo (identidad propia) a partir de un borrador que la persona revisa y edita. No tiene relación con perfiles, chats, memoria ni cuentas, y no requiere migración de esquema.

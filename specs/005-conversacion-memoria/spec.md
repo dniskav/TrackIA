@@ -38,6 +38,9 @@ Mostrar logo en inicio, frases de espera amables y traducciones completas de int
 ### US7 — Plan de iOS (P3)
 La entrega solicita un plan ejecutable de iOS, no implica publicación ni que iOS esté funcionando. Inventariar dependencias nativas, autorización, avisos, almacenamiento, archivos, IA local y pruebas; detallar preparación de Xcode, firma, simulador, iPhone, TestFlight y App Store como alternativas, dependencias y puertas de aceptación. La distribución elegida queda por decidir.
 
+### US8 — Compartir un acompañante por QR o archivo (P3)
+Una persona puede compartir la «receta» de un acompañante —nombre, icono, color, descripción, instrucciones de estilo, modo, plantillas de actividad y avisos por defecto— como código QR cuando cabe y como archivo `.trackia` siempre, y otra persona puede importarla en su teléfono. Nunca viajan claves de IA, chats, memoria, hoja de Google, cuentas ni datos de uso. La importación es contenido externo y no confiable: se muestra completa y editable antes de aplicarse, crea un acompañante nuevo sin permisos ni conexiones, y trata las instrucciones como estilo, nunca como autorización. Prueba independiente: exportar un acompañante, importarlo en otro perfil limpio, comprobar que solo coinciden los campos permitidos y que un paquete con instrucciones maliciosas, versión desconocida o tamaño excesivo no aplica nada.
+
 ### Casos límite
 Red perdida tras respuesta o efecto externo; respuesta tardía tras cambio de acompañante; mensajes y adjuntos grandes; historial archivado; migración desde v6; edición de un mensaje con varios efectos; datos ambiguos; cuenta Google cambiada; conflicto o copia dañada; recordatorio ya programado; accesibilidad, modo oscuro, texto bidireccional y ampliación de fuente. No se usará información personal del teléfono en fixtures.
 
@@ -58,9 +61,13 @@ Red perdida tras respuesta o efecto externo; respuesta tardía tras cambio de ac
 - **FR-013** La interfaz soporta español, inglés, árabe y extensiones; respeta RTL, accesibilidad, plurales, fechas y contenido mixto.
 - **FR-014** Existe plan iOS trazable que distingue investigación, compilación, dispositivo y distribución; ninguna capacidad se declara validada sin evidencia.
 - **FR-015** Se mantienen datos existentes, aislamiento y recuperación en migración; pruebas relevantes cubren errores y transportes simulados, con validación real identificada por separado.
+- **FR-016** Un acompañante se exporta como paquete versionado (`trackia-companion/1`) con solo su configuración (nombre, icono, color, descripción, instrucciones de estilo, modo, plantillas y avisos por defecto); nunca incluye claves, chats, memoria, hoja, cuentas ni datos de uso.
+- **FR-017** El paquete se comparte como QR cuando cabe y como archivo `.trackia` siempre, con contenido equivalente; si no cabe en un QR, la persona lo sabe y dispone del archivo.
+- **FR-018** La importación no aplica nada sin una vista previa completa y editable, avisa de que el contenido es externo, crea un acompañante nuevo con identidad propia, sin permisos ni conexiones, y rechaza versiones desconocidas, daños de integridad y excesos de tamaño.
+- **FR-019** Las instrucciones importadas se tratan como estilo: no pueden autorizar acciones ni permisos, y se retiran los bloques de la aplicación (`trackia-*`/`gymia-*`) que contengan.
 
 ### Entidades
-Mensaje y revisiones; efecto asociado; actividad y revisión de objetivo; recuerdo con origen y estado; copia de memoria y cuenta; personalidad; acuerdo de apoyo y eventos; preferencia de idioma.
+Mensaje y revisiones; efecto asociado; actividad y revisión de objetivo; recuerdo con origen y estado; copia de memoria y cuenta; personalidad; acuerdo de apoyo y eventos; preferencia de idioma; paquete de acompañante.
 
 ## Criterios medibles
 
@@ -70,6 +77,7 @@ Mensaje y revisiones; efecto asociado; actividad y revisión de objetivo; recuer
 - **SC-004** Los tres idiomas permiten completar los cinco recorridos de US6 sin texto de interfaz sin traducir ni controles inaccesibles; árabe se presenta RTL.
 - **SC-005** Los flujos de nube y Sheets distinguen éxito, cancelación, desconexión y conflicto; ningún resultado simulado se presenta como validación real.
 - **SC-006** Existe un plan iOS con tareas, dependencias y evidencia requerida por cada capacidad; el destino de distribución se decide antes de publicar.
+- **SC-007** En 100 % de las pruebas de ida y vuelta el acompañante importado coincide en los campos permitidos y ningún campo prohibido aparece en el paquete; en 100 % de los paquetes maliciosos de la matriz (instrucciones hostiles, bloques `trackia-*`, versión desconocida, tamaño excesivo, integridad rota) no se aplica nada sin confirmación ni se ejecuta ninguna acción.
 
 ## Supuestos y límites
 

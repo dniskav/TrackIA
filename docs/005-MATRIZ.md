@@ -1,4 +1,4 @@
-# Matriz de verificación FR-001–FR-015 y SC-001–SC-006 (spec 005)
+# Matriz de verificación FR-001–FR-019 y SC-001–SC-007 (spec 005)
 
 **Fecha**: 2026-11-07 · **Rama**: `feat/004-trackia-experience` · **Tarea**: T052
 **Fuentes**: `specs/005-conversacion-memoria/spec.md`, `specs/005-conversacion-memoria/tasks.md` (casillas y líneas «Evidencia»/«Estado» de 2026-11-07), `docs/005-QA.md`, `docs/005-MEMORIA.md`, `docs/005-IOS-PLAN.md`, `docs/005-LOCALIZACION.md`.
@@ -34,6 +34,10 @@
 | FR-013 Interfaz en es, en y ar, y extensible; RTL, accesibilidad, plurales, fechas y contenido mixto | T040, T041, T042, T043, T044, T045 | `test/locale_settings_test.dart`, `test/localization_test.dart` (9), `test/localization_t042_test.dart` (RTL en bienvenida), `test/sheets_localization_t044_test.dart`; `l10n.yaml`, `lib/l10n/app_es.arb`, `lib/l10n/app_en.arb`, `lib/l10n/app_ar.arb`, `lib/application/locale_settings.dart`, `docs/005-LOCALIZACION.md` | parcial | T042–T045 abiertas. Faltan pruebas de fechas por idioma, fuente grande, lector de pantalla, RTL en todo el árbol, reinicio y aislamiento del texto mixto (T043). Pendientes de texto: nombres y descripciones de acompañantes por defecto, validación de `reminder.dart`, `SheetsWriter.kt`. Revisión humana del árabe: sin validar. |
 | FR-014 Plan iOS trazable que distingue investigación, compilación, dispositivo y distribución; ninguna capacidad se declara validada sin evidencia | T048, T049, T050 | `docs/005-IOS-PLAN.md` (§1 inventario, §2 preparación y matriz, §3 criterios, §4 distribución, §5 decisiones pendientes) | cubierto | Es un entregable documental. La validación iOS no existe: no hay Xcode completo, compilación, simulador ni dispositivo, y el propio plan lo indica. |
 | FR-015 Datos existentes, aislamiento y recuperación en migración; pruebas con errores y transportes simulados; validación real aparte | T003, T004, T005 | `test/feature_005_migration_test.dart`, `test/feature_005_scope_test.dart` (4), `test/trackia_migrations_test.dart`, `test/trackia_v6_migration_test.dart`, `test/chat_store_migration_test.dart`; `lib/data/trackia_migrations.dart`, `lib/data/feature_scope.dart`; existe `integration_test/feature_005_snapshot_android_test.dart`, que tasks.md no cita (no verificado en esta pasada) | sin validar con servicio real | Pruebas locales cubiertas. Pendiente real (T004): Android antiguo, interrupción de proceso (`kill -9`) y datos heredados en almacenamiento seguro. |
+| FR-016 Paquete versionado `trackia-companion/1` solo con configuración; nunca claves, chats, memoria, hoja, cuentas ni uso | T054, T055, T056 | — | sin cubrir | US8 añadida el 2026-11-07; sin implementar. |
+| FR-017 Compartir como QR si cabe y como archivo `.trackia` siempre | T058, T059, T060 | — | sin cubrir | Escáner y generador de QR son dependencias nuevas. |
+| FR-018 Importación con vista previa completa y editable, aviso de origen externo, identidad nueva y rechazo de versiones o tamaños no válidos | T057, T059 | — | sin cubrir | — |
+| FR-019 Instrucciones importadas como estilo, sin autorizar acciones; bloques `trackia-*` retirados | T056, T057, T063 | — | sin cubrir | Depende de pruebas de casos hostiles. |
 
 ## Criterios de éxito medibles
 
@@ -45,6 +49,7 @@
 | SC-004 Los tres idiomas completan los cinco recorridos de US6 (inicio, chat, configuración, recordatorios, Sheets) sin texto sin traducir ni controles inaccesibles; árabe en RTL | T040–T047 | `test/localization_test.dart`, `test/localization_t042_test.dart`, `docs/005-LOCALIZACION.md` | parcial | No hay prueba de los cinco recorridos. T042–T045 están abiertas. No hay comprobación automatizada de accesibilidad. Revisión humana del árabe: sin validar. |
 | SC-005 Flujos de nube y Sheets distinguen éxito, cancelación, desconexión y conflicto; ningún resultado simulado se presenta como validación real | T020–T022, T028, T030, T031 | `test/memory_cloud_test.dart` (cancelación, permiso denegado, conflicto, resultado incierto), `test/companion_memory_ui_test.dart`, `test/sheets_onboarding_test.dart`, `integration_test/sheets_onboarding_test.dart` | sin validar con servicio real | Las distinciones están probadas con transporte simulado. Google real no se ha probado y T030 está abierta. La desconexión no aparece como caso explícito en las pruebas de nube. La app marca las acciones de nube como no conectadas. |
 | SC-006 Plan iOS con tareas, dependencias y evidencia requerida por capacidad; destino de distribución decidido antes de publicar | T048, T049, T050 | `docs/005-IOS-PLAN.md` (§§2–5) | cubierto | Es un plan documental. La distribución sigue pendiente (§4–5), lo que es correcto mientras no haya publicación. No hay validación iOS. |
+| SC-007 Ida y vuelta íntegra y sin campos prohibidos; paquetes hostiles no aplican nada sin confirmación | T055, T062, T063 | — | sin cubrir | US8 sin implementar. |
 
 ## Huecos para cerrar (prioridad)
 
@@ -56,9 +61,9 @@
 6. **Edición de mensajes (T012)**. Probar los estados de un mensaje editado tras reinicio. Cierra parte de FR-001 y SC-001.
 7. **Decisión de producto (FR-001)**. Editar solo el último mensaje del usuario contradice «cada mensaje». El dueño decide si se amplía la implementación o se cambia la spec por escrito.
 8. **Adaptador Drive real (T030)**. Implementar `appDataFolder`, `drive.appdata`, OAuth e identidad. Requiere autorización del propietario y una cuenta desechable. Es un bloqueo externo que no se cierra solo con código. Cierra FR-009 y SC-005.
-9. **Reconciliar tasks.md** (lo hace el integrador; esta tarea no lo ha tocado). El resumen contradice las casillas [x] de T013, T014, T017, T019, T021, T022, T026, T027, T029, T031, T032, T034, T036, T037 y T038. `docs/005-QA.md` dice que T006 «falta cancelación», pero la evidencia actual de T006 ya la incluye. T017 dice que el A→B→A queda cubierto por el contador, y T018 dice que la firma no lo detecta.
+9. **(Resuelto el 2026-11-07)** Reconciliar tasks.md (lo hace el integrador; esta tarea no lo ha tocado). El resumen contradice las casillas [x] de T013, T014, T017, T019, T021, T022, T026, T027, T029, T031, T032, T034, T036, T037 y T038. `docs/005-QA.md` dice que T006 «falta cancelación», pero la evidencia actual de T006 ya la incluye. T017 dice que el A→B→A queda cubierto por el contador, y T018 dice que la firma no lo detecta.
 10. **Validaciones reales, fuera de código**: Google OAuth y Drive (T021, T022, T030); IA real (T034, FR-002, FR-008, FR-010); Android antiguo e interrupción con `kill -9` (T004, FR-015); revisión humana del árabe (FR-012, FR-013); iOS (no hay validación; el plan de FR-014 sigue como está).
-11. **Cierre (T051, T053)**. Ejecutar `analyze` y la suite completa, registrar resultados en `docs/005-QA.md` y preparar los recorridos de aceptación.
+11. **(T051 y T052 hechos; T053 preparado)** Cierre. Ejecutar `analyze` y la suite completa, registrar resultados en `docs/005-QA.md` y preparar los recorridos de aceptación.
 
 ## Cómo verificar
 
@@ -97,3 +102,4 @@ Pruebas de integración, una por archivo, en emulador (cambiar `-d` por el dispo
 `integration_test/support_agreement_android_test.dart` (T039) aún no existe. Cuando se cree, se ejecutará igual que las anteriores.
 
 Validación real pendiente (no se hace con estos comandos): Google OAuth y Drive, IA real, Android antiguo, interrupción de proceso (`kill -9`) y cualquier prueba iOS. Registrar cada una por separado en `docs/005-QA.md`.
+12. **US8 — compartir acompañantes (T054–T064)**. Empezar por el formato puro y sus pruebas (T054–T056) y por la vía de archivo; QR y escáner después, con sus dependencias justificadas.

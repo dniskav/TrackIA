@@ -23,6 +23,7 @@ Sin excepciones: acciones deterministas, perfil y acompañante aislados, origina
 5. Personalidad y acuerdos: preferencias libres y controles deterministas, sin hardcodear hábitos. Integrar avisos existentes. No implementar vigilancia ni bloqueo de otras apps.
 6. Localización: ARB, generador Flutter, traducción completa y RTL, incluidos textos de error y nativos; preservar texto original de datos. Logo desde asset existente.
 7. Plan iOS basado en inventario real, con comandos y puertas. No publicar ni instalar en el teléfono del usuario sin instrucciones posteriores.
+8. Compartir acompañantes (US8, P3): formato `trackia-companion/1` puro y probado primero (sin interfaz), reutilizando las validaciones de `companion_creation.dart`; después exportar (QR y archivo), importar con vista previa y, por último, escáner de cámara. Tratar el paquete como entrada no confiable: tamaño y versión acotados, instrucciones solo como estilo, bloques de la aplicación retirados, nada aplicado sin confirmación. La generación de QR y el escáner son dependencias nuevas: justificarlas en su tarea y preferir primero la vía por archivo, que no necesita cámara ni permisos.
 
 ## Guía de ejecución para modelos pequeños
 
