@@ -121,6 +121,14 @@ void main() {
     await realIo(tester, 10);
   }
 
+  Future<void> editAndSend(WidgetTester tester, String from, String to) async {
+    await tester.pump(const Duration(milliseconds: 600));
+    await openEditor(tester, from, to);
+    await tester.tap(find.byKey(const Key('save-send-edit-message')));
+    await realIo(tester);
+    await tester.pumpAndSettle();
+  }
+
   testWidgets('Guardar solo guarda la revisión 2 sin enviar ni fallar', (
     tester,
   ) async {
@@ -273,6 +281,82 @@ void main() {
     await close(tester);
   });
 
+  testWidgets('Respuesta verbal sin efecto: no hay efectos que declarar', (
+    tester,
+  ) async {
+    final bodies = await open(tester);
+    await say(tester, 'Hice 10 flexiones');
+    await tester.pump(const Duration(milliseconds: 600));
+    await tester.runAsync(() async {
+      final revisions = await MessageRevisionRepository.fromChatStore(
+        repo.chats,
+        FeatureScope(profileId: controller.profileId, companionId: 'gymbro'),
+      );
+      final id = (await revisions.database.rawQuery(
+        'SELECT message_id FROM message_revision_versions',
+      )).single['message_id'] as String;
+      final effects = MessageEffectRepository.on(revisions);
+      expect(await effects.effectsFor(id), isEmpty);
+      expect(await effects.appliedEffectsSummary(id), '');
+    });
+    await editAndSend(tester, 'Hice 10 flexiones', 'Hice 12 flexiones');
+    final note = systemText(bodies.last);
+    expect(note, contains('Efectos ya aplicados: ninguno registrado.'));
+    expect(note, isNot(contains('Propuestas SIN confirmar')));
+    expect(note, isNot(contains('resultado incierto')));
+    expect(tester.takeException(), isNull);
+    await close(tester);
+  });
+
+  testWidgets('Operación incierta: el modelo sabe que no se sabe si se aplicó', (
+    tester,
+  ) async {
+    final bodies = await open(tester);
+    await say(tester, 'Pon el objetivo en 10 series');
+    await tester.pump(const Duration(milliseconds: 600));
+    await tester.runAsync(() async {
+      final revisions = await MessageRevisionRepository.fromChatStore(
+        repo.chats,
+        FeatureScope(profileId: controller.profileId, companionId: 'gymbro'),
+      );
+      final rows = await revisions.database.rawQuery(
+        'SELECT id, message_id FROM message_revision_versions',
+      );
+      await MessageEffectRepository.on(revisions).record(
+        MessageEffect(
+          id: 'effect-u',
+          profileId: controller.profileId,
+          companionId: 'gymbro',
+          messageId: rows.single['message_id'] as String,
+          revisionId: rows.single['id'] as String,
+          kind: 'target',
+          targetId: 'act-1',
+          operationKey: 'op-incierto',
+          summary: 'Fijar el objetivo en 10 series',
+          createdAt: DateTime.utc(2026, 11, 7),
+          status: EffectStatus.uncertain,
+        ),
+      );
+    });
+    await editAndSend(
+      tester,
+      'Pon el objetivo en 10 series',
+      'Pon el objetivo en 12 series',
+    );
+    final note = systemText(bodies.last);
+    expect(
+      note,
+      contains(
+        'Con resultado incierto (no sabes si se aplicaron; no los repitas a ciegas',
+      ),
+    );
+    expect(note, contains('Fijar el objetivo en 10 series'));
+    expect(note, isNot(contains('Efectos ya aplicados por la respuesta anterior')));
+    expect(note, isNot(contains('ninguno registrado')));
+    expect(tester.takeException(), isNull);
+    await close(tester);
+  });
+
   testWidgets('Cancelar no cambia nada', (tester) async {
     final bodies = await open(tester);
     await say(tester, 'Hola original');
@@ -292,14 +376,6 @@ void main() {
     await close(tester);
   });
 
-  Future<void> editAndSend(WidgetTester tester, String from, String to) async {
-    await tester.pump(const Duration(milliseconds: 600));
-    await openEditor(tester, from, to);
-    await tester.tap(find.byKey(const Key('save-send-edit-message')));
-    await realIo(tester);
-    await tester.pumpAndSettle();
-  }
-
   testWidgets('Editar dos veces seguidas sin reiniciar no rompe la lista', (
     tester,
   ) async {
@@ -311,6 +387,13 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(bodies, hasLength(3));
     expect(find.text('Hoy hice 3 series con 80 kg'), findsOneWidget);
+    // Eventos idénticos consecutivos se colapsan: una sola línea visible.
+    expect(
+      find.text('Conversación continuada desde el mensaje editado'),
+      findsOneWidget,
+    );
+    expect(find.text('Respuesta 3'), findsOneWidget);
+    expect(tester.takeException(), isNull);
     await close(tester);
   });
 

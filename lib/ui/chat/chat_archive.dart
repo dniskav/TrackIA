@@ -240,6 +240,21 @@ extension _ChatArchive on _AssistantChatScreenState {
         );
         return;
       }
+      // Corrección: si este mensaje ya fijó un objetivo en esta actividad, el
+      // nuevo valor lo corrige (se actualiza, no se crea otro). Con varias
+      // relaciones no se elige solo: se pregunta.
+      final previous = await correctableEffects(
+        'target',
+        expectedTargetActivity.id,
+      );
+      if (previous.length > 1) {
+        await saveSheetReply(
+          'Este mensaje ya cambió el objetivo varias veces (${previous.map(effectSummaryText).join('; ')}). '
+          'No lo cambio solo: dime a cuál te refieres.',
+        );
+        return;
+      }
+      final before = expectedTargetActivity.definition.targetSets;
       final done = await widget.controller.run(
         () => widget.controller.activityRepository!.setActivityTarget(
           expectedTargetActivity.id,
@@ -249,14 +264,27 @@ extension _ChatArchive on _AssistantChatScreenState {
       );
       if (!mounted) return;
       if (done) {
-        await recordEffect(
-          'target',
-          targetKey,
-          target == null
-              ? 'Quité el objetivo de series de «${expectedTargetActivity.definition.name}»'
-              : 'Fijé el objetivo en $target series en «${expectedTargetActivity.definition.name}»',
-          targetId: expectedTargetActivity.id,
-        );
+        final summary = target == null
+            ? 'Quité el objetivo de series de «${expectedTargetActivity.definition.name}»'
+            : 'Fijé el objetivo en $target series en «${expectedTargetActivity.definition.name}»';
+        if (previous.length == 1) {
+          await correctEffect(
+            previous.single,
+            'target',
+            targetKey,
+            summary,
+            targetId: expectedTargetActivity.id,
+            before: before == null ? 'sin objetivo' : '$before series',
+            after: target == null ? 'sin objetivo' : '$target series',
+          );
+        } else {
+          await recordEffect(
+            'target',
+            targetKey,
+            summary,
+            targetId: expectedTargetActivity.id,
+          );
+        }
       }
       if (!mounted) return;
       final current = widget.controller.focus;

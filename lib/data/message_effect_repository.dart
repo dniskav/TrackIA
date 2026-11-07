@@ -23,10 +23,20 @@ class MessageEffectRepository {
   final FeatureScope scope;
   Future<void>? _ready;
 
-  Future<void> _ensure() => _ready ??= _db.execute('''CREATE TABLE IF NOT EXISTS
+  Future<void> _ensure() => _ready ??= _create();
+
+  Future<void> _create() async {
+    await _db.execute('''CREATE TABLE IF NOT EXISTS
     trackia_message_effect_notes (
       effect_id TEXT PRIMARY KEY, summary TEXT NOT NULL DEFAULT '',
       reverted_at INTEGER)''');
+    // Antes/después de cada corrección; la fila corregida se conserva.
+    await _db.execute('''CREATE TABLE IF NOT EXISTS
+    trackia_message_effect_corrections (
+      old_effect_id TEXT PRIMARY KEY, new_effect_id TEXT NOT NULL,
+      before_value TEXT NOT NULL DEFAULT '', after_value TEXT NOT NULL DEFAULT '',
+      corrected_at INTEGER NOT NULL)''');
+  }
 
   static const _select = '''SELECT e.id, e.message_revision_id, e.target_type,
     e.target_id, e.operation_id, e.status, e.created_at, v.message_id,
@@ -56,33 +66,37 @@ class MessageEffectRepository {
         whereArgs: [scope.profileId, scope.companionId, effect.operationKey],
       );
       if (existing.isNotEmpty) return false;
-      final revision = await tx.rawQuery(
-        '''SELECT message_id FROM message_revision_versions
-        WHERE profile_id = ? AND companion_id = ? AND id = ?''',
-        [scope.profileId, scope.companionId, effect.revisionId],
-      );
-      if (revision.isEmpty ||
-          revision.single['message_id'] != effect.messageId) {
-        throw const ValidationException(
-          'La revisión del efecto no pertenece al mensaje.',
-        );
-      }
-      await tx.insert('trackia_message_effects', {
-        'id': effect.id,
-        'profile_id': scope.profileId,
-        'companion_id': scope.companionId,
-        'message_revision_id': effect.revisionId,
-        'target_type': effect.kind,
-        'target_id': effect.targetId,
-        'operation_id': effect.operationKey,
-        'status': effect.status.name,
-        'created_at': effect.createdAt.millisecondsSinceEpoch,
-      });
-      await tx.insert('trackia_message_effect_notes', {
-        'effect_id': effect.id,
-        'summary': effect.summary,
-      });
+      await _insert(tx, effect);
       return true;
+    });
+  }
+
+  Future<void> _insert(DatabaseExecutor tx, MessageEffect effect) async {
+    final revision = await tx.rawQuery(
+      '''SELECT message_id FROM message_revision_versions
+      WHERE profile_id = ? AND companion_id = ? AND id = ?''',
+      [scope.profileId, scope.companionId, effect.revisionId],
+    );
+    if (revision.isEmpty ||
+        revision.single['message_id'] != effect.messageId) {
+      throw const ValidationException(
+        'La revisión del efecto no pertenece al mensaje.',
+      );
+    }
+    await tx.insert('trackia_message_effects', {
+      'id': effect.id,
+      'profile_id': scope.profileId,
+      'companion_id': scope.companionId,
+      'message_revision_id': effect.revisionId,
+      'target_type': effect.kind,
+      'target_id': effect.targetId,
+      'operation_id': effect.operationKey,
+      'status': effect.status.name,
+      'created_at': effect.createdAt.millisecondsSinceEpoch,
+    });
+    await tx.insert('trackia_message_effect_notes', {
+      'effect_id': effect.id,
+      'summary': effect.summary,
     });
   }
 
@@ -146,11 +160,120 @@ class MessageEffectRepository {
     });
   }
 
+  /// Efectos confirmados del mensaje de ese tipo (y objetivo si se indica):
+  /// candidatos a corregir. Con más de uno hay que preguntar al usuario.
+  Future<List<MessageEffect>> correctable(
+    String messageId,
+    String kind, {
+    String? targetId,
+  }) async => [
+    for (final e in await effectsFor(messageId))
+      if (e.status == EffectStatus.confirmed &&
+          e.kind == kind &&
+          (targetId == null || e.targetId == targetId))
+        e,
+  ];
+
+  /// Corrige de forma transaccional un efecto ya aplicado: anota el nuevo,
+  /// marca el anterior como corregido y guarda antes/después. Nada se borra.
+  /// Devuelve false, sin cambiar nada, si el anterior ya no está confirmado o
+  /// la clave del nuevo ya existe.
+  Future<bool> correct(
+    String effectId,
+    MessageEffect replacement, {
+    required String before,
+    required String after,
+    DateTime? at,
+  }) async {
+    validTrackiaId(effectId);
+    FeatureScopeValidator.requireScope(
+      requested: scope,
+      stored: FeatureScope(
+        profileId: replacement.profileId,
+        companionId: replacement.companionId,
+      ),
+    );
+    await _ensure();
+    return _db.transaction((tx) async {
+      final taken = await tx.query(
+        'trackia_message_effects',
+        columns: ['id'],
+        where: 'profile_id = ? AND companion_id = ? AND operation_id = ?',
+        whereArgs: [scope.profileId, scope.companionId, replacement.operationKey],
+      );
+      if (taken.isNotEmpty) return false;
+      final changed = await tx.update(
+        'trackia_message_effects',
+        {'status': EffectStatus.superseded.name},
+        where:
+            "profile_id = ? AND companion_id = ? AND id = ? AND status = 'confirmed'",
+        whereArgs: [scope.profileId, scope.companionId, effectId],
+      );
+      if (changed != 1) return false;
+      await _insert(tx, replacement);
+      final when = (at ?? DateTime.now()).toUtc().millisecondsSinceEpoch;
+      await tx.insert('trackia_message_effect_notes', {
+        'effect_id': effectId,
+      }, conflictAlgorithm: ConflictAlgorithm.ignore);
+      await tx.update(
+        'trackia_message_effect_notes',
+        {'reverted_at': when},
+        where: 'effect_id = ?',
+        whereArgs: [effectId],
+      );
+      await tx.insert('trackia_message_effect_corrections', {
+        'old_effect_id': effectId,
+        'new_effect_id': replacement.id,
+        'before_value': before,
+        'after_value': after,
+        'corrected_at': when,
+      });
+      return true;
+    });
+  }
+
+  /// Antes/después de un efecto corregido, o null si no fue una corrección.
+  Future<({String before, String after})?> correctionOf(
+    String effectId,
+  ) async {
+    validTrackiaId(effectId);
+    await _ensure();
+    final rows = await _db.query(
+      'trackia_message_effect_corrections',
+      where: 'old_effect_id = ?',
+      whereArgs: [effectId],
+    );
+    if (rows.isEmpty) return null;
+    return (
+      before: rows.single['before_value'] as String,
+      after: rows.single['after_value'] as String,
+    );
+  }
+
+  /// Resuelve una propuesta o un efecto incierto: confirmado o fallido.
+  /// Devuelve false si no estaba en esos estados.
+  Future<bool> resolve(String effectId, EffectStatus status) async {
+    validTrackiaId(effectId);
+    if (status != EffectStatus.confirmed && status != EffectStatus.failed) {
+      throw ArgumentError.value(status, 'status');
+    }
+    await _ensure();
+    final changed = await _db.update(
+      'trackia_message_effects',
+      {'status': status.name},
+      where:
+          "profile_id = ? AND companion_id = ? AND id = ? AND status IN ('proposed','uncertain')",
+      whereArgs: [scope.profileId, scope.companionId, effectId],
+    );
+    return changed == 1;
+  }
+
   /// Text for the model about what earlier answers to [messageId] already did.
   /// Empty when nothing was applied. Proposals never count as applied.
   Future<String> appliedEffectsSummary(String messageId) async {
     final effects = await effectsFor(messageId);
     final done = <String>[];
+    final proposed = <String>[];
     final uncertain = <String>[];
     final reverted = <String>[];
     for (final e in effects) {
@@ -158,22 +281,35 @@ class MessageEffectRepository {
       switch (e.status) {
         case EffectStatus.confirmed:
           done.add(text);
+        case EffectStatus.proposed:
+          proposed.add(text);
         case EffectStatus.uncertain:
           uncertain.add(text);
         case EffectStatus.superseded:
-          reverted.add(text);
-        case EffectStatus.proposed || EffectStatus.failed:
+          final c = await correctionOf(e.id);
+          reverted.add(
+            c == null ? text : '$text (antes: ${c.before}; ahora: ${c.after})',
+          );
+        case EffectStatus.failed:
           break;
       }
     }
-    if (done.isEmpty && uncertain.isEmpty && reverted.isEmpty) return '';
+    if (done.isEmpty &&
+        proposed.isEmpty &&
+        uncertain.isEmpty &&
+        reverted.isEmpty) {
+      return '';
+    }
     final parts = <String>[
       if (done.isNotEmpty)
         'Efectos ya aplicados por la respuesta anterior: ${done.join('; ')}.',
+      if (proposed.isNotEmpty)
+        'Propuestas SIN confirmar por el usuario (no son hechos, no las des por aplicadas): ${proposed.join('; ')}.',
       if (uncertain.isNotEmpty)
-        'Con resultado incierto (no los repitas sin comprobar): ${uncertain.join('; ')}.',
+        'Con resultado incierto (no sabes si se aplicaron; no los repitas a ciegas, pide comprobarlo al usuario): ${uncertain.join('; ')}.',
       if (reverted.isNotEmpty)
         'Corregidos o revertidos después: ${reverted.join('; ')}.',
+      'Solo lo listado como aplicado ocurrió de verdad; no afirmes otras escrituras.',
     ];
     return parts.join(' ');
   }

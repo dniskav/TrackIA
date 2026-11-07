@@ -280,10 +280,18 @@ class _AssistantChatScreenState extends State<AssistantChatScreen>
           )
           .firstOrNull;
   List<AiMessage> get transcript {
-    final visible = [
-      for (final m in messages)
-        if (!obsoleteMessages.contains(m)) m,
-    ];
+    final visible = <AiMessage>[];
+    for (final m in messages) {
+      if (obsoleteMessages.contains(m)) continue;
+      // Varias ediciones seguidas dejan eventos idénticos juntos: se muestra uno.
+      if (m.role == 'event' &&
+          visible.isNotEmpty &&
+          visible.last.role == 'event' &&
+          visible.last.text == m.text) {
+        continue;
+      }
+      visible.add(m);
+    }
     if (!widget.focusMode) return visible;
     return [
       ...visible,
